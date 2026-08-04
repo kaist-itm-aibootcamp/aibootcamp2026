@@ -254,6 +254,20 @@ h3{font-size:16px;margin:0;}
 .back-home strong{display:block;font-size:15.5px;font-weight:800;}
 .back-home small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;font-weight:600;}
 @media (max-width:640px){.back-home{padding:18px;gap:12px;}}
+
+/* ===== 강사 작성 예시 사이트 ===== */
+.instructor-card{max-width:840px;margin:20px 0;padding:20px 22px;border:1px solid var(--line);border-left:4px solid var(--brand);border-radius:12px;background:linear-gradient(180deg,var(--sky-light),#fff 65%);}
+.ic-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:11px;}
+.ic-badge{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.ic-url{font-size:15px;font-weight:800;color:var(--brand-dark);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s ease;}
+.ic-url:hover{border-bottom-color:var(--brand-dark);}
+.instructor-card p{margin:0;font-size:13.5px;line-height:1.65;color:var(--ink);}
+.instructor-card .ic-note{margin-top:11px;padding-top:11px;border-top:1px dashed var(--line);font-size:13px;color:var(--muted);}
+.ic-tip{margin-top:13px;padding:13px 15px;border:1px solid #cfe6f6;border-radius:9px;background:#fff;}
+.ic-tip strong{display:block;font-size:13px;font-weight:800;color:var(--brand-dark);margin-bottom:5px;}
+.instructor-card .ic-tip p{margin-bottom:8px;font-size:12.5px;color:var(--muted);}
+.ic-tip code{display:block;padding:10px 12px;border-radius:7px;background:#0f2231;color:#d7ecfa;font-size:12.5px;line-height:1.55;word-break:break-all;}
+@media (max-width:640px){.instructor-card{padding:18px;}}
 </style>
 </head>
 <body>
@@ -375,6 +389,19 @@ h3{font-size:16px;margin:0;}
             <pre><code id="promptPreview"></code></pre>
             <button class="copy-button" id="copyPromptBtn" type="button">복사</button>
           </div>
+        </div>
+        <div class="instructor-card">
+          <div class="ic-head">
+            <span class="ic-badge">강사 작성 예시</span>
+            <a class="ic-url" href="https://miraeitm.github.io/" target="_blank" rel="noopener">miraeitm.github.io ↗</a>
+          </div>
+          <p>강사가 직접 만들어 배포한 개인 브랜딩 사이트입니다. <strong>소개 · 관심영역 · 연구 프로젝트 · AI 봇 · 개인 라이프로그 · 연락처</strong>로 구성되어 있고, 라이프로그에는 러닝·독서·식단·투자 기록이 데이터로 정리되어 있습니다. 오늘 만들 사이트가 어디까지 확장될 수 있는지 미리 훑어보세요.</p>
+          <div class="ic-tip">
+            <strong>✍️ 여러분도 비슷한 스타일로 만들고 싶다면</strong>
+            <p>위에서 만든 프롬프트에 이 한 줄을 덧붙이면 됩니다.</p>
+            <code>https://miraeitm.github.io/ 웹사이트와 유사한 스타일로 작성해줘</code>
+          </div>
+          <p class="ic-note">💡 그리고 <strong>지금 보고 있는 이 실습 페이지 역시 Claude Cowork로 만든 것</strong>입니다. 강의자료도, 개인 사이트도 모두 같은 방식 — AI에게 요청해서 HTML 파일로 만들어졌습니다.</p>
         </div>
         <div class="tip-card">
           <h3>학술적이지 않아도 됩니다</h3>
