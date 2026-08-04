@@ -295,6 +295,16 @@ code{
   .topbar-left{flex-wrap:wrap;row-gap:8px;}
   .progress-wrap{width:100%;}
 }
+
+/* ===== 1주차 목록으로 돌아가기 ===== */
+.back-week{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:color .15s ease,border-color .15s ease,background .15s ease;}
+.back-week:hover{color:var(--brand-dark);border-color:var(--brand);background:var(--sky-light);}
+.back-home{display:flex;align-items:center;gap:15px;max-width:840px;margin:34px 0 10px;padding:20px 24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s ease,border-color .18s ease;}
+.back-home:hover{transform:translateY(-2px);border-color:var(--brand);}
+.back-home .bh-ic{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;border-radius:11px;background:var(--sky-light);color:var(--brand-dark);font-size:19px;font-weight:900;}
+.back-home strong{display:block;font-size:15.5px;font-weight:800;}
+.back-home small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;font-weight:600;}
+@media (max-width:640px){.back-home{padding:18px;gap:12px;}}
 </style>
 </head>
 <body>
@@ -306,6 +316,7 @@ code{
         <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
       </a>
       <div class="week-tag"><span class="week-num">WEEK 1</span><span class="week-title">Agentic AI 소개</span></div>
+      <a class="back-week" href="index.html">← 1주차 목록</a>
     </div>
     <div class="progress-wrap" aria-label="진행률">
       <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 이해 완료</span>
@@ -594,6 +605,11 @@ code{
         </div>
         <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s-summary" /><span>전체 Agentic AI 루프를 이해했어요</span></label></div>
       </section>
+
+      <a class="back-home" href="index.html">
+        <span class="bh-ic">←</span>
+        <span><strong>1주차 강의자료 목록으로 돌아가기</strong><small>다음 자료로 이어가려면 목록에서 골라보세요</small></span>
+      </a>
 
     </main>
   </div>
