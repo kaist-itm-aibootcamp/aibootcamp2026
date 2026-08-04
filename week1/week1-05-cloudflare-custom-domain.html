@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>나만의 도메인 연결하기 — KAIST I&amp;TM AI 부트캠프</title>
+<style>
+:root{
+  --bg:#f3f6f2;
+  --surface:#ffffff;
+  --ink:#22201d;
+  --muted:#626a64;
+  --line:#d5ddd3;
+  --brand:#2e9bdb;
+  --brand-dark:#1b6fa6;
+  --green:#2f765b;
+  --amber:#b8792e;
+  --red:#b0483f;
+  --blue:#375f8f;
+  --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12);
+  --radius:14px;
+  --sidebar-width:250px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;color:var(--ink);background:var(--bg);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",sans-serif;
+  line-height:1.65;
+}
+a{color:var(--brand-dark);}
+code{
+  padding:.1em .32em;border-radius:5px;background:#e3f1fb;color:var(--brand-dark);
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em;
+}
+button, input, select, textarea{font:inherit;}
+
+/* ---- shell / topbar (unified with Week1 pages) ---- */
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-label b{color:var(--brand-dark);}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+
+.layout{display:flex;align-items:flex-start;max-width:1320px;margin:0 auto;}
+.sidebar{
+  position:sticky;top:63px;width:var(--sidebar-width);flex:0 0 auto;height:calc(100vh - 63px);
+  overflow-y:auto;padding:22px 14px;border-right:1px solid var(--line);
+}
+.toc{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;}
+.toc a{
+  display:block;padding:9px 12px;border-radius:8px;color:var(--muted);text-decoration:none;
+  font-size:13px;font-weight:600;line-height:1.4;transition:background .15s ease, color .15s ease;
+}
+.toc a:hover{background:var(--sky-light);color:var(--brand-dark);}
+.toc a.active{background:var(--brand);color:#fff;}
+
+.content{flex:1 1 auto;min-width:0;padding:8px clamp(20px,4vw,64px) 140px;max-width:940px;}
+.section{padding-top:40px;padding-bottom:44px;border-bottom:1px solid var(--line);scroll-margin-top:76px;}
+.section:last-child{border-bottom:none;}
+.eyebrow{color:var(--brand-dark);font-weight:800;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;}
+h1{font-size:clamp(28px,4vw,42px);margin:0 0 16px;line-height:1.18;}
+h2{font-size:clamp(21px,2.8vw,28px);margin:0 0 14px;line-height:1.25;}
+h3{font-size:16px;margin:0;}
+.lead{font-size:16.5px;line-height:1.7;color:#433d37;max-width:700px;margin-bottom:8px;}
+.hero{padding-top:34px;}
+.hero-actions{margin-top:20px;}
+.button{
+  display:inline-flex;align-items:center;gap:8px;border-radius:9px;padding:11px 20px;
+  font-weight:700;font-size:14px;text-decoration:none;cursor:pointer;border:1px solid transparent;
+}
+.button.primary{background:var(--brand);color:#fff;}
+.button.primary:hover{background:var(--brand-dark);}
+.button.secondary{background:#fff;border-color:var(--line);color:var(--ink);}
+
+.panel{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:22px clamp(16px,3vw,30px);max-width:840px;margin-bottom:18px;
+}
+.panel p{margin:0 0 10px;font-size:15px;}
+.panel p:last-child{margin-bottom:0;}
+
+.tip-card{
+  display:grid;gap:10px;margin:16px 0;padding:18px;max-width:840px;
+  border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:var(--radius);
+  background:rgba(246,248,245,.9);
+}
+.tip-card h3{margin-bottom:2px;}
+.tip-card p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.55;}
+.tip-card ul{margin:4px 0 0;padding-left:18px;color:var(--muted);font-size:13.5px;line-height:1.7;}
+.tip-card ul li b{color:var(--ink);}
+
+.callout{
+  margin:16px 0;padding:14px 18px;max-width:840px;border-radius:10px;font-size:13.5px;line-height:1.6;
+  border:1px solid #cfe6f6;background:#eef6fb;color:#1b6fa6;
+}
+.callout.caution{border-color:#f0d8b8;background:#fff7ec;color:#8a5a1e;}
+.callout strong:first-child{display:block;margin-bottom:4px;}
+
+.copy-block{position:relative;overflow:hidden;border:1px solid #c9d2c6;border-radius:8px;background:#242824;margin-top:4px;max-width:840px;}
+.copy-block pre{overflow-x:auto;margin:0;padding:16px 88px 16px 16px;color:#fff7ef;font-size:13.5px;line-height:1.55;white-space:pre-wrap;}
+.copy-block code{padding:0;background:transparent;color:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+.copy-button{
+  position:absolute;top:10px;right:10px;padding:7px 12px;border-radius:6px;border:1px solid #444;
+  background:#33372f;color:#fff;font-size:12px;font-weight:700;cursor:pointer;
+}
+.copy-button:hover{background:#454a3e;}
+
+.completion-row{display:flex;justify-content:flex-end;margin-top:20px;max-width:840px;}
+.check{
+  display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:10px 14px;
+  border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);
+  font-weight:700;font-size:13.5px;cursor:pointer;transition:border-color .15s ease, background .15s ease;
+}
+.check:hover{border-color:var(--brand);}
+.check input{width:18px;height:18px;accent-color:var(--brand);}
+.check.done{border-color:var(--green);background:#eaf5ef;color:var(--green);}
+
+.next-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;max-width:840px;margin:18px 0;}
+.next-card{border:1px solid var(--line);border-radius:10px;background:#fff;padding:16px;}
+.next-card h3{color:var(--brand-dark);margin-bottom:6px;font-size:14.5px;}
+.next-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5;}
+
+.step-list{display:grid;gap:10px;max-width:840px;list-style:none;margin:0;padding:0;counter-reset:step;}
+.step-list li{
+  counter-increment:step;position:relative;padding:12px 16px 12px 46px;border:1px solid var(--line);
+  border-radius:10px;background:#fff;font-size:13.5px;color:var(--ink);
+}
+.step-list li::before{
+  content:counter(step);position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  width:22px;height:22px;border-radius:7px;background:var(--ink);color:#fff;font-size:12px;font-weight:900;
+  display:grid;place-items:center;
+}
+
+/* ---- toast / celebration ---- */
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);
+  padding:10px 18px;border-radius:999px;background:var(--ink);color:#fff;font-size:13.5px;font-weight:700;
+  opacity:0;pointer-events:none;transition:transform 240ms ease, opacity 240ms ease;z-index:40;
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.celebration{
+  position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+  background:rgba(20,24,18,.55);padding:24px;
+}
+.celebration[hidden]{display:none;}
+.celebration-canvas{position:absolute;inset:0;width:100%;height:100%;}
+.celebration-box{
+  position:relative;max-width:440px;width:100%;background:#fff;border-radius:16px;padding:30px 28px;
+  box-shadow:0 30px 70px rgba(0,0,0,.35);text-align:center;
+}
+.celebration-box h2{margin:6px 0 10px;}
+.celebration-box p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 18px;}
+.celebration-close{
+  position:absolute;top:12px;right:14px;border:none;background:transparent;font-size:13px;color:var(--muted);cursor:pointer;
+}
+
+/* ---- responsive ---- */
+@media (max-width:900px){
+  .layout{display:block;}
+  .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  .next-card-grid{grid-template-columns:1fr;}
+}
+@media (max-width:640px){
+  .topbar{flex-wrap:wrap;row-gap:10px;}
+  .topbar-left{flex-wrap:wrap;row-gap:8px;}
+  .progress-wrap{width:100%;}
+}
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="#top" class="brand">
+        <span class="brand-mark">AI</span>
+        <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+      </a>
+      <div class="week-tag"><span class="week-num">WEEK 1</span><span class="week-title">추가 실습 · 나만의 도메인 연결하기</span></div>
+    </div>
+    <div class="progress-wrap" aria-label="진행률">
+      <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+      <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+  </header>
+
+  <div class="layout" id="top">
+    <nav class="sidebar" aria-label="목차">
+      <div class="toc" id="toc">
+        <a href="#intro">왜 커스텀 도메인인가</a>
+        <a href="#practice">실습 — 프롬프트로 연동하기</a>
+        <a href="#wrap">마무리</a>
+      </div>
+    </nav>
+
+    <main class="content">
+
+      <!-- HERO -->
+      <section class="section hero">
+        <p class="eyebrow">[추가 실습 과제] · 약 15~20분 소요 (DNS 반영 대기시간 별도)</p>
+        <h1>Cloudflare로 나만의 도메인 만들어서<br/>GitHub과 연동하기</h1>
+        <p class="lead"><code>https://[내아이디].github.io</code> 대신, <code>https://내이름.com</code> 같은 나만의 주소로 내 사이트에 접속하게 만들어봅니다. 이번 실습은 방법을 우리가 미리 설명해주지 않습니다 — <strong>Claude에게 방법을 물어보는 프롬프트</strong>를 드릴 테니, 그 답변을 그대로 따라해보세요.</p>
+        <div class="hero-actions"><a href="#intro" class="button primary">시작하기 →</a></div>
+      </section>
+
+      <!-- INTRO -->
+      <section id="intro" class="section">
+        <p class="eyebrow">왜 커스텀 도메인인가</p>
+        <h2>github.io 대신 내 이름의 주소를 쓴다는 것</h2>
+        <div class="panel">
+          <p><code>[내아이디].github.io</code>는 무료이고 편리하지만, 내 브랜드나 이름이 드러나지 않습니다. <strong>도메인(domain)</strong>은 인터넷 주소에 붙는 이름표이고, 이를 구입해 내 GitHub Pages 사이트에 연결하면 <code>내이름.com</code> 같은 주소로 포트폴리오를 소개할 수 있습니다.</p>
+          <p><strong>Cloudflare</strong>는 도메인을 직접 등록(Cloudflare Registrar)하거나, 다른 곳에서 산 도메인을 가져와 관리할 수 있게 해주는 서비스입니다. DNS 관리·보안·속도 개선 기능은 무료로 제공하지만, <strong>도메인 자체는 유료</strong>입니다 (대부분 연 1만 원 안팎, .com 기준). "무료 도메인"이 아니라 "Cloudflare의 무료 DNS 관리 기능"이라는 점을 헷갈리지 마세요.</p>
+        </div>
+        <div class="tip-card">
+          <h3>이번 실습이 다른 점</h3>
+          <p>지금까지는 이 페이지가 단계를 하나씩 설명해드렸지만, 이번엔 반대로 해봅니다. 아래 프롬프트를 Claude에게 그대로 전달하면, Claude가 여러분의 상황에 맞춰 순서를 설명해줍니다. <strong>그 답변을 보면서 실제로 따라 해보는 것</strong>이 이번 실습의 핵심입니다 — 실전에서 "이런 걸 어떻게 하는지" 궁금할 때마다 이렇게 물어보면 됩니다.</p>
+        </div>
+        <div class="completion-row">
+          <label class="check"><input type="checkbox" data-progress="intro-done" /><span>커스텀 도메인과 Cloudflare의 역할을 이해했어요</span></label>
+        </div>
+      </section>
+
+      <!-- PRACTICE -->
+      <section id="practice" class="section">
+        <p class="eyebrow">실습</p>
+        <h2>이 프롬프트를 Claude에게 그대로 물어보세요</h2>
+        <div class="panel">
+          <p>아래 프롬프트를 복사해서 Claude(Cowork나 claude.ai 어디든 좋습니다)에게 붙여넣으세요. 도메인을 아직 안 사셨다면 그 부분부터, 이미 갖고 계시다면 연동 단계부터 안내받을 수 있습니다.</p>
+        </div>
+        <div class="copy-block">
+          <pre><code>나는 코딩 경험이 없는 초보자야.
+이미 만들어둔 GitHub Pages 사이트(https://[내아이디].github.io)에
+내가 새로 구입할 나만의 도메인(예: mysite.com)을 연결하고 싶어.
+
+Cloudflare를 이용해서 이 작업을 처음부터 끝까지 순서대로 설명해줘.
+
+조건:
+- 도메인을 아직 안 샀다면 어디서/어떻게 사는 게 좋은지, 예상 비용도 알려줘
+- Cloudflare 계정 생성 → 네임서버 변경 → DNS 레코드 추가 →
+  GitHub 저장소의 Custom domain 설정 → HTTPS 적용까지 전부 포함해줘
+- 각 단계마다 실제로 클릭해야 하는 버튼이나 메뉴 이름을 구체적으로 알려줘
+- 네임서버, DNS, CNAME 같은 용어가 나오면 짧게 뜻도 설명해줘</code></pre>
+          <button class="copy-button" type="button" data-copy="나는 코딩 경험이 없는 초보자야.&#10;이미 만들어둔 GitHub Pages 사이트(https://[내아이디].github.io)에&#10;내가 새로 구입할 나만의 도메인(예: mysite.com)을 연결하고 싶어.&#10;&#10;Cloudflare를 이용해서 이 작업을 처음부터 끝까지 순서대로 설명해줘.&#10;&#10;조건:&#10;- 도메인을 아직 안 샀다면 어디서/어떻게 사는 게 좋은지, 예상 비용도 알려줘&#10;- Cloudflare 계정 생성 → 네임서버 변경 → DNS 레코드 추가 →&#10;  GitHub 저장소의 Custom domain 설정 → HTTPS 적용까지 전부 포함해줘&#10;- 각 단계마다 실제로 클릭해야 하는 버튼이나 메뉴 이름을 구체적으로 알려줘&#10;- 네임서버, DNS, CNAME 같은 용어가 나오면 짧게 뜻도 설명해줘">복사</button>
+        </div>
+        <ol class="step-list">
+          <li>위 프롬프트를 복사해서 Claude에게 붙여넣고 답변을 받습니다.</li>
+          <li>답변에 나온 순서를 하나씩 그대로 따라 합니다 — 막히는 단계가 있으면 그 화면을 캡처해서 Claude에게 다시 보여주고 물어보세요.</li>
+          <li>연동이 끝나면 <code>내가 산 도메인</code>으로 접속해 내 사이트가 뜨는지 확인합니다.</li>
+        </ol>
+        <div class="callout caution">
+          <strong>참고할 점</strong>
+          네임서버를 바꾸거나 DNS 레코드를 추가한 직후에는 바로 반영되지 않고 최대 24~48시간 걸릴 수 있습니다. 안 될 때는 오류가 아니라 "아직 전파 중"인 경우가 많으니 몇 시간 뒤 다시 확인해보세요. 또한 도메인 등록은 유료이므로, 결제 전 가격과 자동갱신 여부를 꼭 확인하세요.
+        </div>
+        <div class="completion-row">
+          <label class="check"><input type="checkbox" data-progress="practice-done" /><span>프롬프트를 Claude에게 물어보고 답변을 따라 진행해봤어요</span></label>
+        </div>
+      </section>
+
+      <!-- WRAP -->
+      <section id="wrap" class="section">
+        <p class="eyebrow">Finish</p>
+        <h2>이제 모르는 방법은, 물어보고 따라 하면 됩니다</h2>
+        <p class="lead">앞으로도 "이런 걸 어떻게 하지?" 싶을 때마다, 지금처럼 상황을 구체적으로 설명한 프롬프트로 Claude에게 방법을 물어보고 그 답을 따라 해보세요. 그게 이 부트캠프에서 가장 중요한 습관입니다.</p>
+        <div class="next-card-grid">
+          <div class="next-card">
+            <h3>실습으로 돌아가기</h3>
+            <p><a href="week1-03-js-financial-planner.html">Week1 웹앱 만들기 실습</a>으로 돌아가 이어서 진행하세요.</p>
+          </div>
+          <div class="next-card">
+            <h3>포트폴리오에 반영</h3>
+            <p>도메인 연동이 끝나면, 개인 브랜딩 사이트와 이력서·명함에도 새 주소를 적용해보세요.</p>
+          </div>
+        </div>
+        <div class="completion-row">
+          <label class="check"><input type="checkbox" data-progress="wrap-done" /><span>전체 실습을 완료했어요!</span></label>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Celebration -->
+  <div class="celebration" id="celebration" role="dialog" aria-modal="true" aria-labelledby="celebration-title" hidden>
+    <canvas class="celebration-canvas" id="celebrationCanvas" aria-hidden="true"></canvas>
+    <div class="celebration-box">
+      <button type="button" class="celebration-close" id="celebrationClose" aria-label="닫기">닫기</button>
+      <p class="eyebrow" style="margin-bottom:2px;">All Steps Complete</p>
+      <h2>축하합니다 🎉</h2>
+      <p>이제 나만의 도메인으로 내 사이트에 접속할 수 있습니다.<br/>모르는 것은 언제든 구체적으로 물어보면 됩니다.</p>
+      <button type="button" class="button primary" id="celebrationCloseBtn">마무리</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">복사했습니다</div>
+
+<script>
+/* =========================================================
+   1. copy buttons (generic data-copy) + toast
+   ========================================================= */
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove('show'), 1600);
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.setAttribute('readonly','');
+  ta.style.position = 'fixed'; ta.style.left = '-9999px';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch(_e){}
+  ta.remove();
+}
+async function copyText(text){
+  if (navigator.clipboard && window.isSecureContext){
+    try { await navigator.clipboard.writeText(text); return; } catch(_e){}
+  }
+  fallbackCopy(text);
+}
+document.querySelectorAll('.copy-button[data-copy]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    await copyText(btn.dataset.copy);
+    showToast('복사했습니다');
+  });
+});
+
+/* =========================================================
+   2. sidebar scroll-spy
+   ========================================================= */
+const tocLinks = Array.from(document.querySelectorAll('.toc a'));
+const sections = tocLinks.map(l => document.querySelector(l.getAttribute('href'))).filter(Boolean);
+function updateActiveToc(){
+  if (!sections.length) return;
+  const current = sections.reduce((active, s) => (s.getBoundingClientRect().top <= 130 ? s : active), sections[0]);
+  tocLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + current.id));
+}
+window.addEventListener('scroll', updateActiveToc, { passive:true });
+updateActiveToc();
+
+/* =========================================================
+   3. progress + celebration (in-memory only, no persistence)
+   ========================================================= */
+const checks = Array.from(document.querySelectorAll('.check input[type="checkbox"]'));
+const progressCount = document.getElementById('progressCount');
+const progressTotal = document.getElementById('progressTotal');
+const progressBar = document.getElementById('progressBar');
+progressTotal.textContent = checks.length;
+
+const celebration = document.getElementById('celebration');
+const celebrationCanvas = document.getElementById('celebrationCanvas');
+const celebrationClose = document.getElementById('celebrationClose');
+const celebrationCloseBtn = document.getElementById('celebrationCloseBtn');
+let confettiRAF = null;
+
+function runConfetti(){
+  const ctx = celebrationCanvas.getContext('2d');
+  function resize(){ celebrationCanvas.width = window.innerWidth; celebrationCanvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  const colors = ['#2e9bdb','#ffd23f','#ff2f92','#3cff6a','#375f8f'];
+  const pieces = Array.from({ length: 140 }, () => ({
+    x: Math.random() * celebrationCanvas.width,
+    y: -20 - Math.random() * celebrationCanvas.height,
+    w: 6 + Math.random() * 6,
+    h: 8 + Math.random() * 10,
+    speed: 2 + Math.random() * 3,
+    rot: Math.random() * Math.PI,
+    rotSpeed: (Math.random() - 0.5) * 0.2,
+    color: colors[Math.floor(Math.random() * colors.length)],
+  }));
+  let frame = 0;
+  function tick(){
+    frame++;
+    ctx.clearRect(0, 0, celebrationCanvas.width, celebrationCanvas.height);
+    pieces.forEach(p => {
+      p.y += p.speed; p.rot += p.rotSpeed;
+      if (p.y > celebrationCanvas.height + 20) p.y = -20;
+      ctx.save();
+      ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    if (frame < 260) confettiRAF = requestAnimationFrame(tick);
+  }
+  tick();
+}
+function showCelebration(){ celebration.hidden = false; runConfetti(); }
+function closeCelebration(){ celebration.hidden = true; if (confettiRAF) cancelAnimationFrame(confettiRAF); }
+celebrationClose.addEventListener('click', closeCelebration);
+celebrationCloseBtn.addEventListener('click', closeCelebration);
+
+let celebrated = false;
+function updateProgress(){
+  const done = checks.filter(c => c.checked).length;
+  progressCount.textContent = done;
+  progressBar.style.width = (checks.length ? done / checks.length * 100 : 0) + '%';
+  if (done === checks.length && checks.length > 0 && !celebrated){
+    celebrated = true;
+    showCelebration();
+  }
+}
+checks.forEach(c => {
+  c.closest('.check').classList.toggle('done', c.checked);
+  c.addEventListener('change', () => {
+    c.closest('.check').classList.toggle('done', c.checked);
+    updateProgress();
+  });
+});
+updateProgress();
+</script>
+</body>
+</html>

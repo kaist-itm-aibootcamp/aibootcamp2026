@@ -1,0 +1,1390 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>웹앱 만들기 — KAIST I&amp;TM AI 부트캠프</title>
+<style>
+:root{
+  --bg:#f3f6f2;
+  --surface:#ffffff;
+  --ink:#22201d;
+  --muted:#626a64;
+  --line:#d5ddd3;
+  --brand:#2e9bdb;
+  --brand-dark:#1b6fa6;
+  --green:#2f765b;
+  --amber:#b8792e;
+  --red:#b0483f;
+  --blue:#375f8f;
+  --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12);
+  --radius:14px;
+  --sidebar-width:250px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;color:var(--ink);background:var(--bg);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",sans-serif;
+  line-height:1.65;
+}
+a{color:var(--brand-dark);}
+code{
+  padding:.1em .32em;border-radius:5px;background:#e3f1fb;color:var(--brand-dark);
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em;
+}
+button, input, select, textarea{font:inherit;}
+
+/* ---- shell / topbar (unified with Week1 pages) ---- */
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-label b{color:var(--brand-dark);}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+
+.layout{display:flex;align-items:flex-start;max-width:1320px;margin:0 auto;}
+.sidebar{
+  position:sticky;top:63px;width:var(--sidebar-width);flex:0 0 auto;height:calc(100vh - 63px);
+  overflow-y:auto;padding:22px 14px;border-right:1px solid var(--line);
+}
+.toc{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;}
+.toc a{
+  display:block;padding:9px 12px;border-radius:8px;color:var(--muted);text-decoration:none;
+  font-size:13px;font-weight:600;line-height:1.4;transition:background .15s ease, color .15s ease;
+}
+.toc a:hover{background:var(--sky-light);color:var(--brand-dark);}
+.toc a.active{background:var(--brand);color:#fff;}
+
+.content{flex:1 1 auto;min-width:0;padding:8px clamp(20px,4vw,64px) 140px;max-width:940px;}
+.section{padding-top:40px;padding-bottom:44px;border-bottom:1px solid var(--line);scroll-margin-top:76px;}
+.section:last-child{border-bottom:none;}
+.eyebrow{color:var(--brand-dark);font-weight:800;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px;}
+h1{font-size:clamp(28px,4vw,42px);margin:0 0 16px;line-height:1.18;}
+h2{font-size:clamp(21px,2.8vw,28px);margin:0 0 14px;line-height:1.25;}
+h3{font-size:16px;margin:0;}
+.lead{font-size:16.5px;line-height:1.7;color:#433d37;max-width:700px;margin-bottom:8px;}
+.hero{padding-top:34px;}
+.hero-actions{margin-top:20px;}
+.button{
+  display:inline-flex;align-items:center;gap:8px;border-radius:9px;padding:11px 20px;
+  font-weight:700;font-size:14px;text-decoration:none;cursor:pointer;border:1px solid transparent;
+}
+.button.primary{background:var(--brand);color:#fff;}
+.button.primary:hover{background:var(--brand-dark);}
+.button.secondary{background:#fff;border-color:var(--line);color:var(--ink);}
+
+.panel{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:22px clamp(16px,3vw,30px);max-width:840px;margin-bottom:18px;
+}
+.panel p{margin:0 0 10px;font-size:15px;}
+.panel p:last-child{margin-bottom:0;}
+
+.workshop{display:grid;gap:14px;max-width:840px;}
+.workshop-step{border:1px solid var(--line);border-radius:10px;background:#fff;padding:16px 18px;}
+.workshop-step-header{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.ws-num{display:grid;width:28px;height:28px;flex:0 0 auto;place-items:center;border-radius:8px;color:#fff;background:var(--ink);font-weight:900;font-size:13px;}
+.workshop-step p{margin:0;color:var(--muted);font-size:14px;}
+
+.tip-card{
+  display:grid;gap:10px;margin:16px 0;padding:18px;max-width:840px;
+  border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:var(--radius);
+  background:rgba(246,248,245,.9);
+}
+.tip-card h3{margin-bottom:2px;}
+.tip-card p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.55;}
+
+.callout{
+  margin:16px 0;padding:14px 18px;max-width:840px;border-radius:10px;font-size:13.5px;line-height:1.6;
+  border:1px solid #cfe6f6;background:#eef6fb;color:#1b6fa6;
+}
+.callout.caution{border-color:#f0d8b8;background:#fff7ec;color:#8a5a1e;}
+.callout strong:first-child{display:block;margin-bottom:4px;}
+
+.copy-block{position:relative;overflow:hidden;border:1px solid #c9d2c6;border-radius:8px;background:#242824;margin-top:4px;max-width:840px;}
+.copy-block pre{overflow-x:auto;margin:0;padding:16px 88px 16px 16px;color:#fff7ef;font-size:13.5px;line-height:1.55;white-space:pre-wrap;}
+.copy-block code{padding:0;background:transparent;color:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+.copy-button{
+  position:absolute;top:10px;right:10px;padding:7px 12px;border-radius:6px;border:1px solid #444;
+  background:#33372f;color:#fff;font-size:12px;font-weight:700;cursor:pointer;
+}
+.copy-button:hover{background:#454a3e;}
+
+.completion-row{display:flex;justify-content:flex-end;margin-top:20px;max-width:840px;}
+.check{
+  display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:10px 14px;
+  border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);
+  font-weight:700;font-size:13.5px;cursor:pointer;transition:border-color .15s ease, background .15s ease;
+}
+.check:hover{border-color:var(--brand);}
+.check input{width:18px;height:18px;accent-color:var(--brand);}
+.check.done{border-color:var(--green);background:#eaf5ef;color:var(--green);}
+
+.next-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;max-width:840px;margin:18px 0;}
+.next-card{border:1px solid var(--line);border-radius:10px;background:#fff;padding:16px;}
+.next-card h3{color:var(--brand-dark);margin-bottom:6px;font-size:14.5px;}
+.next-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5;}
+
+/* ---- live demo sample links (맞춤 사이트 예시) ---- */
+.tip-card ul{margin:2px 0 0;padding-left:18px;color:var(--muted);font-size:13.5px;line-height:1.75;}
+.tip-card ul li b{color:var(--ink);}
+.sub-head{margin:34px 0 6px;font-size:19px;font-weight:800;color:var(--ink);max-width:840px;}
+.demo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;max-width:840px;margin:14px 0 6px;}
+.demo-link{
+  display:flex;flex-direction:column;gap:8px;padding:18px 16px 16px;text-decoration:none;color:var(--ink);
+  border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:var(--shadow);
+  transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.demo-link:hover{transform:translateY(-3px);border-color:var(--brand);box-shadow:0 18px 40px rgba(54,42,31,.16);}
+.demo-emoji{font-size:26px;line-height:1;}
+.demo-link h3{font-size:14.5px;color:var(--brand-dark);margin:0;}
+.demo-who{font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.02em;}
+.demo-link p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.55;flex:1 1 auto;}
+.demo-open{font-size:12.5px;font-weight:800;color:var(--brand-dark);}
+@media (max-width:760px){ .demo-grid{grid-template-columns:1fr;} }
+
+/* ---- toast / celebration ---- */
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);
+  padding:10px 18px;border-radius:999px;background:var(--ink);color:#fff;font-size:13.5px;font-weight:700;
+  opacity:0;pointer-events:none;transition:transform 240ms ease, opacity 240ms ease;z-index:40;
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.celebration{
+  position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+  background:rgba(20,24,18,.55);padding:24px;
+}
+.celebration[hidden]{display:none;}
+.celebration-canvas{position:absolute;inset:0;width:100%;height:100%;}
+.celebration-box{
+  position:relative;max-width:440px;width:100%;background:#fff;border-radius:16px;padding:30px 28px;
+  box-shadow:0 30px 70px rgba(0,0,0,.35);text-align:center;
+}
+.celebration-box h2{margin:6px 0 10px;}
+.celebration-box p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 18px;}
+.celebration-close{
+  position:absolute;top:12px;right:14px;border:none;background:transparent;font-size:13px;color:var(--muted);cursor:pointer;
+}
+
+/* ---- canvas card (shared by demo widgets) ---- */
+.canvas-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:22px clamp(16px,3vw,30px);max-width:840px;margin-bottom:14px;
+}
+.canvas-card canvas{display:block;max-width:100%;background:#fafcf9;border:1px solid var(--line);border-radius:10px;}
+
+/* ---- file structure diagram (HTML/CSS/JS) ---- */
+.filediagram{border:1px solid var(--line);border-radius:var(--radius);background:#20241f;max-width:840px;margin:16px 0;overflow:hidden;box-shadow:var(--shadow);}
+.filediagram-head{padding:10px 16px;font-size:12.5px;font-weight:800;color:#cfe6c9;background:#181c17;border-bottom:1px solid #333;}
+.filediagram-code{margin:0;padding:16px;color:#d8e0d4;font-size:13px;line-height:1.75;overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre;}
+.filediagram-code .fd-html{display:inline-block;background:rgba(63,181,130,.22);border-radius:4px;}
+.filediagram-code .fd-css{display:inline-block;background:rgba(90,170,230,.22);border-radius:4px;}
+.filediagram-code .fd-js{display:inline-block;background:rgba(230,170,70,.22);border-radius:4px;}
+.filediagram-legend{display:flex;gap:16px;flex-wrap:wrap;padding:12px 16px;background:#181c17;font-size:12.5px;color:#c9d1c6;}
+.filediagram-legend span{display:inline-flex;align-items:center;gap:6px;}
+.fd-dot{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 auto;}
+.fd-dot-html{background:#3fb582;}
+.fd-dot-css{background:#5aaae6;}
+.fd-dot-js{background:#e6aa46;}
+
+/* ---- live JS demo: mini calculator (intro) ---- */
+.calc-widget{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:6px 0;}
+.calc-widget input[type=number]{
+  width:110px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:16px;
+  text-align:center;background:#fafcf9;color:var(--ink);
+}
+.calc-widget select{
+  padding:10px 10px;border:1px solid var(--line);border-radius:8px;font-size:16px;background:#fafcf9;color:var(--ink);
+}
+.calc-widget .eq{font-size:18px;color:var(--muted);font-weight:800;}
+.calc-result{
+  min-width:120px;padding:10px 16px;border-radius:8px;background:var(--sky-light);border:1px solid #cfe6f6;
+  font-size:20px;font-weight:900;color:var(--brand-dark);text-align:center;
+}
+
+/* ---- game ---- */
+.game-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;}
+.game-hud{display:flex;justify-content:space-between;width:100%;max-width:480px;font-size:13.5px;font-weight:700;color:var(--muted);}
+.game-hud b{color:var(--brand-dark);}
+#gameCanvas{background:#0a0e18;border-radius:10px;border:1px solid var(--line);touch-action:none;outline:none;}
+.game-msg{min-height:22px;font-size:13.5px;font-weight:700;color:var(--green);text-align:center;}
+.game-controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+
+/* ---- financial planner ---- */
+.planner-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:16px;}
+.planner-field label{display:block;font-size:12.5px;font-weight:800;color:var(--brand-dark);margin-bottom:6px;}
+.planner-field .val{font-weight:900;color:var(--ink);}
+.planner-field input[type=range]{width:100%;accent-color:var(--brand);}
+.planner-result{margin-top:14px;padding:14px 16px;border-radius:10px;background:var(--sky-light);border:1px solid #cfe6f6;font-size:14px;}
+.planner-result b{color:var(--brand-dark);}
+.planner-legend{display:flex;gap:18px;margin-top:10px;font-size:12.5px;color:var(--muted);flex-wrap:wrap;}
+.planner-legend span{display:inline-flex;align-items:center;gap:6px;}
+.planner-legend i{width:14px;height:4px;border-radius:2px;display:inline-block;}
+
+/* ---- monte carlo ---- */
+.mc-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.mc-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px;}
+.mc-stat{padding:12px 14px;border-radius:10px;background:#fafcf9;border:1px solid var(--line);text-align:center;}
+.mc-stat .lbl{font-size:11.5px;color:var(--muted);font-weight:700;}
+.mc-stat .num{font-size:17px;font-weight:900;color:var(--brand-dark);margin-top:2px;}
+.mc-legend{display:flex;gap:16px;margin-top:10px;font-size:12.5px;color:var(--muted);flex-wrap:wrap;}
+.mc-legend span{display:inline-flex;align-items:center;gap:6px;}
+.mc-legend i{width:14px;height:10px;border-radius:2px;display:inline-block;}
+
+/* ---- quotes carousel ---- */
+.quote-card{
+  position:relative;min-height:150px;display:flex;flex-direction:column;justify-content:center;
+  padding:26px clamp(18px,4vw,34px);text-align:center;
+}
+.quote-text{font-size:19px;font-weight:700;line-height:1.55;color:var(--ink);max-width:680px;margin:0 auto 12px;opacity:0;transition:opacity .35s ease;}
+.quote-text.show{opacity:1;}
+.quote-sub{font-size:13px;color:var(--muted);opacity:0;transition:opacity .35s ease;}
+.quote-sub.show{opacity:1;}
+.quote-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:16px;}
+.quote-navbtn{
+  width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink);
+  font-size:15px;cursor:pointer;display:grid;place-items:center;
+}
+.quote-navbtn:hover{border-color:var(--brand);color:var(--brand-dark);}
+.quote-dots{display:flex;gap:6px;}
+.quote-dot{width:7px;height:7px;border-radius:50%;background:var(--line);cursor:pointer;border:none;padding:0;}
+.quote-dot.active{background:var(--brand);width:18px;border-radius:4px;}
+
+/* ---- responsive ---- */
+@media (max-width:900px){
+  .layout{display:block;}
+  .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  .planner-grid, .next-card-grid, .mc-stat-grid{grid-template-columns:1fr;}
+}
+@media (max-width:640px){
+  .topbar{flex-wrap:wrap;row-gap:10px;}
+  .topbar-left{flex-wrap:wrap;row-gap:8px;}
+  .progress-wrap{width:100%;}
+}
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="#top" class="brand">
+        <span class="brand-mark">AI</span>
+        <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+      </a>
+      <div class="week-tag"><span class="week-num">WEEK 1</span><span class="week-title">웹앱 만들기</span></div>
+    </div>
+    <div class="progress-wrap" aria-label="진행률">
+      <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+      <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+  </header>
+
+  <div class="layout" id="top">
+    <nav class="sidebar" aria-label="목차">
+      <div class="toc" id="toc">
+        <a href="#intro">소개 — 자바스크립트란</a>
+        <a href="#game">Part 1 · 미니 갤러그 게임</a>
+        <a href="#planner">Part 2 · 금융 플래너 만들기</a>
+        <a href="#montecarlo">Part 3 · 몬테카를로 시뮬레이션</a>
+        <a href="#mindset">Part 4 · 시장 멘탈 관리</a>
+        <a href="#deploy">Part 5 · 배포하고 연결하기</a>
+        <a href="#ideas">더 알아보기 · HTML로 할 수 있는 것들</a>
+      </div>
+    </nav>
+
+    <main class="content">
+
+      <!-- HERO -->
+      <section class="section hero">
+        <p class="eyebrow">1주차 · 두 번째 과제 · 약 30분 소요</p>
+        <h1>웹앱 만들기</h1>
+        <p class="lead">지난 과제에서는 정적인 자기소개 페이지를 만들었습니다. 이번에는 HTML 파일 안에 <code>&lt;script&gt;</code>로 실제 프로그램(계산·그래프·게임)을 넣어, 브라우저 안에서 바로 실행되는 앱을 만들어봅니다.</p>
+        <div class="hero-actions"><a href="#intro" class="button primary">시작하기 →</a></div>
+      </section>
+
+      <!-- INTRO: what is javascript -->
+      <section id="intro" class="section">
+        <p class="eyebrow">시작하기 전에</p>
+        <h2>자바스크립트란? — HTML 안에 들어있는 진짜 프로그램</h2>
+        <div class="panel">
+          <p>HTML 파일 하나는 사실 세 가지 언어로 이루어져 있습니다.</p>
+        </div>
+        <div class="tip-card">
+          <h3>HTML · CSS · JavaScript, 세 가지 역할</h3>
+          <p><strong>HTML</strong>은 뼈대(무엇이 있는지 — 제목, 버튼, 입력창 같은 요소들), <strong>CSS</strong>는 겉모습(어떻게 보이는지 — 색상, 크기, 배치), <strong>JavaScript</strong>는 동작(무엇을 계산하고, 무엇이 움직이는지)을 담당합니다. 여기에 <code>&lt;script&gt;...&lt;/script&gt;</code> 태그로 JavaScript 코드를 끼워 넣으면, 그 코드가 서버 없이 <strong>내 브라우저 안에서 그대로 실행</strong>됩니다. 세 가지 모두 이 파일 하나에 들어있고, 별도의 서버 없이 브라우저가 전부 처리합니다. (2주차에서는 반대로 "왜 서버가 필요한 경우도 있는지"를 다룹니다.)</p>
+        </div>
+        <div class="filediagram">
+          <div class="filediagram-head">📄 sample.html — 세 언어가 파일 하나 안에 이렇게 들어있습니다</div>
+          <pre class="filediagram-code">&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+<span class="fd-css">  &lt;style&gt;
+    button { background: skyblue; border-radius: 8px; }
+  &lt;/style&gt;</span>
+&lt;/head&gt;
+&lt;body&gt;
+<span class="fd-html">  &lt;button id="hi"&gt;눌러보세요&lt;/button&gt;</span>
+<span class="fd-js">  &lt;script&gt;
+    document.getElementById('hi').onclick = () =&gt; alert('안녕!');
+  &lt;/script&gt;</span>
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+          <div class="filediagram-legend">
+            <span><i class="fd-dot fd-dot-html"></i>HTML — 뼈대: 버튼이 하나 있다</span>
+            <span><i class="fd-dot fd-dot-css"></i>CSS — 겉모습: 하늘색 배경, 둥근 모서리</span>
+            <span><i class="fd-dot fd-dot-js"></i>JavaScript — 동작: 누르면 알림창이 뜬다</span>
+          </div>
+        </div>
+        <div class="panel">
+          <p>말로만 들으면 감이 안 오니, 아주 간단한 <strong>계산기</strong>로 직접 확인해봅시다. 숫자를 바꾸면 결과가 바로 바뀌는데, 이걸 만드는 JavaScript 코드는 몇 줄뿐입니다.</p>
+        </div>
+        <div class="canvas-card">
+          <div class="calc-widget">
+            <input type="number" id="calcA" value="12" />
+            <select id="calcOp">
+              <option value="+">+</option>
+              <option value="-">−</option>
+              <option value="*">×</option>
+              <option value="/">÷</option>
+            </select>
+            <input type="number" id="calcB" value="7" />
+            <span class="eq">=</span>
+            <div class="calc-result" id="calcResult">19</div>
+          </div>
+          <div class="copy-block" style="margin-top:14px;">
+            <pre><code>function calculate(a, b, op) {
+  if (op === "+") return a + b;
+  if (op === "-") return a - b;
+  if (op === "*") return a * b;
+  if (op === "/") return a / b;
+}
+// 숫자나 연산자를 바꿀 때마다 이 함수가 다시 실행되어
+// 화면의 결과(calcResult)를 즉시 갱신합니다.</code></pre>
+          </div>
+          <p style="margin-top:10px;font-size:13px;color:var(--muted);">↑ 실제로 이 페이지 안에 들어있는 코드를 그대로 옮긴 것입니다. 이런 코드 블록 하나가 이번 과제에서 만들 게임·그래프·시뮬레이션의 전부를 이루는 재료입니다 — 규모만 커질 뿐 원리는 똑같습니다.</p>
+        </div>
+        <div class="completion-row">
+          <label class="check"><input type="checkbox" data-progress="intro-done" /><span>자바스크립트가 브라우저 안에서 실행된다는 걸 이해했어요</span></label>
+        </div>
+      </section>
+
+      <!-- PART 1: GAME -->
+      <section id="game" class="section">
+        <p class="eyebrow">Part 1</p>
+        <h2>샘플 예제 — 미니 갤러그 게임</h2>
+        <div class="panel">
+          <p>계산기나 그래프뿐 아니라, <strong>게임</strong>도 결국 같은 재료(HTML+JavaScript)로 만들어집니다. 아래는 이 파일 안에 통째로 들어있는 미니 갤러그 게임입니다 — 외부 파일이나 앱스토어 설치 없이, 이 페이지만으로 바로 플레이할 수 있습니다. 적도 가만히 있지 않고 이따금 반격해오니 조심하세요.</p>
+        </div>
+        <div class="canvas-card">
+          <div class="game-wrap">
+            <div class="game-hud">
+              <span>점수: <b id="gameScore">0</b></span>
+              <span>남은 목숨: <b id="gameLives">3</b></span>
+            </div>
+            <canvas id="gameCanvas" width="480" height="360" tabindex="0"></canvas>
+            <div class="game-msg" id="gameMsg">← → 이동 · Space 발사 · 아래 버튼으로 시작</div>
+            <div class="game-controls">
+              <button class="button primary" id="gameStartBtn" type="button">게임 시작 / 다시 시작</button>
+              <button class="button secondary" id="gamePauseBtn" type="button">일시정지</button>
+            </div>
+          </div>
+        </div>
+        <div class="tip-card">
+          <h3>이 게임도 결국 좌표 계산일 뿐입니다</h3>
+          <p>화면 안의 모든 도형(내 우주선, 총알, 적, 적의 반격 총알)은 <code>x, y</code> 좌표를 가진 숫자일 뿐이고, 매 프레임(1초에 60번)마다 그 숫자를 조금씩 바꾸고 <code>&lt;canvas&gt;</code>에 다시 그리는 것이 게임의 전부입니다. 충돌 판정도 두 도형의 좌표가 겹치는지 계산하는 것뿐입니다.</p>
+        </div>
+        <div class="completion-row">
+          <label class="check"><input type="checkbox" data-progress="game-done" /><span>미니 갤러그 게임을 플레이해봤어요</span></label>
+        </div>
+      </section>
+
+      <!-- PART 2: FINANCIAL PLANNER -->
+      <section id="planner" class="section">
+        <p class="eyebrow">Part 2</p>
+        <h2>금융 플래너 만들기 — 복리 계산 그래프</h2>
+        <div class="panel">
+          <p>연간 저축액과 수익률만 알면, 복리 효과로 자산이 얼마나 불어나는지 그래프로 볼 수 있습니다. 아래 슬라이더를 움직여 직접 확인해보세요 — 이것이 우리가 만들 금융 플래너의 <strong>예시</strong>입니다.</p>
+        </div>
+        <div class="canvas-card">
+          <div class="planner-grid">
+            <div class="planner-field">
+              <label for="plAnnual">연간 저축액 — <span class="val" id="plAnnualVal">1,800만원</span></label>
+              <input type="range" id="plAnnual" min="100" max="5000" step="50" value="1800" />
+            </div>
+            <div class="planner-field">
+              <label for="plRate">연 수익률 — <span class="val" id="plRateVal">10%</span></label>
+              <input type="range" id="plRate" min="0" max="15" step="0.5" value="10" />
+            </div>
+            <div class="planner-field">
+              <label for="plYears">투자 기간 — <span class="val" id="plYearsVal">25년</span></label>
+              <input type="range" id="plYears" min="5" max="40" step="1" value="25" />
+            </div>
+          </div>
+          <canvas id="plannerCanvas" width="780" height="300"></canvas>
+          <div class="planner-legend">
+            <span><i style="background:var(--line);"></i>내가 넣은 원금 누적</span>
+            <span><i style="background:var(--brand);"></i>복리 적용 총 자산</span>
+          </div>
+          <div class="planner-result" id="plannerResult"></div>
+        </div>
+        <div class="panel">
+          <p><strong>이제 위 예시와 같은 도구를 직접 만들어달라고 요청해보세요.</strong> 아래 프롬프트는 지금 슬라이더 값을 그대로 반영해서 자동으로 만들어집니다.</p>
+        </div>
+        <div class="copy-block">
+          <pre><code id="plannerPrompt"></code></pre>
+          <button class="copy-button" id="plannerCopyBtn" type="button">복사</button>
+        </div>
+        <div class="completion-row">
+          <label class="check"><input type="checkbox" data-progress="planner-done" /><span>슬라이더로 복리 그래프를 조작해봤어요</span></label>
+        </div>
+      </section>
+
+      <!-- PART 3: MONTE CARLO -->
+      <section id="montecarlo" class="section">
+        <p class="eyebrow">Part 3</p>
+        <h2>단순 계산으로는 부족하다 — S&amp;P 500 몬테카를로 시뮬레이션</h2>
+        <div class="panel">
+          <p>위 그래프는 매년 <strong>정확히 같은 수익률</strong>이 반복된다고 가정합니다. 하지만 실제 주식 시장은 어떤 해는 +30%, 어떤 해는 -20%처럼 들쭉날쭉합니다. <strong>몬테카를로 시뮬레이션</strong>은 "정답 하나"를 계산하는 대신, 무작위 상황을 수백 번 반복해서 <strong>가능한 결과들의 분포</strong>를 보여주는 방법입니다.</p>
+          <p>여기서는 실제 <strong>S&amp;P 500의 1928~2024년(97개년) 연간 수익률</strong> 데이터를 이 파일 안에 그대로 담아두고, 그중에서 매년 무작위로 하나씩 뽑아(복원추출) 시뮬레이션합니다.</p>
+        </div>
+        <div class="canvas-card">
+          <div class="mc-controls">
+            <span style="font-size:13.5px;color:var(--muted);">현재 조건: Part 2에서 설정한 <b id="mcCondText">연간 1,800만원 · 25년</b>을 그대로 사용합니다.</span>
+            <button class="button primary" id="mcRunBtn" type="button">시뮬레이션 실행 / 다시 뽑기</button>
+          </div>
+          <canvas id="mcCanvas" width="780" height="340"></canvas>
+          <div class="mc-legend">
+            <span><i style="background:#cfe6f6;"></i>10~90번째 백분위 구간 (분포가 퍼지는 범위)</span>
+            <span><i style="background:#9fcfe8;"></i>25~75번째 백분위 구간</span>
+            <span><i style="background:var(--brand-dark);"></i>중앙값(50번째 백분위) 추세선</span>
+            <span><i style="background:var(--red);"></i>무작위로 뽑은 시뮬레이션 경로 5개 (순차 애니메이션)</span>
+          </div>
+          <div class="mc-stat-grid">
+            <div class="mc-stat"><div class="lbl">하위 10% (운이 나쁜 경우)</div><div class="num" id="mcStatLow">-</div></div>
+            <div class="mc-stat"><div class="lbl">중앙값 (가장 흔한 경우)</div><div class="num" id="mcStatMid">-</div></div>
+            <div class="mc-stat"><div class="lbl">상위 10% (운이 좋은 경우)</div><div class="num" id="mcStatHigh">-</div></div>
+          </div>
+        </div>
+        <div class="callout">
+          <strong>몬테카를로 시뮬레이션이란?</strong>
+          "미래 수익률은 매년 이럴 것이다"라고 하나로 단정하는 대신, 과거 데이터에서 있었던 실제 연도별 수익률을 무작위로 수백 번 뽑아 대입해보고, 그 결과들이 넓게 흩어져 있는 범위(분포)를 관찰하는 방법입니다. "다시 뽑기"를 누를 때마다 뽑히는 순서가 달라지므로 결과도 매번 조금씩 바뀝니다.
+        </div>
+        <div class="callout caution">
+          <strong>참고</strong>
+          이 시뮬레이션은 교육용 예시이며 투자 조언이 아닙니다. 과거 수익률(1928~2024년 S&amp;P 500)이 미래 수익을 보장하지 않습니다.
+        </div>
+        <div class="completion-row">
+          <label class="check"><input type="checkbox" data-progress="mc-done" /><span>몬테카를로 시뮬레이션을 실행해봤어요</span></label>
+        </div>
+      </section>
+
+      <!-- PART 4: MINDSET -->
+      <section id="mindset" class="section">
+        <p class="eyebrow">Part 4</p>
+        <h2>시장 멘탈 관리 — 장기 우상향을 기억하기</h2>
+        <div class="panel">
+          <p>위 시뮬레이션에서 봤듯, 어떤 해는 크게 떨어지기도 합니다(2008년 -36.55%, 2022년 -18.11%). 하지만 97년 전체로 보면 시장은 오르내림을 반복하며 장기적으로 우상향해 왔습니다. 최근 시장이 흔들릴 때일수록 아래 문장들을 떠올려 보세요.</p>
+        </div>
+        <div class="canvas-card quote-card">
+          <p class="quote-text" id="quoteText"></p>
+          <p class="quote-sub" id="quoteSub"></p>
+          <div class="quote-nav">
+            <button class="quote-navbtn" id="quotePrev" type="button" aria-label="이전 명언">‹</button>
+            <div class="quote-dots" id="quoteDots"></div>
+            <button class="quote-navbtn" id="quoteNext" type="button" aria-label="다음 명언">›</button>
+          </div>
+        </div>
+        <div class="panel">
+          <p><strong>이 "멘탈 관리기" 기능을 내가 만들고 있는 금융 플래너(financial-planner.html)에 직접 추가</strong>해봅시다. 아래 프롬프트를 Cowork(Claude)에게 그대로 전달하세요.</p>
+        </div>
+        <div class="copy-block">
+          <pre><code>내 금융 플래너(financial-planner.html)에 아래 기능을 추가해줘.
+
+기능: 주식 시장은 장기적으로 우상향한다는 유명 투자자들의 명언 10개를 보여주는 "멘탈 관리기" 카드를 추가해줘.
+조건:
+- 4~5초마다 자동으로 다음 명언으로 넘어가기
+- 이전/다음 버튼과 현재 위치를 보여주는 점(dot) 표시도 추가
+- 마우스를 올리면 자동 넘김이 잠시 멈추도록</code></pre>
+          <button class="copy-button" type="button" data-copy="내 금융 플래너(financial-planner.html)에 아래 기능을 추가해줘.&#10;&#10;기능: 주식 시장은 장기적으로 우상향한다는 유명 투자자들의 명언 10개를 보여주는 &quot;멘탈 관리기&quot; 카드를 추가해줘.&#10;조건:&#10;- 4~5초마다 자동으로 다음 명언으로 넘어가기&#10;- 이전/다음 버튼과 현재 위치를 보여주는 점(dot) 표시도 추가&#10;- 마우스를 올리면 자동 넘김이 잠시 멈추도록">복사</button>
+        </div>
+        <div class="completion-row">
+          <label class="check"><input type="checkbox" data-progress="mindset-done" /><span>멘탈 관리기 기능을 내 금융 플래너에 추가하는 프롬프트를 만들어봤어요</span></label>
+        </div>
+      </section>
+
+      <!-- PART 5: DEPLOY -->
+      <section id="deploy" class="section">
+        <p class="eyebrow">Part 5</p>
+        <h2>배포하고 내 사이트에 연결하기</h2>
+        <div class="panel">
+          <p>이번엔 지난 과제의 저장소를 건드리지 않고, <strong>별도의 새 저장소</strong>에 금융 플래너를 올려 독립적인 페이지로 배포합니다. 그런 다음 개인 브랜딩 사이트에서 링크로 연결합니다.</p>
+        </div>
+        <div class="workshop">
+          <div class="workshop-step">
+            <div class="workshop-step-header"><div class="ws-num">1</div><h3>파일 받기</h3></div>
+            <p>Cowork(Claude)에게 요청해 완성한 금융 플래너 파일을 다운로드합니다. 이번에는 파일 이름을 <code>index.html</code>로 저장하세요 — 새 저장소의 대표 파일이 되기 때문입니다.</p>
+          </div>
+          <div class="workshop-step">
+            <div class="workshop-step-header"><div class="ws-num">2</div><h3>새 저장소 만들기</h3></div>
+            <p>GitHub 우측 상단의 <strong>+ → New repository</strong>를 클릭합니다. 이번엔 지난번과 달리 이름을 자유롭게 지어도 됩니다 (예: <code>financial-planner</code>). <strong>Public</strong>으로, <strong>Add a README</strong>는 체크하지 않고 <strong>Create repository</strong>를 누릅니다.</p>
+          </div>
+          <div class="workshop-step">
+            <div class="workshop-step-header"><div class="ws-num">3</div><h3>index.html 업로드</h3></div>
+            <p>방금 만든 저장소에서 <strong>Add file → Upload files</strong>로 <code>index.html</code>을 드래그해서 올리고 <strong>Commit changes</strong>를 누릅니다.</p>
+          </div>
+          <div class="workshop-step">
+            <div class="workshop-step-header"><div class="ws-num">4</div><h3>GitHub Pages 켜기</h3></div>
+            <p>저장소 상단의 <strong>Settings → Pages</strong>로 이동해 <strong>Source</strong>를 <code>Deploy from a branch</code>, <strong>Branch</strong>를 <code>main</code>으로 지정하고 <strong>Save</strong>합니다. 1~2분 뒤 <code>https://[내아이디].github.io/financial-planner/</code> 주소로 접속해 확인합니다.</p>
+          </div>
+          <div class="workshop-step">
+            <div class="workshop-step-header"><div class="ws-num">5</div><h3>개인 브랜딩 사이트에 연결하기</h3></div>
+            <p>1주차 첫 과제로 만든 자기소개 사이트로 돌아가, Cowork에게 아래처럼 요청해 프로젝트 카드를 추가하세요.</p>
+            <div class="copy-block">
+              <pre><code>내 개인 소개 사이트(index.html)의 프로젝트/하는 일 섹션에 카드를 하나 추가해줘.
+제목: 몬테카를로 금융 플래너
+설명: 실제 S&amp;P 500 데이터로 미래 자산을 시뮬레이션하는 인터랙티브 웹앱
+링크: https://[내아이디].github.io/financial-planner/</code></pre>
+              <button class="copy-button" type="button" data-copy="내 개인 소개 사이트(index.html)의 프로젝트/하는 일 섹션에 카드를 하나 추가해줘.&#10;제목: 몬테카를로 금융 플래너&#10;설명: 실제 S&amp;P 500 데이터로 미래 자산을 시뮬레이션하는 인터랙티브 웹앱&#10;링크: https://[내아이디].github.io/financial-planner/">복사</button>
+            </div>
+            <p style="margin-top:8px;">완성된 <code>index.html</code>을 다시 받아, 자기소개 사이트의 저장소(<code>[내아이디].github.io</code>)에 <strong>같은 이름으로 다시 업로드</strong>(덮어쓰기)하면 링크가 반영됩니다.</p>
+          </div>
+        </div>
+        <div class="completion-row">
+          <label class="check"><input type="checkbox" data-progress="deploy-done" /><span>금융 플래너를 배포하고 내 사이트에 연결했어요</span></label>
+        </div>
+      </section>
+
+      <!-- MORE IDEAS -->
+      <section id="ideas" class="section">
+        <p class="eyebrow">더 알아보기</p>
+        <h2>HTML로 할 수 있는 것들</h2>
+        <div class="panel">
+          <p>오늘 만든 게임·플래너·시뮬레이션은 시작일 뿐입니다. 사실 <strong>보고서, 발표자료(PPT), 심지어 논문</strong>까지도 워드나 파워포인트 대신 HTML 한 파일로 만드는 사례가 늘고 있습니다. Anthropic의 아티클 <a href="week1-04-html-effectiveness.html" target="_blank" rel="noopener">"The Unreasonable Effectiveness of HTML"</a>에서 소개한 대표적인 활용 분야는 아래와 같습니다.</p>
+        </div>
+        <div class="next-card-grid">
+          <div class="next-card">
+            <h3>기획서 · 계획 · 탐색</h3>
+            <p>서로 다른 시안 여러 개를 그리드로 나란히 비교하거나, 프로젝트 진행 계획을 단계별로 정리한 문서</p>
+          </div>
+          <div class="next-card">
+            <h3>문서 비교 · 설명</h3>
+            <p>계약서 같은 문서의 수정 전/후를 색상과 이유 설명으로 한눈에 비교할 수 있는 문서</p>
+          </div>
+          <div class="next-card">
+            <h3>리포트 · 리서치 · 학습 자료</h3>
+            <p>여러 자료를 종합해 다이어그램·주석과 함께 정리한 설명 페이지</p>
+          </div>
+          <div class="next-card">
+            <h3>커스텀 편집 도구</h3>
+            <p>내 데이터에 딱 맞는, 한 번 쓰고 버리는 전용 편집기(역할 분담 보드 등)</p>
+          </div>
+        </div>
+        <p style="max-width:840px;font-size:14px;color:var(--muted);">👉 위 활용법들을 예시 프롬프트와 실제 화면으로 직접 구현해봤습니다. <a href="week1-04-html-effectiveness.html" target="_blank" rel="noopener"><strong>HTML의 압도적 효과성</strong> 열어보기 →</a></p>
+
+        <h3 class="sub-head">한 걸음 더 — "우리만을 위한 사이트" 만들기</h3>
+        <div class="panel">
+          <p>앞의 사례들이 <strong>문서를 대신하는</strong> 이야기였다면, 여기서 한 걸음 더 나갈 수 있습니다. 바로 <strong>특정한 사람·특정한 상황만을 위한 맞춤 웹사이트</strong>를 만들어, 그 사이트 자체를 정보를 주고받는 창구로 쓰는 것입니다.</p>
+          <p>카톡 대화, 이메일 첨부파일, 엑셀, 캡처 이미지에 흩어져 있던 내용을 한 페이지에 모아 링크 하나로 공유하면, <strong>관련된 사람 모두가 같은 화면을 보면서 이야기하게 됩니다.</strong> "그 파일 어디 있죠?"가 사라지고, 대화가 항상 최신 정보 위에서 이루어집니다.</p>
+          <p>수업 발표도 마찬가지입니다. PPT를 만드는 대신 <strong>발표용 웹사이트</strong>를 만들어 링크를 띄워놓고 발표하면, 발표가 끝난 뒤에도 그 링크가 그대로 남아 팀원과 교수님이 언제든 다시 열어볼 수 있는 자료가 됩니다.</p>
+        </div>
+        <p style="max-width:840px;font-size:14px;">아래는 실제로 만들어본 예시 3가지입니다. 클릭해서 직접 열어보세요 — 전부 <strong>HTML 파일 하나</strong>로만 되어 있습니다.</p>
+        <div class="demo-grid">
+          <a class="demo-link" href="week1-example-litigation-dashboard.html" target="_blank" rel="noopener">
+            <span class="demo-emoji">⚖️</span>
+            <span class="demo-who">변호사 → 의뢰인</span>
+            <h3>소송 사건 대시보드</h3>
+            <p>사건별 전용 페이지. 쟁점마다 우리 주장과 상대 주장을 나란히 놓고, 증거 목록·재판 일정·담당자 소통까지 한곳에서.</p>
+            <span class="demo-open">열어보기 →</span>
+          </a>
+          <a class="demo-link" href="week1-example-pt-workout-tracker.html" target="_blank" rel="noopener">
+            <span class="demo-emoji">💪</span>
+            <span class="demo-who">트레이너 → 회원</span>
+            <h3>PT 회원 전용 관리 페이지</h3>
+            <p>회원 한 명만을 위한 페이지. 체중·체지방 변화 그래프, 요일별 운동 계획과 중량 기록, 트레이너 피드백까지.</p>
+            <span class="demo-open">열어보기 →</span>
+          </a>
+          <a class="demo-link" href="week1-example-family-trip-planner.html" target="_blank" rel="noopener">
+            <span class="demo-emoji">🏖️</span>
+            <span class="demo-who">가족 모두가 함께</span>
+            <h3>가족 여행 플래너</h3>
+            <p>2박 3일 일정·숙소·식사·준비물을 한 페이지에. 여행 중 온 가족이 같은 링크를 열어놓고 따라다닐 수 있게.</p>
+            <span class="demo-open">열어보기 →</span>
+          </a>
+        </div>
+        <div class="tip-card">
+          <h3>이런 것들도 똑같은 방식으로 만들 수 있습니다</h3>
+          <ul>
+            <li><b>수업 발표 자료</b> — PPT 대신 발표용 사이트. 발표 후에도 링크가 남아 그대로 제출 자료가 됩니다.</li>
+            <li><b>연구 프로젝트 현황판</b> — 실험 진행률, 데이터 정리, 참고문헌, 미팅 기록을 공동연구자와 한 화면에서 공유</li>
+            <li><b>웨딩·행사 안내 페이지</b> — 일정·장소·드레스코드·오시는 길·참석 여부를 하객에게 링크 하나로</li>
+            <li><b>병원·요양 간병 기록</b> — 투약 시간, 검사 일정, 특이사항을 가족들이 함께 확인하고 기록</li>
+            <li><b>동아리·스터디 운영 페이지</b> — 모임 일정, 발표 순번, 자료 아카이브, 참석 체크</li>
+            <li><b>제품 사용 설명 페이지</b> — 고객마다 다른 설정값·계약 조건을 반영한 맞춤 안내서</li>
+          </ul>
+        </div>
+        <div class="callout">
+          <strong>핵심은 "범용"이 아니라 "맞춤"입니다</strong>
+          시중의 협업 도구는 모든 사람에게 맞추느라 정작 내 상황엔 안 맞는 항목이 가득합니다. 반대로 AI에게 부탁해 만드는 사이트는 <strong>딱 이 사건, 딱 이 회원, 딱 우리 가족</strong>에게만 맞춰져 있어서 군더더기가 없습니다. 만드는 데 몇 분이면 되니, 필요 없어지면 그냥 버려도 아깝지 않습니다.
+        </div>
+        <div class="completion-row">
+          <label class="check"><input type="checkbox" data-progress="ideas-done" /><span>맞춤 사이트 예시 3가지를 열어봤어요</span></label>
+        </div>
+      </section>
+
+      <!-- WRAP -->
+      <section id="wrap" class="section">
+        <p class="eyebrow">Finish</p>
+        <h2>축하합니다 — 브라우저 안에서 진짜 프로그램을 실행시켰습니다</h2>
+        <p class="lead">HTML 안에 자바스크립트를 넣어 게임을 만들고, 복리 그래프를 그리고, 실제 데이터로 몬테카를로 시뮬레이션까지 실행했습니다. 이 모든 것이 서버 없이 이 파일 하나로 이루어졌습니다.</p>
+        <div class="next-card-grid">
+          <div class="next-card">
+            <h3>더 확장해보기</h3>
+            <p>Cowork에게 "은퇴 나이", "인플레이션 반영" 같은 조건을 추가해 달라고 요청해보세요.</p>
+          </div>
+          <div class="next-card">
+            <h3>2주차 예고</h3>
+            <p>다음 주에는 텍스트를 벡터로 바꾸는 임베딩을 배우고, 왜 어떤 앱은 서버(백엔드)가 필요한지 이해합니다.</p>
+          </div>
+          <div class="next-card">
+            <h3>포트폴리오에 추가</h3>
+            <p>이 프로젝트도 개인 사이트의 프로젝트 목록에 계속 추가해 나가면 좋은 포트폴리오가 됩니다.</p>
+          </div>
+        </div>
+        <div class="completion-row">
+          <label class="check"><input type="checkbox" data-progress="wrap-done" /><span>전체 과정을 완료했어요!</span></label>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Celebration -->
+  <div class="celebration" id="celebration" role="dialog" aria-modal="true" aria-labelledby="celebration-title" hidden>
+    <canvas class="celebration-canvas" id="celebrationCanvas" aria-hidden="true"></canvas>
+    <div class="celebration-box">
+      <button type="button" class="celebration-close" id="celebrationClose" aria-label="닫기">닫기</button>
+      <p class="eyebrow" style="margin-bottom:2px;">All Steps Complete</p>
+      <h2>축하합니다 🎉</h2>
+      <p>자바스크립트로 게임과 금융 시뮬레이션까지 만들어봤습니다.<br/>이제 브라우저 안에서 무엇이든 만들 수 있다는 감을 잡으셨을 거예요.</p>
+      <button type="button" class="button primary" id="celebrationCloseBtn">마무리</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">복사했습니다</div>
+
+<script>
+/* =========================================================
+   0. S&P 500 historical annual TOTAL returns (with dividends), 1928-2024
+   Source: composite of publicly published historical return tables
+   (approximate, for educational simulation use only)
+   ========================================================= */
+const SP500_YEARS = [];
+const SP500_RETURNS = [
+  43.81,-8.30,-25.12,-43.84,-8.64,49.98,-1.19,46.74,31.94,-35.34,
+  29.28,-1.10,-10.67,-12.77,19.17,25.06,19.03,35.82,-8.43,5.20,
+  5.70,18.30,30.81,23.68,18.15,-1.21,52.56,32.60,7.44,-10.46,
+  43.72,12.06,0.34,26.64,-8.81,22.61,16.42,12.40,-9.97,23.80,
+  10.81,-8.24,3.56,14.22,18.76,-14.31,-25.90,37.00,23.83,-6.98,
+  6.51,18.52,31.74,-4.70,20.42,22.34,6.15,31.24,18.49,5.81,
+  16.54,31.48,-3.06,30.23,7.49,9.97,1.33,37.20,22.68,33.10,
+  28.34,20.89,-9.03,-11.85,-21.97,28.36,10.74,4.83,15.61,5.48,
+  -36.55,25.94,14.82,2.10,15.89,32.15,13.52,1.36,11.96,21.83,
+  -4.38,31.49,18.40,28.71,-18.11,26.29,25.02
+];
+(function(){ for (let y=1928; y<1928+SP500_RETURNS.length; y++) SP500_YEARS.push(y); })();
+
+/* =========================================================
+   0.5 Shared formatting helpers — 억원 단위 표시 + 예쁜 축 간격
+   ========================================================= */
+// 내부 계산은 "만원" 단위로 하고, 화면 표시만 "억" 단위로 바꿔줍니다. (1억원 = 10,000만원)
+// 결과 문장에서는 뒤에 "원"을 붙여 "3.2억원"처럼, 축 라벨에서는 "3.2억"처럼 그대로 씁니다.
+function formatEok(manValue){
+  const eok = manValue / 10000;
+  if (Math.abs(eok) < 0.01) return '0억';
+  const rounded = Math.round(eok * 100) / 100;
+  return (Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')) + '억';
+}
+// maxVal을 ticksTarget개 정도의 눈금으로 나눌 때, 1/2/5/10 × 10ⁿ 중 보기 좋은 간격을 찾습니다.
+function niceStep(maxVal, ticksTarget){
+  if (!(maxVal > 0)) return 1;
+  const rough = maxVal / ticksTarget;
+  const mag = Math.pow(10, Math.floor(Math.log10(rough)));
+  const norm = rough / mag;
+  let niceNorm;
+  if (norm <= 1) niceNorm = 1;
+  else if (norm <= 2) niceNorm = 2;
+  else if (norm <= 5) niceNorm = 5;
+  else niceNorm = 10;
+  return niceNorm * mag;
+}
+
+/* =========================================================
+   1. Live JS demo (intro) — mini calculator
+   ========================================================= */
+(function(){
+  const aEl = document.getElementById('calcA');
+  const opEl = document.getElementById('calcOp');
+  const bEl = document.getElementById('calcB');
+  const resultEl = document.getElementById('calcResult');
+
+  function calculate(a, b, op){
+    if (op === '+') return a + b;
+    if (op === '-') return a - b;
+    if (op === '*') return a * b;
+    if (op === '/') return a / b;
+  }
+
+  function update(){
+    const a = Number(aEl.value);
+    const b = Number(bEl.value);
+    const op = opEl.value;
+    const r = calculate(a, b, op);
+    if (!Number.isFinite(r)){
+      resultEl.textContent = '계산 불가';
+    } else {
+      resultEl.textContent = Number.isInteger(r) ? String(r) : r.toFixed(2).replace(/\.?0+$/,'');
+    }
+  }
+
+  [aEl, opEl, bEl].forEach(el => el.addEventListener('input', update));
+  update();
+})();
+
+/* =========================================================
+   2. Mini Galaga-style game
+   ========================================================= */
+(function(){
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const scoreEl = document.getElementById('gameScore');
+  const livesEl = document.getElementById('gameLives');
+  const msgEl = document.getElementById('gameMsg');
+  const startBtn = document.getElementById('gameStartBtn');
+  const pauseBtn = document.getElementById('gamePauseBtn');
+
+  const INVADER_ROWS = [
+    '00100100',
+    '00111100',
+    '01111110',
+    '11011011',
+    '11111111',
+    '10100101',
+  ];
+  function drawInvader(e){
+    const cols = INVADER_ROWS[0].length, rows = INVADER_ROWS.length;
+    const pw = e.w / cols, ph = e.h / rows;
+    for (let r=0; r<rows; r++){
+      for (let c=0; c<cols; c++){
+        if (INVADER_ROWS[r][c] === '1') ctx.fillRect(e.x + c*pw, e.y + r*ph, pw+0.6, ph+0.6);
+      }
+    }
+  }
+
+  let player, bullets, enemies, enemyBullets, enemyDir, score, lives, running, paused, rafId, keys, hitFlash;
+
+  function reset(startRunning){
+    player = { x: W/2 - 16, y: H - 34, w: 32, h: 16, speed: 5 };
+    bullets = [];
+    enemies = [];
+    enemyBullets = [];
+    const cols = 8, rowsN = 4;
+    for (let r=0; r<rowsN; r++){
+      for (let c=0; c<cols; c++){
+        enemies.push({ x: 30 + c*50, y: 30 + r*36, w: 30, h: 20, alive: true });
+      }
+    }
+    enemyDir = 1;
+    score = 0; lives = 3; keys = {}; hitFlash = 0;
+    paused = false;
+    pauseBtn.textContent = '일시정지';
+    scoreEl.textContent = '0'; livesEl.textContent = '3';
+    if (rafId) cancelAnimationFrame(rafId);
+    if (startRunning){
+      running = true;
+      msgEl.textContent = '← → 이동 · Space 발사';
+      loop();
+    } else {
+      running = false;
+      draw();
+    }
+  }
+
+  function endGame(win){
+    running = false;
+    hitFlash = 0;
+    msgEl.textContent = win ? '클리어! 🎉 "게임 시작" 버튼으로 다시 도전해보세요.' : '게임 오버 — "게임 시작" 버튼으로 다시 도전해보세요.';
+    if (rafId) cancelAnimationFrame(rafId);
+  }
+
+  function togglePause(){
+    if (!running) return;
+    paused = !paused;
+    if (paused){
+      if (rafId) cancelAnimationFrame(rafId);
+      msgEl.textContent = '일시정지됨 — "일시정지" 버튼으로 재개하세요.';
+      pauseBtn.textContent = '재개';
+    } else {
+      msgEl.textContent = '← → 이동 · Space 발사';
+      pauseBtn.textContent = '일시정지';
+      loop();
+    }
+  }
+
+  function update(){
+    if (keys['ArrowLeft'] || keys['a']) player.x -= player.speed;
+    if (keys['ArrowRight'] || keys['d']) player.x += player.speed;
+    player.x = Math.max(0, Math.min(W - player.w, player.x));
+
+    bullets.forEach(b => { b.y -= 6; });
+    bullets = bullets.filter(b => b.y > -10);
+
+    let hitEdge = false;
+    enemies.forEach(e => {
+      if (!e.alive) return;
+      e.x += enemyDir * 1.0;
+      if (e.x < 4 || e.x + e.w > W - 4) hitEdge = true;
+    });
+    if (hitEdge){
+      enemyDir *= -1;
+      enemies.forEach(e => { if (e.alive) e.y += 14; });
+    }
+
+    bullets.forEach(b => {
+      enemies.forEach(e => {
+        if (!e.alive || b.hit) return;
+        if (b.x < e.x + e.w && b.x + b.w > e.x && b.y < e.y + e.h && b.y + b.h > e.y){
+          e.alive = false; b.hit = true;
+          score += 10; scoreEl.textContent = String(score);
+        }
+      });
+    });
+    bullets = bullets.filter(b => !b.hit);
+
+    // enemy counter-attack: occasionally a random alive enemy fires downward
+    if (Math.random() < 0.018){
+      const shooters = enemies.filter(e => e.alive);
+      if (shooters.length){
+        const s = shooters[Math.floor(Math.random() * shooters.length)];
+        enemyBullets.push({ x: s.x + s.w/2 - 2, y: s.y + s.h, w: 4, h: 10 });
+      }
+    }
+    enemyBullets.forEach(b => { b.y += 4.5; });
+    enemyBullets = enemyBullets.filter(b => b.y < H + 10);
+    for (const b of enemyBullets){
+      if (b.x < player.x + player.w && b.x + b.w > player.x && b.y < player.y + player.h && b.y + b.h > player.y){
+        b.hit = true;
+        lives -= 1; livesEl.textContent = String(Math.max(0, lives)); hitFlash = 48;
+      }
+    }
+    enemyBullets = enemyBullets.filter(b => !b.hit);
+    if (lives <= 0){ endGame(false); return; }
+
+    const anyAlive = enemies.some(e => e.alive);
+    if (!anyAlive){ endGame(true); return; }
+
+    const reached = enemies.some(e => e.alive && e.y + e.h >= player.y);
+    if (reached){
+      lives -= 1; livesEl.textContent = String(Math.max(0,lives)); hitFlash = 48;
+      if (lives <= 0){ endGame(false); return; }
+      enemies.forEach(e => { if (e.alive) e.y -= 60; });
+    }
+
+    if (hitFlash > 0) hitFlash -= 1;
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // stars
+    ctx.fillStyle = '#0a0e18'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = 'rgba(255,255,255,.35)';
+    for (let i=0;i<40;i++){
+      const sx = (i*37) % W; const sy = (i*53 + Math.floor(Date.now()/50)) % H;
+      ctx.fillRect(sx, sy, 1.5, 1.5);
+    }
+    // player (blinks briefly right after taking a hit)
+    const playerVisible = hitFlash <= 0 || Math.floor(hitFlash / 4) % 2 === 0;
+    if (playerVisible){
+      ctx.fillStyle = '#2e9bdb';
+      ctx.fillRect(player.x, player.y, player.w, player.h);
+      ctx.fillRect(player.x + player.w/2 - 3, player.y - 8, 6, 8);
+    }
+    // bullets
+    ctx.fillStyle = '#ffd23f';
+    bullets.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
+    // enemies (pixel-invader silhouette)
+    ctx.fillStyle = '#ff5f7a';
+    enemies.forEach(e => { if (e.alive) drawInvader(e); });
+    // enemy counter-attack bullets
+    ctx.fillStyle = '#ff9f43';
+    enemyBullets.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
+  }
+
+  function loop(){
+    if (!running || paused) return;
+    update();
+    draw();
+    rafId = requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if (['ArrowLeft','ArrowRight',' '].includes(e.key) && document.activeElement === canvas){
+      e.preventDefault();
+    }
+    keys[e.key] = true;
+    if (running && e.key === ' '){
+      bullets.push({ x: player.x + player.w/2 - 2, y: player.y - 4, w: 4, h: 10 });
+    }
+  });
+  window.addEventListener('keyup', (e) => { keys[e.key] = false; });
+
+  startBtn.addEventListener('click', () => { canvas.focus(); reset(true); });
+  pauseBtn.addEventListener('click', () => { canvas.focus(); togglePause(); });
+  canvas.addEventListener('click', () => canvas.focus());
+
+  // initial idle frame (state initialized but game not running yet)
+  reset(false);
+})();
+
+/* =========================================================
+   3. Financial planner (compound growth)
+   ========================================================= */
+const Planner = (function(){
+  const annualEl = document.getElementById('plAnnual');
+  const rateEl = document.getElementById('plRate');
+  const yearsEl = document.getElementById('plYears');
+  const annualValEl = document.getElementById('plAnnualVal');
+  const rateValEl = document.getElementById('plRateVal');
+  const yearsValEl = document.getElementById('plYearsVal');
+  const canvas = document.getElementById('plannerCanvas');
+  const ctx = canvas.getContext('2d');
+  const resultEl = document.getElementById('plannerResult');
+  const promptEl = document.getElementById('plannerPrompt');
+
+  function compute(annual, rate, years){
+    const principal = [0];
+    const total = [0];
+    let p = 0, t = 0;
+    for (let y=1; y<=years; y++){
+      p += annual;
+      t = (t + annual) * (1 + rate/100);
+      principal.push(p);
+      total.push(t);
+    }
+    return { principal, total };
+  }
+
+  function draw(annual, rate, years){
+    const { principal, total } = compute(annual, rate, years);
+    const W = canvas.width, H = canvas.height;
+    const padL = 60, padR = 20, padT = 16, padB = 30;
+    const rawMax = Math.max(...total, 1);
+    const step = niceStep(rawMax, 4);
+    const niceMax = Math.ceil(rawMax / step) * step;
+    const x = (i) => padL + (i/(years)) * (W - padL - padR);
+    const y = (v) => H - padB - (v/niceMax) * (H - padT - padB);
+
+    ctx.clearRect(0,0,W,H);
+    // gridlines + y labels (nice, evenly-spaced ticks in 억원 units)
+    ctx.strokeStyle = '#e5eae2'; ctx.fillStyle = '#8a8f86'; ctx.font = '11px sans-serif';
+    const gridCount = Math.round(niceMax / step);
+    for (let g=0; g<=gridCount; g++){
+      const v = step * g;
+      const yy = y(v);
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+      ctx.fillText(formatEok(v), 6, yy+4);
+    }
+    // principal area (muted)
+    ctx.strokeStyle = '#c7cfc3'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    principal.forEach((v,i) => { const px=x(i), py=y(v); i===0?ctx.moveTo(px,py):ctx.lineTo(px,py); });
+    ctx.stroke();
+    // total line (brand)
+    ctx.strokeStyle = '#2e9bdb'; ctx.lineWidth = 3;
+    ctx.beginPath();
+    total.forEach((v,i) => { const px=x(i), py=y(v); i===0?ctx.moveTo(px,py):ctx.lineTo(px,py); });
+    ctx.stroke();
+    // x labels
+    ctx.fillStyle = '#8a8f86';
+    ctx.fillText('0년', padL-8, H-10);
+    ctx.fillText(years + '년', W-padR-24, H-10);
+
+    const finalTotal = total[total.length-1];
+    const finalPrincipal = principal[principal.length-1];
+    const gain = finalTotal - finalPrincipal;
+    resultEl.innerHTML = `<b>${years}년 후 예상 자산: 약 ${formatEok(finalTotal)}원</b><br/>` +
+      `(내가 넣은 원금 ${formatEok(finalPrincipal)}원 + 복리로 불어난 수익 ${formatEok(gain)}원)`;
+  }
+
+  function buildPrompt(annual, rate, years){
+    return `연간 저축액, 수익률, 투자 기간을 슬라이더로 조절하면 복리 성장 그래프가 실시간으로 바뀌는 인터랙티브 금융 플래너를 index.html 한 파일로 만들어줘.\n조건:\n- 슬라이더 3개: 연간 저축액(만원), 연 수익률(%), 투자 기간(년)\n- 그래프: 내가 넣은 원금 누적선과 복리 적용 총 자산선을 함께 표시\n- 값이 바뀔 때마다 그래프와 "n년 후 예상 자산" 텍스트가 즉시 갱신되게 해줘\n예시 값: 연간 저축액 ${annual}만원, 수익률 ${rate}%, 기간 ${years}년`;
+  }
+
+  function update(){
+    const annual = Number(annualEl.value);
+    const rate = Number(rateEl.value);
+    const years = Number(yearsEl.value);
+    annualValEl.textContent = annual.toLocaleString() + '만원';
+    rateValEl.textContent = rate + '%';
+    yearsValEl.textContent = years + '년';
+    draw(annual, rate, years);
+    promptEl.textContent = buildPrompt(annual, rate, years);
+  }
+
+  [annualEl, rateEl, yearsEl].forEach(el => el.addEventListener('input', update));
+  update();
+
+  return {
+    getAnnual: () => Number(annualEl.value),
+    getYears: () => Number(yearsEl.value),
+  };
+})();
+
+/* =========================================================
+   4. Monte Carlo simulation (bootstrap from real S&P 500 data)
+   ========================================================= */
+(function(){
+  const canvas = document.getElementById('mcCanvas');
+  const ctx = canvas.getContext('2d');
+  const runBtn = document.getElementById('mcRunBtn');
+  const condText = document.getElementById('mcCondText');
+  const statLow = document.getElementById('mcStatLow');
+  const statMid = document.getElementById('mcStatMid');
+  const statHigh = document.getElementById('mcStatHigh');
+  const NUM_PATHS = 300;
+
+  function samplePaths(annual, years){
+    const paths = [];
+    for (let p=0; p<NUM_PATHS; p++){
+      const bal = [0];
+      let b = 0;
+      for (let y=0; y<years; y++){
+        const r = SP500_RETURNS[Math.floor(Math.random() * SP500_RETURNS.length)];
+        b = (b + annual) * (1 + r/100);
+        bal.push(b);
+      }
+      paths.push(bal);
+    }
+    return paths;
+  }
+
+  function percentile(sortedArr, p){
+    const idx = (sortedArr.length - 1) * p;
+    const lo = Math.floor(idx), hi = Math.ceil(idx);
+    if (lo === hi) return sortedArr[lo];
+    return sortedArr[lo] + (sortedArr[hi] - sortedArr[lo]) * (idx - lo);
+  }
+
+  function computeBands(paths, years){
+    const bands = { p10:[], p25:[], p50:[], p75:[], p90:[] };
+    for (let y=0; y<=years; y++){
+      const col = paths.map(p => p[y]).sort((a,b) => a-b);
+      bands.p10.push(percentile(col, 0.10));
+      bands.p25.push(percentile(col, 0.25));
+      bands.p50.push(percentile(col, 0.50));
+      bands.p75.push(percentile(col, 0.75));
+      bands.p90.push(percentile(col, 0.90));
+    }
+    return bands;
+  }
+
+  function pickRandomPaths(paths, n){
+    const idxs = new Set();
+    while (idxs.size < Math.min(n, paths.length)){
+      idxs.add(Math.floor(Math.random() * paths.length));
+    }
+    return Array.from(idxs).map(i => paths[i]);
+  }
+
+  let animId = null;
+
+  function drawStatic(bands, years, maxV){
+    const W = canvas.width, H = canvas.height;
+    const padL = 58, padR = 20, padT = 16, padB = 30;
+    const step = niceStep(maxV, 4);
+    const niceMax = Math.ceil(maxV / step) * step;
+    const x = (i) => padL + (i/years) * (W - padL - padR);
+    const y = (v) => H - padB - (v/niceMax) * (H - padT - padB);
+
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle = '#e5eae2'; ctx.fillStyle = '#8a8f86'; ctx.font = '11px sans-serif';
+    const gridCount = Math.round(niceMax / step);
+    for (let g=0; g<=gridCount; g++){
+      const v = step * g; const yy = y(v);
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W-padR, yy); ctx.stroke();
+      ctx.fillText(formatEok(v), 4, yy+4);
+    }
+
+    function band(lowArr, highArr, color){
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      lowArr.forEach((v,i) => { const px=x(i), py=y(v); i===0?ctx.moveTo(px,py):ctx.lineTo(px,py); });
+      for (let i=highArr.length-1; i>=0; i--){ ctx.lineTo(x(i), y(highArr[i])); }
+      ctx.closePath(); ctx.fill();
+    }
+    band(bands.p10, bands.p90, 'rgba(207,230,246,0.85)');
+    band(bands.p25, bands.p75, 'rgba(159,207,232,0.9)');
+
+    ctx.strokeStyle = '#1b6fa6'; ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    bands.p50.forEach((v,i) => { const px=x(i), py=y(v); i===0?ctx.moveTo(px,py):ctx.lineTo(px,py); });
+    ctx.stroke();
+
+    return { x, y };
+  }
+
+  // 5개의 진짜 무작위 경로를 순서대로 하나씩 그려나갑니다 (동시에 X, 순차적으로 O).
+  function animateSamplePaths(samplePaths, years, scales){
+    if (animId) cancelAnimationFrame(animId);
+    const { x, y } = scales;
+    const totalSteps = 45;
+
+    function drawOnePath(idx){
+      if (idx >= samplePaths.length) return;
+      const path = samplePaths[idx];
+      let step = 0;
+      function frame(){
+        step++;
+        const revealYears = Math.min(years, (step/totalSteps) * years);
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, x(revealYears), canvas.height);
+        ctx.clip();
+        ctx.strokeStyle = '#b0483f'; ctx.lineWidth = 1.3;
+        ctx.beginPath();
+        path.forEach((v,i) => { const px=x(i), py=y(v); i===0?ctx.moveTo(px,py):ctx.lineTo(px,py); });
+        ctx.stroke();
+        ctx.restore();
+        if (step < totalSteps){
+          animId = requestAnimationFrame(frame);
+        } else {
+          animId = requestAnimationFrame(() => drawOnePath(idx + 1));
+        }
+      }
+      frame();
+    }
+    drawOnePath(0);
+  }
+
+  function run(){
+    const annual = Planner.getAnnual();
+    const years = Planner.getYears();
+    condText.textContent = `연간 ${annual.toLocaleString()}만원 · ${years}년`;
+
+    const paths = samplePaths(annual, years);
+    const bands = computeBands(paths, years);
+    const randomPaths = pickRandomPaths(paths, 5);
+    const maxV = Math.max(bands.p90[bands.p90.length-1], ...randomPaths.map(p => p[p.length-1])) * 1.05;
+
+    const scales = drawStatic(bands, years, maxV);
+    animateSamplePaths(randomPaths, years, scales);
+
+    const finals = paths.map(p => p[p.length-1]).sort((a,b) => a-b);
+    statLow.textContent = formatEok(percentile(finals,0.10)) + '원';
+    statMid.textContent = formatEok(percentile(finals,0.50)) + '원';
+    statHigh.textContent = formatEok(percentile(finals,0.90)) + '원';
+  }
+
+  runBtn.addEventListener('click', run);
+  run();
+})();
+
+/* =========================================================
+   5. Quotes carousel (mental health / long-term mindset)
+   ========================================================= */
+(function(){
+  const QUOTES = [
+    { text: '다른 사람이 욕심낼 때 두려워하고, 다른 사람이 두려워할 때 욕심내라.', sub: 'Warren Buffett — 워런 버핏' },
+    { text: '주식 시장은 조급한 사람의 돈을 인내심 있는 사람에게 옮기는 장치다.', sub: 'Warren Buffett — 워런 버핏' },
+    { text: '우리가 가장 좋아하는 주식 보유 기간은 영원히다.', sub: 'Warren Buffett — 워런 버핏' },
+    { text: '단기적으로 시장은 투표 기계이지만, 장기적으로는 저울이다.', sub: 'Benjamin Graham — 벤저민 그레이엄' },
+    { text: '시간은 당신의 편이고, 충동은 당신의 적이다.', sub: 'John C. Bogle — 존 보글' },
+    { text: '건초더미에서 바늘을 찾으려 하지 마라. 그냥 건초더미 전체를 사라.', sub: 'John C. Bogle — 존 보글' },
+    { text: '조정을 대비하거나 예측하려다가 잃은 돈이, 실제 조정에서 잃은 돈보다 훨씬 많다.', sub: 'Peter Lynch — 피터 린치' },
+    { text: '무엇을 소유하고 있는지, 왜 소유하고 있는지를 알아야 한다.', sub: 'Peter Lynch — 피터 린치' },
+    { text: '큰돈은 사고파는 데서 나오는 게 아니라, 기다리는 데서 나온다.', sub: 'Charlie Munger — 찰리 멍거' },
+    { text: '시장을 예측하려 하기보다, 시장에 머무는 시간이 수익을 만든다.', sub: '오래전부터 전해지는 투자 격언 (특정 인물의 직접 인용 아님)' },
+  ];
+  const textEl = document.getElementById('quoteText');
+  const subEl = document.getElementById('quoteSub');
+  const prevBtn = document.getElementById('quotePrev');
+  const nextBtn = document.getElementById('quoteNext');
+  const dotsWrap = document.getElementById('quoteDots');
+  let idx = 0, timer = null;
+
+  QUOTES.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'quote-dot' + (i===0 ? ' active' : '');
+    dot.type = 'button';
+    dot.setAttribute('aria-label', (i+1) + '번째 명언');
+    dot.addEventListener('click', () => show(i, true));
+    dotsWrap.appendChild(dot);
+  });
+
+  function show(i, userTriggered){
+    idx = (i + QUOTES.length) % QUOTES.length;
+    textEl.classList.remove('show');
+    subEl.classList.remove('show');
+    setTimeout(() => {
+      textEl.textContent = '"' + QUOTES[idx].text + '"';
+      subEl.textContent = QUOTES[idx].sub;
+      textEl.classList.add('show');
+      subEl.classList.add('show');
+      Array.from(dotsWrap.children).forEach((d,di) => d.classList.toggle('active', di===idx));
+    }, 180);
+    if (userTriggered) restartTimer();
+  }
+
+  function restartTimer(){
+    if (timer) clearInterval(timer);
+    timer = setInterval(() => show(idx+1, false), 4500);
+  }
+
+  prevBtn.addEventListener('click', () => show(idx-1, true));
+  nextBtn.addEventListener('click', () => show(idx+1, true));
+
+  const card = document.querySelector('.quote-card');
+  card.addEventListener('mouseenter', () => { if (timer) clearInterval(timer); });
+  card.addEventListener('mouseleave', restartTimer);
+
+  show(0, false);
+  restartTimer();
+})();
+
+/* =========================================================
+   6. copy buttons (generic data-copy)
+   ========================================================= */
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove('show'), 1400);
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.setAttribute('readonly','');
+  ta.style.position = 'fixed'; ta.style.left = '-9999px';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch(_e){}
+  ta.remove();
+}
+async function copyText(text){
+  if (navigator.clipboard && window.isSecureContext){
+    try { await navigator.clipboard.writeText(text); return; } catch(_e){}
+  }
+  fallbackCopy(text);
+}
+document.getElementById('plannerCopyBtn').addEventListener('click', async () => {
+  await copyText(document.getElementById('plannerPrompt').textContent);
+  showToast('프롬프트를 복사했습니다');
+});
+document.querySelectorAll('.copy-button[data-copy]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    await copyText(btn.dataset.copy);
+    showToast('복사했습니다');
+  });
+});
+
+/* =========================================================
+   7. sidebar scroll-spy
+   ========================================================= */
+const tocLinks = Array.from(document.querySelectorAll('.toc a'));
+const sections = tocLinks.map(l => document.querySelector(l.getAttribute('href'))).filter(Boolean);
+function updateActiveToc(){
+  if (!sections.length) return;
+  const current = sections.reduce((active, s) => (s.getBoundingClientRect().top <= 130 ? s : active), sections[0]);
+  tocLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + current.id));
+}
+window.addEventListener('scroll', updateActiveToc, { passive:true });
+updateActiveToc();
+
+/* =========================================================
+   8. progress + celebration (in-memory only, no persistence)
+   ========================================================= */
+const checks = Array.from(document.querySelectorAll('.check input[type="checkbox"]'));
+const progressCount = document.getElementById('progressCount');
+const progressTotal = document.getElementById('progressTotal');
+const progressBar = document.getElementById('progressBar');
+progressTotal.textContent = checks.length;
+
+const celebration = document.getElementById('celebration');
+const celebrationCanvas = document.getElementById('celebrationCanvas');
+const celebrationClose = document.getElementById('celebrationClose');
+const celebrationCloseBtn = document.getElementById('celebrationCloseBtn');
+let confettiRAF = null;
+
+function runConfetti(){
+  const ctx = celebrationCanvas.getContext('2d');
+  function resize(){ celebrationCanvas.width = window.innerWidth; celebrationCanvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  const colors = ['#2e9bdb','#ffd23f','#ff2f92','#3cff6a','#375f8f'];
+  const pieces = Array.from({ length: 140 }, () => ({
+    x: Math.random() * celebrationCanvas.width,
+    y: -20 - Math.random() * celebrationCanvas.height,
+    w: 6 + Math.random() * 6,
+    h: 8 + Math.random() * 10,
+    speed: 2 + Math.random() * 3,
+    rot: Math.random() * Math.PI,
+    rotSpeed: (Math.random() - 0.5) * 0.2,
+    color: colors[Math.floor(Math.random() * colors.length)],
+  }));
+  let frame = 0;
+  function tick(){
+    frame++;
+    ctx.clearRect(0, 0, celebrationCanvas.width, celebrationCanvas.height);
+    pieces.forEach(p => {
+      p.y += p.speed; p.rot += p.rotSpeed;
+      if (p.y > celebrationCanvas.height + 20) p.y = -20;
+      ctx.save();
+      ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    if (frame < 260) confettiRAF = requestAnimationFrame(tick);
+  }
+  tick();
+}
+function showCelebration(){ celebration.hidden = false; runConfetti(); }
+function closeCelebration(){ celebration.hidden = true; if (confettiRAF) cancelAnimationFrame(confettiRAF); }
+celebrationClose.addEventListener('click', closeCelebration);
+celebrationCloseBtn.addEventListener('click', closeCelebration);
+
+let celebrated = false;
+function updateProgress(){
+  const done = checks.filter(c => c.checked).length;
+  progressCount.textContent = done;
+  progressBar.style.width = (checks.length ? done / checks.length * 100 : 0) + '%';
+  if (done === checks.length && checks.length > 0 && !celebrated){
+    celebrated = true;
+    showCelebration();
+  }
+}
+checks.forEach(c => {
+  c.closest('.check').classList.toggle('done', c.checked);
+  c.addEventListener('change', () => {
+    c.closest('.check').classList.toggle('done', c.checked);
+    updateProgress();
+  });
+});
+updateProgress();
+</script>
+</body>
+</html>
