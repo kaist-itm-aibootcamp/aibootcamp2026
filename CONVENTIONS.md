@@ -42,6 +42,24 @@
 
 > 참고: 이름 변경 전 `week1-03-...`은 존재하지 않는 `Week1_HTML의_압도적_효과성.html` / `Week1_JS_financial_planner.html`을 링크하고 있었다(번호 접두어가 나중에 붙으면서 링크가 갱신되지 않음). 이번 정리에서 함께 수정했다.
 
+## Week 2 적용 결과 (이름 변경 이력)
+
+| 이전 (초안) | 변경 후 |
+|---|---|
+| `01_Week2_Cowork_웹스크래핑.html` | `week2-01-cowork-web-scraping.html` |
+| `02_Week2_임베딩_추출.html` | `week2-02-embedding-extraction.html` |
+| `03_Week2_판결문지도_클러스터링.html` | `week2-03-judgment-map-clustering.html` |
+| `04_Week2_Chat_Cowork_Code.html` | `week2-04-chat-cowork-code.html` |
+| `05_Week2_검색엔진_키워드vs임베딩.html` | `week2-05-keyword-vs-embedding-search.html` |
+| `06_Week2_임베딩_검색엔진.html` | `week2-06-embedding-search-engine.html` |
+| `07_Week2_RAG_LongContext.html` | `week2-07-rag-long-context.html` |
+| `08_Week2_스킬_제작.html` | `week2-08-building-skills.html` |
+| `09_Week2_논문계보도_문헌리서치.html` | `week2-09-citation-genealogy-research.html` |
+| `자료/Week2_예시_판례분석보고서.html` | `week2-example-workplace-harassment-report.html` |
+| `자료/Week2_자료_계보도_AI노동.html` | `week2-example-citation-genealogy-ai-labor.html` |
+
+> 예시 파일 2개는 각각 `week2-01`·`week2-09`에 base64 data URL로 내장되어 있어 강의 페이지만 열어도 보인다. 저장소에는 단독으로 열어볼 수 있는 원본으로 함께 두되, 주차 `index.html`의 자료 목록에는 넣지 않는다(Week 1의 `week1-example-*` 파일과 같은 취급).
+
 ## 콘텐츠 규칙
 
 각 강의자료 HTML은 단일 파일(인라인 CSS+JS, 외부 의존성 없음)로 만들고, topbar/사이드바 TOC/진행률 바/완료 체크박스 등 디자인 시스템은 `kaist-bootcamp-html-builder` 스킬 문서를 따른다.
