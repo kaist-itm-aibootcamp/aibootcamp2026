@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 2 — 임베딩 추출: 판결문 347건을 숫자로 바꾸기</title>
+<style>
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
+  --brand:#2e9bdb; --brand-dark:#1b6fa6; --green:#2f765b; --amber:#b8792e; --red:#b0483f;
+  --blue:#375f8f; --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12); --radius:14px; --sidebar-width:250px;
+  --series-1:#2a78d6; --series-2:#eb6834; --series-3:#1baf7a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15.5px;
+}
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+.layout{display:flex;align-items:flex-start;}
+.sidebar{
+  position:sticky;top:63px;flex:0 0 var(--sidebar-width);width:var(--sidebar-width);
+  height:calc(100vh - 63px);overflow-y:auto;padding:22px 14px 40px 22px;border-right:1px solid var(--line);
+}
+.sidebar-title{font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+.toc a{
+  display:block;padding:7px 11px;margin:2px 0;border-radius:8px;border-left:3px solid transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;line-height:1.4;
+}
+.toc a:hover{background:#eef3ec;color:var(--ink);}
+.toc a.active{background:var(--sky-light);border-left-color:var(--brand);color:var(--brand-dark);font-weight:800;}
+.toc a .done-mark{color:var(--green);font-weight:900;margin-left:4px;display:none;}
+.toc a.done .done-mark{display:inline;}
+.content{flex:1;min-width:0;max-width:920px;padding:clamp(20px,4vw,44px) clamp(16px,4vw,44px) 100px;}
+.hero{margin-bottom:16px;}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.07em;color:var(--brand-dark);background:var(--sky-light);padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+.hero h1{font-size:clamp(23px,3.6vw,32px);line-height:1.3;letter-spacing:-.015em;margin-bottom:10px;}
+.hero p{color:var(--muted);max-width:660px;}
+.section{margin-top:44px;padding-top:8px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
+.sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
+.sec-lead{color:var(--muted);margin:4px 0 18px;max-width:700px;}
+h3{font-size:16.5px;margin:26px 0 10px;}
+h4{font-size:15px;margin:16px 0 8px;}
+p{margin:10px 0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:14px 0;box-shadow:0 3px 14px rgba(54,42,31,.05);}
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+.concept-grid.two{grid-template-columns:repeat(2,1fr);}
+.concept{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.concept .ico{font-size:21px;}
+.concept b{display:block;margin:7px 0 4px;font-size:14.5px;}
+.concept span{display:block;color:var(--muted);font-size:13px;line-height:1.55;}
+.concept .use{display:inline-block;margin-top:9px;font-size:12px;font-weight:800;color:var(--brand-dark);background:var(--sky-light);border-radius:999px;padding:2px 10px;}
+.callout{border-left:4px solid var(--brand);background:var(--sky-light);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;font-size:14.5px;}
+.callout.caution{border-left-color:var(--red);background:#faeeec;}
+.callout.ok{border-left-color:var(--green);background:#edf4ef;}
+.callout b.cap{display:block;font-size:13px;letter-spacing:.03em;margin-bottom:4px;color:var(--brand-dark);}
+.callout.caution b.cap{color:var(--red);}
+.callout.ok b.cap{color:var(--green);}
+.tip-card{border-left:4px solid var(--brand);background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 17px;margin:14px 0;font-size:14px;color:var(--muted);}
+.tip-card b{color:var(--ink);}
+.copy-block{position:relative;background:#20242a;color:#e8ecf1;border-radius:12px;padding:18px 20px;margin:14px 0;font-size:14px;line-height:1.8;}
+.copy-block .cb-label{position:absolute;top:-10px;left:14px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--brand);padding:3px 10px;border-radius:999px;}
+.copy-block pre{white-space:pre-wrap;word-break:break-word;font-family:inherit;margin-top:4px;}
+.copy-block pre.mono{font-family:ui-monospace,Consolas,monospace;font-size:13px;}
+.copy-btn{position:absolute;top:12px;right:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 11px;cursor:pointer;}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+.doc-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--surface);}
+.doc-table th{background:#f2f6f0;text-align:left;padding:8px 12px;border:1px solid var(--line);font-size:12.5px;}
+.doc-table td{padding:8px 12px;border:1px solid var(--line);}
+.doc-table td.r{text-align:right;font-variant-numeric:tabular-nums;}
+.doc-table td code, p code, li code{background:#eef3ec;border-radius:5px;padding:1px 6px;font-family:ui-monospace,Consolas,monospace;font-size:.9em;}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+.compare.three{grid-template-columns:1fr 1fr 1fr;}
+.compare .col{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.compare .col h4{font-size:14.5px;margin:0 0 8px;}
+.compare ul{margin:0 0 0 18px;font-size:13.5px;color:var(--muted);}
+.compare li{margin:5px 0;}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+.stat-row.three{grid-template-columns:repeat(3,1fr);}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 15px;}
+.stat .v{font-size:26px;font-weight:900;letter-spacing:-.02em;color:var(--brand-dark);line-height:1.15;}
+.stat .k{margin-top:5px;font-size:12.5px;color:var(--muted);line-height:1.5;}
+.insight{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0;}
+.insight .n{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;border-radius:999px;background:var(--sky-light);color:var(--brand-dark);font-weight:900;font-size:13px;transform:translateY(2px);}
+.insight p{margin:0;font-size:14.5px;}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin:16px 0;}
+.flow .step{flex:1 1 150px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;position:relative;}
+.flow .step b{display:block;font-size:13.5px;margin-bottom:3px;color:var(--brand-dark);}
+.flow .step span{font-size:12.5px;color:var(--muted);line-height:1.5;display:block;}
+.flow .arrow{align-self:center;color:var(--brand);font-weight:900;font-size:16px;}
+.workshop-step{display:flex;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0;}
+.ws-num{flex:0 0 auto;display:grid;place-items:center;width:30px;height:30px;border-radius:999px;background:var(--brand);color:#fff;font-weight:900;font-size:14px;transform:translateY(2px);}
+.ws-body{min-width:0;flex:1;}
+.ws-body b.ws-title{display:block;font-size:14.5px;margin-bottom:4px;}
+.ws-body p{margin:5px 0;font-size:14px;color:var(--muted);}
+.example-card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;margin:16px 0;box-shadow:var(--shadow);max-width:560px;}
+.example-card:focus-visible{outline:3px solid var(--brand);}
+.example-thumb{position:relative;height:210px;overflow:hidden;background:#eef1ec;}
+.example-thumb iframe{position:absolute;top:0;left:0;width:400%;height:400%;transform:scale(.25);transform-origin:top left;border:none;pointer-events:none;}
+.example-thumb .zoom{position:absolute;right:12px;bottom:12px;background:rgba(32,36,42,.85);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:5px 12px;}
+.example-body{padding:14px 18px;}
+.example-body b{font-size:14.5px;}
+.example-body p{margin:4px 0 0;font-size:13px;color:var(--muted);}
+.example-lightbox{position:fixed;inset:0;z-index:80;background:rgba(20,24,20,.62);display:flex;align-items:center;justify-content:center;padding:3vh 3vw;}
+.example-lightbox[hidden]{display:none;}
+.lightbox-inner{position:relative;width:min(980px,96vw);height:92vh;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);}
+.lightbox-inner iframe{width:100%;height:100%;border:none;}
+.lightbox-close{position:absolute;top:10px;right:10px;z-index:2;border:none;background:#20242a;color:#fff;width:34px;height:34px;border-radius:999px;font-size:16px;font-weight:900;cursor:pointer;}
+.placeholder-box{border:2px dashed var(--line);border-radius:var(--radius);background:#fafcf9;padding:26px 22px;margin:14px 0;text-align:center;color:var(--muted);}
+.placeholder-box b{display:block;color:var(--ink);font-size:15px;margin-bottom:6px;}
+.placeholder-box .soon{display:inline-block;margin-top:10px;font-size:12px;font-weight:900;letter-spacing:.05em;color:var(--amber);background:#f7efe3;border-radius:999px;padding:4px 12px;}
+.completion-row{margin:22px 0 6px;}
+.check{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 18px;cursor:pointer;font-size:14px;font-weight:700;color:var(--muted);}
+.check input{width:17px;height:17px;accent-color:var(--green);}
+.check:has(input:checked){border-color:var(--green);color:var(--green);background:#edf4ef;}
+.celebrate-banner{border:1px solid #bfe0c9;background:linear-gradient(120deg,#edf7ef,#e3f1fb);border-radius:var(--radius);padding:18px 22px;margin:0 0 22px;font-size:15px;box-shadow:var(--shadow);}
+.celebrate-banner b{color:var(--green);}
+.final-list{list-style:none;margin:14px 0;}
+.final-list li{display:flex;gap:10px;margin:9px 0;font-size:14.5px;}
+.final-list li::before{content:"✔";color:var(--green);font-weight:900;}
+.next-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.next-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.next-card b{display:block;font-size:14.5px;margin-bottom:5px;color:var(--brand-dark);}
+.next-card span{font-size:13.5px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#20242a;color:#fff;font-size:13.5px;font-weight:700;border-radius:999px;padding:10px 20px;opacity:0;transition:all .25s;z-index:90;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.diagram-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:16px 0;}
+.diagram-card h4{margin:0 0 4px;}
+.diagram-card .sub{font-size:12.5px;color:var(--muted);margin-bottom:10px;}
+.diagram-card svg{width:100%;height:auto;display:block;}
+@media (max-width:900px){
+  .layout{display:block;}
+  .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  .concept-grid,.concept-grid.two{grid-template-columns:1fr 1fr;}
+  .stat-row,.stat-row.three{grid-template-columns:1fr 1fr;}
+  .compare,.compare.three{grid-template-columns:1fr;}
+  .next-card-grid{grid-template-columns:1fr;}
+}
+@media (max-width:640px){
+  .topbar{flex-wrap:wrap;row-gap:10px;}
+  .topbar-left{flex-wrap:wrap;row-gap:8px;}
+  .progress-wrap{width:100%;}
+  .concept-grid,.concept-grid.two{grid-template-columns:1fr;}
+}
+
+
+/* ---- 목록으로 돌아가기 (week1과 동일 패턴) ---- */
+.back-week{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:color .15s ease,border-color .15s ease,background .15s ease;}
+.back-week:hover{color:var(--brand-dark);border-color:var(--brand);background:var(--sky-light);}
+.back-home{display:flex;align-items:center;gap:15px;max-width:840px;margin:34px 0 10px;padding:20px 24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s ease,border-color .18s ease;}
+.back-home:hover{transform:translateY(-2px);border-color:var(--brand);}
+.back-home .bh-ic{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;border-radius:11px;background:var(--sky-light);color:var(--brand-dark);font-size:19px;font-weight:900;}
+.back-home strong{display:block;font-size:15.5px;font-weight:800;}
+.back-home small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;font-weight:600;}
+@media (max-width:640px){.back-home{padding:18px;gap:12px;}}
+</style>
+</head>
+<body id="top" data-celebrate="🎉 <b>임베딩 파트 완주!</b> 이제 여러분은 비정형 텍스트를 '의미의 좌표'로 바꾸는 파이프라인을 AI에게 맡길 수 있습니다. 이 좌표로 지도를 그리는 실습이 이어집니다.">
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+    </a>
+    <div class="week-tag"><span class="week-num">WEEK 2</span><span class="week-title">임베딩 추출 파이프라인</span></div>
+    <a class="back-week" href="index.html">← 2주차 목록</a>
+  </div>
+  <div class="progress-wrap" aria-label="진행률">
+    <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="목차">
+    <div class="sidebar-title">이 페이지의 흐름</div>
+    <div class="toc">
+      <a href="#s1" data-sec="s1">1. 임베딩이란 — 비정형을 숫자로<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. OpenRouter — 임베딩을 뽑는 창구<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. Cowork 파이프라인 — 폴더 연동과 키<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 실전 기록 — 실제로 일어난 일들<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 산출물과 활용 — 검색·지도·군집<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. 마무리 체크리스트<span class="done-mark">✔</span></a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div id="celebrateSlot"></div>
+
+    <div class="hero">
+      <span class="hero-kicker">WEEK 2 · STEP 2 — 임베딩 추출</span>
+      <h1>판결문 347건을 숫자로 —<br/>임베딩 추출 파이프라인</h1>
+      <p>수집한 판결문을 "읽는" 대신 "재는" 방법을 배웁니다. 텍스트를 의미의 좌표(임베딩)로 바꾸면 검색·지도·군집 분석이 가능해집니다. 이 페이지의 수치와 사례는 <b>실제 판결문 코퍼스에 이 파이프라인을 돌린 기록</b>입니다.</p>
+    </div>
+
+    <!-- ============ S1 ============ -->
+    <section class="section" id="s1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>임베딩이란 — 비정형 데이터를 숫자로 요약하기</h2></div>
+      <p class="sec-lead">판결문 한 건은 평균 8,500자짜리 비정형 텍스트입니다. 통계도, 지도도, 유사도 계산도 텍스트 그대로는 불가능합니다. 임베딩은 이 문제를 푸는 도구입니다.</p>
+
+      <div class="callout"><b class="cap">재료 — 앞 강의에서 수집한 895건 중 347건</b>
+        앞 강의(웹 스크래핑)에서 "직장 내 괴롭힘"이 언급된 지방법원 판결 <b>895건</b>의 목록을 수집했습니다. 그중 <b>본문 전문을 확보하고 분석 대상(직장 내 괴롭힘 민사 손해배상)으로 확정한 347건</b>이 이 페이지부터 계속 쓰이는 코퍼스입니다. 수집한 전부를 쓰는 것이 아니라 <b>분석 목적에 맞는 것만 추리는 단계</b>가 수집과 분석 사이에 반드시 들어갑니다 — 여러분의 데이터에서도 마찬가지입니다.
+      </div>
+
+      <h3>먼저 seq-to-seq 모델부터</h3>
+      <p>번역기를 생각해 보세요. 문장(단어의 <b>시퀀스</b>)이 들어가면 번역문(다른 시퀀스)이 나옵니다. 내부는 두 부분입니다 — 입력 문장을 읽어 <b>의미를 압축한 숫자 뭉치</b>로 만드는 <b>인코더</b>, 그 숫자 뭉치를 풀어 출력 문장을 만드는 <b>디코더</b>.</p>
+
+      <div class="diagram-card">
+        <h4>seq-to-seq에서 임베딩이 나오는 자리</h4>
+        <div class="sub">인코더가 만든 "의미 요약 숫자"만 떼어 저장한 것이 임베딩입니다</div>
+        <svg viewBox="0 0 680 190" role="img" aria-label="seq2seq 구조 다이어그램">
+          <rect x="8" y="30" width="150" height="52" rx="10" fill="#fafcf9" stroke="#d5ddd3"/>
+          <text x="83" y="52" text-anchor="middle" font-size="12" fill="#626a64">입력 시퀀스</text>
+          <text x="83" y="70" text-anchor="middle" font-size="12.5" font-weight="700" fill="#22201d">"판결문 텍스트…"</text>
+          <text x="176" y="61" text-anchor="middle" font-size="16" font-weight="900" fill="#2e9bdb">→</text>
+          <rect x="194" y="24" width="110" height="64" rx="10" fill="#1b6fa6"/>
+          <text x="249" y="52" text-anchor="middle" font-size="13.5" font-weight="800" fill="#fff">인코더</text>
+          <text x="249" y="70" text-anchor="middle" font-size="10.5" fill="#cde2fb">의미를 압축</text>
+          <text x="322" y="61" text-anchor="middle" font-size="16" font-weight="900" fill="#2e9bdb">→</text>
+          <rect x="340" y="30" width="140" height="52" rx="10" fill="#e3f1fb" stroke="#2e9bdb"/>
+          <text x="410" y="52" text-anchor="middle" font-size="11" fill="#1b6fa6" font-weight="800">의미 요약 벡터</text>
+          <text x="410" y="70" text-anchor="middle" font-size="11.5" font-family="monospace" fill="#22201d">[0.12, −0.98, …]</text>
+          <text x="498" y="61" text-anchor="middle" font-size="16" font-weight="900" fill="#c3c2b7">→</text>
+          <rect x="516" y="24" width="110" height="64" rx="10" fill="#eceae6"/>
+          <text x="571" y="52" text-anchor="middle" font-size="13.5" font-weight="800" fill="#898781">디코더</text>
+          <text x="571" y="70" text-anchor="middle" font-size="10.5" fill="#898781">번역·요약 생성</text>
+          <path d="M410 90 v28" stroke="#2f765b" stroke-width="2" fill="none" marker-end="none"/>
+          <rect x="250" y="122" width="320" height="52" rx="10" fill="#edf4ef" stroke="#2f765b"/>
+          <text x="410" y="144" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f765b">디코더를 떼어내고 이 벡터만 저장하면 = 임베딩</text>
+          <text x="410" y="162" text-anchor="middle" font-size="11" fill="#626a64">긴 시퀀스의 정보를 요약한 고정 길이 숫자 목록 (오늘은 4,096개)</text>
+        </svg>
+      </div>
+
+      <div class="callout"><b class="cap">한 문장 정의</b>
+      임베딩 = <b>복잡한 비정형 데이터(텍스트)를 의미가 보존되도록 수치로 요약한 것.</b> 비슷한 내용의 글은 비슷한 숫자가 되므로, 숫자 사이의 거리가 곧 <b>의미의 거리</b>가 됩니다. 모든 판결문에 GPS 좌표를 붙인다고 생각하면 됩니다 — 쟁점이 비슷하면 이웃 동네.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>임베딩이 "시퀀스 정보를 요약한 숫자"임을 이해했다</span></label></div>
+    </section>
+
+    <!-- ============ S2 ============ -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>OpenRouter — 임베딩을 뽑는 가장 편한 창구</h2></div>
+      <p class="sec-lead">임베딩 모델을 내 PC에서 직접 돌릴 수도 있지만, 비개발자에게는 <b>API 호출</b>이 압도적으로 편합니다. 그리고 여러 회사의 모델을 한곳에서 쓰게 해주는 중개소가 OpenRouter입니다.</p>
+
+      <div class="concept-grid">
+        <div class="concept"><div class="ico">🔀</div><b>하나의 키, 수백 개 모델</b><span>OpenAI·Google·Qwen 등 여러 회사 모델을 <b>API 키 하나</b>로 호출. 모델명 문자열만 바꾸면 모델이 바뀝니다.</span></div>
+        <div class="concept"><div class="ico">💳</div><b>선불 크레딧</b><span>openrouter.ai 가입 → 소액 충전(몇 달러면 충분) → Keys 메뉴에서 API 키 발급. 쓴 만큼만 차감됩니다.</span></div>
+        <div class="concept"><div class="ico">🧾</div><b>투명한 사용 내역</b><span>대시보드에서 호출 1건 단위로 토큰·비용이 조회됩니다 — 뒤에서 이 내역이 <b>검증 도구</b>로도 쓰입니다(§4).</span></div>
+      </div>
+
+      <h3>임베딩 모델 고르기 — 컨텍스트 길이가 핵심</h3>
+      <p>이번 코퍼스 실측: 347건 평균 <b>8,492자</b>, 최대 41,374자. 8,000자를 넘는 판결문이 절반 가까이라, 컨텍스트가 8K 토큰인 모델은 <b>절반이 잘립니다</b>(한국어는 글자당 토큰 소모가 커서 더 심함). 실제 조회된 선택지:</p>
+      <table class="doc-table">
+        <thead><tr><th>모델 (OpenRouter 슬러그)</th><th style="text-align:right">컨텍스트</th><th style="text-align:right">단가</th><th>비고</th></tr></thead>
+        <tbody>
+          <tr><td><code>qwen/qwen3-embedding-8b</code></td><td class="r">32K</td><td class="r">$0.01/M</td><td><b>선택</b> — 길이·가격 모두 유리</td></tr>
+          <tr><td><code>google/gemini-embedding-001</code></td><td class="r">20K</td><td class="r">$0.15/M</td><td></td></tr>
+          <tr><td><code>openai/text-embedding-3-large</code></td><td class="r">8K</td><td class="r">$0.13/M</td><td>장문 판결문 절반이 잘림</td></tr>
+          <tr><td><code>baai/bge-m3</code></td><td class="r">8K</td><td class="r">$0.01/M</td><td></td></tr>
+        </tbody>
+      </table>
+      <div class="tip-card"><b>비용 감각</b> — 판결문 347건 전체(본문+개요)를 임베딩하는 데 든 비용은 <b>약 2센트</b>였습니다. "API는 비쌀 것"이라는 걱정은 임베딩에서는 대체로 기우입니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>OpenRouter의 역할과 모델 선택 기준(컨텍스트 길이)을 이해했다</span></label></div>
+    </section>
+
+    <!-- ============ S3 ============ -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>Cowork 파이프라인 — PC 폴더 연동과 API 키</h2></div>
+      <p class="sec-lead">코드를 한 줄도 쓰지 않고, Cowork에 요청 하나로 전체 파이프라인을 맡깁니다. 핵심은 <b>API 키를 안전하게 전달하는 방법</b>입니다.</p>
+
+      <div class="flow">
+        <div class="step"><b>① PC 폴더 연동</b><span>Cowork에서 판결문이 있는 로컬 폴더를 연결</span></div>
+        <span class="arrow">→</span>
+        <div class="step"><b>② 키 파일 저장</b><span>연동 폴더에 <code>openrouterkey.txt</code> (키 한 줄) 저장</span></div>
+        <span class="arrow">→</span>
+        <div class="step"><b>③ 프롬프트</b><span>"키를 읽어 임베딩을 뽑고 JSON으로 저장해줘"</span></div>
+        <span class="arrow">→</span>
+        <div class="step"><b>④ 클라우드 실행</b><span>Cowork가 키를 환경변수로만 읽어 API 호출</span></div>
+        <span class="arrow">→</span>
+        <div class="step"><b>⑤ 결과 동기화</b><span>판결문별 JSON 347개가 PC 폴더로 돌아옴</span></div>
+      </div>
+
+      <div class="copy-block"><span class="cb-label">💬 실제 사용한 요청 (수업용으로 다듬음)</span><button class="copy-btn" data-copy="p1">복사</button>
+<pre id="p1">수집된 판결문 본문의 임베딩을 OpenRouter API로 뽑으려 한다.
+연동 폴더에 openrouterkey.txt 파일을 저장해 두었다. 키를 읽어 API 호출을 하고,
+판결문별로 JSON 파일을 저장해줘. JSON에는 metadata.csv의 기본 서지 정보 +
+본문 전체 임베딩 + 요약문 + 요약문 임베딩을 넣으면 될 것 같다.</pre></div>
+
+      <div class="callout caution"><b class="cap">키 보안 — 반드시 확인할 것</b>
+      키는 <b>환경변수로만</b> 읽게 하고, 화면·로그·산출물 어디에도 출력하지 말 것을 명시하세요(Cowork도 같은 원칙으로 동작합니다). 작업이 끝나면 <b>평문 키 파일이 폴더에 남아 있다는 사실</b>을 잊지 마세요 — 폴더를 공유·백업하기 전에 키 파일을 빼두어야 합니다. 실제 작업에서도 AI가 이 점을 마지막에 상기시켜 주었습니다.</div>
+
+      <div class="tip-card"><b>구조 이해</b> — 내 PC 쪽에는 네트워크 실행 권한이 없으므로, 실제 HTTP 호출은 Cowork의 클라우드 컨테이너에서 일어나고 완성된 JSON이 PC 폴더로 돌아오는 구조입니다. "어디서 무엇이 실행되는가"는 민감 데이터를 다룰 때 꼭 확인해야 할 질문입니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>폴더 연동 → 키 파일 → 클라우드 실행 → 동기화 구조를 이해했다</span></label></div>
+    </section>
+
+    <!-- ============ S4 ============ -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>실전 기록 — 요청 한 줄 뒤에서 실제로 일어난 일들</h2></div>
+      <p class="sec-lead">위의 짧은 요청에 대해 AI가 스스로 수행한 검증과, 사용자가 던진 확인 질문의 기록입니다. <b>AI에게 일을 맡기는 법</b>과 <b>결과를 믿는 법</b>을 동시에 보여줍니다.</p>
+
+      <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
+        <b class="ws-title">AI가 모델명부터 바로잡았다</b>
+        <p>사용자는 "chatgpt-oss-embedding 모델로"라고 요청했지만 그런 모델은 실존하지 않았습니다. AI는 그대로 진행하는 대신 OpenRouter의 실제 임베딩 모델 목록과 단가를 조회해 표로 제시하고 선택을 물었습니다. <b>교훈: 이름·수치가 애매하면 AI에게 실존 확인부터 시키세요.</b></p>
+      </div></div>
+      <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
+        <b class="ws-title">데이터를 실측한 뒤 모델을 골랐다</b>
+        <p>코퍼스 전체 길이를 실측(평균 8,492자, 8천자 초과 다수)해 컨텍스트 8K 모델을 배제하고 32K 모델을 권장했습니다. 최장 판결문(24,250토큰)을 실제로 보내 <b>절단 없이 과금되는지</b>까지 확인했습니다.</p>
+      </div></div>
+      <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
+        <b class="ws-title">시험 5건 → 검증 → 본 배치</b>
+        <p>전량을 바로 돌리지 않고 5건으로 시험 실행 후 무결성을 검증했습니다 — 차원 4,096 동일, 벡터 정규화 확인, 본문 벡터가 자기 개요와 가장 가까운지(정합성) 확인. 통과 후 본 배치: <b>347건, 13.8분, 실패 0건, 비용 약 2센트.</b></p>
+      </div></div>
+      <div class="workshop-step"><span class="ws-num">4</span><div class="ws-body">
+        <b class="ws-title">사용자는 "과금 내역"으로 교차검증했다</b>
+        <p>사용자가 OpenRouter 대시보드에서 호출 이력이 353건임을 보고 물었습니다 — "본문과 요약을 따로 불렀으면 2배여야 하는 것 아닌가?" AI의 답: 본문+요약을 <b>한 요청에 배열로 담아</b> 판결당 1콜이며, 353 = 소통 확인 1 + 절단 검증 2 + 시험 5 + 본 배치 342 + 검색 스팟체크 3. 토큰 수도 로컬 계산과 1토큰 오차 없이 일치. <b>교훈: AI의 보고를 외부 기록(과금 내역)과 대조하면 가장 확실합니다.</b></p>
+      </div></div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>시험 실행·무결성 검증·외부 기록 교차검증의 흐름을 이해했다</span></label></div>
+    </section>
+
+    <!-- ============ S5 ============ -->
+    <section class="section" id="s5">
+      <div class="sec-head"><span class="sec-num">5</span><h2>산출물과 활용 — 검색, 지도, 군집</h2></div>
+      <p class="sec-lead">판결문 1건당 JSON 파일 1개(평균 181KB)가 만들어졌습니다. 안에는 서지 정보와 두 개의 벡터가 들어 있습니다.</p>
+
+      <div class="copy-block"><span class="cb-label">📄 실제 산출물 JSON (수원지법 2020가단8667 · 벡터는 앞부분만 표시)</span>
+<pre class="mono">{
+  "id": "수원지방법원_2020가단8667",
+  "법원": "수원지방법원",  "사건번호": "2020가단8667",
+  "선고일": "2021. 4. 21.",  "심급": "1심",  "소송결과": "원고일부승",
+  "사건유형": "괴롭힘 손해배상",
+  "body_chars": 2263,  "body_tokens": 1607,
+  "embedding_model": "qwen/qwen3-embedding-8b",
+  "embedding_dim": 4096,  "normalized": true,  "chunked": false,
+  "body_embedding": [-0.01119, -0.00574, 0.03813, 0.01374, …],  // 4,096개
+  "summary": "원고가 노동조합 조합장인 피고를 상대로 특수협박·모욕 및 이로 인한
+    직장 내 괴롭힘·왕따를 이유로 재산상 손해와 위자료를 청구한 사건이다. 법원은
+    형사 약식명령이 확정된 특수협박·모욕 행위에 대해 위자료 1,000만 원을
+    인정하였으나, 직장 내 괴롭힘 주장은 증거 부족으로 배척하였다.",
+  "summary_embedding": [-0.03728, -0.00944, 0.04158, 0.00807, …]  // 4,096개
+}</pre></div>
+      <div class="tip-card"><b>메타데이터도 함께</b> — 벡터만 저장하지 않고 서지 정보·모델명·차원·정규화 여부를 같은 파일에 남겼습니다. 나중에 "이 벡터가 어떤 모델에서 나왔더라?"를 파일 하나로 답할 수 있어야 재현 가능한 연구가 됩니다.</div>
+
+      <h3>활용 ① — 의미 검색: 키워드가 아니라 "논리"로 찾기</h3>
+      <p>질의문도 같은 모델로 임베딩해 거리가 가까운 판결을 찾으면, 단어가 아니라 <b>판시 논리</b>가 검색됩니다. 실제 스팟체크:</p>
+      <div class="callout ok"><b class="cap">실제 검색 결과</b>
+      "업무상 적정범위를 넘지 않았다고 보아 괴롭힘을 부정한 사례"로 질의 → 1·2위가 정확히 그 논리로 기각된 <b>원고패 판결</b>. "사용자의 예견가능성" 질의 → 보고서에서 대표 사례로 인용했던 판결(카카오톡 근거로 예견가능성 인정)이 1위. 키워드 검색으로는 불가능한 결과입니다.</div>
+
+      <h3>활용 ② — 2D 지도와 클러스터링</h3>
+      <p>4,096차원 좌표를 2차원으로 압축(UMAP 등)하면 코퍼스 전체가 <b>한 장의 지도</b>가 됩니다. 가까운 점 = 비슷한 판결. 여기에 클러스터링을 적용하면 "비슷한 판결 무리"가 자동으로 묶입니다.</p>
+      <div class="diagram-card">
+        <h4>판결문 지도 개념도</h4>
+        <div class="sub">개념 설명용 그림입니다 — 실제 지도는 실습에서 여러분이 직접 만듭니다</div>
+        <svg viewBox="0 0 680 270" role="img" aria-label="임베딩 2D 지도 개념도">
+          <rect x="8" y="8" width="664" height="230" rx="12" fill="#fafcf9" stroke="#e1e0d9"/>
+          <g fill="var(--series-1)">
+            <circle cx="130" cy="80" r="7"/><circle cx="158" cy="62" r="7"/><circle cx="172" cy="96" r="7"/>
+            <circle cx="118" cy="112" r="7"/><circle cx="196" cy="78" r="7"/><circle cx="150" cy="128" r="7"/><circle cx="184" cy="120" r="7"/>
+          </g>
+          <text x="156" y="170" text-anchor="middle" font-size="12" font-weight="800" fill="#1c5cab">폭언·질책형</text>
+          <g fill="var(--series-2)">
+            <circle cx="360" cy="150" r="7"/><circle cx="390" cy="132" r="7"/><circle cx="404" cy="168" r="7"/>
+            <circle cx="348" cy="184" r="7"/><circle cx="428" cy="150" r="7"/><circle cx="382" cy="196" r="7"/>
+          </g>
+          <text x="388" y="228" text-anchor="middle" font-size="12" font-weight="800" fill="#b5470f">업무배제·인사형</text>
+          <g fill="var(--series-3)">
+            <circle cx="545" cy="70" r="7"/><circle cx="575" cy="56" r="7"/><circle cx="590" cy="88" r="7"/>
+            <circle cx="533" cy="100" r="7"/><circle cx="608" cy="70" r="7"/>
+          </g>
+          <text x="572" y="136" text-anchor="middle" font-size="12" font-weight="800" fill="#0d7a52">성희롱·사용자책임형</text>
+          <g>
+            <path d="M292 60 l14 14 M306 60 l-14 14" stroke="#b0483f" stroke-width="3.5" fill="none"/>
+            <text x="299" y="46" text-anchor="middle" font-size="11.5" font-weight="800" fill="#b0483f">새 사건</text>
+            <path d="M290 82 Q240 96 205 88" stroke="#b0483f" stroke-width="1.5" stroke-dasharray="4 3" fill="none"/>
+          </g>
+          <text x="340" y="258" text-anchor="middle" font-size="11.5" fill="#898781">비슷한 판결끼리 모입니다. 새 사건을 임베딩해 지도에 찍으면 "어느 동네 사건인지"가 보입니다.</text>
+        </svg>
+      </div>
+      <div class="tip-card"><b>다음 강의와의 연결</b> — 이 지도를 실제로 그린 기록이 <b>바로 다음 강의</b>(클러스터링·차원축소·시각화)입니다. 그리고 활용 ①의 의미 검색은 그 뒤의 검색엔진 강의에서 "새 질의를 실시간으로 임베딩하려면 왜 백엔드가 필요한가"로 이어집니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>임베딩의 세 가지 활용(검색·지도·군집)을 설명할 수 있다</span></label></div>
+    </section>
+
+    <!-- ============ S6 ============ -->
+    <section class="section" id="s6">
+      <div class="sec-head"><span class="sec-num">6</span><h2>마무리 체크리스트</h2></div>
+      <ul class="final-list">
+        <li>임베딩 = 시퀀스(비정형 텍스트)의 의미를 요약한 고정 길이 숫자 벡터</li>
+        <li>OpenRouter: 키 하나로 여러 모델 — 모델 선택은 컨텍스트 길이와 단가로, 실존 여부는 AI에게 확인시키기</li>
+        <li>키는 연동 폴더에 파일로 — 환경변수로만 읽게 하고, 작업 후 평문 키 파일 정리</li>
+        <li>전량 실행 전 시험 실행 → 무결성 검증, 완료 후 과금 내역으로 교차검증</li>
+        <li>임베딩의 활용: 의미 검색 · 2D 지도 · 클러스터링</li>
+      </ul>
+      <div class="next-card-grid">
+        <div class="next-card"><b>다음 강의 — 판결문 지도</b><span>추출한 임베딩 347건을 실제로 활용해 봅니다 — 클러스터링으로 사건 유형을 찾고 차원축소로 2D 지도를 그리는 <b>판결문 347건 지도</b>로 이어집니다.</span></div>
+        <div class="next-card"><b>직접 해보기</b><span>여러분이 1교시에 수집한 데이터(리뷰·초록 등)에 같은 파이프라인을 적용해 보세요. 데이터 소스만 바뀔 뿐 절차는 동일합니다.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>임베딩 추출 파트를 마쳤다!</span></label></div>
+    </section>
+      <a class="back-home" href="index.html">
+        <span class="bh-ic">←</span>
+        <span><strong>2주차 강의자료 목록으로 돌아가기</strong><small>다음 자료로 이어가려면 목록에서 골라보세요</small></span>
+      </a>
+
+  </main>
+</div>
+
+<div class="toast" id="toast">복사되었습니다</div>
+<script>
+/* 공통: 프롬프트 복사 / 진행률 / scroll-spy / 라이트박스 (요소 없으면 자동 생략) */
+const $ = s => document.querySelector(s);
+function showToast(msg){
+  const t = $("#toast"); if(!t) return;
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){}
+  ta.remove();
+}
+document.querySelectorAll(".copy-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const text = document.getElementById(btn.dataset.copy).textContent;
+    const done = () => showToast("복사되었습니다");
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+    } else fallbackCopy(text, done);
+  });
+});
+/* 진행률 + 축하 배너 (상태는 메모리에만) */
+const checks = [...document.querySelectorAll("input[data-progress]")];
+if(checks.length){
+  $("#progressTotal").textContent = checks.length;
+  let celebrated = false;
+  const updateProgress = () => {
+    const done = checks.filter(c => c.checked).length;
+    $("#progressCount").textContent = done;
+    $("#progressBar").style.width = (done/checks.length*100)+"%";
+    checks.forEach(c => {
+      const a = document.querySelector(`.toc a[data-sec="${c.dataset.progress}"]`);
+      if(a) a.classList.toggle("done", c.checked);
+    });
+    if(done===checks.length && !celebrated){
+      celebrated = true;
+      const b = document.createElement("div");
+      b.className = "celebrate-banner";
+      b.innerHTML = document.body.dataset.celebrate || "🎉 <b>완료!</b> 수고하셨습니다.";
+      $("#celebrateSlot").appendChild(b);
+      b.scrollIntoView({behavior:"smooth", block:"center"});
+    }
+  };
+  checks.forEach(c => c.addEventListener("change", updateProgress));
+  updateProgress();
+}
+/* scroll-spy */
+const tocLinks = {};
+document.querySelectorAll(".toc a[data-sec]").forEach(a => tocLinks[a.dataset.sec] = a);
+const secIds = Object.keys(tocLinks);
+if(secIds.length){
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { en.target._visible = en.isIntersecting; });
+    let current = null;
+    for(const id of secIds){ const el = document.getElementById(id); if(el && el._visible){ current = id; break; } }
+    if(current){
+      Object.values(tocLinks).forEach(a => a.classList.remove("active"));
+      tocLinks[current].classList.add("active");
+    }
+  }, {rootMargin:"-15% 0px -55% 0px"});
+  secIds.forEach(id => { const el = document.getElementById(id); if(el) io.observe(el); });
+}
+/* 라이트박스 — data-doc 카드 여러 개 지원 */
+const lb = $("#exampleLightbox");
+if(lb){
+  const lbFrame = $("#exampleLightboxFrame");
+  const closeLb = () => { lb.hidden = true; lbFrame.src = "about:blank"; document.body.style.overflow=""; };
+  document.querySelectorAll(".example-card[data-doc]").forEach(card => {
+    const docURL = "data:text/html;base64," + window[card.dataset.doc];
+    const thumb = card.querySelector("iframe");
+    if(thumb) thumb.src = docURL;
+    const openLb = () => { lbFrame.src = docURL; lb.hidden = false; document.body.style.overflow="hidden"; };
+    card.addEventListener("click", openLb);
+    card.addEventListener("keydown", e => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openLb(); } });
+  });
+  $("#lightboxClose").addEventListener("click", closeLb);
+  lb.addEventListener("click", e => { if(e.target===lb) closeLb(); });
+  document.addEventListener("keydown", e => { if(e.key==="Escape" && !lb.hidden) closeLb(); });
+}
+
+</script>
+</body>
+</html>

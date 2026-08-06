@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 2 — Cowork로 웹 스크래핑: 수집부터 탐색적 분석까지</title>
+<style>
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
+  --brand:#2e9bdb; --brand-dark:#1b6fa6; --green:#2f765b; --amber:#b8792e; --red:#b0483f;
+  --blue:#375f8f; --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12); --radius:14px; --sidebar-width:250px;
+  /* dataviz roles (validated) */
+  --viz-surface:#ffffff; --viz-ink:#0b0b0b; --viz-ink2:#52514e; --viz-muted:#898781;
+  --viz-grid:#e1e0d9; --viz-axis:#c3c2b7;
+  --series-1:#2a78d6; --series-2:#eb6834;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15.5px;
+}
+/* ---------- topbar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+/* ---------- layout ---------- */
+.layout{display:flex;align-items:flex-start;}
+.sidebar{
+  position:sticky;top:63px;flex:0 0 var(--sidebar-width);width:var(--sidebar-width);
+  height:calc(100vh - 63px);overflow-y:auto;padding:22px 14px 40px 22px;border-right:1px solid var(--line);
+}
+.sidebar-title{font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+.toc a{
+  display:block;padding:7px 11px;margin:2px 0;border-radius:8px;border-left:3px solid transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;line-height:1.4;
+}
+.toc a:hover{background:#eef3ec;color:var(--ink);}
+.toc a.active{background:var(--sky-light);border-left-color:var(--brand);color:var(--brand-dark);font-weight:800;}
+.toc a .done-mark{color:var(--green);font-weight:900;margin-left:4px;display:none;}
+.toc a.done .done-mark{display:inline;}
+.content{flex:1;min-width:0;max-width:920px;padding:clamp(20px,4vw,44px) clamp(16px,4vw,44px) 100px;}
+/* ---------- hero ---------- */
+.hero{margin-bottom:16px;}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.07em;color:var(--brand-dark);background:var(--sky-light);padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+.hero h1{font-size:clamp(23px,3.6vw,32px);line-height:1.3;letter-spacing:-.015em;margin-bottom:10px;}
+.hero p{color:var(--muted);max-width:640px;}
+/* ---------- sections ---------- */
+.section{margin-top:44px;padding-top:8px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
+.sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
+.sec-lead{color:var(--muted);margin:4px 0 18px;max-width:700px;}
+h3{font-size:16.5px;margin:26px 0 10px;}
+p{margin:10px 0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:14px 0;box-shadow:0 3px 14px rgba(54,42,31,.05);}
+/* concept grid */
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+.concept{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.concept .ico{font-size:21px;}
+.concept b{display:block;margin:7px 0 4px;font-size:14.5px;}
+.concept span{display:block;color:var(--muted);font-size:13px;line-height:1.55;}
+.concept .use{display:inline-block;margin-top:9px;font-size:12px;font-weight:800;color:var(--brand-dark);background:var(--sky-light);border-radius:999px;padding:2px 10px;}
+/* callouts */
+.callout{border-left:4px solid var(--brand);background:var(--sky-light);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;font-size:14.5px;}
+.callout.caution{border-left-color:var(--red);background:#faeeec;}
+.callout.ok{border-left-color:var(--green);background:#edf4ef;}
+.callout b.cap{display:block;font-size:13px;letter-spacing:.03em;margin-bottom:4px;}
+.callout.caution b.cap{color:var(--red);}
+.callout.ok b.cap{color:var(--green);}
+.callout b.cap{color:var(--brand-dark);}
+.tip-card{border-left:4px solid var(--brand);background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 17px;margin:14px 0;font-size:14px;color:var(--muted);}
+.tip-card b{color:var(--ink);}
+/* prompt copy block */
+.copy-block{position:relative;background:#20242a;color:#e8ecf1;border-radius:12px;padding:18px 20px;margin:14px 0;font-size:14px;line-height:1.8;}
+.copy-block .cb-label{position:absolute;top:-10px;left:14px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--brand);padding:3px 10px;border-radius:999px;}
+.copy-block pre{white-space:pre-wrap;word-break:keep-all;font-family:inherit;margin-top:4px;}
+.copy-btn{position:absolute;top:12px;right:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 11px;cursor:pointer;}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+/* two-col compare */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+.compare .col{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.compare .col h4{font-size:14px;margin-bottom:8px;}
+.compare .col.static-col h4{color:var(--green);}
+.compare .col.dyn-col h4{color:var(--amber);}
+.compare ul{margin:0 0 0 18px;font-size:13.5px;color:var(--muted);}
+.compare li{margin:5px 0;}
+/* stat tiles */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 15px;}
+.stat .v{font-size:26px;font-weight:900;letter-spacing:-.02em;color:var(--brand-dark);line-height:1.15;}
+.stat .k{margin-top:5px;font-size:12.5px;color:var(--muted);line-height:1.5;}
+/* explorer table */
+.explorer{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:16px 0;}
+.radio-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:12px;}
+.radio-row .rlabel{font-size:12.5px;font-weight:800;color:var(--muted);margin-right:2px;}
+.radio-group{display:flex;flex-wrap:wrap;gap:6px;}
+.radio-option{display:flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--line);border-radius:8px;background:#fafcf9;font-size:13px;font-weight:600;cursor:pointer;}
+.radio-option input{accent-color:var(--brand);}
+.radio-option:has(input:checked){border-color:var(--brand);background:var(--sky-light);color:var(--brand-dark);font-weight:800;}
+.book-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+.book-table th{background:#f2f6f0;border:1px solid var(--line);padding:7px 10px;text-align:left;font-size:12.5px;}
+.book-table td{border:1px solid var(--line);padding:6px 10px;}
+.book-table td.num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);}
+.dl-btn{border:1px solid var(--brand);color:var(--brand-dark);background:var(--sky-light);font-weight:800;font-size:13px;border-radius:9px;padding:8px 15px;cursor:pointer;}
+.dl-btn:hover{background:#d3e9f8;}
+/* charts */
+.chart-card{background:var(--viz-surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px 12px;margin:16px 0;}
+.chart-card h4{font-size:15px;color:var(--viz-ink);margin-bottom:2px;}
+.chart-card .sub{font-size:12.5px;color:var(--viz-ink2);margin-bottom:10px;}
+.legend{display:flex;gap:16px;align-items:center;margin:2px 0 8px;font-size:12.5px;color:var(--viz-ink2);}
+.legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;transform:translateY(1px);}
+.chart-svg{width:100%;height:auto;display:block;}
+.viz-tooltip{position:fixed;z-index:60;pointer-events:none;background:#20242a;color:#fff;font-size:12.5px;line-height:1.5;border-radius:8px;padding:7px 11px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .12s;max-width:280px;}
+.chart-note{font-size:12px;color:var(--viz-muted);margin:6px 0 4px;}
+/* insight list */
+.insight{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0;}
+.insight .n{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;border-radius:999px;background:var(--sky-light);color:var(--brand-dark);font-weight:900;font-size:13px;transform:translateY(2px);}
+.insight p{margin:0;font-size:14.5px;}
+/* example embed (lightbox) */
+.example-card{display:flex;gap:0;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;margin:16px 0;box-shadow:var(--shadow);max-width:560px;}
+.example-card:focus-visible{outline:3px solid var(--brand);}
+.example-thumb{position:relative;height:210px;overflow:hidden;background:#eef1ec;}
+.example-thumb iframe{position:absolute;top:0;left:0;width:400%;height:400%;transform:scale(.25);transform-origin:top left;border:none;pointer-events:none;}
+.example-thumb .zoom{position:absolute;right:12px;bottom:12px;background:rgba(32,36,42,.85);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:5px 12px;}
+.example-body{padding:14px 18px;}
+.example-body b{font-size:14.5px;}
+.example-body p{margin:4px 0 0;font-size:13px;color:var(--muted);}
+.example-lightbox{position:fixed;inset:0;z-index:80;background:rgba(20,24,20,.62);display:flex;align-items:center;justify-content:center;padding:3vh 3vw;}
+.example-lightbox[hidden]{display:none;}
+.lightbox-inner{position:relative;width:min(980px,96vw);height:92vh;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);}
+.lightbox-inner iframe{width:100%;height:100%;border:none;}
+.lightbox-close{position:absolute;top:10px;right:10px;z-index:2;border:none;background:#20242a;color:#fff;width:34px;height:34px;border-radius:999px;font-size:16px;font-weight:900;cursor:pointer;}
+/* completion */
+.completion-row{margin:22px 0 6px;}
+.check{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 18px;cursor:pointer;font-size:14px;font-weight:700;color:var(--muted);}
+.check input{width:17px;height:17px;accent-color:var(--green);}
+.check:has(input:checked){border-color:var(--green);color:var(--green);background:#edf4ef;}
+/* celebrate banner */
+.celebrate-banner{border:1px solid #bfe0c9;background:linear-gradient(120deg,#edf7ef,#e3f1fb);border-radius:var(--radius);padding:18px 22px;margin:0 0 22px;font-size:15px;box-shadow:var(--shadow);}
+.celebrate-banner b{color:var(--green);}
+/* checklist */
+.final-list{list-style:none;margin:14px 0;}
+.final-list li{display:flex;gap:10px;margin:9px 0;font-size:14.5px;}
+.final-list li::before{content:"✔";color:var(--green);font-weight:900;}
+.next-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.next-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.next-card b{display:block;font-size:14.5px;margin-bottom:5px;color:var(--brand-dark);}
+.next-card span{font-size:13.5px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#20242a;color:#fff;font-size:13.5px;font-weight:700;border-radius:999px;padding:10px 20px;opacity:0;transition:all .25s;z-index:90;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media (max-width:900px){ .layout{display:block;} .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  .concept-grid{grid-template-columns:1fr 1fr;} .stat-row{grid-template-columns:1fr 1fr;} .compare{grid-template-columns:1fr;} .next-card-grid{grid-template-columns:1fr;} }
+@media (max-width:640px){ .topbar{flex-wrap:wrap;row-gap:10px;} .topbar-left{flex-wrap:wrap;row-gap:8px;} .progress-wrap{width:100%;} .concept-grid{grid-template-columns:1fr;} }
+
+/* ---- 목록으로 돌아가기 (week1과 동일 패턴) ---- */
+.back-week{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:color .15s ease,border-color .15s ease,background .15s ease;}
+.back-week:hover{color:var(--brand-dark);border-color:var(--brand);background:var(--sky-light);}
+.back-home{display:flex;align-items:center;gap:15px;max-width:840px;margin:34px 0 10px;padding:20px 24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s ease,border-color .18s ease;}
+.back-home:hover{transform:translateY(-2px);border-color:var(--brand);}
+.back-home .bh-ic{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;border-radius:11px;background:var(--sky-light);color:var(--brand-dark);font-size:19px;font-weight:900;}
+.back-home strong{display:block;font-size:15.5px;font-weight:800;}
+.back-home small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;font-weight:600;}
+@media (max-width:640px){.back-home{padding:18px;gap:12px;}}
+</style>
+</head>
+<body id="top">
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+    </a>
+    <div class="week-tag"><span class="week-num">WEEK 2</span><span class="week-title">Cowork 웹 스크래핑</span></div>
+    <a class="back-week" href="index.html">← 2주차 목록</a>
+  </div>
+  <div class="progress-wrap" aria-label="진행률">
+    <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="목차">
+    <div class="sidebar-title">이 페이지의 흐름</div>
+    <div class="toc" id="toc">
+      <a href="#s1" data-sec="s1">1. 웹에서 무엇을 모을 수 있나<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. 유의사항 — 법적·윤리적 경계<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 실습 — 정적 사이트 소량 수집<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 동적 사이트와 브라우저 플러그인<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 수집 후 — 탐색적 분석(EDA)<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. 마무리 체크리스트<span class="done-mark">✔</span></a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div id="celebrateSlot"></div>
+
+    <div class="hero">
+      <span class="hero-kicker">WEEK 2 · STEP 1 — 데이터 수집</span>
+      <h1>Cowork로 웹 스크래핑 —<br/>복사–붙여넣기 수백 번 대신, 문장 하나</h1>
+      <p>웹페이지를 일일이 복사해 엑셀에 붙여넣던 일을, AI에게 "이 페이지에서 이런 정보를 뽑아줘"라고 요청하는 것으로 끝냅니다. 이 자료의 수집·분석 사례는 모두 <b>이 강의자료를 만들면서 실제로 실행한 결과</b>입니다.</p>
+    </div>
+
+    <!-- ================= SECTION 1 ================= -->
+    <section class="section" id="s1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>웹에서 무엇을 모을 수 있나</h2></div>
+      <p class="sec-lead">스크래핑(scraping)은 웹페이지에 이미 공개되어 있는 정보를 <b>구조화된 데이터(표·CSV·JSON)</b>로 긁어 모으는 일입니다. 연구와 업무에서 쓰이는 대표적인 원천들:</p>
+
+      <div class="concept-grid">
+        <div class="concept"><div class="ico">📰</div><b>뉴스 기사 · 보도자료</b><span>특정 이슈가 언제, 얼마나, 어떤 논조로 다뤄졌는지</span><em class="use">이슈 트렌드 분석</em></div>
+        <div class="concept"><div class="ico">🛒</div><b>커머스 목록 · 상품 리뷰</b><span>베스트셀러 순위, 가격 변동, 소비자 불만 키워드</span><em class="use">시장·소비자 분석</em></div>
+        <div class="concept"><div class="ico">⚖️</div><b>판례 · 법령 · 특허</b><span>판결문에서 반복되는 인정 요건, 유사 선행 특허</span><em class="use">요건 분석 · 선행 조사</em></div>
+        <div class="concept"><div class="ico">💼</div><b>채용 공고</b><span>직무별 요구 스킬, 연봉 범위, 채용 수요의 변화</span><em class="use">노동시장 분석</em></div>
+        <div class="concept"><div class="ico">🎓</div><b>학술 초록 · 연구 동향</b><span>특정 주제의 연구가 언제부터 급증했는지, 핵심 저자는 누구인지</span><em class="use">문헌 지형 파악</em></div>
+        <div class="concept"><div class="ico">💬</div><b>커뮤니티 · 앱 리뷰</b><span>사용자 여론, 반복되는 불만, 경쟁 제품과의 비교 담론</span><em class="use">여론 · VOC 분석</em></div>
+      </div>
+
+      <div class="callout"><b class="cap">오늘 실제로 해 본 것</b>
+      온라인 서점의 <b>경제·경영 베스트셀러</b>를 성별×연령대(남/여 × 10대~60대 이상, 12개 그룹) 조합별 Top 20씩 — 분석에 필요한 <b>소량(239권)</b>만 수집했습니다. (240권이 아닌 이유: 10대 여성 베스트셀러는 사이트에 19위까지만 존재합니다.) "지금 한국에서 세대·성별에 따라 어떤 경제경영서를 읽는가?"라는 질문에 데이터로 답해 봅니다(§3). 그리고 같은 방법을 판결문 <b>895건</b>에 적용한 연구용 분석 사례를 §5에서 보여드립니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>어떤 데이터를 모아 무엇을 분석할 수 있는지 감을 잡았다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 2 ================= -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>유의사항 — 법적·윤리적 경계</h2></div>
+      <p class="sec-lead">기술적으로 "긁을 수 있다"와 법적으로 "긁어도 된다"는 다른 문제입니다. 시작 전에 세 가지를 확인하세요.</p>
+
+      <h3>① 페이월(paywall) 뒤의 콘텐츠 — 하지 마세요</h3>
+      <div class="callout caution"><b class="cap">원칙적 금지</b>
+      구독·결제·로그인 장벽 뒤에 있는 콘텐츠(유료 기사, 구독형 DB, 전자책 등)의 자동 수집은 <b>거의 예외 없이 이용약관에서 금지</b>되어 있고, 접근 제한을 우회하는 행위 자체가 별도의 법적 문제(기술적 보호조치 침해, 부정 접근 등)를 일으킬 수 있습니다. <b>페이월이 보이면 스크래핑 대상에서 제외</b>하는 것을 기본값으로 삼으세요.</div>
+
+      <h3>② 약관상 금지 = 항상 불법? — 그렇지는 않습니다</h3>
+      <p>공개된 페이지라도 약관에 "자동화된 수집 금지" 조항이 있는 사이트가 많습니다. 다만 약관이 곧 최종 결론은 아닙니다. <b>공정이용(fair use)까지 금지하는 약관 조항은 무효로 판단될 수 있다</b>는 것이 중요한 포인트입니다. 결국 핵심은 <b>내 수집이 공정이용에 해당하는지 스스로 평가</b>하는 것입니다.</p>
+      <div class="callout ok"><b class="cap">공정이용 평가의 감각</b>
+      <b>오로지 비영리 목적</b> — 수업 과제나 연구 목적으로, 공개된 페이지를 소량 수집해 내부 분석에만 쓰는 경우라면 공정이용으로 인정될 가능성이 높습니다. 반대로 수집물을 <b>상업적으로 재배포</b>하거나, 원본 사이트를 <b>대체하는 서비스</b>를 만들거나, 대량 수집으로 <b>서버에 부담</b>을 주면 공정이용과 멀어집니다. 오늘 실습(상업 서점의 공개 목록을 수업 목적으로 소량 수집·내부 분석)이 바로 이 평가를 통과하는 전형적인 사례입니다.</div>
+
+      <h3>③ 그 밖의 기본 수칙</h3>
+      <ul style="margin-left:22px;">
+        <li><b>robots.txt 확인</b> — 사이트 주소 뒤에 <code>/robots.txt</code>를 붙이면 수집 허용/금지 경로가 나옵니다. Cowork에 "이 사이트 robots.txt 확인해줘"라고 요청하면 됩니다.</li>
+        <li><b>서버 배려</b> — 요청 사이에 간격을 두고, 필요한 만큼만 수집하세요. (오늘 실습도 그룹별 Top 20, 분석에 필요한 소량만 수집)</li>
+        <li><b>개인정보</b> — 닉네임·프로필·작성자 정보도 개인정보일 수 있습니다. 분석에 불필요하면 수집 단계에서 제외(익명화)하세요.</li>
+        <li><b>출처 기록</b> — 수집 일시·URL·조건을 데이터와 함께 저장해 두면 연구 재현성과 인용 문제를 함께 해결합니다.</li>
+      </ul>
+      <div class="tip-card"><b>수업의 관점</b> — 이 부트캠프의 실습은 전부 "비영리·소량·내부 분석"의 범위 안에서 설계되어 있습니다. 각자 연구에 응용할 때도 이 세 단어를 기준으로 삼으세요. (본 자료는 일반적인 교육 안내이며, 구체적 사안에 대한 법률 자문이 아닙니다.)</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>페이월 금지 원칙과 공정이용 평가 기준을 이해했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 3 ================= -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>실습 — 정적 사이트에서 소량 수집하기</h2></div>
+      <p class="sec-lead"><b>정적(static) 사이트</b>는 주소(URL)만 요청하면 서버가 내용이 이미 담긴 HTML을 통째로 보내주는 사이트입니다. 이런 사이트는 Cowork에 문장 하나로 요청해도 수집이 잘 됩니다.</p>
+
+      <h3>실습 대상 — YES24 경제·경영 베스트셀러 (성별 × 연령대)</h3>
+      <p>YES24 베스트셀러 목록은 URL의 파라미터로 조건이 표현되는, 스크래핑 입문에 좋은 구조입니다:</p>
+      <div class="card" style="font-size:13.5px;overflow-x:auto;">
+        <code>…/bestseller?categoryNumber=001001025&amp;pageNumber=1&amp;pageSize=24&amp;<b style="color:var(--brand-dark)">age=10</b>&amp;<b style="color:var(--brand-dark)">sex=F</b></code>
+        <p style="color:var(--muted);font-size:13px;margin-top:8px;">→ "경제·경영 분야, 10대 여성 독자의 베스트셀러 1페이지". <b>age</b>(10~60, 60은 "60대 이상")와 <b>sex</b>(F/M)만 바꾸면 12개 그룹의 목록이 나옵니다. 주소만 바꿔도 원하는 목록이 통째로 열린다 = 정적으로 접근 가능한 부분이 있다는 신호입니다.</p>
+      </div>
+
+      <div class="copy-block"><span class="cb-label">💬 Cowork 프롬프트 — 그대로 복사해서 시작하세요</span><button class="copy-btn" data-copy="p1">복사</button>
+<pre id="p1">YES24 경제경영 베스트셀러 페이지를 수집하려고 해. 시작 URL은 이거야:
+https://www.yes24.com/product/category/bestseller?categoryNumber=001001025&pageNumber=1&pageSize=24&age=10&sex=F
+
+URL의 age(10~60, 60은 60대 이상)와 sex(F/M) 파라미터를 바꿔가며
+성별×연령대 12개 조합 각각의 Top 20 도서를 수집해줘. 각 도서의 순위·제목·저자·출판사·출간월·판매가·평점을 뽑아서
+그룹 정보(성별, 연령대)와 함께 CSV 파일 하나로 저장해줘.
+서버에 부담이 없도록 요청 사이에 간격을 두고, 끝나면 그룹별 수집 건수를 표로 보여줘.</pre></div>
+
+      <div class="tip-card"><b>프롬프트의 핵심 3요소</b> — ① 시작 URL과 <b>규칙</b>(무엇을 바꾸면 다른 목록이 나오는지) ② 뽑을 <b>항목</b>(컬럼) ③ 저장 <b>형식</b>(CSV/JSON). 이 세 가지만 정확히 알려주면 나머지는 AI가 알아서 합니다.</div>
+
+      <h3>실제 수집 결과 — 239권 (10대 여성은 목록 자체가 19권)</h3>
+      <div class="explorer">
+        <div class="radio-row">
+          <span class="rlabel">성별</span>
+          <div class="radio-group" id="sexRadio">
+            <label class="radio-option"><input type="radio" name="sex" value="여" checked />여성</label>
+            <label class="radio-option"><input type="radio" name="sex" value="남" />남성</label>
+          </div>
+          <span class="rlabel">연령대</span>
+          <div class="radio-group" id="ageRadio">
+            <label class="radio-option"><input type="radio" name="age" value="10" />10대</label>
+            <label class="radio-option"><input type="radio" name="age" value="20" checked />20대</label>
+            <label class="radio-option"><input type="radio" name="age" value="30" />30대</label>
+            <label class="radio-option"><input type="radio" name="age" value="40" />40대</label>
+            <label class="radio-option"><input type="radio" name="age" value="50" />50대</label>
+            <label class="radio-option"><input type="radio" name="age" value="60" />60대+</label>
+          </div>
+        </div>
+        <div style="max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:10px;">
+          <table class="book-table" id="bookTable">
+            <thead><tr><th style="width:44px;">순위</th><th>제목</th><th style="width:120px;">저자</th><th style="width:110px;">출판사</th><th style="width:70px;">출간</th><th style="width:76px;">판매가</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:8px;">
+          <span style="font-size:12.5px;color:var(--muted);" id="tableCaption"></span>
+          <button class="dl-btn" id="csvBtn">⬇ 수집 결과 CSV 내려받기 (239건)</button>
+        </div>
+      </div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>정적 사이트 수집 프롬프트의 구조(URL 규칙·항목·형식)를 이해했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 4 ================= -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>동적 사이트 — 브라우저 플러그인이 필요한 이유</h2></div>
+      <p class="sec-lead">그런데 요즘 웹사이트 대부분은 이렇게 호락호락하지 않습니다. <b>동적(dynamic) 로딩</b> — 서버가 빈 껍데기 HTML만 먼저 주고, 실제 내용은 자바스크립트가 나중에 채워 넣는 방식이 표준이 되었기 때문입니다.</p>
+
+      <div class="callout"><b class="cap">이 자료를 만들면서 실제로 겪은 일</b>
+      YES24 목록도 서버는 한 번에 <b>12권까지만</b> HTML에 담아 보내고, 나머지는 화면을 스크롤할 때 자바스크립트가 추가로 불러옵니다. 오늘은 pageSize·pageNumber 파라미터를 조절해 우회했지만, <b>이런 우회로가 아예 없는 사이트가 대부분</b>입니다 — 무한 스크롤 SNS, "더보기" 버튼 뒤의 리뷰, 로그인해야 보이는 화면들.</div>
+
+      <div class="compare">
+        <div class="col static-col"><h4>정적 — URL만으로 수집 가능</h4>
+          <ul><li>주소만 바꿔도 원하는 목록이 그대로 열림</li><li>정부·공공기관 게시판, 오래된 게시판형 사이트</li><li>Cowork에서 바로 수집 가능 (§3 방식)</li></ul></div>
+        <div class="col dyn-col"><h4>동적 — 브라우저가 필요</h4>
+          <ul><li>스크롤·클릭해야 내용이 나타남, URL은 그대로</li><li>SNS 피드, 쇼핑몰 리뷰 더보기, 지도, 로그인 화면</li><li>브라우저 플러그인(Claude in Chrome)으로 수집</li></ul></div>
+      </div>
+
+      <div class="tip-card"><b>판별법 10초 테스트</b> — 브라우저 주소창의 URL만 바꿔서(페이지 번호, 조건 등) 원하는 목록이 바로 열리면 정적으로 접근 가능. 스크롤하거나 버튼을 눌러야만 내용이 나타나고 URL은 그대로라면 동적입니다.</div>
+
+      <h3>해법 — Claude in Chrome (브라우저 확장)</h3>
+      <p>Claude 크롬 확장을 쓰면 AI가 <b>내 브라우저가 이미 렌더링을 끝낸 화면</b>을 읽습니다. 자바스크립트가 채워 넣은 내용, 스크롤로 불러온 목록, (내 계정으로) 로그인된 화면까지 — 사람 눈에 보이는 그대로를 대상으로 하므로 동적 로딩 문제가 사라집니다. 스크롤과 클릭도 AI가 대신 수행합니다.</p>
+      <div class="copy-block"><span class="cb-label">💬 크롬 확장에서 쓰는 프롬프트 예시</span><button class="copy-btn" data-copy="p2">복사</button>
+<pre id="p2">지금 열려 있는 이 페이지에서 리뷰를 100개 수집하고 싶어.
+"더보기" 버튼을 눌러가며 리뷰가 100개 보일 때까지 스크롤한 다음,
+각 리뷰의 별점·날짜·본문을 뽑아 CSV로 정리해줘. 작성자 이름은 수집하지 마.</pre></div>
+      <div class="callout caution" style="font-size:13.5px;"><b class="cap">로그인 화면 수집 시 주의</b>
+      내 계정으로 보이는 화면은 편리한 만큼 책임도 내 계정에 귀속됩니다. §2의 원칙(페이월 금지, 비영리·소량, 개인정보 제외)은 브라우저 방식에서도 똑같이 적용됩니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>정적/동적을 구분할 수 있고, 언제 크롬 확장이 필요한지 안다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 5 ================= -->
+    <section class="section" id="s5">
+      <div class="sec-head"><span class="sec-num">5</span><h2>수집 후 — 탐색적 분석(EDA)</h2></div>
+      <p class="sec-lead">수집은 절반입니다. 나머지 절반은 "이 데이터가 무슨 이야기를 하는가"를 찾는 <b>탐색적 분석(Exploratory Data Analysis)</b>입니다. 이것도 프롬프트 하나로 시작합니다.</p>
+
+      <div class="copy-block"><span class="cb-label">💬 EDA 프롬프트 — 수집 직후 이어서 요청하세요</span><button class="copy-btn" data-copy="p3">복사</button>
+<pre id="p3">수집한 베스트셀러 데이터로, 지금 성별과 나이대별로 어떤 책을
+선호하는지 보여주는 분석자료를 만들어보자.</pre></div>
+
+      <div class="tip-card"><b>지시는 이 정도면 충분합니다</b> — 유사도 행렬, 공통 도서, 키워드 분류 같은 분석 방법은 AI가 알아서 고릅니다. 결과를 보고 나서 "성별 차이와 세대 차이 중 뭐가 더 커?", "유사도 행렬은 평균을 흰색으로 두고 이질적인 그룹이 드러나게 다시 그려줘"처럼 <b>후속 지시로 다듬는 것</b>이 실제 작업 흐름입니다. 아래 결과물도 그렇게 만들어졌습니다.</div>
+
+      <h3>분석 결과 — 세대와 성별은 정말 다른 책을 읽을까?</h3>
+      <div class="stat-row">
+        <div class="stat"><div class="v">11/12</div><div class="k">『나의 첫 번째 부동산 교과서』『돈, 뜨겁게…』가 등장한 그룹 수 — 전 세대 공통 "국민 재테크서"</div></div>
+        <div class="stat"><div class="v">0.00</div><div class="k">10대 남성 ↔ 10대 여성 목록의 유사도 — <b>겹치는 책이 한 권도 없음</b></div></div>
+        <div class="stat"><div class="v">0.67</div><div class="k">40대 ↔ 50대 남성 유사도 — 전체 그룹 쌍 중 <b>최고</b></div></div>
+        <div class="stat"><div class="v">.34 vs .29</div><div class="k">같은 세대 남녀 유사도(.34) &gt; 같은 성별 세대 간 평균(.29) — <b>세대가 성별보다 큰 경계선</b></div></div>
+      </div>
+
+      <div class="chart-card">
+        <h4>모든 세대가 함께 읽는 책 — "재테크 캐논"</h4>
+        <div class="sub">12개 그룹(성별×연령대) 목록 중 몇 개에 등장했는가 · 상위 12권</div>
+        <div id="chartCanon"></div>
+      </div>
+
+      <div class="chart-card">
+        <h4>나이가 들수록 "배당·연금"으로 — 주제의 이동</h4>
+        <div class="sub">제목에 ETF·배당·연금·포트폴리오가 들어간 책 수 (그룹별 Top 20 중)</div>
+        <div class="legend"><span><i class="sw" style="background:var(--series-1)"></i>여성</span><span><i class="sw" style="background:var(--series-2)"></i>남성</span></div>
+        <div id="chartTheme"></div>
+        <p class="chart-note">남성은 10대 1권 → 50대 5권까지 증가하다 60대에 3권으로 줄어듭니다. 60대 이상 목록에는 대신 『2026 주택과 세금』 같은 절세·자산 정리 주제가 등장 — 관심이 "종목 발굴" → "현금흐름·노후" → "자산 정리"로 이동합니다.</p>
+      </div>
+
+      <div class="chart-card">
+        <h4>성별 차이 vs 세대 차이 — 무엇이 더 큰가</h4>
+        <div class="sub">같은 성별에서 세대 간격이 벌어질 때의 평균 유사도 (막대) · 주황 점선 = 같은 세대 남↔여 평균</div>
+        <div id="chartGap"></div>
+        <p class="chart-note">한 세대(10살) 차이(.38)는 성별 차이(.34)보다 작지만, 두 세대(20살) 이상 벌어지면 세대 차이가 성별 차이를 압도합니다. 성별 장벽 자체도 세대에 따라 다릅니다 — 10대 .00에서 40·50대 .48까지 좁혀졌다가 60대에 다시 .33으로 벌어집니다.</p>
+      </div>
+
+      <div class="chart-card">
+        <h4>누구와 누가 같은 책을 읽나 — 그룹 간 유사도 행렬</h4>
+        <div class="sub">자카드 유사도 · <b>흰색 = 전체 평균(.28)</b> · 평균보다 파랄수록 동질적, 붉을수록 이질적</div>
+        <div class="radio-row" style="margin:2px 0 10px;">
+          <span class="rlabel">비교</span>
+          <div class="radio-group">
+            <label class="radio-option"><input type="radio" name="heatmode" value="FM" checked />여성 ↔ 남성</label>
+            <label class="radio-option"><input type="radio" name="heatmode" value="FF" />여성 ↔ 여성</label>
+            <label class="radio-option"><input type="radio" name="heatmode" value="MM" />남성 ↔ 남성</label>
+          </div>
+        </div>
+        <div id="chartHeat"></div>
+        <p class="chart-note">색 기준은 세 보기 모두 동일해 서로 비교할 수 있습니다. <b>여성↔남성</b> 보기의 대각선이 "같은 세대의 남녀"입니다 — 10대만 .00으로 짙은 붉은색, 40·50대는 .48로 파랗습니다. <b>같은 성별끼리</b> 보기에서는 10대 행 전체가 붉게 나타나, 성별과 무관하게 10대가 다른 모든 세대와 이질적인 "섬"임이 드러납니다.</p>
+      </div>
+
+      <div class="chart-card">
+        <h4>10대만 다른 세상 — 그 그룹에만 있는 책의 수</h4>
+        <div class="sub">다른 11개 그룹 어디에도 없는 "고유 도서" 수 (Top 20 중)</div>
+        <div class="legend"><span><i class="sw" style="background:var(--series-1)"></i>여성</span><span><i class="sw" style="background:var(--series-2)"></i>남성</span></div>
+        <div id="chartUniq"></div>
+        <p class="chart-note">10대 여성 목록은 19권 중 16권이 고유 — 진로·교양서(패션 디자이너, 해운·조선 산업, 물류)가 많아 "재테크"보다 "진로 탐색" 독서에 가깝습니다.</p>
+      </div>
+
+      <h3>패턴 6가지 — 숫자가 말해주는 것</h3>
+      <div class="insight"><span class="n">1</span><p><b>세대를 관통하는 캐논이 있다.</b> 『나의 첫 번째 부동산 교과서』 『돈, 뜨겁게 사랑하고 차갑게 다루어라』는 12개 그룹 중 11개 목록에, 『돈의 심리학』 『생각에 관한 생각』은 10개 목록에 등장 — 사실상 전 세대 공통 교과서입니다.</p></div>
+      <div class="insight"><span class="n">2</span><p><b>10대는 완전히 다른 목록을 읽는다.</b> 10대 남녀는 겹치는 책이 0권. 여학생 목록은 진로·직업 탐색서, 남학생 목록은 거시경제·산업·창업서 중심 — 입시·진로 맥락의 독서로 해석됩니다.</p></div>
+      <div class="insight"><span class="n">3</span><p><b>성별 차이보다 세대 차이가 크다.</b> 같은 세대 남녀의 유사도 평균은 .34로, 같은 성별 안에서 세대를 건너뛴 평균 .29보다 높습니다. 단, 바로 인접한 세대(10살 차, .38)는 성별 장벽보다 가깝습니다 — 경계는 두 세대 이상 벌어질 때 생깁니다.</p></div>
+      <div class="insight"><span class="n">4</span><p><b>연령이 오를수록 주제가 "연금·배당"으로, 60대엔 "자산 정리"로 이동한다.</b> 남성의 ETF·배당·연금 책 수는 10대 1권 → 50대 5권까지 증가한 뒤 60대에 3권으로 줄고, 그 자리에 절세·자산 정리 주제가 들어옵니다.</p></div>
+      <div class="insight"><span class="n">5</span><p><b>AI 책은 오히려 중장년·고령 목록에 많다.</b> 『박태웅의 AI 강의 2026』 『AI, 신의 탄생 인간의 종말』 등 AI 교양서는 60대 이상 남성 3권·50대 여성 3권으로 최다이고, 10대 남성은 AI를 "주식 자동매매 도구"로 소비하는 실용서가 특징적입니다.</p></div>
+      <div class="insight"><span class="n">6</span><p><b>같은 데이터에서 후속 질문이 나온다.</b> "여성 목록에만 있는 『엄마의 두 번째 재테크』류는 어떤 마케팅의 결과일까?", "10대 목록은 누가(본인? 부모?) 구매한 것일까?" — EDA의 끝은 결론이 아니라 <b>더 좋은 질문</b>입니다.</p></div>
+
+      <h3>연구에 적용하면 — 판결문 895건 분석 사례</h3>
+      <p>같은 파이프라인(수집 → 분류 → 반복 패턴 추출)을 판례 데이터에 적용한 실제 사례입니다. "직장 내 괴롭힘"이 언급된 지방법원 판결 <b>895건</b>을 수집해 유형별로 분류하고, 법원이 손해배상을 인정할 때 반복 적용하는 요건을 추출해 보고서로 정리했습니다. 카드를 클릭하면 보고서 전문이 열립니다.</p>
+
+      <div class="callout"><b class="cap">대량 텍스트 수집 요령 — 목록 먼저, 본문은 천천히</b>
+      판결문처럼 <b>본문이 긴 자료를 수백 건</b> 수집할 때는 한 번에 긁지 마세요. <b>① 먼저 전체 목록(사건번호·법원·선고일·링크 등 메타데이터)만 수집해 CSV로 저장</b>하고, <b>② 본문은 그 목록을 보며 시간 간격을 두고 조금씩</b>(예: 한 번에 수십 건씩) 수집합니다. 서버에 부하를 주지 않기 위한 예의이자(§2의 서버 배려), 중간에 끊겨도 목록 CSV에 진행 상황이 남아 이어서 수집할 수 있는 실전 요령입니다. 위 895건도 이 방식으로 모았습니다.</div>
+
+      <div class="copy-block"><span class="cb-label">💬 두 단계 수집 프롬프트</span><button class="copy-btn" data-copy="p5">복사</button>
+<pre id="p5">1단계: 검색 결과의 전체 목록(사건번호, 법원, 선고일, 링크)만 먼저 수집해서
+목록.csv로 저장해줘. 본문은 아직 수집하지 마.
+
+2단계: 목록.csv에서 아직 본문을 수집하지 않은 사건 30건만 골라,
+요청 사이에 간격을 두면서 본문을 수집하고, 수집 완료 여부를 목록.csv에
+표시해줘. (이 단계를 시간을 두고 여러 번 반복)</pre></div>
+
+      <div class="example-card" id="reportCard" tabindex="0" role="button" aria-label="판례 분석 보고서 열기">
+        <div class="example-thumb"><iframe id="reportThumb" title="판례 분석 보고서 미리보기" loading="lazy"></iframe><span class="zoom">🔍 클릭해서 전문 보기</span></div>
+        <div class="example-body"><b>직장 내 괴롭힘 민사 손해배상 인정 요건 분석 — 최종 보고</b>
+        <p>판결 895건 → 4개 사건유형 분류 → 인정 요건 ①~⑥ 도출. 수집한 데이터가 "탐색적 분석"을 거쳐 연구 보고서가 되는 전 과정의 예시입니다.</p></div>
+      </div>
+
+      <div class="copy-block"><span class="cb-label">💬 이 보고서에 실제로 사용한 지시</span><button class="copy-btn" data-copy="p4">복사</button>
+<pre id="p4">EDA의 목적은 민사 손해배상 소송(직장 내 괴롭힘을 근거로 한 불법행위
+손해배상) 사건에서 직장 내 괴롭힘으로 인정된 요건을 파악하는 것임.
+수집한 사건을 (1) 유형별로 분류하고, (2) 약 2줄로 사건 개요를 요약하라.</pre></div>
+      <div class="tip-card"><b>여기서도 마찬가지</b> — 분석의 <b>목적</b>과 최소한의 산출물(분류·요약)만 지시했고, 인정 요건 ①~⑥의 추출과 긍정/부정 사례 대비 같은 구성은 AI가 목적에 맞춰 스스로 발전시킨 것입니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>수집 → EDA → 보고서로 이어지는 흐름을 이해했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 6 ================= -->
+    <section class="section" id="s6">
+      <div class="sec-head"><span class="sec-num">6</span><h2>마무리 체크리스트</h2></div>
+      <ul class="final-list">
+        <li>스크래핑 대상 6유형과 각각의 분석 용도를 말할 수 있다</li>
+        <li>페이월 콘텐츠는 수집하지 않는다 — 약관 금지 조항은 공정이용(비영리·소량·내부 분석) 관점에서 평가한다</li>
+        <li>정적 사이트는 "URL 규칙 + 뽑을 항목 + 저장 형식"의 3요소 프롬프트로 수집한다</li>
+        <li>스크롤·클릭해야 내용이 나오는 동적 사이트는 Claude 크롬 확장으로 수집한다</li>
+        <li>수집 직후 EDA 프롬프트로 유사도·공통항목·키워드 주제·시계열 패턴을 탐색한다</li>
+      </ul>
+      <div class="next-card-grid">
+        <div class="next-card"><b>직접 해보기 (이번 주 과제)</b><span>관심 분야의 정적 사이트 하나를 골라 §3 프롬프트를 변형해 100건 이상 수집하고, §5 프롬프트로 패턴 3가지를 찾아보세요.</span></div>
+        <div class="next-card"><b>다음 강의 — 임베딩 추출</b><span>수집한 데이터를 <b>의미의 좌표(임베딩)</b>로 바꾸면 "비슷한 문서 찾기"가 됩니다. 다음 강의에서는 여기서 모은 판결문을 실제로 숫자 벡터로 바꾸고, 그것이 판례 검색기로 이어지는 원리를 봅니다.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>Week 2 웹 스크래핑 파트를 마쳤다!</span></label></div>
+    </section>
+
+      <a class="back-home" href="index.html">
+        <span class="bh-ic">←</span>
+        <span><strong>2주차 강의자료 목록으로 돌아가기</strong><small>다음 자료로 이어가려면 목록에서 골라보세요</small></span>
+      </a>
+
+  </main>
+</div>
+
+<div class="viz-tooltip" id="vizTip"></div>
+<div class="toast" id="toast">복사되었습니다</div>
+
+<div class="example-lightbox" id="exampleLightbox" hidden>
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lightboxClose" aria-label="닫기">×</button>
+    <iframe id="exampleLightboxFrame" title="예시 보고서" src="about:blank"></iframe>
+  </div>
+</div>
+
+<script>
+/* ===== 수집 데이터 (이 페이지의 모든 차트·표는 아래 원본 데이터에서 실시간 계산됩니다) ===== */
+const BOOKS = [{"성별":"여","연령대":10,"순위":1,"제목":"주식시장의 심리학","저자":"G.C.셀든","출판사":"반니","출간":"2026-07","판매가":16200,"평점":10.0},{"성별":"여","연령대":10,"순위":2,"제목":"리더의 일은 맡기는 것이 전부다","저자":"이바 마사야스","출판사":"비즈니스북스","출간":"2026-06","판매가":15750,"평점":9.8},{"성별":"여","연령대":10,"순위":3,"제목":"기술이 인류를 구원한다는 착각","저자":"애덤 베커","출판사":"동아시아","출간":"2026-06","판매가":19800,"평점":2.0},{"성별":"여","연령대":10,"순위":4,"제목":"나의 첫 번째 부동산 교과서","저자":"송희구","출판사":"서삼독","출간":"2026-06","판매가":20700,"평점":9.5},{"성별":"여","연령대":10,"순위":5,"제목":"AI가 나보다 일을 잘할 때","저자":"김대식, 김혜연","출판사":"창비","출간":"2026-03","판매가":11700,"평점":8.9},{"성별":"여","연령대":10,"순위":6,"제목":"진보를 위한 주식투자","저자":"이광수","출판사":"21세기북스","출간":"2025-12","판매가":19800,"평점":8.7},{"성별":"여","연령대":10,"순위":7,"제목":"자본주의 시대에서 살아남기 위한 최소한의 경제 공부","저자":"백억남(김욱현)","출판사":"하이스트","출간":"2025-12","판매가":25200,"평점":9.7},{"성별":"여","연령대":10,"순위":8,"제목":"일본어 명카피 필사 노트","저자":"정규영","출판사":"길벗이지톡","출간":"2025-08","판매가":18900,"평점":9.8},{"성별":"여","연령대":10,"순위":9,"제목":"진짜 하루만에 이해하는 해운·조선 산업","저자":"김성훈, 엄성희","출판사":"티더블유아이지","출간":"2025-06","판매가":22320,"평점":9.5},{"성별":"여","연령대":10,"순위":10,"제목":"경제 상식사전","저자":"김민구","출판사":"길벗","출간":"2025-03","판매가":18000,"평점":9.9},{"성별":"여","연령대":10,"순위":11,"제목":"부동산 상식사전","저자":"백영록","출판사":"길벗","출간":"2025-03","판매가":19800,"평점":10.0},{"성별":"여","연령대":10,"순위":12,"제목":"월급쟁이 재테크 상식사전","저자":"우용표","출판사":"길벗","출간":"2025-02","판매가":17820,"평점":9.5},{"성별":"여","연령대":10,"순위":13,"제목":"100일 아침 습관의 기적","저자":"켈리 최","출판사":"다산북스","출간":"2023-11","판매가":17100,"평점":9.6},{"성별":"여","연령대":10,"순위":14,"제목":"넛지: 파이널 에디션","저자":"리처드 탈러, 캐스 선스타인","출판사":"리더스북","출간":"2022-06","판매가":19800,"평점":9.3},{"성별":"여","연령대":10,"순위":15,"제목":"패션 디자이너, 미래가 찬란한 너에게","저자":"박민지","출판사":"크루","출간":"2022-04","판매가":16200,"평점":10.0},{"성별":"여","연령대":10,"순위":16,"제목":"해상과 항공 물류 업무 개념 정리","저자":"최주호","출판사":"생각나눔","출간":"2021-02","판매가":26100,"평점":10.0},{"성별":"여","연령대":10,"순위":17,"제목":"생각에 관한 생각","저자":"대니얼 카너먼","출판사":"김영사","출간":"2018-03","판매가":26820,"평점":9.3},{"성별":"여","연령대":10,"순위":18,"제목":"일의 미래, 무엇이 바뀌고 무엇이 오는가","저자":"선대인","출판사":"인플루엔셜","출간":"2017-03","판매가":14220,"평점":8.3},{"성별":"여","연령대":10,"순위":19,"제목":"기브 앤 테이크","저자":"애덤 그랜트","출판사":"생각연구소","출간":"2013-06","판매가":15750,"평점":9.1},{"성별":"여","연령대":20,"순위":1,"제목":"나의 첫 번째 부동산 교과서","저자":"송희구","출판사":"서삼독","출간":"2026-06","판매가":20700,"평점":9.5},{"성별":"여","연령대":20,"순위":2,"제목":"부의 갈림길","저자":"오건영","출판사":"포레스트북스","출간":"2026-06","판매가":24300,"평점":9.7},{"성별":"여","연령대":20,"순위":3,"제목":"손자병법","저자":"손자","출판사":"현대지성","출간":"2025-10","판매가":11700,"평점":9.7},{"성별":"여","연령대":20,"순위":4,"제목":"100세까지 월 500만 원 받는 ETF 연금 수업","저자":"제도권주식분석(최기원)","출판사":"와이즈베리","출간":"2026-08","판매가":20700,"평점":9.9},{"성별":"여","연령대":20,"순위":5,"제목":"독하게 돈 공부","저자":"박소연","출판사":"메이븐","출간":"2026-07","판매가":20700,"평점":9.7},{"성별":"여","연령대":20,"순위":6,"제목":"돈의 속성 400쇄 리커버","저자":"김승호","출판사":"스노우폭스북스","출간":"2020-06","판매가":16020,"평점":9.5},{"성별":"여","연령대":20,"순위":7,"제목":"돈의 심리학","저자":"모건 하우절","출판사":"인플루엔셜","출간":"2026-01","판매가":22320,"평점":9.4},{"성별":"여","연령대":20,"순위":8,"제목":"지금 꼭 사야 할 ETF","저자":"마지혜","출판사":"경향비피","출간":"2026-08","판매가":19350,"평점":null},{"성별":"여","연령대":20,"순위":9,"제목":"자본주의 시대에서 살아남기 위한 최소한의 경제 공부","저자":"백억남(김욱현)","출판사":"하이스트","출간":"2025-12","판매가":25200,"평점":9.7},{"성별":"여","연령대":20,"순위":10,"제목":"박곰희 연금 부자 수업","저자":"박곰희","출판사":"인플루엔셜","출간":"2025-06","판매가":18900,"평점":9.7},{"성별":"여","연령대":20,"순위":11,"제목":"돈, 뜨겁게 사랑하고 차갑게 다루어라","저자":"앙드레 코스톨라니","출판사":"미래의창","출간":"2023-09","판매가":13500,"평점":9.4},{"성별":"여","연령대":20,"순위":12,"제목":"공시 6년 실패, 중소기업 김 대리는 어떻게 6년 만에 22억을 벌었나","저자":"김동면","출판사":"모티브","출간":"2026-08","판매가":19800,"평점":4.7},{"성별":"여","연령대":20,"순위":13,"제목":"잼비의 첫 재테크","저자":"잼비","출판사":"길벗","출간":"2026-07","판매가":19800,"평점":10.0},{"성별":"여","연령대":20,"순위":14,"제목":"파동 눌림목 매매법","저자":"파동마스터","출판사":"스마트비즈니스","출간":"2026-08","판매가":19800,"평점":9.9},{"성별":"여","연령대":20,"순위":15,"제목":"한 권의 재테크 수업","저자":"수미숨(상의민)","출판사":"서삼독","출간":"2026-04","판매가":19800,"평점":10.0},{"성별":"여","연령대":20,"순위":16,"제목":"AI, 신의 탄생 인간의 종말","저자":"엘리에저 유드코스키, 네이트 소아레스","출판사":"상상스퀘어","출간":"2026-04","판매가":19800,"평점":9.7},{"성별":"여","연령대":20,"순위":17,"제목":"제로 투 원","저자":"피터 틸, 블레이크 매스터스","출판사":"한국경제신문사","출간":"2025-04","판매가":16200,"평점":9.7},{"성별":"여","연령대":20,"순위":18,"제목":"일의 격","저자":"신수정","출판사":"턴어라운드","출간":"2021-07","판매가":16200,"평점":9.3},{"성별":"여","연령대":20,"순위":19,"제목":"왜 일하는가","저자":"이나모리 가즈오","출판사":"다산북스","출간":"2021-04","판매가":16200,"평점":8.7},{"성별":"여","연령대":20,"순위":20,"제목":"생각에 관한 생각","저자":"대니얼 카너먼","출판사":"김영사","출간":"2018-03","판매가":26820,"평점":9.3},{"성별":"여","연령대":30,"순위":1,"제목":"나의 첫 번째 부동산 교과서","저자":"송희구","출판사":"서삼독","출간":"2026-06","판매가":20700,"평점":9.5},{"성별":"여","연령대":30,"순위":2,"제목":"독하게 돈 공부","저자":"박소연","출판사":"메이븐","출간":"2026-07","판매가":20700,"평점":9.7},{"성별":"여","연령대":30,"순위":3,"제목":"부의 갈림길","저자":"오건영","출판사":"포레스트북스","출간":"2026-06","판매가":24300,"평점":9.7},{"성별":"여","연령대":30,"순위":4,"제목":"박곰희 연금 부자 수업","저자":"박곰희","출판사":"인플루엔셜","출간":"2025-06","판매가":18900,"평점":9.7},{"성별":"여","연령대":30,"순위":5,"제목":"손자병법","저자":"손자","출판사":"현대지성","출간":"2025-10","판매가":11700,"평점":9.7},{"성별":"여","연령대":30,"순위":6,"제목":"100세까지 월 500만 원 받는 ETF 연금 수업","저자":"제도권주식분석(최기원)","출판사":"와이즈베리","출간":"2026-08","판매가":20700,"평점":9.9},{"성별":"여","연령대":30,"순위":7,"제목":"돈의 심리학","저자":"모건 하우절","출판사":"인플루엔셜","출간":"2026-01","판매가":22320,"평점":9.4},{"성별":"여","연령대":30,"순위":8,"제목":"지금 꼭 사야 할 ETF","저자":"마지혜","출판사":"경향비피","출간":"2026-08","판매가":19350,"평점":null},{"성별":"여","연령대":30,"순위":9,"제목":"돈, 뜨겁게 사랑하고 차갑게 다루어라","저자":"앙드레 코스톨라니","출판사":"미래의창","출간":"2023-09","판매가":13500,"평점":9.4},{"성별":"여","연령대":30,"순위":10,"제목":"주식투자 무작정 따라하기","저자":"윤재수","출판사":"길벗","출간":"2026-01","판매가":22500,"평점":9.4},{"성별":"여","연령대":30,"순위":11,"제목":"생각에 관한 생각","저자":"대니얼 카너먼","출판사":"김영사","출간":"2018-03","판매가":26820,"평점":9.3},{"성별":"여","연령대":30,"순위":12,"제목":"쏘쿨의 구축명품 아파트 내집마련","저자":"쏘쿨","출판사":"진서원","출간":"2026-08","판매가":19800,"평점":10.0},{"성별":"여","연령대":30,"순위":13,"제목":"천만 원으로 시작해 매달 500만 원 받는 ETF 월배당머신","저자":"평온, 김지형","출판사":"이나우스북스","출간":"2026-05","판매가":20700,"평점":9.9},{"성별":"여","연령대":30,"순위":14,"제목":"공시 6년 실패, 중소기업 김 대리는 어떻게 6년 만에 22억을 벌었나","저자":"김동면","출판사":"모티브","출간":"2026-08","판매가":19800,"평점":4.7},{"성별":"여","연령대":30,"순위":15,"제목":"자본주의","저자":"EBS 〈자본주의〉 제작팀","출판사":"가나출판사","출간":"2013-09","판매가":19800,"평점":9.5},{"성별":"여","연령대":30,"순위":16,"제목":"주식 투자의 그릇","저자":"후지모토 시게루","출판사":"다산북스","출간":"2026-06","판매가":18000,"평점":9.8},{"성별":"여","연령대":30,"순위":17,"제목":"명료함","저자":"탁민 오","출판사":"탁희재","출간":"2026-02","판매가":17820,"평점":9.5},{"성별":"여","연령대":30,"순위":18,"제목":"자본주의 시대에서 살아남기 위한 최소한의 경제 공부","저자":"백억남(김욱현)","출판사":"하이스트","출간":"2025-12","판매가":25200,"평점":9.7},{"성별":"여","연령대":30,"순위":19,"제목":"퇴근 후 100만 원 버는 미국 주식 바닥의 기술","저자":"미부기","출판사":"모티브","출간":"2026-08","판매가":19800,"평점":null},{"성별":"여","연령대":30,"순위":20,"제목":"머니베이킹","저자":"머니바게트","출판사":"모티브","출간":"2026-08","판매가":17820,"평점":10.0},{"성별":"여","연령대":40,"순위":1,"제목":"독하게 돈 공부","저자":"박소연","출판사":"메이븐","출간":"2026-07","판매가":20700,"평점":9.7},{"성별":"여","연령대":40,"순위":2,"제목":"나의 첫 번째 부동산 교과서","저자":"송희구","출판사":"서삼독","출간":"2026-06","판매가":20700,"평점":9.5},{"성별":"여","연령대":40,"순위":3,"제목":"부의 갈림길","저자":"오건영","출판사":"포레스트북스","출간":"2026-06","판매가":24300,"평점":9.7},{"성별":"여","연령대":40,"순위":4,"제목":"손자병법","저자":"손자","출판사":"현대지성","출간":"2025-10","판매가":11700,"평점":9.7},{"성별":"여","연령대":40,"순위":5,"제목":"박곰희 연금 부자 수업","저자":"박곰희","출판사":"인플루엔셜","출간":"2025-06","판매가":18900,"평점":9.7},{"성별":"여","연령대":40,"순위":6,"제목":"돈, 뜨겁게 사랑하고 차갑게 다루어라","저자":"앙드레 코스톨라니","출판사":"미래의창","출간":"2023-09","판매가":13500,"평점":9.4},{"성별":"여","연령대":40,"순위":7,"제목":"100세까지 월 500만 원 받는 ETF 연금 수업","저자":"제도권주식분석(최기원)","출판사":"와이즈베리","출간":"2026-08","판매가":20700,"평점":9.9},{"성별":"여","연령대":40,"순위":8,"제목":"돈의 심리학","저자":"모건 하우절","출판사":"인플루엔셜","출간":"2026-01","판매가":22320,"평점":9.4},{"성별":"여","연령대":40,"순위":9,"제목":"왜 일하는가","저자":"이나모리 가즈오","출판사":"다산북스","출간":"2021-04","판매가":16200,"평점":8.7},{"성별":"여","연령대":40,"순위":10,"제목":"박태웅의 AI 강의 2026","저자":"박태웅","출판사":"한빛비즈","출간":"2026-03","판매가":20700,"평점":9.6},{"성별":"여","연령대":40,"순위":11,"제목":"천만 원으로 시작해 매달 500만 원 받는 ETF 월배당머신","저자":"평온, 김지형","출판사":"이나우스북스","출간":"2026-05","판매가":20700,"평점":9.9},{"성별":"여","연령대":40,"순위":12,"제목":"불변의 법칙","저자":"모건 하우절","출판사":"서삼독","출간":"2024-02","판매가":22500,"평점":9.5},{"성별":"여","연령대":40,"순위":13,"제목":"생각에 관한 생각","저자":"대니얼 카너먼","출판사":"김영사","출간":"2018-03","판매가":26820,"평점":9.3},{"성별":"여","연령대":40,"순위":14,"제목":"주식 투자를 잘한다는 것","저자":"육과장","출판사":"노티스","출간":"2026-04","판매가":19800,"평점":9.7},{"성별":"여","연령대":40,"순위":15,"제목":"투자에 대한 생각","저자":"하워드 막스","출판사":"비즈니스맵","출간":"2012-09","판매가":13500,"평점":9.1},{"성별":"여","연령대":40,"순위":16,"제목":"자본주의 시대에서 살아남기 위한 최소한의 경제 공부","저자":"백억남(김욱현)","출판사":"하이스트","출간":"2025-12","판매가":25200,"평점":9.7},{"성별":"여","연령대":40,"순위":17,"제목":"돈의 속성 400쇄 리커버","저자":"김승호","출판사":"스노우폭스북스","출간":"2020-06","판매가":16020,"평점":9.5},{"성별":"여","연령대":40,"순위":18,"제목":"엄마의 두 번째 재테크","저자":"우리나 외","출판사":"제이브리즈북스","출간":"2026-08","판매가":15750,"평점":10.0},{"성별":"여","연령대":40,"순위":19,"제목":"쏘쿨의 구축명품 아파트 내집마련","저자":"쏘쿨","출판사":"진서원","출간":"2026-08","판매가":19800,"평점":10.0},{"성별":"여","연령대":40,"순위":20,"제목":"라오어의 미국주식 밸류 리밸런싱","저자":"라오어","출판사":"알키","출간":"2022-08","판매가":16200,"평점":8.6},{"성별":"여","연령대":50,"순위":1,"제목":"독하게 돈 공부","저자":"박소연","출판사":"메이븐","출간":"2026-07","판매가":20700,"평점":9.7},{"성별":"여","연령대":50,"순위":2,"제목":"돈, 뜨겁게 사랑하고 차갑게 다루어라","저자":"앙드레 코스톨라니","출판사":"미래의창","출간":"2023-09","판매가":13500,"평점":9.4},{"성별":"여","연령대":50,"순위":3,"제목":"나의 첫 번째 부동산 교과서","저자":"송희구","출판사":"서삼독","출간":"2026-06","판매가":20700,"평점":9.5},{"성별":"여","연령대":50,"순위":4,"제목":"부의 갈림길","저자":"오건영","출판사":"포레스트북스","출간":"2026-06","판매가":24300,"평점":9.7},{"성별":"여","연령대":50,"순위":5,"제목":"박곰희 연금 부자 수업","저자":"박곰희","출판사":"인플루엔셜","출간":"2025-06","판매가":18900,"평점":9.7},{"성별":"여","연령대":50,"순위":6,"제목":"투자에 대한 생각","저자":"하워드 막스","출판사":"비즈니스맵","출간":"2012-09","판매가":13500,"평점":9.1},{"성별":"여","연령대":50,"순위":7,"제목":"100세까지 월 500만 원 받는 ETF 연금 수업","저자":"제도권주식분석(최기원)","출판사":"와이즈베리","출간":"2026-08","판매가":20700,"평점":9.9},{"성별":"여","연령대":50,"순위":8,"제목":"돈의 심리학","저자":"모건 하우절","출판사":"인플루엔셜","출간":"2026-01","판매가":22320,"평점":9.4},{"성별":"여","연령대":50,"순위":9,"제목":"주식 투자를 잘한다는 것","저자":"육과장","출판사":"노티스","출간":"2026-04","판매가":19800,"평점":9.7},{"성별":"여","연령대":50,"순위":10,"제목":"박태웅의 AI 강의 2026","저자":"박태웅","출판사":"한빛비즈","출간":"2026-03","판매가":20700,"평점":9.6},{"성별":"여","연령대":50,"순위":11,"제목":"손자병법","저자":"손자","출판사":"현대지성","출간":"2025-10","판매가":11700,"평점":9.7},{"성별":"여","연령대":50,"순위":12,"제목":"생각에 관한 생각","저자":"대니얼 카너먼","출판사":"김영사","출간":"2018-03","판매가":26820,"평점":9.3},{"성별":"여","연령대":50,"순위":13,"제목":"전설로 떠나는 월가의 영웅","저자":"피터 린치, 존 로스차일드","출판사":"국일증권경제연구소","출간":"2026-08","판매가":32400,"평점":null},{"성별":"여","연령대":50,"순위":14,"제목":"마케팅 설계자","저자":"러셀 브런슨","출판사":"윌북","출간":"2022-12","판매가":22320,"평점":8.9},{"성별":"여","연령대":50,"순위":15,"제목":"지금부터 주식공부 다시 시작이다","저자":"감은숙","출판사":"타래","출간":"2026-06","판매가":21600,"평점":null},{"성별":"여","연령대":50,"순위":16,"제목":"돈의 방정식","저자":"모건 하우절","출판사":"서삼독","출간":"2026-01","판매가":25200,"평점":9.3},{"성별":"여","연령대":50,"순위":17,"제목":"불변의 법칙","저자":"모건 하우절","출판사":"서삼독","출간":"2024-02","판매가":22500,"평점":9.5},{"성별":"여","연령대":50,"순위":18,"제목":"AI, 신의 탄생 인간의 종말","저자":"엘리에저 유드코스키, 네이트 소아레스","출판사":"상상스퀘어","출간":"2026-04","판매가":19800,"평점":9.7},{"성별":"여","연령대":50,"순위":19,"제목":"라오어의 미국주식 무한매수법","저자":"라오어","출판사":"알키","출간":"2021-06","판매가":14400,"평점":9.0},{"성별":"여","연령대":50,"순위":20,"제목":"AI가 두려운 당신에게","저자":"배경훈, 과학기술정보통신부","출판사":"한빛미디어","출간":"2026-07","판매가":16020,"평점":9.9},{"성별":"남","연령대":10,"순위":1,"제목":"손자병법","저자":"손자","출판사":"현대지성","출간":"2025-10","판매가":11700,"평점":9.7},{"성별":"남","연령대":10,"순위":2,"제목":"고환율 시대, 나는 배에서 경제적 자유를 이룬다","저자":"황희상","출판사":"모티브","출간":"2026-07","판매가":17820,"평점":10.0},{"성별":"남","연령대":10,"순위":3,"제목":"현명한 투자자","저자":"벤저민 그레이엄","출판사":"국일증권경제연구소","출간":"2025-06","판매가":25200,"평점":9.5},{"성별":"남","연령대":10,"순위":4,"제목":"돈, 뜨겁게 사랑하고 차갑게 다루어라","저자":"앙드레 코스톨라니","출판사":"미래의창","출간":"2025-12","판매가":16200,"평점":9.5},{"성별":"남","연령대":10,"순위":5,"제목":"AI 에이전트 주식 자동 매매","저자":"고현민","출판사":"리코멘드","출간":"2026-08","판매가":18000,"평점":null},{"성별":"남","연령대":10,"순위":6,"제목":"공시 6년 실패, 중소기업 김 대리는 어떻게 6년 만에 22억을 벌었나","저자":"김동면","출판사":"모티브","출간":"2026-08","판매가":19800,"평점":4.7},{"성별":"남","연령대":10,"순위":7,"제목":"주식의 시대","저자":"EBS 다큐프라임 〈주식의 시대〉 제작진","출판사":"위즈덤하우스","출간":"2026-07","판매가":17100,"평점":10.0},{"성별":"남","연령대":10,"순위":8,"제목":"격동하는 미중 패권 전쟁과 대분열의 시대","저자":"닐 시어링","출판사":"21세기북스","출간":"2026-07","판매가":21600,"평점":10.0},{"성별":"남","연령대":10,"순위":9,"제목":"지금 꼭 사야 할 ETF","저자":"마지혜","출판사":"경향비피","출간":"2026-08","판매가":19350,"평점":null},{"성별":"남","연령대":10,"순위":10,"제목":"디지털 헬스케어로 다시 쓰는 의료·제약·바이오 산업","저자":"최경환","출판사":"비제이퍼블릭","출간":"2026-07","판매가":21600,"평점":10.0},{"성별":"남","연령대":10,"순위":11,"제목":"복합불황 2027~2030","저자":"박홍기","출판사":"바른북스","출간":"2026-06","판매가":21600,"평점":9.8},{"성별":"남","연령대":10,"순위":12,"제목":"아이디어를 사업으로 키우는 법","저자":"줄리아 오스틴","출판사":"더퀘스트","출간":"2026-06","판매가":21150,"평점":9.9},{"성별":"남","연령대":10,"순위":13,"제목":"스킬 코드","저자":"맷 빈","출판사":"청림출판","출간":"2026-05","판매가":18000,"평점":9.8},{"성별":"남","연령대":10,"순위":14,"제목":"할 수 있다! AI 주식 투자","저자":"머신러너","출판사":"에프엔미디어","출간":"2026-04","판매가":22500,"평점":8.3},{"성별":"남","연령대":10,"순위":15,"제목":"경매 100계명 제2부","저자":"박홍기","출판사":"바른북스","출간":"2026-02","판매가":21600,"평점":9.7},{"성별":"남","연령대":10,"순위":16,"제목":"우리 회사 AI 전환, 어떻게 시작할까?","저자":"이근형","출판사":"지식공감","출간":"2026-03","판매가":20700,"평점":10.0},{"성별":"남","연령대":10,"순위":17,"제목":"무극화 시대","저자":"조한범","출판사":"보다나은","출간":"2026-02","판매가":18000,"평점":8.5},{"성별":"남","연령대":10,"순위":18,"제목":"주식투자 무작정 따라하기","저자":"윤재수","출판사":"길벗","출간":"2026-01","판매가":22500,"평점":9.4},{"성별":"남","연령대":10,"순위":19,"제목":"돈의 심리학","저자":"모건 하우절","출판사":"인플루엔셜","출간":"2026-01","판매가":22320,"평점":9.4},{"성별":"남","연령대":10,"순위":20,"제목":"초보 창업자를 위한 창업학 개론","저자":"이창영","출판사":"BG북갤러리","출간":"2025-11","판매가":18000,"평점":null},{"성별":"남","연령대":20,"순위":1,"제목":"나의 첫 번째 부동산 교과서","저자":"송희구","출판사":"서삼독","출간":"2026-06","판매가":20700,"평점":9.5},{"성별":"남","연령대":20,"순위":2,"제목":"돈의 심리학","저자":"모건 하우절","출판사":"인플루엔셜","출간":"2026-01","판매가":22320,"평점":9.4},{"성별":"남","연령대":20,"순위":3,"제목":"돈, 뜨겁게 사랑하고 차갑게 다루어라","저자":"앙드레 코스톨라니","출판사":"미래의창","출간":"2023-09","판매가":13500,"평점":9.4},{"성별":"남","연령대":20,"순위":4,"제목":"생각에 관한 생각","저자":"대니얼 카너먼","출판사":"김영사","출간":"2018-03","판매가":26820,"평점":9.3},{"성별":"남","연령대":20,"순위":5,"제목":"자본주의","저자":"EBS 〈자본주의〉 제작팀","출판사":"가나출판사","출간":"2013-09","판매가":19800,"평점":9.5},{"성별":"남","연령대":20,"순위":6,"제목":"전설로 떠나는 월가의 영웅","저자":"피터 린치, 존 로스차일드","출판사":"국일증권경제연구소","출간":"2026-08","판매가":32400,"평점":null},{"성별":"남","연령대":20,"순위":7,"제목":"자본주의 시대에서 살아남기 위한 최소한의 경제 공부","저자":"백억남(김욱현)","출판사":"하이스트","출간":"2025-12","판매가":25200,"평점":9.7},{"성별":"남","연령대":20,"순위":8,"제목":"100세까지 월 500만 원 받는 ETF 연금 수업","저자":"제도권주식분석(최기원)","출판사":"와이즈베리","출간":"2026-08","판매가":20700,"평점":9.9},{"성별":"남","연령대":20,"순위":9,"제목":"주식투자 무작정 따라하기","저자":"윤재수","출판사":"길벗","출간":"2026-01","판매가":22500,"평점":9.4},{"성별":"남","연령대":20,"순위":10,"제목":"제로 투 원","저자":"피터 틸, 블레이크 매스터스","출판사":"한국경제신문사","출간":"2025-04","판매가":16200,"평점":9.7},{"성별":"남","연령대":20,"순위":11,"제목":"투자에 대한 생각","저자":"하워드 막스","출판사":"비즈니스맵","출간":"2012-09","판매가":13500,"평점":9.1},{"성별":"남","연령대":20,"순위":12,"제목":"부의 갈림길","저자":"오건영","출판사":"포레스트북스","출간":"2026-06","판매가":24300,"평점":9.7},{"성별":"남","연령대":20,"순위":13,"제목":"손자병법","저자":"손자","출판사":"현대지성","출간":"2025-10","판매가":11700,"평점":9.7},{"성별":"남","연령대":20,"순위":14,"제목":"불변의 법칙","저자":"모건 하우절","출판사":"서삼독","출간":"2024-02","판매가":22500,"평점":9.5},{"성별":"남","연령대":20,"순위":15,"제목":"1,000만 원으로 3년 안에 300만 원 월배당 만들기","저자":"인생업(임승현)","출판사":"경이로움","출간":"2026-02","판매가":20700,"평점":9.8},{"성별":"남","연령대":20,"순위":16,"제목":"마케팅 불변의 법칙","저자":"알 리스, 잭 트라우트","출판사":"비즈니스맵","출간":"2024-10","판매가":15120,"평점":9.9},{"성별":"남","연령대":20,"순위":17,"제목":"부자의 그릇","저자":"이즈미 마사토","출판사":"다산북스","출간":"2020-12","판매가":15300,"평점":9.2},{"성별":"남","연령대":20,"순위":18,"제목":"돈의 속성 400쇄 리커버","저자":"김승호","출판사":"스노우폭스북스","출간":"2020-06","판매가":16020,"평점":9.5},{"성별":"남","연령대":20,"순위":19,"제목":"적정 주가 가치투자 법칙","저자":"이주택","출판사":"길벗","출간":"2026-07","판매가":16920,"평점":9.8},{"성별":"남","연령대":20,"순위":20,"제목":"부의 사다리에 올라타라","저자":"닉 매기울리","출판사":"알에이치코리아","출간":"2026-04","판매가":20700,"평점":9.7},{"성별":"남","연령대":30,"순위":1,"제목":"나의 첫 번째 부동산 교과서","저자":"송희구","출판사":"서삼독","출간":"2026-06","판매가":20700,"평점":9.5},{"성별":"남","연령대":30,"순위":2,"제목":"독하게 돈 공부","저자":"박소연","출판사":"메이븐","출간":"2026-07","판매가":20700,"평점":9.7},{"성별":"남","연령대":30,"순위":3,"제목":"박곰희 연금 부자 수업","저자":"박곰희","출판사":"인플루엔셜","출간":"2025-06","판매가":18900,"평점":9.7},{"성별":"남","연령대":30,"순위":4,"제목":"돈의 심리학","저자":"모건 하우절","출판사":"인플루엔셜","출간":"2026-01","판매가":22320,"평점":9.4},{"성별":"남","연령대":30,"순위":5,"제목":"부의 갈림길","저자":"오건영","출판사":"포레스트북스","출간":"2026-06","판매가":24300,"평점":9.7},{"성별":"남","연령대":30,"순위":6,"제목":"돈, 뜨겁게 사랑하고 차갑게 다루어라","저자":"앙드레 코스톨라니","출판사":"미래의창","출간":"2023-09","판매가":13500,"평점":9.4},{"성별":"남","연령대":30,"순위":7,"제목":"100세까지 월 500만 원 받는 ETF 연금 수업","저자":"제도권주식분석(최기원)","출판사":"와이즈베리","출간":"2026-08","판매가":20700,"평점":9.9},{"성별":"남","연령대":30,"순위":8,"제목":"퇴근 후 100만 원 버는 미국 주식 바닥의 기술","저자":"미부기","출판사":"모티브","출간":"2026-08","판매가":19800,"평점":10.0},{"성별":"남","연령대":30,"순위":9,"제목":"지금 꼭 사야 할 ETF","저자":"마지혜","출판사":"경향비피","출간":"2026-08","판매가":19350,"평점":null},{"성별":"남","연령대":30,"순위":10,"제목":"전설로 떠나는 월가의 영웅","저자":"피터 린치, 존 로스차일드","출판사":"국일증권경제연구소","출간":"2026-08","판매가":32400,"평점":null},{"성별":"남","연령대":30,"순위":11,"제목":"언노우너스","저자":"윤상윤","출판사":"다산북스","출간":"2026-06","판매가":18000,"평점":9.9},{"성별":"남","연령대":30,"순위":12,"제목":"투자에 대한 생각","저자":"하워드 막스","출판사":"비즈니스맵","출간":"2012-09","판매가":13500,"평점":9.1},{"성별":"남","연령대":30,"순위":13,"제목":"주식 투자의 그릇","저자":"후지모토 시게루","출판사":"다산북스","출간":"2026-06","판매가":18000,"평점":9.8},{"성별":"남","연령대":30,"순위":14,"제목":"명료함","저자":"탁민 오","출판사":"탁희재","출간":"2026-02","판매가":17820,"평점":9.5},{"성별":"남","연령대":30,"순위":15,"제목":"돈의 방정식","저자":"모건 하우절","출판사":"서삼독","출간":"2026-01","판매가":25200,"평점":9.3},{"성별":"남","연령대":30,"순위":16,"제목":"불변의 법칙","저자":"모건 하우절","출판사":"서삼독","출간":"2024-02","판매가":22500,"평점":9.5},{"성별":"남","연령대":30,"순위":17,"제목":"공무원 AI 54제 활용 가이드","저자":"소현규","출판사":"한빛미디어","출간":"2026-07","판매가":20700,"평점":null},{"성별":"남","연령대":30,"순위":18,"제목":"AI가 두려운 당신에게","저자":"배경훈, 과학기술정보통신부","출판사":"한빛미디어","출간":"2026-07","판매가":16020,"평점":9.9},{"성별":"남","연령대":30,"순위":19,"제목":"파동 눌림목 매매법","저자":"파동마스터","출판사":"스마트비즈니스","출간":"2026-08","판매가":19800,"평점":9.9},{"성별":"남","연령대":30,"순위":20,"제목":"쏘쿨의 구축명품 아파트 내집마련","저자":"쏘쿨","출판사":"진서원","출간":"2026-08","판매가":19800,"평점":10.0},{"성별":"남","연령대":40,"순위":1,"제목":"독하게 돈 공부","저자":"박소연","출판사":"메이븐","출간":"2026-07","판매가":20700,"평점":9.7},{"성별":"남","연령대":40,"순위":2,"제목":"나의 첫 번째 부동산 교과서","저자":"송희구","출판사":"서삼독","출간":"2026-06","판매가":20700,"평점":9.5},{"성별":"남","연령대":40,"순위":3,"제목":"돈, 뜨겁게 사랑하고 차갑게 다루어라","저자":"앙드레 코스톨라니","출판사":"미래의창","출간":"2023-09","판매가":13500,"평점":9.4},{"성별":"남","연령대":40,"순위":4,"제목":"부의 갈림길","저자":"오건영","출판사":"포레스트북스","출간":"2026-06","판매가":24300,"평점":9.7},{"성별":"남","연령대":40,"순위":5,"제목":"투자에 대한 생각","저자":"하워드 막스","출판사":"비즈니스맵","출간":"2012-09","판매가":13500,"평점":9.1},{"성별":"남","연령대":40,"순위":6,"제목":"파동 눌림목 매매법","저자":"파동마스터","출판사":"스마트비즈니스","출간":"2026-08","판매가":19800,"평점":9.9},{"성별":"남","연령대":40,"순위":7,"제목":"박곰희 연금 부자 수업","저자":"박곰희","출판사":"인플루엔셜","출간":"2025-06","판매가":18900,"평점":9.7},{"성별":"남","연령대":40,"순위":8,"제목":"손자병법","저자":"손자","출판사":"현대지성","출간":"2025-10","판매가":11700,"평점":9.7},{"성별":"남","연령대":40,"순위":9,"제목":"100세까지 월 500만 원 받는 ETF 연금 수업","저자":"제도권주식분석(최기원)","출판사":"와이즈베리","출간":"2026-08","판매가":20700,"평점":9.9},{"성별":"남","연령대":40,"순위":10,"제목":"돈의 심리학","저자":"모건 하우절","출판사":"인플루엔셜","출간":"2026-01","판매가":22320,"평점":9.4},{"성별":"남","연령대":40,"순위":11,"제목":"생각에 관한 생각","저자":"대니얼 카너먼","출판사":"김영사","출간":"2018-03","판매가":26820,"평점":9.3},{"성별":"남","연령대":40,"순위":12,"제목":"불변의 법칙","저자":"모건 하우절","출판사":"서삼독","출간":"2024-02","판매가":22500,"평점":9.5},{"성별":"남","연령대":40,"순위":13,"제목":"전설로 떠나는 월가의 영웅","저자":"피터 린치, 존 로스차일드","출판사":"국일증권경제연구소","출간":"2026-08","판매가":32400,"평점":null},{"성별":"남","연령대":40,"순위":14,"제목":"주식 투자의 그릇","저자":"후지모토 시게루","출판사":"다산북스","출간":"2026-06","판매가":18000,"평점":9.8},{"성별":"남","연령대":40,"순위":15,"제목":"지금 꼭 사야 할 ETF","저자":"마지혜","출판사":"경향비피","출간":"2026-08","판매가":19350,"평점":null},{"성별":"남","연령대":40,"순위":16,"제목":"천만 원으로 시작해 매달 500만 원 받는 ETF 월배당머신","저자":"평온, 김지형","출판사":"이나우스북스","출간":"2026-05","판매가":20700,"평점":9.9},{"성별":"남","연령대":40,"순위":17,"제목":"박태웅의 AI 강의 2026","저자":"박태웅","출판사":"한빛비즈","출간":"2026-03","판매가":20700,"평점":9.6},{"성별":"남","연령대":40,"순위":18,"제목":"명료함","저자":"탁민 오","출판사":"탁희재","출간":"2026-02","판매가":17820,"평점":9.5},{"성별":"남","연령대":40,"순위":19,"제목":"제로 투 원","저자":"피터 틸, 블레이크 매스터스","출판사":"한국경제신문사","출간":"2025-04","판매가":16200,"평점":9.7},{"성별":"남","연령대":40,"순위":20,"제목":"테슬라를 넘어서 스페이스X로","저자":"손정우","출판사":"리치캠프","출간":"2026-07","판매가":27000,"평점":9.6},{"성별":"남","연령대":50,"순위":1,"제목":"독하게 돈 공부","저자":"박소연","출판사":"메이븐","출간":"2026-07","판매가":20700,"평점":9.7},{"성별":"남","연령대":50,"순위":2,"제목":"돈, 뜨겁게 사랑하고 차갑게 다루어라","저자":"앙드레 코스톨라니","출판사":"미래의창","출간":"2023-09","판매가":13500,"평점":9.4},{"성별":"남","연령대":50,"순위":3,"제목":"부의 갈림길","저자":"오건영","출판사":"포레스트북스","출간":"2026-06","판매가":24300,"평점":9.7},{"성별":"남","연령대":50,"순위":4,"제목":"투자에 대한 생각","저자":"하워드 막스","출판사":"비즈니스맵","출간":"2012-09","판매가":13500,"평점":9.1},{"성별":"남","연령대":50,"순위":5,"제목":"박태웅의 AI 강의 2026","저자":"박태웅","출판사":"한빛비즈","출간":"2026-03","판매가":20700,"평점":9.6},{"성별":"남","연령대":50,"순위":6,"제목":"나의 첫 번째 부동산 교과서","저자":"송희구","출판사":"서삼독","출간":"2026-06","판매가":20700,"평점":9.5},{"성별":"남","연령대":50,"순위":7,"제목":"AI, 신의 탄생 인간의 종말","저자":"엘리에저 유드코스키, 네이트 소아레스","출판사":"상상스퀘어","출간":"2026-04","판매가":19800,"평점":9.7},{"성별":"남","연령대":50,"순위":8,"제목":"생각에 관한 생각","저자":"대니얼 카너먼","출판사":"김영사","출간":"2018-03","판매가":26820,"평점":9.3},{"성별":"남","연령대":50,"순위":9,"제목":"100세까지 월 500만 원 받는 ETF 연금 수업","저자":"제도권주식분석(최기원)","출판사":"와이즈베리","출간":"2026-08","판매가":20700,"평점":9.9},{"성별":"남","연령대":50,"순위":10,"제목":"파동 눌림목 매매법","저자":"파동마스터","출판사":"스마트비즈니스","출간":"2026-08","판매가":19800,"평점":9.9},{"성별":"남","연령대":50,"순위":11,"제목":"천만 원으로 시작해 매달 500만 원 받는 ETF 월배당머신","저자":"평온, 김지형","출판사":"이나우스북스","출간":"2026-05","판매가":20700,"평점":9.9},{"성별":"남","연령대":50,"순위":12,"제목":"돈의 심리학","저자":"모건 하우절","출판사":"인플루엔셜","출간":"2026-01","판매가":22320,"평점":9.4},{"성별":"남","연령대":50,"순위":13,"제목":"박곰희 연금 부자 수업","저자":"박곰희","출판사":"인플루엔셜","출간":"2025-06","판매가":18900,"평점":9.7},{"성별":"남","연령대":50,"순위":14,"제목":"전설로 떠나는 월가의 영웅","저자":"피터 린치, 존 로스차일드","출판사":"국일증권경제연구소","출간":"2026-08","판매가":32400,"평점":null},{"성별":"남","연령대":50,"순위":15,"제목":"지금 꼭 사야 할 ETF","저자":"마지혜","출판사":"경향비피","출간":"2026-08","판매가":19350,"평점":null},{"성별":"남","연령대":50,"순위":16,"제목":"1억부터는 포트폴리오다","저자":"신환종","출판사":"에프엔미디어","출간":"2026-07","판매가":22500,"평점":10.0},{"성별":"남","연령대":50,"순위":17,"제목":"주식 투자의 그릇","저자":"후지모토 시게루","출판사":"다산북스","출간":"2026-06","판매가":18000,"평점":9.8},{"성별":"남","연령대":50,"순위":18,"제목":"불변의 법칙","저자":"모건 하우절","출판사":"서삼독","출간":"2024-02","판매가":22500,"평점":9.5},{"성별":"남","연령대":50,"순위":19,"제목":"주식은 미국의 전략을 따라 움직인다","저자":"소현철","출판사":"황금부엉이","출간":"2026-07","판매가":21600,"평점":9.8},{"성별":"남","연령대":50,"순위":20,"제목":"사라지는 돈, 살아남는 돈, 불어나는 돈","저자":"김효진","출판사":"페이지2북스","출간":"2026-07","판매가":18900,"평점":9.3},{"성별":"여","연령대":60,"순위":1,"제목":"돈, 뜨겁게 사랑하고 차갑게 다루어라","저자":"앙드레 코스톨라니","출판사":"미래의창","출간":"2023-09","판매가":13500,"평점":9.4},{"성별":"여","연령대":60,"순위":2,"제목":"나의 첫 번째 부동산 교과서","저자":"송희구","출판사":"서삼독","출간":"2026-06","판매가":20700,"평점":9.5},{"성별":"여","연령대":60,"순위":3,"제목":"독하게 돈 공부","저자":"박소연","출판사":"메이븐","출간":"2026-07","판매가":20700,"평점":9.7},{"성별":"여","연령대":60,"순위":4,"제목":"투자에 대한 생각","저자":"하워드 막스","출판사":"비즈니스맵","출간":"2012-09","판매가":13500,"평점":9.1},{"성별":"여","연령대":60,"순위":5,"제목":"부의 갈림길","저자":"오건영","출판사":"포레스트북스","출간":"2026-06","판매가":24300,"평점":9.7},{"성별":"여","연령대":60,"순위":6,"제목":"주식 투자를 잘한다는 것","저자":"육과장","출판사":"노티스","출간":"2026-04","판매가":19800,"평점":9.7},{"성별":"여","연령대":60,"순위":7,"제목":"지금 꼭 사야 할 ETF","저자":"마지혜","출판사":"경향비피","출간":"2026-08","판매가":19350,"평점":null},{"성별":"여","연령대":60,"순위":8,"제목":"박태웅의 AI 강의 2026","저자":"박태웅","출판사":"한빛비즈","출간":"2026-03","판매가":20700,"평점":9.6},{"성별":"여","연령대":60,"순위":9,"제목":"주식 투자의 그릇","저자":"후지모토 시게루","출판사":"다산북스","출간":"2026-06","판매가":18000,"평점":9.8},{"성별":"여","연령대":60,"순위":10,"제목":"염승환의 ETF 완전 정복","저자":"염승환","출판사":"한스미디어","출간":"2026-05","판매가":21600,"평점":9.8},{"성별":"여","연령대":60,"순위":11,"제목":"돈의 심리학","저자":"모건 하우절","출판사":"인플루엔셜","출간":"2026-01","판매가":22320,"평점":9.4},{"성별":"여","연령대":60,"순위":12,"제목":"엄마의 두 번째 재테크","저자":"우리나 외","출판사":"제이브리즈북스","출간":"2026-08","판매가":15750,"평점":10.0},{"성별":"여","연령대":60,"순위":13,"제목":"사라지는 돈, 살아남는 돈, 불어나는 돈","저자":"김효진","출판사":"페이지2북스","출간":"2026-07","판매가":18900,"평점":9.3},{"성별":"여","연령대":60,"순위":14,"제목":"AI, 신의 탄생 인간의 종말","저자":"엘리에저 유드코스키, 네이트 소아레스","출판사":"상상스퀘어","출간":"2026-04","판매가":19800,"평점":9.7},{"성별":"여","연령대":60,"순위":15,"제목":"딴딴한 투자를 위한 주식투자 교과서","저자":"정규준","출판사":"애덤스미스","출간":"2026-03","판매가":22500,"평점":9.6},{"성별":"여","연령대":60,"순위":16,"제목":"주식투자 무작정 따라하기","저자":"윤재수","출판사":"길벗","출간":"2026-01","판매가":22500,"평점":9.4},{"성별":"여","연령대":60,"순위":17,"제목":"손자병법","저자":"손자","출판사":"현대지성","출간":"2025-10","판매가":11700,"평점":9.7},{"성별":"여","연령대":60,"순위":18,"제목":"듀얼 브레인","저자":"이선 몰릭","출판사":"상상스퀘어","출간":"2025-03","판매가":18900,"평점":8.7},{"성별":"여","연령대":60,"순위":19,"제목":"마케팅 설계자","저자":"러셀 브런슨","출판사":"윌북","출간":"2022-12","판매가":22320,"평점":8.9},{"성별":"여","연령대":60,"순위":20,"제목":"생각에 관한 생각","저자":"대니얼 카너먼","출판사":"김영사","출간":"2018-03","판매가":26820,"평점":9.3},{"성별":"남","연령대":60,"순위":1,"제목":"독하게 돈 공부","저자":"박소연","출판사":"메이븐","출간":"2026-07","판매가":20700,"평점":9.7},{"성별":"남","연령대":60,"순위":2,"제목":"AI, 신의 탄생 인간의 종말","저자":"엘리에저 유드코스키, 네이트 소아레스","출판사":"상상스퀘어","출간":"2026-04","판매가":19800,"평점":9.7},{"성별":"남","연령대":60,"순위":3,"제목":"박태웅의 AI 강의 2026","저자":"박태웅","출판사":"한빛비즈","출간":"2026-03","판매가":20700,"평점":9.6},{"성별":"남","연령대":60,"순위":4,"제목":"돈, 뜨겁게 사랑하고 차갑게 다루어라","저자":"앙드레 코스톨라니","출판사":"미래의창","출간":"2023-09","판매가":13500,"평점":9.4},{"성별":"남","연령대":60,"순위":5,"제목":"지금 꼭 사야 할 ETF","저자":"마지혜","출판사":"경향비피","출간":"2026-08","판매가":19350,"평점":null},{"성별":"남","연령대":60,"순위":6,"제목":"나의 첫 번째 부동산 교과서","저자":"송희구","출판사":"서삼독","출간":"2026-06","판매가":20700,"평점":9.5},{"성별":"남","연령대":60,"순위":7,"제목":"생각에 관한 생각","저자":"대니얼 카너먼","출판사":"김영사","출간":"2018-03","판매가":26820,"평점":9.3},{"성별":"남","연령대":60,"순위":8,"제목":"투자에 대한 생각","저자":"하워드 막스","출판사":"비즈니스맵","출간":"2012-09","판매가":13500,"평점":9.1},{"성별":"남","연령대":60,"순위":9,"제목":"주식투자 불패의 법칙","저자":"조진표","출판사":"오아시스","출간":"2026-07","판매가":18900,"평점":9.8},{"성별":"남","연령대":60,"순위":10,"제목":"염승환의 ETF 완전 정복","저자":"염승환","출판사":"한스미디어","출간":"2026-05","판매가":21600,"평점":9.8},{"성별":"남","연령대":60,"순위":11,"제목":"AI가 두려운 당신에게","저자":"배경훈, 과학기술정보통신부","출판사":"한빛미디어","출간":"2026-07","판매가":16020,"평점":9.9},{"성별":"남","연령대":60,"순위":12,"제목":"사라지는 돈, 살아남는 돈, 불어나는 돈","저자":"김효진","출판사":"페이지2북스","출간":"2026-07","판매가":18900,"평점":9.3},{"성별":"남","연령대":60,"순위":13,"제목":"불변의 법칙","저자":"모건 하우절","출판사":"서삼독","출간":"2024-02","판매가":22500,"평점":9.5},{"성별":"남","연령대":60,"순위":14,"제목":"격동하는 미중 패권 전쟁과 대분열의 시대","저자":"닐 시어링","출판사":"21세기북스","출간":"2026-07","판매가":21600,"평점":10.0},{"성별":"남","연령대":60,"순위":15,"제목":"100세까지 월 500만 원 받는 ETF 연금 수업","저자":"제도권주식분석(최기원)","출판사":"와이즈베리","출간":"2026-08","판매가":20700,"평점":9.9},{"성별":"남","연령대":60,"순위":16,"제목":"2026 주택과 세금","저자":"편집부","출판사":"국세청","출간":"2026-07","판매가":7000,"평점":10.0},{"성별":"남","연령대":60,"순위":17,"제목":"테슬라를 넘어서 스페이스X로","저자":"손정우","출판사":"리치캠프","출간":"2026-07","판매가":27000,"평점":9.6},{"성별":"남","연령대":60,"순위":18,"제목":"전설로 떠나는 월가의 영웅","저자":"피터 린치, 존 로스차일드","출판사":"국일증권경제연구소","출간":"2026-08","판매가":32400,"평점":null},{"성별":"남","연령대":60,"순위":19,"제목":"슈퍼개미 이정윤의 성장주 집중 투자","저자":"이정윤","출판사":"베가북스","출간":"2026-06","판매가":22500,"평점":9.8},{"성별":"남","연령대":60,"순위":20,"제목":"제미나이 주식투자","저자":"조성호","출판사":"길벗","출간":"2026-04","판매가":18000,"평점":9.5}];
+const REPORT_B64 = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImtvIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9IlVURi04IiAvPgo8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLCBpbml0aWFsLXNjYWxlPTEuMCIgLz4KPHRpdGxlPuyngeyepSDrgrQg6rS066Gt7Z6YIOuvvOyCrCDshpDtlbTrsLDsg4Eg7J247KCVIOyalOqxtCDrtoTshJ0g4oCUIO2MkOqysOusuCA4OTXqsbQg7YOQ7IOJ7KCBIOu2hOyEnSDsmIjsi5w8L3RpdGxlPgo8c3R5bGU+CiAgOnJvb3R7CiAgICAtLWJnOiNmM2Y2ZjI7IC0tc3VyZmFjZTojZmZmZmZmOyAtLWluazojMjIyMDFkOyAtLW11dGVkOiM2MjZhNjQ7IC0tbGluZTojZDVkZGQzOwogICAgLS1icmFuZDojMmU5YmRiOyAtLWJyYW5kLWRhcms6IzFiNmZhNjsgLS1ncmVlbjojMmY3NjViOyAtLWFtYmVyOiNiODc5MmU7IC0tcmVkOiNiMDQ4M2Y7CiAgICAtLWJsdWU6IzM3NWY4ZjsgLS1za3ktbGlnaHQ6I2UzZjFmYjsKICAgIC0tc2hhZG93OjAgMTZweCA0NXB4IHJnYmEoNTQsNDIsMzEsLjEyKTsgLS1yYWRpdXM6MTRweDsKICB9CiAgKntib3gtc2l6aW5nOmJvcmRlci1ib3g7bWFyZ2luOjA7cGFkZGluZzowO30KICBib2R5ewogICAgZm9udC1mYW1pbHk6IlByZXRlbmRhcmQiLCJBcHBsZSBTRCBHb3RoaWMgTmVvIiwiTm90byBTYW5zIEtSIixzeXN0ZW0tdWksLWFwcGxlLXN5c3RlbSwiU2Vnb2UgVUkiLHNhbnMtc2VyaWY7CiAgICBiYWNrZ3JvdW5kOnZhcigtLWJnKTsgY29sb3I6dmFyKC0taW5rKTsgbGluZS1oZWlnaHQ6MS43NTsgZm9udC1zaXplOjE1LjVweDsKICAgIHBhZGRpbmc6Y2xhbXAoMThweCw0dncsNDhweCkgMTZweDsKICB9CiAgLnJlcG9ydHsKICAgIG1heC13aWR0aDo4ODBweDttYXJnaW46MCBhdXRvO2JhY2tncm91bmQ6dmFyKC0tc3VyZmFjZSk7CiAgICBib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxpbmUpO2JvcmRlci1yYWRpdXM6dmFyKC0tcmFkaXVzKTtib3gtc2hhZG93OnZhcigtLXNoYWRvdyk7CiAgICBwYWRkaW5nOmNsYW1wKDI4cHgsNXZ3LDU2cHgpOwogIH0KICAucmVwb3J0LWtpY2tlcnsKICAgIGRpc3BsYXk6aW5saW5lLWJsb2NrO2ZvbnQtc2l6ZToxMS41cHg7Zm9udC13ZWlnaHQ6OTAwO2xldHRlci1zcGFjaW5nOi4wOGVtOwogICAgY29sb3I6dmFyKC0tYnJhbmQtZGFyayk7YmFja2dyb3VuZDp2YXIoLS1za3ktbGlnaHQpOwogICAgcGFkZGluZzo1cHggMTJweDtib3JkZXItcmFkaXVzOjk5OXB4O21hcmdpbi1ib3R0b206MTRweDsKICB9CiAgaDF7Zm9udC1zaXplOmNsYW1wKDIxcHgsMy40dncsMjhweCk7bGluZS1oZWlnaHQ6MS4zNTtsZXR0ZXItc3BhY2luZzotLjAxZW07bWFyZ2luLWJvdHRvbToxMHB4O30KICAucmVwb3J0LW1ldGF7CiAgICBjb2xvcjp2YXIoLS1tdXRlZCk7Zm9udC1zaXplOjEzLjVweDtib3JkZXItYm90dG9tOjJweCBzb2xpZCB2YXIoLS1pbmspOwogICAgcGFkZGluZy1ib3R0b206MThweDttYXJnaW4tYm90dG9tOjhweDsKICB9CiAgLnJlcG9ydC1tZXRhIGJ7Y29sb3I6dmFyKC0taW5rKTt9CiAgaDJ7CiAgICBmb250LXNpemU6MTlweDttYXJnaW46NDBweCAwIDE0cHg7cGFkZGluZy10b3A6MjZweDtib3JkZXItdG9wOjFweCBzb2xpZCB2YXIoLS1saW5lKTsKICAgIGxldHRlci1zcGFjaW5nOi0uMDFlbTsKICB9CiAgaDIgLm51bXtjb2xvcjp2YXIoLS1icmFuZC1kYXJrKTttYXJnaW4tcmlnaHQ6OHB4O30KICBoM3tmb250LXNpemU6MTZweDttYXJnaW46MjRweCAwIDhweDtjb2xvcjp2YXIoLS1icmFuZC1kYXJrKTt9CiAgcHttYXJnaW46MTBweCAwO30KICBzdHJvbmd7Zm9udC13ZWlnaHQ6ODAwO30KICB0YWJsZXsKICAgIHdpZHRoOjEwMCU7Ym9yZGVyLWNvbGxhcHNlOmNvbGxhcHNlO21hcmdpbjoxNnB4IDA7Zm9udC1zaXplOjE0cHg7CiAgfQogIHRoewogICAgYmFja2dyb3VuZDojZjJmNmYwO3RleHQtYWxpZ246bGVmdDtwYWRkaW5nOjlweCAxMnB4O2JvcmRlcjoxcHggc29saWQgdmFyKC0tbGluZSk7CiAgICBmb250LXNpemU6MTNweDtsZXR0ZXItc3BhY2luZzouMDJlbTsKICB9CiAgdGR7cGFkZGluZzo5cHggMTJweDtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxpbmUpO30KICB0ZC5ye3RleHQtYWxpZ246cmlnaHQ7Zm9udC12YXJpYW50LW51bWVyaWM6dGFidWxhci1udW1zO30KICAuY2FzZXsKICAgIGJvcmRlci1sZWZ0OjRweCBzb2xpZCB2YXIoLS1saW5lKTtiYWNrZ3JvdW5kOiNmYWZjZjk7CiAgICBwYWRkaW5nOjEwcHggMTZweDttYXJnaW46MTBweCAwO2JvcmRlci1yYWRpdXM6MCAxMHB4IDEwcHggMDtmb250LXNpemU6MTQuNXB4OwogIH0KICAuY2FzZS5wb3N7Ym9yZGVyLWxlZnQtY29sb3I6dmFyKC0tZ3JlZW4pO30KICAuY2FzZS5uZWd7Ym9yZGVyLWxlZnQtY29sb3I6dmFyKC0tcmVkKTt9CiAgLmNhc2UgLnRhZ3tmb250LXNpemU6MTEuNXB4O2ZvbnQtd2VpZ2h0OjkwMDtsZXR0ZXItc3BhY2luZzouMDVlbTttYXJnaW4tcmlnaHQ6NnB4O30KICAuY2FzZS5wb3MgLnRhZ3tjb2xvcjp2YXIoLS1ncmVlbik7fQogIC5jYXNlLm5lZyAudGFne2NvbG9yOnZhcigtLXJlZCk7fQogIHVsLG9se21hcmdpbjoxMHB4IDAgMTBweCAyMnB4O30KICBsaXttYXJnaW46N3B4IDA7fQogIC5mb3JtdWxhewogICAgYmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTgwZGVnLHZhcigtLXNreS1saWdodCksI2Y0ZmFmZik7CiAgICBib3JkZXI6MXB4IHNvbGlkICNiY2RjZjM7Ym9yZGVyLXJhZGl1czoxMnB4O3BhZGRpbmc6MjBweCAyNHB4O21hcmdpbjoxOHB4IDA7CiAgICBmb250LXNpemU6MTUuNXB4OwogIH0KICAuZm9ybXVsYSBie2NvbG9yOnZhcigtLWJyYW5kLWRhcmspO30KICAuZm9vdG5vdGV7CiAgICBtYXJnaW4tdG9wOjM2cHg7cGFkZGluZy10b3A6MTZweDtib3JkZXItdG9wOjFweCBzb2xpZCB2YXIoLS1saW5lKTsKICAgIGNvbG9yOnZhcigtLW11dGVkKTtmb250LXNpemU6MTNweDtmb250LXN0eWxlOml0YWxpYzsKICB9CiAgLmJhZGdlLXJvd3tkaXNwbGF5OmZsZXg7ZmxleC13cmFwOndyYXA7Z2FwOjhweDttYXJnaW46MTRweCAwIDRweDt9CiAgLmJhZGdlewogICAgZm9udC1zaXplOjEyLjVweDtmb250LXdlaWdodDo3MDA7Y29sb3I6dmFyKC0taW5rKTsKICAgIGJhY2tncm91bmQ6I2YyZjZmMDtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxpbmUpO2JvcmRlci1yYWRpdXM6OTk5cHg7cGFkZGluZzo0cHggMTJweDsKICB9CiAgQG1lZGlhIHByaW50eyBib2R5e2JhY2tncm91bmQ6I2ZmZjtwYWRkaW5nOjA7fSAucmVwb3J0e2JveC1zaGFkb3c6bm9uZTtib3JkZXI6bm9uZTt9IH0KPC9zdHlsZT4KPC9oZWFkPgo8Ym9keT4KPGFydGljbGUgY2xhc3M9InJlcG9ydCI+CiAgPHNwYW4gY2xhc3M9InJlcG9ydC1raWNrZXIiPu2DkOyDieyggSDrtoTshJ0g7JiI7IucIMK3IO2MkOqysOusuCDsvZTtjbzsiqQ8L3NwYW4+CiAgPGgxPuyngeyepSDrgrQg6rS066Gt7Z6YIOuvvOyCrCDshpDtlbTrsLDsg4Eg7J247KCVIOyalOqxtCDrtoTshJ0g4oCUIOy1nOyihSDrs7Tqs6A8L2gxPgogIDxkaXYgY2xhc3M9InJlcG9ydC1tZXRhIj4KICAgIDxiPuuMgOyDgSDsvZTtjbzsiqQ8L2I+IDog7KeA67Cp67KV7JuQICLsp4HsnqUg64K0IOq0tOuhre2emCIg7Ja46riJIO2MkOqysCA8Yj44OTXqsbQ8L2I+ICgyMDIxfjIwMjYg7ISg6rOgKSAmbmJzcDvCtyZuYnNwOwogICAgPGI+67aE7ISdIOuqqeyggTwvYj4gOiDrr7zsgqwg7IaQ7ZW067Cw7IOBKOychOyekOujjCkg7IaM7Iah7JeQ7IScIOuyleybkOydtCDsp4HsnqUg64K0IOq0tOuhre2emOydhCDsnbjsoJXtlZjripQg7JqU6rG0IOq3nOuqhQogIDwvZGl2PgoKICA8aDI+PHNwYW4gY2xhc3M9Im51bSI+MS48L3NwYW4+7IiY7KeRIOy9lO2NvOyKpCDqsJzsmpQ8L2gyPgogIDxwPuyghOyytCA4OTXqsbTsnYQg7KO865CcIOyyreq1rCjrs7jshowpIOq4sOykgOycvOuhnCA07Jyg7ZiVIOu2hOulmO2VmOyYgOuLpC48L3A+CiAgPHRhYmxlPgogICAgPHRoZWFkPjx0cj48dGg+7IKs6rG07Jyg7ZiVPC90aD48dGggc3R5bGU9InRleHQtYWxpZ246cmlnaHQiPuqxtOyImDwvdGg+PHRoIHN0eWxlPSJ0ZXh0LWFsaWduOnJpZ2h0Ij7ruYTspJE8L3RoPjwvdHI+PC90aGVhZD4KICAgIDx0Ym9keT4KICAgICAgPHRyPjx0ZD7qtLTroa3tnpgg7IaQ7ZW067Cw7IOBICjtlLztlbTsnpDqsIAg7JyE7J6Q66OMIOyyreq1rCk8L3RkPjx0ZCBjbGFzcz0iciI+Mzg4PC90ZD48dGQgY2xhc3M9InIiPjQzLjQlPC90ZD48L3RyPgogICAgICA8dHI+PHRkPu2VtOqzoMK37KeV6rOEIOustO2aqCAo6rS066Gt7Z6Y7J20IOynleqzhOyCrOycoMK37ZWt67OA7Jy866GcIOuTseyepSk8L3RkPjx0ZCBjbGFzcz0iciI+MjY3PC90ZD48dGQgY2xhc3M9InIiPjI5LjglPC90ZD48L3RyPgogICAgICA8dHI+PHRkPuyXreyGjOyGoSAo6rCA7ZW07KeA66qp7J6QwrfsgqzsmqnsnpDsnZgg67CY6rKpIOyGjOyGoSk8L3RkPjx0ZCBjbGFzcz0iciI+MTE5PC90ZD48dGQgY2xhc3M9InIiPjEzLjMlPC90ZD48L3RyPgogICAgICA8dHI+PHRkPuq4sO2DgCAo6rS066Gt7Z6Y7J20IOu2gOyImOyggeycvOuhnOunjCDslrjquIkpPC90ZD48dGQgY2xhc3M9InIiPjEyMTwvdGQ+PHRkIGNsYXNzPSJyIj4xMy41JTwvdGQ+PC90cj4KICAgIDwvdGJvZHk+CiAgPC90YWJsZT4KICA8ZGl2IGNsYXNzPSJiYWRnZS1yb3ciPgogICAgPHNwYW4gY2xhc3M9ImJhZGdlIj7shKDqs6Dsl7Drj4QgMjAyMeuFhCA1OCDCtyAyMDIy64WEIDExMiDCtyAyMDIz64WEIDE4NSDCtyAyMDI064WEIDIwMyDCtyAyMDI164WEIDI2NSDCtyAyMDI264WEIDcyPC9zcGFuPgogICAgPHNwYW4gY2xhc3M9ImJhZGdlIj7si6zquIkgMeyLrCA4MjkgwrcgMuyLrCA1NSDCtyDquLDtg4AgMTE8L3NwYW4+CiAgPC9kaXY+CiAgPHA+PHN0cm9uZz7tlbXsi6wg67aE7ISdIOuMgOyDgeyduCAi6rS066Gt7Z6YIOyGkO2VtOuwsOyDgSIgMzg46rG07J2YIOyGjOyGoeqysOqzvDwvc3Ryb25nPuuKlCDsm5Dqs6DsnbzrtoDsirkgMjI16rG0LCDsm5Dqs6DsirkgMTjqsbQsIOybkOqzoO2MqCAxNDHqsbTsnbTri6QuIOymiSDtlLztlbTsnpDqsIAg7KeB7KCRIOychOyekOujjOulvCDqtaztlZwg7IKs6rG07J2YIOyVvSA2MyXsl5DshJwg7KCE67aAIOuYkOuKlCDsnbzrtoAg7J247Jqp7J20IOydtOujqOyWtOyhjOuLpC4g64uk66eMICLsnbzrtoDsirki7J20IOyVleuPhOyggSgyMjUvMjQzLCDsnbjsmqkg7IKs6rG07J2YIDkzJSnsnbTrnbzripQg7KCQ7J2AIOyVhOuemCA07ZWt7JeQ7IScIOuztOuTryA8c3Ryb25nPuyxheyehCDrsJzsg53snYAg7J247KCV65CY64KYIOychOyekOujjCDslaHsiJjripQg7IOB64u57Z6IIOygiOygnOuQmOuKlDwvc3Ryb25nPiDsnbQg67aE7JW87J2YIOydvOq0gOuQnCDqsr3tlqXsnYQg67O07Jes7KSA64ukLjwvcD4KCiAgPGgyPjxzcGFuIGNsYXNzPSJudW0iPjIuPC9zcGFuPuuyleybkOydtCDsoIHsmqntlZjripQg7LKt6rWs6raMIOq1rOyEsSAo7LGF7J6E7J2YIOuyleyggSDqt7zqsbApPC9oMj4KICA8cD7siJjsp5Eg7YyQ6rKw7JeQ7IScIOyngeyepSDrgrQg6rS066Gt7Z6Y7JeQIOuMgO2VnCDrr7zsgqwg7IaQ7ZW067Cw7IOB7LGF7J6E7J2AIOuLpOydjCDrhKQg6rCI656YIOykkSDtlZjrgpgo65iQ64qUIOuzke2VqSnroZwg6rWs7ISx65Cc64ukLjwvcD4KICA8b2w+CiAgICA8bGk+PHN0cm9uZz7qsIDtlbTsnpAg6rCc7J247JeQIOuMgO2VnCDsnbzrsJjrtojrspXtlonsnIQgKOuvvOuylSDsoJw3NTDsobApPC9zdHJvbmc+PGJyLz4KICAgICAg7IOB6riJ7J6Qwrfrj5nro4wg6rCc7J247J2YIO2PreyWuMK366qo7JqVwrfrlLDrj4zrprzCt+u2gOuLueyngOyLnOqwgCDsnbjqsqnqtozsnYQg7Lmo7ZW07ZWY64qUIOychOuyle2WieychOuhnCDtj4nqsIDrkJjripQg6rK97JqwLiAo7JiIOiDshJzsmrjspJHslZkgMjAyMOqwgOuLqDUyOTY0MjMg4oCUIOuwnOyjvOyymCDssKjsnqXsnZgg7Ja47ZaJ7J2EIOyduOqyqeq2jCDsuajtlbQg67aI67KV7ZaJ7JyE66GcIOuztOyVhCA3MDDrp4wg7JuQIOyduOyaqSk8L2xpPgogICAgPGxpPjxzdHJvbmc+7IKs7Jqp7J6Q7J2YIOuztO2YuOydmOustCDsnITrsJggKOq3vOuhnOqzhOyVveyDgSDrtoDsiJjsnZjrrLQsIOuMgOuyleybkCA5NeuLpDM5NTMzKTwvc3Ryb25nPjxici8+CiAgICAgIOuyleybkOydgCAi7IKs7Jqp7J6Q64qUIOq3vOuhnOyekOydmCDsnbjqsqnsnYQg7KG07KSRwrfrs7TtmLjtlZjqs6Ag7L6M7KCB7ZWcIOq3vOuhnO2ZmOqyveydhCDsoJzqs7XtlaAg67O07Zi47J2Y66y066W8IOu2gOuLtO2VmOupsCwg7J2066W8IOychOuwmO2VtCDqt7zroZzsnpDqsIAg7IaQ7ZW066W8IOyeheycvOuptCDrsLDsg4HtlZjsl6zslbwg7ZWc64ukIuuKlCDrspXrpqzrpbwg67CY67O1IOyduOyaqe2VnOuLpC4g7J2064qUIDxzdHJvbmc+7IKs7Jqp7J6Q6rCAIOyngeygkSDqtLTroa3tnowg6rK97Jqw67+QIOyVhOuLiOudvCwg7KCcM+yekCjsg4HquInsnpDCt+uPmeujjCnsnZgg6rS066Gt7Z6Y7J2EIOyYiOqyrMK37JiI67Cp7ZWgIOyImCDsnojsl4jsnYzsl5Drj4Qg67Cp7KeA7ZWY7KeAIOuqu+2VnCDqsr3smrA8L3N0cm9uZz7sl5Drj4Qg7ISx66a97ZWc64ukLiAo7JiIOiDsiJjsm5Dsp4DrspUg7JWI7IKw7KeA7JuQIDIwMjDqsIDri6g2ODQ3MiDigJQg7J6E7JuQ7J2YIOyDgeyLnOyggSDtj63slrjsnYQg7IKs7Jqp7J6Q6rCAIOyYiOqyrCDqsIDriqXtlojri6TrqbAg7ZqM7IKs7JeQIDEsMjAw66eMIOybkCDrsLDsg4HssYXsnoQpPC9saT4KICAgIDxsaT48c3Ryb25nPuyCrOyaqeyekOyxheyehCAo66+867KVIOygnDc1NuyhsCk8L3N0cm9uZz48YnIvPgogICAgICDqsIDtlbTsnpDqsIAg7ZS87Jqp7J6Q7J206rOgIOq3uCDqsIDtlbTtlonsnITqsIAg7IKs66y07KeR7ZaJIOq0gOugqOyEseydhCDqsIDsp4DripQg6rK97JqwIOyCrOyaqeyekOqwgCDtlajqu5gg7LGF7J6E7KeE64ukLiDtirntnogg7ISx7Z2s66Gx7ZiV7JeQ7IScICLrtoDtlZjsp4Hsm5DsnZgg7JeF66y07ZmY6rK97JeQIOyYge2WpeydhCDrr7jsuaAg7IiYIOyeiOuKlCDsg4HquInsnpDsnZgg7ISx7KCBIOyWuOuPmeydgCDqt7gg7J6Q7LK066GcIOyCrOustOynke2WiSDqtIDroKgg67aI67KV7ZaJ7JyEIuudvOuKlCDrspXrpqwo64yA67KV7JuQIDk464ukMzk5MzAg6rOE7Je0KeqwgCDsm5DsmqnrkJzri6QuICjsmIg6IOyEnOyauOykkeyVmSAyMDE56rCA64uoNTIwNTgzNCk8L2xpPgogICAgPGxpPjxzdHJvbmc+6rWt6rCA67Cw7IOBICjqta3qsIDrsLDsg4HrspUg7KCcMuyhsCk8L3N0cm9uZz48YnIvPgogICAgICDqs7Xqs7XrtoDrrLjsl5DshJwg6rO166y07JuQ7J24IOyDgeq4ieyekOydmCDqtLTroa3tnpgg65iQ64qUIOyduOyCrOuLtOuLueyekOydmCDrtoTrpqzsobDsuZjCt+yhsOyCrOydmOustCDtlbTtg5zqsIAg66y47KCc65CY64qUIOqyveyasC4gKOyYiDog64yA7KCEIDIwMjDqsIDri6gxMDk4Njgg4oCUIOuwqeyXreyngOybkOuzuOu2gOydmCDsgqzsmqnsnpDssYXsnoQg67CPIOuztOuzteyEsSDsoITrs7TsnZgg67aI67KV7ZaJ7JyEIOyduOyglSk8L2xpPgogIDwvb2w+CgogIDxoMj48c3BhbiBjbGFzcz0ibnVtIj4zLjwvc3Bhbj7sp4HsnqUg64K0IOq0tOuhre2emOydmCDsi6TssrTsoIEg7J247KCVIOyalOqxtCAo7YyQ6rKw7J20IOuwmOuztSDssYTtg53tlZjripQg7YyQ64uoIO2LgCk8L2gyPgogIDxwPuuyleybkOydgCDqt7zroZzquLDspIDrspUg7KCcNzbsobDsnZgy7J2YIOygleydmCgi7KeB7J6l7JeQ7ISc7J2YIOyngOychCDrmJDripQg6rSA6rOEIOuTseydmCDsmrDsnITrpbwg7J207Jqp7ZWY7JesIOyXheustOyDgSDsoIHsoJXrspTsnITrpbwg64SY7Ja0IOuLpOuluCDqt7zroZzsnpDsl5Dqsowg7Iug7LK07KCBwrfsoJXsi6DsoIEg6rOg7Ya17J2EIOyjvOqxsOuCmCDqt7zrrLTtmZjqsr3snYQg7JWF7ZmU7Iuc7YKk64qUIO2WieychCIp66W8IOuvvOyCrCDtjJDri6jsnZgg7KSA6rGw66GcIOyCvOuQmCwgPHN0cm9uZz7shLHtnazrobEg7YyQ64uo6riw7KSAKOuMgOuyleybkCAyMDE365GQNzQ3MDIp7J2EIOuqheyLnOyggeycvOuhnCDsm5Dsmqk8L3N0cm9uZz7tlZjsl6wg64uk7J2MIOyalOqxtOydhCDsmpTqtaztlZzri6QuIOydtOuKlCDqtJHso7wgMjAyMOqwgO2VqTUyNTg1LCDshJzsmrjrgqjrtoAgMjAyMOqwgOuLqDIzOTE2Miwg64yA7KCEIDIwMjDqsIDtlakxMDU0NTAg65OxIOuLpOyImCDtjJDqsrDsl5DshJwg6rGw7J2YIOuPmeydvO2VnCDrrLjslrjsnLzroZwg67CY67O165Cc64ukLjwvcD4KCiAgPGgzPuyalOqxtCDikaAg4oCUIOyngOychCDrmJDripQg6rSA6rOEIOuTseydmCDsmrDsnIQg7J207JqpPC9oMz4KICA8cD7qsIDtlbTsnpDqsIAg7ZS87ZW07J6Q7JeQIOuMgO2VmOyXrCDsp4DsnITsg4Eo7KeB6riJKSDrmJDripQg6rSA6rOE7IOBKOyImOyggcK36rK966Clwrfsp5Hri6gpIOyasOychOyXkCDsnojqs6Ag7J2066W8IOydtOyaqe2VmOyYgOydhCDqsoMuIOuyleybkOydgCDsnbQg7JqU6rG07J2EIDxzdHJvbmc+7ZiV7Iud7KCBIOyngeq4ieydtCDslYTri4jrnbwg7Iuk7KeI7KCBIOyYge2WpeugpTwvc3Ryb25nPiDquLDspIDsnLzroZwg67O464ukLjwvcD4KICA8ZGl2IGNsYXNzPSJjYXNlIG5lZyI+PHNwYW4gY2xhc3M9InRhZyI+67aA7KCVIOyCrOuhgDwvc3Bhbj7qtJHso7wgMjAyMOqwgO2VqTUyNTg1IOKAlCDrtoDsnqUo7JuQ6rOgKeydtCDri6Trpbgg7KeA7IKsIOyGjOyGjSDssKjsnqXsl5Dqsowg67Cc7ZGcIOykkSDrgpjsnbTrpbwg66y87J2AIO2WieychOyXkCDrjIDtlbQsICLqsJnsnYAg67aA7ISc6rCAIOyVhOuLiOqzoCDrsJztkZzsnpDigJPssq3spJEg6rSA6rOE7JeQ7IScIOuniOy5qCDqsIDquYzsnbQg7JWJ7J2AIOyCrOuejOyXkOqyjCDsp4jrrLjtlZwg6rKDIuydtOudvOupsCDsmrDsnIQg7J207Jqp7J2EIOu2gOyglSwg6rKs7LGFIOustO2aqC48L2Rpdj4KCiAgPGgzPuyalOqxtCDikaEg4oCUIOyXheustOyDgSDsoIHsoJXrspTsnITrpbwg64SY7J2EIOqygzwvaDM+CiAgPHA+7ZaJ7JyE6rCAIOyXheustOq0gOugqOyEseydhCDqsIDsp4DrkJgg6re4IDxzdHJvbmc+7KCB7KCV67KU7JyE66W8IOyZhOyghO2eiCDsnbztg4g8L3N0cm9uZz7tlZjsmIDsnYQg6rKDLiDsnbQg7JqU6rG07J2AIOygleuLue2VnCDsl4XrrLTsp4Dsi5zCt+yniOyxheqzvCDqtLTroa3tnpjsnYQg6rCA66W064qUIO2VteyLrCDqtIDrrLjsnbTrqbAsIOuyleybkOydgCDri6TsnYwg7JqU7IaM66W8IOyihe2Vqe2VnOuLpCjrjIDsoIQgMjAyMOqwgO2VqTEwNTQ1MCDrk7Hsl5DshJwg7IOB7IS4KTog7KeA7Iuc7J2YIOuwqeyLncK364K07Jqpwrfsi5zquLDsmYAg6riw6rCEwrftlYTsmpTshLHsnZgg7KCV64+EwrftlLztlbTqt7zroZzsnpDsnZgg64yA7J2R67Cp7Iudwrfri6Trpbgg6re866Gc7J6Q7JmA7J2YIOywqOuzhCDrgrTsmqnCt+yXheustOyngOyLnOuCmCDsl4XrrLTrsLDsoJzsnZgg7IKs7JygwrftlLztlbTsnpAg7JeF66y07Jes6rG07JeQIOuMgO2VnCDrsLDroKQg7KCV64+ELjwvcD4KICA8ZGl2IGNsYXNzPSJjYXNlIG5lZyI+PHNwYW4gY2xhc3M9InRhZyI+67aA7KCVIOyCrOuhgDwvc3Bhbj7rjIDsoIQgMjAyMOqwgO2VqTEwNTQ1MCDigJQg7IKs64K067OA7Zi47IKs7JeQIOuMgO2VnCDri6TsiJjsnZgg7Lac7J6lwrfrjIDsmbjtmZzrj5kg67CY66CkLCDrs7Tqs6Ag7JqU6rWsIOuTseydtCAi7KCB7KCV7ISx7J2AIOuzhOuhoOycvOuhnCDtlZjrkJgg7KCB7KCV67KU7JyE66W8IOyZhOyghO2eiCDsnbztg4jtlojri6Tqs6Ag64uo7KCV7ZWY6riwIOyWtOugteuLpCLrqbAg7KCE67aAIOq4sOqwgS48L2Rpdj4KICA8ZGl2IGNsYXNzPSJjYXNlIHBvcyI+PHNwYW4gY2xhc3M9InRhZyI+6riN7KCVIOyCrOuhgDwvc3Bhbj7shJzsmrjspJHslZkgMjAyMOqwgOuLqDUyOTY1Nzcg4oCUIOybkOqzoOunjCDtmLzsnpAg7IWA7JeQIOuwsOy5mO2VtCDsl4XrrLTsiJjtlonsnYQg67Cp7ZW07ZWcIO2WieychOulvCDsoJw3NuyhsOydmDIg7JyE67CY7Jy866GcIOyduOyglS48L2Rpdj4KCiAgPGgzPuyalOqxtCDikaIg4oCUIOyLoOyytOyggcK37KCV7Iug7KCBIOqzoO2GtSDrmJDripQg6re866y07ZmY6rK9IOyVhe2ZlCAo6rCd6rSA7KCBIOqysOqzvOyalOqxtCk8L2gzPgogIDxwPuqwgOyepSDqsrDsoJXsoIEg6rSA66y4LiDrspXsm5DsnYAgPHN0cm9uZz4i7ZS87ZW07J6Q7JmAIOu5hOyKt+2VnCDsspjsp4Dsl5Ag7J6I64qUIOuztO2GteydmCjsnbzrsJjsoIHCt+2Pieq3oOyggSkg7IKs656MIOyeheyepeyXkOyEnCDrs7TslYQg6rOg7Ya17J2064KYIOq3vOustO2ZmOqyvSDslYXtmZTqsIAg67Cc7IOd7ZWgIOyImCDsnojripQg7ZaJ7JyEIuqwgCDsnojqs6AsICLqt7jroZwg7J247ZW0IOyLpOygnOuhnCDqt7jrn6ztlZwg6rKw6rO86rCAIOuwnOyDnSLtlZjsmIDsnYQg6rKDPC9zdHJvbmc+7J2EIOyalOq1rO2VnOuLpC4g7KaJIOyjvOq0gOyggSDrtojsvozqsJDrp4zsnLzroZzripQg67aA7KGx7ZWY66mwIOqwneq0gOyggSDsg4Hri7nshLHsnbQg7ZWE7JqU7ZWY64ukLjwvcD4KICA8ZGl2IGNsYXNzPSJjYXNlIG5lZyI+PHNwYW4gY2xhc3M9InRhZyI+67aA7KCVIOyCrOuhgDwvc3Bhbj7qtJHso7wgMjAyMOqwgO2VqTUyNTg1IOKAlCDsobDsgqwg7LC46rOg7J24IDE566qFIOykkSDruYTtlZjrsJzslrgg7J247KCVIDXrqoXCt+u2gOyglSA166qFwrfsnKDrs7QgOeuqheycvOuhnCDqsIjroKQgIuydvOuwmOyggcK37Y+J6reg7KCBIOyCrOuejOydtCDqs6DthrXsnYQg64qQ64KEIOyImCDsnojri6Tqs6Ag7J247KCV7ZWY6riwIOyWtOugteuLpCLrqbAg6rS066Gt7Z6YIOu2gOyglS48L2Rpdj4KICA8ZGl2IGNsYXNzPSJjYXNlIHBvcyI+PHNwYW4gY2xhc3M9InRhZyI+6riN7KCVIOyCrOuhgDwvc3Bhbj7shJzsmrjrgqjrtoAgMjAyMOqwgOuLqDIzOTE2MiDigJQg7JuQ7J6l7J2YIOuwmOuzteyggcK36rO16rCc7KCBIOyniOyxheqzvCDsgqzqs7wg6rCV7JqU66GcIOuztOycoeq1kOyCrOqwgCDsi6Tsi6Dsl5Ag7J2066W4IOqysOqzvOulvCDsnbjsoJUsIDMwMOunjCDsm5AuPC9kaXY+CgogIDxoMz4o7IKs7Jqp7J6Q7LGF7J6E7J2YIOy2lOqwgCDsmpTqsbQpIOKAlCDsmIjqsqzqsIDriqXshLE8L2gzPgogIDxwPuyCrOyaqeyekCDrs7TtmLjsnZjrrLQg7JyE67CY7J2EIOusu+uKlCDqsr3smrAg67KV7JuQ7J2AIDxzdHJvbmc+Iu2UvO2VtOyCrOyLpOydtCDsl4XrrLQg6rSA66Co7ISx7J2EIOqwgOyngOqzoCwg7Ya17IOBIOuwnOyDne2VoCDsiJgg7J6I64uk6rOgIOyYiOy4oeuQmOqxsOuCmCDsmIjsuKHtlaAg7IiYIOyeiOuKlCDqsr3smrAiPC9zdHJvbmc+7J28IOqyg+ydhCDstpTqsIDroZwg7JqU6rWs7ZWc64ukKOuMgOuyleybkCA5OeuLpDU2NzM0IOybkOyaqSkuIOyCrOyaqeyekOqwgCDqtLTroa3tnpjsnYQg7JWM7JWY6rGw64KYIOyVjCDsiJgg7J6I7JeI64qU7KeA6rCAIOq0gOqxtOydtCDrkJzri6QuICjsmIg6IOyduOyynCAyMDIw6rCA64uoMjIwNTY5IOKAlCDsgqzrp50g67KE7Iqk6riw7IKsIOyCrOqxtOyXkOyEnCDtmozsgqzqsIAg64+Z66OMIOqwiOuTseydhCAi7JWM7JWY6rGw64KYIOyVjCDsiJgg7J6I7JeI64uk6rOgIOuzvCDspp3qsbAg67aA7KGxIuydtOudvOupsCDsp4HsnqUg64K0IOq0tOuhre2emCDsobDsuZjsnZjrrLQg7JyE67CYIOu2gOyglSk8L3A+CgogIDxoMj48c3BhbiBjbGFzcz0ibnVtIj40Ljwvc3Bhbj7snbjsmqnsnYQg7KKM7Jqw7ZWY64qUIOyLpOustOyggSDrs4DsiJggKOyKue2MqCDtjKjthLQpPC9oMj4KICA8cD7siJjsp5Eg7YyQ6rKwIOyghOuwmOyXkOyEnCDqtIDssLDrkJjripQg7J247JqpL+q4sOqwgeydmCDqsIjrprwg7JqU7IaMOjwvcD4KICA8dWw+CiAgICA8bGk+PHN0cm9uZz7snoXspp3snZgg7KeIPC9zdHJvbmc+IDog7Lm07Lm07Jik7YahwrfsnbTrqZTsnbzCt+uFuey3qMK37ZiV7IKsIOycoOyjhO2MkOqysCjslb3si53rqoXroLkg7Y+s7ZWoKcK364W464+Z7LKtIOyLnOygleyngOyLnMK37IKw7J6sIOyKueyduCDrk7EgPHN0cm9uZz7qsJ3qtIDsoIEg7Jm467aAIOymneqxsOqwgCDsnojripQg7IKs6rG07J2AIOyduOyaqSwg7KeE7Iig66eM7Jy866Gc64qUIOq4sOqwgTwvc3Ryb25nPuuQmOuKlCDqsr3tlqXsnbQg65qc66C37ZWY64ukLiDtmJXsgqwg7LKY67KMIOyghOugpSjrjIDsoIQgMjAyMOqwgOuLqDEwOTg2OOydmCDsg4Hsgqwg7Jyg7KOELCDsiJjsm5AgMjAyMOqwgOuLqDg2NjfsnZgg7Yq57IiY7ZiR67CVIOyVveyLneuqheuguSnsnYAg6rCV66Cl7ZWcIOyduOyaqSDqt7zqsbDqsIAg65Cc64ukLjwvbGk+CiAgICA8bGk+PHN0cm9uZz7snbjqs7zqtIDqs4Q8L3N0cm9uZz4gOiDqtLTroa3tnpgg7IKs7Iuk7J20IOyduOygleuQmOyWtOuPhCA8c3Ryb25nPuyekOyCtMK37KeI67ORIOuTsSDspJHrjIDqsrDqs7zsmYDsnZgg7IOB64u57J246rO86rSA6rOE64qUIOuzhOuPhOuhnCDsl4Tqsqntnogg7Ius7IKsPC9zdHJvbmc+65CY7Ja0IOyekOyjvCDrtoDsoJXrkJzri6QuICjshJzsmrjspJHslZkgMjAxOeqwgO2VqTUxNTI3NCDigJQg7IOB6riJ7J6Q7J2YIOyaleyEpMK366ek64m07Ja8IOyImOq4sOyekeyEsSDsp4Dsi5zripQg67aI67KV7ZaJ7JyE66GcIOyduOygle2VmOuQmCDsirnshKDsm5Ag7J6Q7IK06rO87J2YIOyduOqzvOq0gOqzhOuKlCDrtoDsoJUsIOychOyekOujjOunjCAyLDAwMOunjCDsm5ApPC9saT4KICAgIDxsaT48c3Ryb25nPu2UvO2VtOyekOydmCDqtIDsl6zCt+yImOyaqTwvc3Ryb25nPiA6IOyCrOyggSDqtIDqs4Tsl5DshJwg7ZS87ZW07J6Q6rCAIOusteyduMK37IiY7Jqp7ZWcIOqyveyasCDsnITrspXshLHsnbQg67aA7KCV65Cc64ukLiAo7ISc7Jq47KSR7JWZIDIwMjDqsIDri6g1MDM2MTI2IOKAlCDsg4HquInsnpDsnZggIuuztOqzoCDsi7bri6QiIOuTsSDslrjrj5nsnYQg7JuQ6rOg6rCAIOyepeq4sOqwhCDsiJjsmqntlZwg7IKs7KCBIOq0gOqzhOuhnCDrs7TslYQg7ISx7Z2s66GxwrfrtojrspXtlonsnIQg67aA7KCVKTwvbGk+CiAgICA8bGk+PHN0cm9uZz7snITsnpDro4zsnZgg7KCI7KCcPC9zdHJvbmc+IDog7J247Jqp65CY642U652864+EIOychOyekOujjOuKlCDrjIDssrTroZwgPHN0cm9uZz4zMDDrp4x+MSwyMDDrp4wg7JuQPC9zdHJvbmc+IOyEoOyXkCDsp5HspJHrkJzri6Qo7JiI7Jm47KCB7Jy866GcIDIsMDAw66eMIOybkOuMgCkuIOyerOyCsOyDgSDshpDtlbQo7J287Iuk7IiY7J6FwrfsuZjro4zruYQp64qUIOuzhOuPhCDsnoXspp3qs7wg7J246rO86rSA6rOE6rCAIOyalOq1rOuQmOyWtCDsnbjsoJUg7Y+t7J20IOyigeuLpC48L2xpPgogIDwvdWw+CgogIDxoMj48c3BhbiBjbGFzcz0ibnVtIj41Ljwvc3Bhbj4i7Jet7IaM7IahIiDsnKDtmJXsnbQg7KO864qUIOyLnOyCrOygkDwvaDI+CiAgPHA+7KCE7LK07J2YIDEzLjMlKDExOeqxtCnrpbwg7LCo7KeA7ZWY64qUIDxzdHJvbmc+7Jet7IaM7IahPC9zdHJvbmc+7J2AIOydtCDrtoTslbzsnZgg7KSR7JqU7ZWcIOydtOuptOydtOuLpC4g6rS066Gt7Z6Y7Jy866GcIOyngOuqqeuQnCDsg4HquInsnpDrgpgg7IKs7Jqp7J6Q6rCAIChhKSDsi6Dqs6DsnpDrpbwg7IOB64yA66GcIOuqheyYiO2bvOyGkMK366y06rOgIOyGkO2VtOuwsOyDgeydhCDqtaztlZjqsbDrgpgo7ISc7Jq464Ko67aAIDIwMjHqsIDri6gyMjE5OTEsIOyEnOyauOuPmeu2gCAyMDIw6rCA64uoMTM1ODc4KSwgKGIpIOyLoOqzoMK37Kad6rGw7IiY7KeRIOqzvOyglSjruYTrsIDrhbnsnYwp7J2EIOydjOyEseq2jCDsuajtlbTroZwg64uk7Yis6rGw64KYKOyEnOyauOykkeyVmSAyMDIw6rCA64uoNTExNTg5MMK3MjAyMOqwgOuLqDUwODcwMDEpLCAoYykg67aA64u57ZW06rOg66W8IOuLpO2IrOuKlCDsoIQg7KeB7JuQ7JeQ6rKMIOyEnOyVveyEnMK37ZWp7J2YIOychOuwmOydhCDrrLvripQo7ISc7Jq47KSR7JWZIDIwMjDqsIDri6g1MTYwMjEwKSDsnKDtmJXsnbTri6QuPC9wPgogIDxwPuuyleybkOydmCDtg5zrj4TripQg64yA7LK066GcIDxzdHJvbmc+7Iug6rOg7J6QwrftlLztlbTso7zsnqXsnpAg67O07Zi4IOyqvTwvc3Ryb25nPuydtOuLpC4g7Yq57Z6IIOq0tOuhre2emCDspp3qsbAg7ZmV67O066W8IOychO2VnCDruYTrsIDrhbnsnYzsnYAgIuygleuLue2VnCDrqqnsoIHsnYQg7JyE7ZW0IO2VhOyalMK37IOB64u57ZWcIOuylOychOyXkOyEnCDsnbTro6jslrTsoLgg7IKs7ZqM7IOB6rec7JeQIOychOuwsOuQmOyngCDslYrripTri6Qi66mwIOychOuyleyEseydtCDsobDqsIHrkJjslrQg7Jet7IaM7Iah7J20IOq4sOqwgeuQmOuKlCDqsoPsnbQg7ZmV66a965CcIO2MqO2EtOydtOuLpC4g64uk66eMIOyLoOqzoOyekOqwgCDsobDsgqwg7KCI7LCo66W8IOuyl+yWtOuCmCDsp4Dsnbjrk6Tsl5Dqsowg7ZeY64u0wrfrqqjsmpXsnYQg7Jyg7Y+s7ZWcIOu2gOu2hOydgCDrs4Trj4Qg67aI67KV7ZaJ7JyE66GcIOydvOu2gCDsnbjsmqnrkJjquLDrj4Qg7ZWc64ukKOyEnOyauOuPmeu2gCAyMDIw6rCA64uoMTM1ODc4LCAzMDDrp4wg7JuQKS48L3A+CgogIDxoMj48c3BhbiBjbGFzcz0ibnVtIj42Ljwvc3Bhbj7smpTslb0g4oCUIOuvvOyCrCDsnbjsoJXsnZgg7LWc7IaMIOqzteyLnTwvaDI+CiAgPHA+7IiY7KeRIO2MkOqysOydhCDsooXtlantlZjrqbQsIOuvvOyCrCDshpDtlbTrsLDsg4Hsl5DshJwg7KeB7J6lIOuCtCDqtLTroa3tnpjsnbQg7J247KCV65CY6riwIOychO2VnCDsi6TrrLTsoIEg6rO17Iud7J2AIOuLpOydjOqzvCDqsJnri6QuPC9wPgogIDxkaXYgY2xhc3M9ImZvcm11bGEiPgogICAgPGI+4pGgIOyasOychCDsnbTsmqk8L2I+ICsgPGI+4pGhIOyXheustOyDgSDsoIHsoJXrspTsnITsnZgg7JmE7KCE7ZWcIOydvO2DiDwvYj4gKyA8Yj7ikaIg6rCd6rSA7KCBwrftj4nqt6DsoIEg6rSA7KCQ7JeQ7ISc7J2YIOqzoO2GtcK36re866y07ZmY6rK9IOyVhe2ZlCjsi6TsoJwg6rKw6rO8IO2PrO2VqCk8L2I+66W8LCA8Yj7ikaMg7KeE7Iig7J2EIOuEmOyWtOyEnOuKlCDqsJ3qtIDsoIEg7Kad6rGwPC9iPuuhnCDsnoXspp3tlZjqs6AsIOyCrOyaqeyekOyxheyehOydhCDrrLvripQg6rK97JqwIDxiPuKRpCDsgqzsmqnsnpDsnZgg7JiI6rKs6rCA64ql7ISxKOyVjOyVmOqxsOuCmCDslYwg7IiYIOyeiOyXiOydjCk8L2I+6rmM7KeAIOqwluy2nCDrlYwg7J247Jqp65Cc64ukLiDsnpDsgrTCt+yniOuzkSDrk7Eg7KSR64yA6rKw6rO8IOuwsOyDgeydgCA8Yj7ikaUg7IOB64u57J246rO86rSA6rOEPC9iPuudvOuKlCDstpTqsIDCt+uPheumvSDqtIDrrLjsnYQg7Ya16rO87ZW07JW8IO2VmOupsCwg7Ya16rO87ZWY7KeAIOuqu+2VtOuPhCDqtLTroa3tnpgg7J6Q7LK07J2YIOychOyekOujjCjrjIDssrTroZwg7IiY67Cx66eMIOybkOuMgCnripQg7J247KCV65CgIOyImCDsnojri6QuCiAgPC9kaXY+CgogIDxwIGNsYXNzPSJmb290bm90ZSI+67O4IOuztOqzoOuKlCA4OTXqsbQg7KCE6rG07J2YIDTsnKDtmJUg67aE66WYwrfqsJzsmpTsmYAg7KCV64+F7ZWcIDYw7JesIOqxtCjtirntnoggMjAyMeuFhCDqtLTroa3tnpgg7IaQ7ZW067Cw7IOBwrftlbTqs6DrrLTtmqgg7YyQ6rKwKeydmCDrsJjrs7Ug67KV66as7JeQIOq3vOqxsO2VnCDsmIjruYQg67aE7ISd7J2064ukLiBBSSDsl5DsnbTsoITtirgoQ293b3JrKeuhnCDtjJDqsrDrrLjsnYQg7IiY7KeRwrfrtoTrpZjCt+ygleuPhe2VmOyXrCDsnpHshLHtlZwg7YOQ7IOJ7KCBIOu2hOyEneydmCDsmIjsi5zroZwsIOyEuOu2gCDsiJjsuZjripQg7L2U7Y287IqkIOq1rOyEseyXkCDrlLDrnbwg64us65287KeIIOyImCDsnojri6QuPC9wPgo8L2FydGljbGU+CjwvYm9keT4KPC9odG1sPgo=";
+
+/* ===== 유틸 ===== */
+const $ = s => document.querySelector(s);
+const AGES = [10,20,30,40,50,60];
+const ageLabel = a => a===60 ? "60대+" : a+"대";
+const GROUPS = [];
+["여","남"].forEach(s => AGES.forEach(a => GROUPS.push({sex:s, age:a})));
+const gkey = g => g.sex + g.age;
+const booksOf = g => BOOKS.filter(b => b.성별===g.sex && b.연령대===g.age);
+const titleSet = g => new Set(booksOf(g).map(b => b.제목));
+function esc(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+/* ===== ① 수집 결과 탐색기 ===== */
+function renderTable(){
+  const sex = document.querySelector('input[name="sex"]:checked').value;
+  const age = +document.querySelector('input[name="age"]:checked').value;
+  const rows = BOOKS.filter(b => b.성별===sex && b.연령대===age).sort((a,b)=>a.순위-b.순위);
+  $("#bookTable tbody").innerHTML = rows.map(b =>
+    `<tr><td class="num">${b.순위}</td><td>${esc(b.제목)}</td><td>${esc(b.저자)}</td><td>${esc(b.출판사)}</td><td class="num">${esc(b.출간)}</td><td class="num">${b.판매가.toLocaleString()}원</td></tr>`).join("");
+  $("#tableCaption").textContent = `${age===60?"60대 이상":age+"대"} ${sex}성 경제·경영 베스트셀러 Top ${rows.length} · 수집일 2026-08-04`;
+}
+document.querySelectorAll('input[name="sex"], input[name="age"]').forEach(r => r.addEventListener("change", renderTable));
+
+$("#csvBtn").addEventListener("click", () => {
+  const cols = ["성별","연령대","순위","제목","저자","출판사","출간","판매가","평점"];
+  const lines = [cols.join(",")].concat(BOOKS.map(b => cols.map(c => {
+    const v = b[c] == null ? "" : String(b[c]);
+    return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v;
+  }).join(",")));
+  const blob = new Blob(["﻿"+lines.join("\n")], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "yes24_bestseller_gender_age_top20.csv";
+  document.body.appendChild(a); a.click(); a.remove();
+  showToast("CSV 파일을 내려받았습니다");
+});
+
+/* ===== ② 분석 계산 ===== */
+function canonTop(n){
+  const m = new Map();
+  BOOKS.forEach(b => {
+    if(!m.has(b.제목)) m.set(b.제목, new Set());
+    m.get(b.제목).add(b.성별+b.연령대);
+  });
+  return [...m.entries()].map(([t,s])=>[t,s.size]).sort((a,b)=>b[1]-a[1]).slice(0,n);
+}
+const THEME_KW = ["ETF","배당","연금","포트폴리오"];
+function themeCount(sex){
+  return AGES.map(a => booksOf({sex,age:a}).filter(b => THEME_KW.some(k => b.제목.includes(k))).length);
+}
+function uniqCount(sex){
+  const owners = new Map();
+  BOOKS.forEach(b => {
+    if(!owners.has(b.제목)) owners.set(b.제목, new Set());
+    owners.get(b.제목).add(b.성별+b.연령대);
+  });
+  return AGES.map(a => booksOf({sex,age:a}).filter(b => owners.get(b.제목).size===1).length);
+}
+function jaccard(){
+  const sets = GROUPS.map(titleSet);
+  return GROUPS.map((_,i) => GROUPS.map((_,j) => {
+    const A=sets[i], B=sets[j];
+    let inter=0; A.forEach(t=>{ if(B.has(t)) inter++; });
+    return inter/(A.size+B.size-inter);
+  }));
+}
+
+/* ===== ③ 차트 (인라인 SVG) ===== */
+const TIP = $("#vizTip");
+function tipOn(el, html){
+  el.addEventListener("mousemove", e => {
+    TIP.innerHTML = html; TIP.style.opacity = 1;
+    const w = TIP.offsetWidth;
+    TIP.style.left = Math.min(e.clientX+14, innerWidth-w-10)+"px";
+    TIP.style.top = (e.clientY+14)+"px";
+  });
+  el.addEventListener("mouseleave", () => TIP.style.opacity = 0);
+}
+function svgEl(w,h){
+  const s = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  s.setAttribute("viewBox",`0 0 ${w} ${h}`); s.classList.add("chart-svg"); return s;
+}
+function add(parent, tag, attrs, text){
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for(const k in attrs) el.setAttribute(k, attrs[k]);
+  if(text != null) el.textContent = text;
+  parent.appendChild(el); return el;
+}
+/* 가로 막대 — 데이터 끝만 4px 라운드 */
+function hbarPath(x,y,w,h,r){
+  r = Math.min(r, w);
+  return `M${x},${y} h${w-r} a${r},${r} 0 0 1 ${r},${r} v${h-2*r} a${r},${r} 0 0 1 -${r},${r} h-${w-r} z`;
+}
+/* 세로 막대 — 위쪽만 4px 라운드 */
+function vbarPath(x,y,w,h,r){
+  r = Math.min(r, h);
+  return `M${x},${y+h} v-${h-r} a${r},${r} 0 0 1 ${r},-${r} h${w-2*r} a${r},${r} 0 0 1 ${r},${r} v${h-r} z`;
+}
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+/* 차트 A — 캐논 (가로 막대, 단일 시리즈) */
+function drawCanon(){
+  const data = canonTop(12);
+  const W=680, rowH=27, padL=8, padR=46, labelW=270, top=6;
+  const H = top + data.length*rowH + 24;
+  const svg = svgEl(W,H);
+  const max = 12, x0 = padL+labelW, plotW = W-x0-padR;
+  [0,3,6,9,12].forEach(v => {
+    const x = x0 + plotW*v/max;
+    add(svg,"line",{x1:x,y1:top,x2:x,y2:top+data.length*rowH,stroke:css("--viz-grid"),"stroke-width":1});
+    add(svg,"text",{x:x,y:H-8,"text-anchor":"middle","font-size":10.5,fill:css("--viz-muted"),style:"font-variant-numeric:tabular-nums"},v);
+  });
+  data.forEach(([t,c],i) => {
+    const y = top + i*rowH + 4, h = rowH-9;
+    const name = t.length>22 ? t.slice(0,21)+"…" : t;
+    add(svg,"text",{x:padL+labelW-10,y:y+h/2+4,"text-anchor":"end","font-size":12,fill:css("--viz-ink2")},name);
+    const w = plotW*c/max;
+    const bar = add(svg,"path",{d:hbarPath(x0,y,w,h,4),fill:"var(--series-1)"});
+    add(svg,"text",{x:x0+w+7,y:y+h/2+4,"font-size":11.5,"font-weight":700,fill:css("--viz-ink2"),style:"font-variant-numeric:tabular-nums"},c);
+    tipOn(bar, `<b>${esc(t)}</b><br/>12개 그룹 중 <b>${c}개</b> 목록에 등장`);
+  });
+  add(svg,"line",{x1:x0,y1:top,x2:x0,y2:top+data.length*rowH,stroke:css("--viz-axis"),"stroke-width":1});
+  $("#chartCanon").appendChild(svg);
+}
+
+/* 차트 B·D — 연령대별 그룹 막대 (여/남 2시리즈) */
+function drawGrouped(sel, femaleVals, maleVals, unitLabel){
+  const W=680, H=230, padL=34, padB=30, padT=14;
+  const svg = svgEl(W,H);
+  const plotW = W-padL-14, plotH = H-padT-padB;
+  const max = Math.max(...femaleVals, ...maleVals) <= 6 ? 6 : Math.ceil(Math.max(...femaleVals,...maleVals)/4)*4;
+  const ticks = max===6 ? [0,2,4,6] : [0, max/4, max/2, 3*max/4, max];
+  ticks.forEach(v => {
+    const y = padT + plotH*(1-v/max);
+    add(svg,"line",{x1:padL,y1:y,x2:padL+plotW,y2:y,stroke:css("--viz-grid"),"stroke-width":1});
+    add(svg,"text",{x:padL-7,y:y+4,"text-anchor":"end","font-size":10.5,fill:css("--viz-muted"),style:"font-variant-numeric:tabular-nums"},v);
+  });
+  const band = plotW/AGES.length, barW = 24, gap = 2;
+  AGES.forEach((a,i) => {
+    const cx = padL + band*i + band/2;
+    add(svg,"text",{x:cx,y:H-9,"text-anchor":"middle","font-size":12,fill:css("--viz-ink2")},ageLabel(a));
+    [[femaleVals[i],"var(--series-1)","여성"],[maleVals[i],"var(--series-2)","남성"]].forEach(([v,color,name],k) => {
+      const h = plotH*v/max;
+      const x = cx - barW - gap/2 + k*(barW+gap);
+      if(v>0){
+        const bar = add(svg,"path",{d:vbarPath(x,padT+plotH-h,barW,h,4),fill:color});
+        tipOn(bar, `${ageLabel(a)} ${name} · <b>${v}${unitLabel}</b>`);
+      }
+      add(svg,"text",{x:x+barW/2,y:padT+plotH-h-6,"text-anchor":"middle","font-size":11,"font-weight":700,fill:css("--viz-ink2"),style:"font-variant-numeric:tabular-nums"},v);
+    });
+  });
+  add(svg,"line",{x1:padL,y1:padT+plotH,x2:padL+plotW,y2:padT+plotH,stroke:css("--viz-axis"),"stroke-width":1});
+  $(sel).appendChild(svg);
+}
+
+/* 차트 C — 유사도 히트맵 (다이버징: 평균 = 흰색, 평균 이하 = 붉은색 = 이질적) */
+const BLUE_ARM = ["#cde2fb","#9ec5f4","#6da7ec","#3987e5","#2a78d6","#1c5cab","#0d366b"];
+const RED_ARM  = ["#f9dcdb","#f3bcba","#ec9b99","#e57877","#e34948","#c13d3c","#96302f"];
+const NEUTRAL  = "#f6f5f2";
+function divColor(v, mean, vmin, vmax){
+  const t = v >= mean ? (vmax>mean ? (v-mean)/(vmax-mean) : 0) : (mean>vmin ? (v-mean)/(mean-vmin) : 0);
+  const arm = t >= 0 ? BLUE_ARM : RED_ARM;
+  const mag = Math.abs(t);
+  if(mag < 0.07) return {fill:NEUTRAL, dark:false};
+  const idx = Math.min(arm.length-1, Math.floor(mag*arm.length));
+  return {fill:arm[idx], dark:idx>=4};
+}
+const jacOf = (a,b) => {
+  const A = titleSet(a), B = titleSet(b);
+  let inter=0; A.forEach(t=>{ if(B.has(t)) inter++; });
+  return inter/(A.size+B.size-inter);
+};
+/* 전체 12개 그룹 쌍 기준의 고정 색 기준(평균·최소·최대) — 세 보기에서 색을 비교 가능하게 */
+const HEAT_STATS = (() => {
+  const vals = [];
+  for(let i=0;i<GROUPS.length;i++) for(let j=i+1;j<GROUPS.length;j++) vals.push(jacOf(GROUPS[i],GROUPS[j]));
+  const mean = vals.reduce((a,b)=>a+b,0)/vals.length;
+  return {mean, vmin:Math.min(...vals), vmax:Math.max(...vals)};
+})();
+function drawHeat(mode){
+  const container = $("#chartHeat");
+  container.innerHTML = "";
+  const F = GROUPS.filter(g=>g.sex==="여"), M = GROUPS.filter(g=>g.sex==="남");
+  const rows = mode==="MM" ? M : F;
+  const cols = mode==="FF" ? F : M2(mode);
+  function M2(m){ return m==="FM" ? M : (m==="MM" ? M : F); }
+  const lab = g => g.sex+" "+(g.age===60?"60+":g.age);
+  const n = 6;
+  const W=680, padL=70, padT=30, gap=3;
+  const cell = (W-padL-14-(n-1)*gap)/n;
+  const H = padT + n*(cell+gap) + 56;
+  const svg = svgEl(W,H);
+  const {mean,vmin,vmax} = HEAT_STATS;
+  cols.forEach((g,j) => add(svg,"text",{x:padL+j*(cell+gap)+cell/2,y:padT-8,"text-anchor":"middle","font-size":11,fill:css("--viz-muted")},lab(g).replace(" ","")));
+  rows.forEach((gr,i) => {
+    add(svg,"text",{x:padL-8,y:padT+i*(cell+gap)+cell/2+4,"text-anchor":"end","font-size":11.5,fill:css("--viz-ink2")},lab(gr));
+    cols.forEach((gc,j) => {
+      const x = padL+j*(cell+gap), y = padT+i*(cell+gap);
+      const same = gr.sex===gc.sex && gr.age===gc.age;
+      if(same){
+        add(svg,"rect",{x,y,width:cell,height:cell,rx:3,fill:"#ffffff",stroke:css("--viz-grid")});
+        return;
+      }
+      const v = jacOf(gr,gc);
+      const {fill,dark} = divColor(v, mean, vmin, vmax);
+      const r = add(svg,"rect",{x,y,width:cell,height:cell,rx:3,fill});
+      if(mode==="FM" && gr.age===gc.age) add(svg,"rect",{x:x+1.5,y:y+1.5,width:cell-3,height:cell-3,rx:2,fill:"none",stroke:dark?"#ffffff":css("--viz-ink2"),"stroke-width":1.5,"stroke-dasharray":"4 3","pointer-events":"none"});
+      add(svg,"text",{x:x+cell/2,y:y+cell/2+4,"text-anchor":"middle","font-size":12,"font-weight":700,fill:dark?"#ffffff":css("--viz-ink2"),style:"font-variant-numeric:tabular-nums","pointer-events":"none"},v.toFixed(2).replace("0.","."));
+      tipOn(r, `<b>${lab(gr)} ↔ ${lab(gc)}</b><br/>자카드 유사도 ${v.toFixed(2)} · 전체 평균 ${mean.toFixed(2)}보다 ${v>=mean?"동질적":"<b>이질적</b>"}`);
+    });
+  });
+  // 다이버징 범례
+  const ly = H-28, lx = padL, lw = 220, half = lw/2;
+  const redRev = [...RED_ARM].reverse();
+  redRev.forEach((c,k) => add(svg,"rect",{x:lx+k*(half/7),y:ly,width:half/7+0.5,height:9,fill:c}));
+  BLUE_ARM.forEach((c,k) => add(svg,"rect",{x:lx+half+k*(half/7),y:ly,width:half/7+0.5,height:9,fill:c}));
+  add(svg,"line",{x1:lx+half,y1:ly-3,x2:lx+half,y2:ly+12,stroke:css("--viz-ink2"),"stroke-width":1});
+  add(svg,"text",{x:lx-6,y:ly+9,"text-anchor":"end","font-size":10.5,fill:css("--viz-muted")},"이질적");
+  add(svg,"text",{x:lx+half,y:ly+24,"text-anchor":"middle","font-size":10.5,fill:css("--viz-muted")},"평균 "+mean.toFixed(2));
+  add(svg,"text",{x:lx+lw+6,y:ly+9,"font-size":10.5,fill:css("--viz-muted")},"동질적");
+  if(mode==="FM") add(svg,"text",{x:W-14,y:ly+9,"text-anchor":"end","font-size":10.5,fill:css("--viz-muted")},"점선 = 같은 세대의 남녀");
+  container.appendChild(svg);
+}
+document.querySelectorAll('input[name="heatmode"]').forEach(r =>
+  r.addEventListener("change", () => drawHeat(document.querySelector('input[name="heatmode"]:checked').value)));
+
+/* 차트 E — 성별 차이 vs 세대 차이 */
+function drawGap(){
+  const jac = (a,b) => {
+    const A = titleSet(a), B = titleSet(b);
+    let inter=0; A.forEach(t=>{ if(B.has(t)) inter++; });
+    return inter/(A.size+B.size-inter);
+  };
+  const gaps = [10,20,30,40,50];
+  const gapMeans = gaps.map(g => {
+    const vals = [];
+    ["여","남"].forEach(s => AGES.forEach(a => { if(AGES.includes(a+g)) vals.push(jac({sex:s,age:a},{sex:s,age:a+g})); }));
+    return vals.reduce((x,y)=>x+y,0)/vals.length;
+  });
+  const crossSex = AGES.map(a => jac({sex:"여",age:a},{sex:"남",age:a}));
+  const refMean = crossSex.reduce((a,b)=>a+b,0)/crossSex.length;
+  const W=680, H=240, padL=40, padB=32, padT=16;
+  const svg = svgEl(W,H);
+  const plotW = W-padL-150, plotH = H-padT-padB;
+  const max = 0.5;
+  [0,.1,.2,.3,.4,.5].forEach(v => {
+    const y = padT + plotH*(1-v/max);
+    add(svg,"line",{x1:padL,y1:y,x2:padL+plotW,y2:y,stroke:css("--viz-grid"),"stroke-width":1});
+    add(svg,"text",{x:padL-7,y:y+4,"text-anchor":"end","font-size":10.5,fill:css("--viz-muted"),style:"font-variant-numeric:tabular-nums"},v.toFixed(1).replace("0.","."));
+  });
+  const band = plotW/gaps.length, barW = 34;
+  gaps.forEach((g,i) => {
+    const v = gapMeans[i];
+    const cx = padL + band*i + band/2, h = plotH*v/max;
+    add(svg,"text",{x:cx,y:H-10,"text-anchor":"middle","font-size":12,fill:css("--viz-ink2")},g+"살 차");
+    const bar = add(svg,"path",{d:vbarPath(cx-barW/2,padT+plotH-h,barW,h,4),fill:"var(--series-1)"});
+    add(svg,"text",{x:cx,y:padT+plotH-h-6,"text-anchor":"middle","font-size":11,"font-weight":700,fill:css("--viz-ink2"),style:"font-variant-numeric:tabular-nums"},v.toFixed(2).replace("0.","."));
+    tipOn(bar, `같은 성별, <b>${g}살 차이</b> 세대쌍의 평균 유사도 <b>${v.toFixed(2)}</b>`);
+  });
+  // 기준선: 같은 세대 남↔여 평균
+  const refY = padT + plotH*(1-refMean/max);
+  add(svg,"line",{x1:padL,y1:refY,x2:padL+plotW,y2:refY,stroke:"var(--series-2)","stroke-width":2,"stroke-dasharray":"6 4"});
+  add(svg,"text",{x:padL+plotW+8,y:refY-2,"font-size":11.5,"font-weight":700,fill:"var(--series-2)"},"같은 세대 남↔여");
+  add(svg,"text",{x:padL+plotW+8,y:refY+12,"font-size":11.5,"font-weight":700,fill:"var(--series-2)",style:"font-variant-numeric:tabular-nums"},"평균 "+refMean.toFixed(2).replace("0.","."));
+  add(svg,"line",{x1:padL,y1:padT+plotH,x2:padL+plotW,y2:padT+plotH,stroke:css("--viz-axis"),"stroke-width":1});
+  $("#chartGap").appendChild(svg);
+}
+
+/* ===== ④ 프롬프트 복사 ===== */
+function showToast(msg){
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+document.querySelectorAll(".copy-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const text = document.getElementById(btn.dataset.copy).textContent;
+    const done = () => showToast("프롬프트가 복사되었습니다");
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+    } else fallbackCopy(text, done);
+  });
+});
+function fallbackCopy(text, done){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){}
+  ta.remove();
+}
+
+/* ===== ⑤ 보고서 라이트박스 ===== */
+const reportURL = "data:text/html;base64," + REPORT_B64;
+$("#reportThumb").src = reportURL;
+const lb = $("#exampleLightbox"), lbFrame = $("#exampleLightboxFrame");
+function openLb(){ lbFrame.src = reportURL; lb.hidden = false; document.body.style.overflow="hidden"; }
+function closeLb(){ lb.hidden = true; lbFrame.src = "about:blank"; document.body.style.overflow=""; }
+$("#reportCard").addEventListener("click", openLb);
+$("#reportCard").addEventListener("keydown", e => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openLb(); } });
+$("#lightboxClose").addEventListener("click", closeLb);
+lb.addEventListener("click", e => { if(e.target===lb) closeLb(); });
+document.addEventListener("keydown", e => { if(e.key==="Escape" && !lb.hidden) closeLb(); });
+
+/* ===== ⑥ 진행률 + 축하 배너 (상태는 메모리에만 저장) ===== */
+const checks = [...document.querySelectorAll("input[data-progress]")];
+$("#progressTotal").textContent = checks.length;
+let celebrated = false;
+function updateProgress(){
+  const done = checks.filter(c => c.checked).length;
+  $("#progressCount").textContent = done;
+  $("#progressBar").style.width = (done/checks.length*100)+"%";
+  checks.forEach(c => {
+    const a = document.querySelector(`.toc a[data-sec="${c.dataset.progress}"]`);
+    if(a) a.classList.toggle("done", c.checked);
+  });
+  if(done===checks.length && !celebrated){
+    celebrated = true;
+    const b = document.createElement("div");
+    b.className = "celebrate-banner";
+    b.innerHTML = "🎉 <b>Week 2 스크래핑 파트 완주!</b> 이제 여러분은 웹의 공개 데이터를 문장 하나로 수집하고, 그 안의 패턴을 찾아낼 수 있습니다. 다음 시간에는 이 데이터로 유사 문서 검색기를 만듭니다.";
+    $("#celebrateSlot").appendChild(b);
+    b.scrollIntoView({behavior:"smooth", block:"center"});
+  }
+}
+checks.forEach(c => c.addEventListener("change", updateProgress));
+
+/* ===== ⑦ 사이드바 scroll-spy ===== */
+const secIds = ["s1","s2","s3","s4","s5","s6"];
+const tocLinks = {};
+document.querySelectorAll(".toc a").forEach(a => tocLinks[a.dataset.sec] = a);
+const io = new IntersectionObserver(entries => {
+  entries.forEach(en => { en.target._visible = en.isIntersecting; });
+  let current = null;
+  for(const id of secIds){ const el = document.getElementById(id); if(el && el._visible){ current = id; break; } }
+  if(current){
+    Object.values(tocLinks).forEach(a => a.classList.remove("active"));
+    tocLinks[current].classList.add("active");
+  }
+}, {rootMargin:"-15% 0px -55% 0px"});
+secIds.forEach(id => io.observe(document.getElementById(id)));
+
+/* ===== 초기 렌더 ===== */
+renderTable();
+drawCanon();
+drawGrouped("#chartTheme", themeCount("여"), themeCount("남"), "권");
+drawGap();
+drawHeat("FM");
+drawGrouped("#chartUniq", uniqCount("여"), uniqCount("남"), "권");
+updateProgress();
+</script>
+</body>
+</html>

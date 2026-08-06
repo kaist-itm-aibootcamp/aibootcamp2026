@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 2 — RAG: 검색해서 읽고 답하는 AI, 그리고 Long Context라는 대안</title>
+<style>
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
+  --brand:#2e9bdb; --brand-dark:#1b6fa6; --green:#2f765b; --amber:#b8792e; --red:#b0483f;
+  --blue:#375f8f; --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12); --radius:14px; --sidebar-width:250px;
+  --series-1:#2a78d6; --series-2:#eb6834; --series-3:#1baf7a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15.5px;
+}
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+.layout{display:flex;align-items:flex-start;}
+.sidebar{
+  position:sticky;top:63px;flex:0 0 var(--sidebar-width);width:var(--sidebar-width);
+  height:calc(100vh - 63px);overflow-y:auto;padding:22px 14px 40px 22px;border-right:1px solid var(--line);
+}
+.sidebar-title{font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+.toc a{
+  display:block;padding:7px 11px;margin:2px 0;border-radius:8px;border-left:3px solid transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;line-height:1.4;
+}
+.toc a:hover{background:#eef3ec;color:var(--ink);}
+.toc a.active{background:var(--sky-light);border-left-color:var(--brand);color:var(--brand-dark);font-weight:800;}
+.toc a .done-mark{color:var(--green);font-weight:900;margin-left:4px;display:none;}
+.toc a.done .done-mark{display:inline;}
+.content{flex:1;min-width:0;max-width:920px;padding:clamp(20px,4vw,44px) clamp(16px,4vw,44px) 100px;}
+.hero{margin-bottom:16px;}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.07em;color:var(--brand-dark);background:var(--sky-light);padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+.hero h1{font-size:clamp(23px,3.6vw,32px);line-height:1.3;letter-spacing:-.015em;margin-bottom:10px;}
+.hero p{color:var(--muted);max-width:660px;}
+.section{margin-top:44px;padding-top:8px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
+.sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
+.sec-lead{color:var(--muted);margin:4px 0 18px;max-width:700px;}
+h3{font-size:16.5px;margin:26px 0 10px;}
+h4{font-size:15px;margin:16px 0 8px;}
+p{margin:10px 0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:14px 0;box-shadow:0 3px 14px rgba(54,42,31,.05);}
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+.concept-grid.two{grid-template-columns:repeat(2,1fr);}
+.concept{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.concept .ico{font-size:21px;}
+.concept b{display:block;margin:7px 0 4px;font-size:14.5px;}
+.concept span{display:block;color:var(--muted);font-size:13px;line-height:1.55;}
+.concept .use{display:inline-block;margin-top:9px;font-size:12px;font-weight:800;color:var(--brand-dark);background:var(--sky-light);border-radius:999px;padding:2px 10px;}
+.callout{border-left:4px solid var(--brand);background:var(--sky-light);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;font-size:14.5px;}
+.callout.caution{border-left-color:var(--red);background:#faeeec;}
+.callout.ok{border-left-color:var(--green);background:#edf4ef;}
+.callout b.cap{display:block;font-size:13px;letter-spacing:.03em;margin-bottom:4px;color:var(--brand-dark);}
+.callout.caution b.cap{color:var(--red);}
+.callout.ok b.cap{color:var(--green);}
+.tip-card{border-left:4px solid var(--brand);background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 17px;margin:14px 0;font-size:14px;color:var(--muted);}
+.tip-card b{color:var(--ink);}
+.copy-block{position:relative;background:#20242a;color:#e8ecf1;border-radius:12px;padding:18px 20px;margin:14px 0;font-size:14px;line-height:1.8;}
+.copy-block .cb-label{position:absolute;top:-10px;left:14px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--brand);padding:3px 10px;border-radius:999px;}
+.copy-block pre{white-space:pre-wrap;word-break:break-word;font-family:inherit;margin-top:4px;}
+.copy-block pre.mono{font-family:ui-monospace,Consolas,monospace;font-size:13px;}
+.copy-btn{position:absolute;top:12px;right:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 11px;cursor:pointer;}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+.doc-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--surface);}
+.doc-table th{background:#f2f6f0;text-align:left;padding:8px 12px;border:1px solid var(--line);font-size:12.5px;}
+.doc-table td{padding:8px 12px;border:1px solid var(--line);}
+.doc-table td.r{text-align:right;font-variant-numeric:tabular-nums;}
+.doc-table td code, p code, li code{background:#eef3ec;border-radius:5px;padding:1px 6px;font-family:ui-monospace,Consolas,monospace;font-size:.9em;}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+.compare.three{grid-template-columns:1fr 1fr 1fr;}
+.compare .col{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.compare .col h4{font-size:14.5px;margin:0 0 8px;}
+.compare ul{margin:0 0 0 18px;font-size:13.5px;color:var(--muted);}
+.compare li{margin:5px 0;}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+.stat-row.three{grid-template-columns:repeat(3,1fr);}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 15px;}
+.stat .v{font-size:26px;font-weight:900;letter-spacing:-.02em;color:var(--brand-dark);line-height:1.15;}
+.stat .k{margin-top:5px;font-size:12.5px;color:var(--muted);line-height:1.5;}
+.insight{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0;}
+.insight .n{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;border-radius:999px;background:var(--sky-light);color:var(--brand-dark);font-weight:900;font-size:13px;transform:translateY(2px);}
+.insight p{margin:0;font-size:14.5px;}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin:16px 0;}
+.flow .step{flex:1 1 150px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;position:relative;}
+.flow .step b{display:block;font-size:13.5px;margin-bottom:3px;color:var(--brand-dark);}
+.flow .step span{font-size:12.5px;color:var(--muted);line-height:1.5;display:block;}
+.flow .arrow{align-self:center;color:var(--brand);font-weight:900;font-size:16px;}
+.workshop-step{display:flex;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0;}
+.ws-num{flex:0 0 auto;display:grid;place-items:center;width:30px;height:30px;border-radius:999px;background:var(--brand);color:#fff;font-weight:900;font-size:14px;transform:translateY(2px);}
+.ws-body{min-width:0;flex:1;}
+.ws-body b.ws-title{display:block;font-size:14.5px;margin-bottom:4px;}
+.ws-body p{margin:5px 0;font-size:14px;color:var(--muted);}
+.example-card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;margin:16px 0;box-shadow:var(--shadow);max-width:560px;}
+.example-card:focus-visible{outline:3px solid var(--brand);}
+.example-thumb{position:relative;height:210px;overflow:hidden;background:#eef1ec;}
+.example-thumb iframe{position:absolute;top:0;left:0;width:400%;height:400%;transform:scale(.25);transform-origin:top left;border:none;pointer-events:none;}
+.example-thumb .zoom{position:absolute;right:12px;bottom:12px;background:rgba(32,36,42,.85);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:5px 12px;}
+.example-body{padding:14px 18px;}
+.example-body b{font-size:14.5px;}
+.example-body p{margin:4px 0 0;font-size:13px;color:var(--muted);}
+.example-lightbox{position:fixed;inset:0;z-index:80;background:rgba(20,24,20,.62);display:flex;align-items:center;justify-content:center;padding:3vh 3vw;}
+.example-lightbox[hidden]{display:none;}
+.lightbox-inner{position:relative;width:min(980px,96vw);height:92vh;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);}
+.lightbox-inner iframe{width:100%;height:100%;border:none;}
+.lightbox-close{position:absolute;top:10px;right:10px;z-index:2;border:none;background:#20242a;color:#fff;width:34px;height:34px;border-radius:999px;font-size:16px;font-weight:900;cursor:pointer;}
+.placeholder-box{border:2px dashed var(--line);border-radius:var(--radius);background:#fafcf9;padding:26px 22px;margin:14px 0;text-align:center;color:var(--muted);}
+.placeholder-box b{display:block;color:var(--ink);font-size:15px;margin-bottom:6px;}
+.placeholder-box .soon{display:inline-block;margin-top:10px;font-size:12px;font-weight:900;letter-spacing:.05em;color:var(--amber);background:#f7efe3;border-radius:999px;padding:4px 12px;}
+.completion-row{margin:22px 0 6px;}
+.check{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 18px;cursor:pointer;font-size:14px;font-weight:700;color:var(--muted);}
+.check input{width:17px;height:17px;accent-color:var(--green);}
+.check:has(input:checked){border-color:var(--green);color:var(--green);background:#edf4ef;}
+.celebrate-banner{border:1px solid #bfe0c9;background:linear-gradient(120deg,#edf7ef,#e3f1fb);border-radius:var(--radius);padding:18px 22px;margin:0 0 22px;font-size:15px;box-shadow:var(--shadow);}
+.celebrate-banner b{color:var(--green);}
+.final-list{list-style:none;margin:14px 0;}
+.final-list li{display:flex;gap:10px;margin:9px 0;font-size:14.5px;}
+.final-list li::before{content:"✔";color:var(--green);font-weight:900;}
+.next-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.next-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.next-card b{display:block;font-size:14.5px;margin-bottom:5px;color:var(--brand-dark);}
+.next-card span{font-size:13.5px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#20242a;color:#fff;font-size:13.5px;font-weight:700;border-radius:999px;padding:10px 20px;opacity:0;transition:all .25s;z-index:90;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.diagram-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:16px 0;}
+.diagram-card h4{margin:0 0 4px;}
+.diagram-card .sub{font-size:12.5px;color:var(--muted);margin-bottom:10px;}
+.diagram-card svg{width:100%;height:auto;display:block;}
+@media (max-width:900px){
+  .layout{display:block;}
+  .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  .concept-grid,.concept-grid.two{grid-template-columns:1fr 1fr;}
+  .stat-row,.stat-row.three{grid-template-columns:1fr 1fr;}
+  .compare,.compare.three{grid-template-columns:1fr;}
+  .next-card-grid{grid-template-columns:1fr;}
+}
+@media (max-width:640px){
+  .topbar{flex-wrap:wrap;row-gap:10px;}
+  .topbar-left{flex-wrap:wrap;row-gap:8px;}
+  .progress-wrap{width:100%;}
+  .concept-grid,.concept-grid.two{grid-template-columns:1fr;}
+}
+
+.rag-demo{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:14px 0;}
+.rag-demo .q{background:#20242a;color:#fff;padding:13px 18px;font-size:14px;}
+.rag-demo .q b{color:#9ec5f4;}
+.rag-demo .a{padding:15px 18px;font-size:14px;line-height:1.8;}
+.rag-demo .src{border-top:1px dashed var(--line);padding:11px 18px;background:#fafcf9;font-size:12.5px;color:var(--muted);}
+.rag-demo .src b{color:var(--ink);}
+/* 개발자 스타일 API 호출 박스 */
+.api-code{background:#20242a;color:#e8ecf1;border-radius:12px;padding:16px 18px;margin:12px 0;font-family:ui-monospace,Consolas,monospace;font-size:12.3px;line-height:1.75;overflow-x:auto;}
+.api-code .k{color:#9ec5f4;}
+.api-code .v{color:#c5e3b5;}
+.api-code .n{color:#f0c987;}
+.api-code .c{color:#8b93a1;}
+.api-code .hl-sys{color:#f0c987;}
+.api-code .hl-doc{color:#a8cdf0;}
+.api-code .hl-q{color:#9fe0b5;font-weight:700;}
+/* 컨텍스트 구조 시각화 */
+.ctx-stack{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:12px 0;font-size:13px;line-height:1.65;}
+.ctx-block{padding:11px 16px;}
+.ctx-block .lb{display:block;font-size:11px;font-weight:900;letter-spacing:.05em;margin-bottom:4px;}
+.ctx-sys{background:#20242a;color:#e8ecf1;}
+.ctx-sys .lb{color:#9ec5f4;}
+.ctx-doc{background:#eaf3fb;border-top:2px solid #fff;color:#2d4a63;}
+.ctx-doc .lb{color:#1b6fa6;}
+.ctx-doc.dim{background:#f0f6fb;color:#7d97ab;}
+.ctx-q{background:#e7f2ea;border-top:2px solid #fff;color:#2b4a37;}
+.ctx-q .lb{color:#2f765b;}
+.ctx-note{font-size:12px;color:var(--muted);margin:6px 2px 0;}
+.ctx-compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+.ctx-compare h5{font-size:13.5px;margin:0 0 8px;text-align:center;}
+.ctx-token{display:block;text-align:center;font-size:12px;color:var(--muted);margin-top:6px;}
+@media (max-width:760px){ .ctx-compare{grid-template-columns:1fr;} }
+/* 목업 (챗) */
+.mock-browser{border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);margin:14px 0;background:#fff;}
+.mock-bar{display:flex;align-items:center;gap:8px;background:#eceff0;padding:9px 14px;border-bottom:1px solid var(--line);}
+.mock-bar .dot{width:11px;height:11px;border-radius:999px;}
+.mock-bar .url{flex:1;background:#fff;border:1px solid #dce0e2;border-radius:999px;padding:4px 14px;font-size:12px;color:#52514e;font-family:ui-monospace,Consolas,monospace;}
+.mock-body{padding:20px 22px;}
+.mock-title{font-size:16px;font-weight:900;margin-bottom:12px;}
+.chat-q{display:flex;justify-content:flex-end;margin:10px 0;}
+.chat-q .bub{max-width:78%;background:var(--brand-dark);color:#fff;border-radius:14px 14px 3px 14px;padding:10px 15px;font-size:13.5px;line-height:1.65;}
+.chat-a{display:flex;margin:10px 0;}
+.chat-a .bub{max-width:88%;background:#f4f7f3;border:1px solid var(--line);border-radius:14px 14px 14px 3px;padding:12px 16px;font-size:13.5px;line-height:1.75;}
+.chat-a .cite{color:var(--brand-dark);font-weight:700;}
+.chat-srcs{margin:8px 0 0 6px;display:flex;flex-wrap:wrap;gap:6px;}
+.chat-src{font-size:11.5px;font-weight:700;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 11px;}
+.chat-input{display:flex;gap:8px;margin-top:14px;border-top:1px solid var(--line);padding-top:14px;}
+.chat-input .inp{flex:1;border:2px solid var(--line);border-radius:10px;padding:10px 14px;font-size:13.5px;color:#898781;}
+.chat-input .btn{background:var(--brand-dark);color:#fff;font-weight:800;font-size:13.5px;border-radius:10px;padding:0 18px;display:grid;place-items:center;}
+/* 논문 카드 */
+.paper{display:flex;gap:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin:9px 0;}
+.paper .tag{flex:0 0 auto;font-size:10.5px;font-weight:900;color:#fff;background:var(--blue);border-radius:7px;padding:3px 9px;height:fit-content;transform:translateY(3px);white-space:nowrap;}
+.paper .bd{font-size:13.5px;}
+.paper .bd b{display:block;margin-bottom:2px;}
+.paper .bd span{color:var(--muted);font-size:12.5px;line-height:1.6;}
+.paper .bd .ref{display:block;margin-top:3px;font-size:11.5px;color:#898781;font-family:ui-monospace,Consolas,monospace;}
+
+/* ---- 목록으로 돌아가기 (week1과 동일 패턴) ---- */
+.back-week{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:color .15s ease,border-color .15s ease,background .15s ease;}
+.back-week:hover{color:var(--brand-dark);border-color:var(--brand);background:var(--sky-light);}
+.back-home{display:flex;align-items:center;gap:15px;max-width:840px;margin:34px 0 10px;padding:20px 24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s ease,border-color .18s ease;}
+.back-home:hover{transform:translateY(-2px);border-color:var(--brand);}
+.back-home .bh-ic{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;border-radius:11px;background:var(--sky-light);color:var(--brand-dark);font-size:19px;font-weight:900;}
+.back-home strong{display:block;font-size:15.5px;font-weight:800;}
+.back-home small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;font-weight:600;}
+@media (max-width:640px){.back-home{padding:18px;gap:12px;}}
+</style>
+</head>
+<body id="top" data-celebrate="🎉 <b>RAG 강의 완주!</b> 검색으로 근거를 모아 답하게 하는 법과, 통째로 읽혀 답하게 하는 법 — 두 도구의 구조와 한계까지 알고 상황에 맞게 고를 수 있게 되었습니다.">
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+    </a>
+    <div class="week-tag"><span class="week-num">WEEK 2</span><span class="week-title">RAG와 Long Context</span></div>
+    <a class="back-week" href="index.html">← 2주차 목록</a>
+  </div>
+  <div class="progress-wrap" aria-label="진행률">
+    <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="목차">
+    <div class="sidebar-title">이 페이지의 흐름</div>
+    <div class="toc">
+      <a href="#s1" data-sec="s1">1. RAG란 무엇인가<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. 아키텍처와 데이터 플로우<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 컨텍스트에 실제로 담기는 것<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 실습 — 판례 챗봇, 계획부터<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 대안 — Long Context 방식<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. 얼마나 담을 수 있나 — 모델 비교<span class="done-mark">✔</span></a>
+      <a href="#s7" data-sec="s7">7. 하이브리드 — 요지는 통째, 전문은 골라서<span class="done-mark">✔</span></a>
+      <a href="#s8" data-sec="s8">8. 마무리 체크리스트<span class="done-mark">✔</span></a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div id="celebrateSlot"></div>
+
+    <div class="hero">
+      <span class="hero-kicker">WEEK 2 · STEP 7 — RAG와 Long Context</span>
+      <h1>RAG — 질문하면 관련 문서를 찾아<br/>읽히고, 근거를 달아 답하게 하기</h1>
+      <p>앞 강의의 검색엔진은 "문서 목록"을 사람에게 돌려줬습니다. RAG는 다른 목적의 기법입니다 — <b>질문과 관련된 문서를 찾아 AI의 컨텍스트에 로딩하고, 그 문서만 근거로 답변을 쓰게</b> 합니다. 마지막에는 유력한 대안인 <b>Long Context</b> 방식의 현재 수준까지 살펴봅니다.</p>
+    </div>
+
+    <!-- ============ S1 ============ -->
+    <section class="section" id="s1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>RAG란 무엇인가 — 오픈북 시험을 치르는 AI</h2></div>
+      <p class="sec-lead">LLM에게 그냥 물으면 <b>기억(학습 데이터)</b>으로 답합니다. 기억에는 세 가지 문제가 있습니다 — 학습 이후의 일을 모르고, 내 데이터(사내 문서·수집 판결문)를 모르고, 모르면서 그럴듯하게 지어냅니다(환각).</p>
+      <div class="callout"><b class="cap">RAG의 아이디어 한 줄</b>
+      질문이 들어오면 <b>관련 문서를 검색해서(Retrieval) 질문과 함께 컨텍스트에 로딩하고(Augmented), 그 문서를 근거로 답을 쓰게(Generation)</b> 한다. — 암기 시험을 오픈북 시험으로 바꾸는 것입니다. AI는 "기억나는 대로"가 아니라 "방금 책상에 올려준 자료를 읽고" 답합니다.</div>
+      <div class="concept-grid">
+        <div class="concept"><div class="ico">🆕</div><b>최신·사적 데이터</b><span>모델이 학습한 적 없는 문서(어제 수집한 판결문, 사내 규정)로도 답할 수 있게 됩니다.</span></div>
+        <div class="concept"><div class="ico">🔗</div><b>출처가 달린다</b><span>어떤 문서를 근거로 답했는지 인용을 강제할 수 있어 <b>검증 가능</b>해집니다.</span></div>
+        <div class="concept"><div class="ico">🚫</div><b>환각 억제</b><span>"제공된 문서로 답할 수 없으면 모른다고 하라"는 지시가 가능해집니다.</span></div>
+      </div>
+      <div class="tip-card"><b>검색엔진과의 관계 — 진화가 아니라 분업</b> — RAG는 앞 강의의 검색엔진을 <b>부품으로 빌려 쓰지만</b>, 두 기법은 목적이 다릅니다. 검색엔진의 사용자는 <b>문서 목록을 직접 읽고 판단하려는 사람</b>이고, RAG의 사용자는 <b>종합된 답을 원하는 사람</b>입니다. 연구자는 대개 둘 다 필요합니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>RAG를 "오픈북" 비유로 설명할 수 있다</span></label></div>
+    </section>
+
+    <!-- ============ S2 ============ -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>아키텍처와 데이터 플로우</h2></div>
+      <p class="sec-lead">구조는 앞 강의의 검색엔진에 <b>"챗 모델 호출" 한 단계가 추가</b>된 것입니다. 이번에도 질의 하나의 여행을 따라가 봅니다 — 이번에는 OpenRouter를 <b>두 번</b>(임베딩 모델, 챗 모델) 방문합니다.</p>
+
+      <div class="diagram-card">
+        <h4>데이터 플로우 — "동료들의 따돌림도 손해배상이 되나?" 질문의 몇 초</h4>
+        <div class="sub">세로 = 시간 순서 · 화살표 위 = 실제로 오가는 데이터 · ③~⑤는 앞 강의 검색엔진과 동일</div>
+        <svg viewBox="0 0 680 660" role="img" aria-label="RAG 데이터 플로우 시퀀스 다이어그램">
+          <rect x="8" y="8" width="184" height="46" rx="9" fill="#fafcf9" stroke="#d5ddd3"/>
+          <text x="100" y="37" text-anchor="middle" font-size="15" font-weight="800" fill="#22201d">🖥 브라우저</text>
+          <rect x="248" y="8" width="184" height="46" rx="9" fill="#1b6fa6"/>
+          <text x="340" y="37" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">⚙ 서버 (내 PC) 🔑</text>
+          <rect x="488" y="8" width="184" height="46" rx="9" fill="#eceae6"/>
+          <text x="580" y="37" text-anchor="middle" font-size="15" font-weight="800" fill="#52514e">☁ OpenRouter</text>
+          <line x1="100" y1="54" x2="100" y2="648" stroke="#d5ddd3" stroke-dasharray="4 4"/>
+          <line x1="340" y1="54" x2="340" y2="648" stroke="#9dc4de" stroke-dasharray="4 4"/>
+          <line x1="580" y1="54" x2="580" y2="648" stroke="#d5ddd3" stroke-dasharray="4 4"/>
+          <!-- 1 -->
+          <rect x="12" y="68" width="176" height="42" rx="8" fill="#fff" stroke="#d5ddd3"/>
+          <text x="100" y="87" text-anchor="middle" font-size="12.5" font-weight="800" fill="#22201d">① 질문 입력</text>
+          <text x="100" y="103" text-anchor="middle" font-size="11" fill="#898781">"동료들의 따돌림도…?"</text>
+          <!-- 2 -->
+          <line x1="100" y1="132" x2="331" y2="132" stroke="#2e9bdb" stroke-width="2.5"/>
+          <path d="M331 132 l-10 -6 v12 z" fill="#2e9bdb"/>
+          <text x="216" y="124" text-anchor="middle" font-size="12.5" font-weight="800" fill="#1b6fa6">② POST /ask</text>
+          <text x="216" y="149" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">{"question": "동료들의 따돌림도…"}</text>
+          <!-- 3 -->
+          <line x1="340" y1="182" x2="571" y2="182" stroke="#b8792e" stroke-width="2.5"/>
+          <path d="M571 182 l-10 -6 v12 z" fill="#b8792e"/>
+          <text x="456" y="174" text-anchor="middle" font-size="12.5" font-weight="800" fill="#8a5a13">③ 임베딩 요청 (🔑)</text>
+          <text x="456" y="199" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">{model:"qwen3-embedding-8b", input:"…"}</text>
+          <!-- 4 -->
+          <line x1="571" y1="228" x2="349" y2="228" stroke="#2f765b" stroke-width="2.5"/>
+          <path d="M349 228 l10 -6 v12 z" fill="#2f765b"/>
+          <text x="456" y="220" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f765b">④ 질문 벡터 반환</text>
+          <text x="456" y="245" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">[0.021, −0.011, …] (4,096개)</text>
+          <!-- 5 -->
+          <rect x="240" y="262" width="200" height="58" rx="8" fill="#e3f1fb" stroke="#2e9bdb"/>
+          <text x="340" y="283" text-anchor="middle" font-size="12.5" font-weight="900" fill="#1b6fa6">⑤ 검색 (서버 내부)</text>
+          <text x="340" y="301" text-anchor="middle" font-size="11" fill="#375f8f">347건과 코사인 → 관련 판결 Top-5</text>
+          <!-- 6 -->
+          <line x1="340" y1="352" x2="571" y2="352" stroke="#b8792e" stroke-width="2.5"/>
+          <path d="M571 352 l-10 -6 v12 z" fill="#b8792e"/>
+          <text x="456" y="344" text-anchor="middle" font-size="12.5" font-weight="800" fill="#8a5a13">⑥ 챗 모델 요청 (🔑) — 두 번째 방문</text>
+          <text x="456" y="369" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">{지시 + 검색된 판결 5건 + 질문}</text>
+          <text x="456" y="384" text-anchor="middle" font-size="10.5" fill="#898781">← §3에서 이 꾸러미의 실물을 봅니다</text>
+          <!-- 7 -->
+          <rect x="492" y="398" width="176" height="42" rx="8" fill="#fff" stroke="#d5ddd3"/>
+          <text x="580" y="417" text-anchor="middle" font-size="12.5" font-weight="800" fill="#22201d">⑦ 문서를 읽고 답변 생성</text>
+          <text x="580" y="433" text-anchor="middle" font-size="11" fill="#898781">제공 문서 밖 내용은 금지</text>
+          <!-- 8 -->
+          <line x1="571" y1="470" x2="349" y2="470" stroke="#2f765b" stroke-width="2.5"/>
+          <path d="M349 470 l10 -6 v12 z" fill="#2f765b"/>
+          <text x="456" y="462" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f765b">⑧ 답변 텍스트 반환</text>
+          <text x="456" y="487" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">"…인정된 사례가 있습니다 [대구지법 …]"</text>
+          <!-- 9 -->
+          <line x1="331" y1="530" x2="109" y2="530" stroke="#2f765b" stroke-width="2.5"/>
+          <path d="M109 530 l10 -6 v12 z" fill="#2f765b"/>
+          <text x="216" y="522" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f765b">⑨ 답변 + 근거 목록 반환</text>
+          <text x="216" y="547" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">{answer:"…", sources:[5건 서지]}</text>
+          <!-- 10 -->
+          <rect x="12" y="576" width="176" height="46" rx="8" fill="#edf4ef" stroke="#bfe0c9"/>
+          <text x="100" y="596" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f765b">⑩ 답변 + 근거 카드 표시</text>
+          <text x="100" y="613" text-anchor="middle" font-size="11" fill="#628a72">아래 "완성 화면 예시" 참고</text>
+        </svg>
+        <p class="chart-note">앞 강의와 마찬가지로 — 🔑 키는 서버만 갖고, 판결문 347건 원본은 내 PC를 떠나지 않습니다(⑥에서 검색된 5건의 요약만 전송). 소요 시간은 몇 초로 늘어나는데, 대부분 ⑦의 답변 생성입니다.</p>
+      </div>
+
+      <h3>왜 Chat·Cowork가 아니라 외부 유료 API인가</h3>
+      <p>"답변 생성이라면 Claude Chat이나 Cowork로도 되지 않나?"— 됩니다, <b>내가 손으로 쓸 때는</b>. 그러나 위 구조도의 ⑥⑦ 자리에는 Chat 화면이 들어갈 수 없습니다.</p>
+      <div class="compare">
+        <div class="col"><h4 style="color:var(--amber)">Chat·Cowork — 사람의 도구</h4>
+          <ul>
+            <li>사람이 로그인해 <b>화면에서 직접</b> 실행하는 개인용 서비스</li>
+            <li>내 연구를 내가 할 때는 이걸로 충분 (Long Context 방식 §5 포함)</li>
+            <li>그러나 <b>내 프로그램(서버)이 대신 호출할 수 없고</b>, 내 계정 1인분 — 이용자 100명을 받을 수 없음</li>
+          </ul></div>
+        <div class="col"><h4 style="color:var(--brand-dark)">외부 API — 프로그램의 부품</h4>
+          <ul>
+            <li>서버가 <b>자동으로, 동시에, 무인으로</b> 호출하는 인터페이스</li>
+            <li>쓴 만큼 과금 → 이용자가 늘면 비용도 따라 늘어나는 <b>확장 가능한 구조</b></li>
+            <li>그래서 서비스(챗봇·웹앱)를 만들 때는 일반적으로 이 구조를 씁니다</li>
+          </ul></div>
+      </div>
+      <div class="tip-card"><b>기준 한 줄</b> — <b>혼자 쓰는 분석이면 Chat·Cowork로 충분, "다른 사람이 쓰는 서비스"를 만드는 순간 유료 API.</b> 검색엔진 강의에서 임베딩 호출을 API로 한 것과 정확히 같은 이유입니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>플로우 ①~⑩과 "왜 외부 API인가"를 설명할 수 있다</span></label></div>
+    </section>
+
+    <!-- ============ S3 ============ -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>컨텍스트에 실제로 담기는 것 — 증강의 실물</h2></div>
+      <p class="sec-lead">⑥단계에서 서버가 실제로 보내는 LLM 호출을 열어보면 이렇게 생겼습니다. <b>사용자 질문 앞에 검색된 문서 5건이 끼워 넣어진, 하나의 긴 컨텍스트</b> — 이것이 "증강(Augmented)"의 전부입니다.</p>
+      <div class="api-code">
+<span class="c">// ⑥ 서버가 보내는 실제 LLM 호출 — 컨텍스트 전체가 한 번에 들어갑니다</span><br/>
+<span class="k">POST</span> https://openrouter.ai/api/v1/chat/completions<br/>
+{<br/>
+&nbsp;&nbsp;<span class="k">"model"</span>: <span class="v">"(계획서에서 정한 챗 모델)"</span>,<br/>
+&nbsp;&nbsp;<span class="k">"messages"</span>: [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="k">"role"</span>: <span class="v">"system"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"content"</span>: <span class="hl-sys">"아래 제공된 판결문 정보만을 근거로 답하라. 근거가 된 판결의<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;법원·사건번호를 반드시 인용하라. 제공된 판결로 답할 수 없으면<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'제공된 판례 범위에서는 답하기 어렵다'고 말하라."</span> },<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="k">"role"</span>: <span class="v">"user"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"content"</span>: <span class="hl-doc">"[문서 1 | 유사도 0.86] 대구지방법원 2024가단138550 (원고일부승)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;무용단 단원인 원고 2명이 동료 단원 8명을 상대로 공연 출연자 명단변경,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;폭언, 따돌림 등 직장 내 괴롭힘·불법행위를 이유로 손해배상을 청구…<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[문서 2 | 유사도 0.84] 수원지방법원 2022가단546552 (원고일부승)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;품질검사원인 원고가 폭언, 잔업·특근 배제, 따돌림 등을 이유로 동료<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;검사원 3명을 상대로 약 3,185만 원의 손해배상을 청구…<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[문서 3 | 유사도 0.83] 서울중앙지방법원 2022가단5252694 (원고일부승)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;단체채팅방 배제 등 집단 따돌림…&nbsp;&nbsp;<span class="c">…[문서 4], [문서 5] 생략…</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="hl-q">질문: 동료 직원들의 따돌림만으로도 손해배상을 받을 수 있어?</span><span class="hl-doc">"</span> }<br/>
+&nbsp;&nbsp;]<br/>
+}</div>
+      <p class="ctx-note">노란 글씨 = 개발자가 고정한 지시, 파란 글씨 = 방금 검색된 문서 5건, 초록 글씨 = 사용자 질문. 이 전체(약 1천 토큰)가 <b>한 번의 호출에 담긴 하나의 컨텍스트</b>이고, 모델은 "이 자료를 읽고 마지막 질문에 답하라"는 오픈북 문제지를 받은 셈입니다. 검색이 문서를 잘못 고르면 문제지 자체가 엉뚱해집니다 — RAG 품질의 절반은 검색 품질입니다.</p>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>증강 = "질문 앞에 검색 문서를 끼워 넣는 것"임을 실물로 확인했다</span></label></div>
+    </section>
+
+    <!-- ============ S4 ============ -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>실습 — 판례 챗봇, 계획부터 대화로</h2></div>
+      <p class="sec-lead">검색엔진 강의와 같은 방식입니다 — <b>원하는 것만 서술 → AI가 계획서 → 피드백 → 확정 계획대로 구현</b>. 앞 실습의 검색 서버가 켜져 있는 폴더에서 이어갑니다.</p>
+
+      <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
+        <b class="ws-title">원하는 것만 서술한다</b>
+        <div class="copy-block" style="margin-top:8px;"><span class="cb-label">💬 1단계 — 요구 서술</span><button class="copy-btn" data-copy="r1">복사</button>
+<pre id="r1">나는 개발자가 아니야. 바로 코드를 짜지 말고 계획서부터 만들어줘.
+
+내가 원하는 것:
+- 지금 만든 판례 검색 서비스에 챗봇 기능을 추가하고 싶어
+- 질문을 하면, 판결문 347건에서 관련 판례를 찾아 그것을
+  근거로 답해주는 방식(RAG)이면 좋겠어
+- 답변에는 어떤 판결을 근거로 했는지 표시되어야 해
+- 근거가 없으면 아는 척하지 말고 모른다고 해야 해
+
+계획서에 무엇을 만들지, 순서, 내가 확인할 지점을 넣고,
+결정이 필요한 것은 나에게 질문해줘.</pre></div>
+      </div></div>
+
+      <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
+        <b class="ws-title">AI가 계획서를 만든다 (예시)</b>
+        <div class="card" style="margin-top:8px;font-size:13.5px;line-height:1.7;">
+          <b>📋 계획서 v1 (요약)</b><br/>
+          <b>만들 것</b> — 기존 서버에 질문 응답 기능(/ask) 추가 + 화면에 "AI에게 물어보기" 탭. 흐름: 질문 → 기존 검색 재사용(Top-5) → 5건을 근거로 챗 모델이 답변 생성<br/>
+          <b>진행 순서</b> — /ask 추가 → 시험 질문(확인 요청) → 화면 탭 연결<br/>
+          <b>질문 3가지</b> — (a) 답변 생성용 챗 모델은 무엇으로 할까요? (추천 가능) (b) 근거 표시는 어떤 형태로? (본문 인용 / 하단 목록 / 둘 다) (c) 검색은 몇 건을 근거로 넣을까요?
+        </div>
+      </div></div>
+
+      <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
+        <b class="ws-title">피드백을 주고받는다</b>
+        <div class="copy-block" style="margin-top:8px;"><span class="cb-label">💬 3단계 — 피드백 예시</span><button class="copy-btn" data-copy="r2">복사</button>
+<pre id="r2">질문에 답할게.
+(a) 챗 모델은 네가 가성비 좋은 걸로 추천해서 계획서에 이유와 함께 적어줘
+(b) 둘 다 — 답변 문장 안에 [법원 사건번호]로 인용하고,
+    답변 아래에 근거 판례 카드도 보여줘
+(c) 5건이면 충분해
+
+추가 요구:
+- 챗 모델에게 주는 지시에 "제공된 판결로 답할 수 없으면
+  '제공된 판례 범위에서는 답하기 어렵다'고 말하라"를 꼭 넣어줘
+- 키는 지금처럼 openrouterkey.txt에서만 읽어
+
+이 내용 반영해서 계획서 v2로 확정해줘.</pre></div>
+      </div></div>
+
+      <div class="workshop-step"><span class="ws-num">4</span><div class="ws-body">
+        <b class="ws-title">확정된 계획서대로 구현시킨다</b>
+        <div class="copy-block" style="margin-top:8px;"><span class="cb-label">💬 4단계 — 구현 지시</span><button class="copy-btn" data-copy="r3">복사</button>
+<pre id="r3">계획서 v2대로 구현해줘. 계획에 없는 것은 먼저 물어봐.
+완성되면 "동료 직원들의 따돌림만으로도 손해배상을 받을 수 있어?"로
+시험 질문을 해서 답변과 근거를 보여줘.</pre></div>
+      </div></div>
+
+      <h3>완성되면 이런 화면이 나옵니다 (예시)</h3>
+      <div class="mock-browser">
+        <div class="mock-bar">
+          <span class="dot" style="background:#ee6a5f"></span><span class="dot" style="background:#f5bd4f"></span><span class="dot" style="background:#61c454"></span>
+          <span class="url">http://localhost:8000/ask</span>
+        </div>
+        <div class="mock-body">
+          <div class="mock-title">💬 판례 AI에게 물어보기 <span style="font-size:11px;font-weight:700;color:#898781">— 347건 근거 · RAG</span></div>
+          <div class="chat-q"><div class="bub">동료 직원들의 따돌림만으로도 손해배상을 받을 수 있어?</div></div>
+          <div class="chat-a"><div class="bub">
+            제공된 판례 범위에서는 <b>가능합니다 — 다만 상대와 입증에 따라 갈립니다.</b> 상급자가 아닌 <b>동료를 상대로 직접</b> 위자료가 인정된 사례가 있습니다: 동료 단원 8명의 따돌림·폭언에 대해 일부 인용된 사건 <span class="cite">[대구지방법원 2024가단138550]</span>, 동료 검사원 3명의 따돌림·배제에 대해 일부 인용된 사건 <span class="cite">[수원지방법원 2022가단546552]</span>. 반면 집단 따돌림을 주장했지만 <b>증거 부족으로 기각</b>된 사례도 있습니다 <span class="cite">[울산지방법원 2022가단128995]</span>. 회사에까지 책임을 물으려면 회사가 따돌림을 알았거나 알 수 있었다는 점이 추가로 입증되어야 합니다.
+          </div></div>
+          <div class="chat-srcs">
+            <span class="chat-src">📎 대구지법 2024가단138550 · 원고일부승</span>
+            <span class="chat-src">📎 수원지법 2022가단546552 · 원고일부승</span>
+            <span class="chat-src">📎 울산지법 2022가단128995 · 원고패</span>
+          </div>
+          <div class="chat-input"><div class="inp">추가 질문을 입력하세요…</div><div class="btn">질문</div></div>
+        </div>
+      </div>
+      <p class="chart-note" style="margin-top:-6px;">예시 화면입니다 — 인용된 세 사건 모두 코퍼스에 실재하며, 답변 문구는 예시입니다. 인정 사례와 기각 사례가 함께 인용된 점(§3의 문서 5건이 그대로 근거가 됨)을 눈여겨보세요.</p>
+
+      <div class="callout caution"><b class="cap">RAG의 실패 모드도 알아두기</b>
+      RAG의 품질은 <b>①검색이 좋은 문서를 찾았는가</b>에 달려 있습니다. 답이 이상하면 생성보다 먼저 <b>검색 결과부터 확인</b>하는 것이 디버깅 순서입니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>계획 왕복을 거쳐 근거 인용 답변을 받아보았다</span></label></div>
+    </section>
+
+    <!-- ============ S5 ============ -->
+    <section class="section" id="s5">
+      <div class="sec-head"><span class="sec-num">5</span><h2>대안 — Long Context: 그냥 전부 읽히면 안 되나?</h2></div>
+      <p class="sec-lead">됩니다 — 코퍼스가 충분히 작다면. 최신 LLM의 컨텍스트 창은 수십만~백만 토큰까지 커졌습니다. 두 방식의 차이는 <b>컨텍스트에 무엇을 싣는가</b>로 보면 한눈에 들어옵니다.</p>
+
+      <div class="ctx-compare">
+        <div>
+          <h5 style="color:var(--brand-dark)">RAG의 컨텍스트 — 골라서 싣기</h5>
+          <div class="ctx-stack">
+            <div class="ctx-block ctx-sys" style="padding:8px 14px;"><span class="lb">지시</span>제공 문서만 근거로 답하라…</div>
+            <div class="ctx-block ctx-doc" style="padding:8px 14px;">검색된 판결 5건 (관련도 순)</div>
+            <div class="ctx-block ctx-q" style="padding:8px 14px;"><span class="lb">질문</span>동료들의 따돌림도…?</div>
+          </div>
+          <span class="ctx-token">총 <b>약 1천 토큰</b> — 질문마다 검색으로 새로 고름</span>
+        </div>
+        <div>
+          <h5 style="color:var(--green)">Long Context — 통째로 싣기</h5>
+          <div class="ctx-stack">
+            <div class="ctx-block ctx-sys" style="padding:8px 14px;"><span class="lb">지시</span>첨부 자료 전체를 읽고 답하라…</div>
+            <div class="ctx-block ctx-doc" style="padding:26px 14px 8px;">판결 요지 <b>347건 전부</b><br/><span style="font-size:11px;color:#7d97ab">1번부터 347번까지, 검색 없이 통째로</span></div>
+            <div class="ctx-block ctx-doc" style="padding:20px 14px;">　</div>
+            <div class="ctx-block ctx-doc dim" style="padding:20px 14px;">　</div>
+            <div class="ctx-block ctx-q" style="padding:8px 14px;"><span class="lb">질문</span>동료들의 따돌림도…?</div>
+          </div>
+          <span class="ctx-token">총 <b>약 4~5만 토큰</b> — 질문마다 전체를 다시 실음 (비용도 그만큼)</span>
+        </div>
+      </div>
+      <div class="callout ok"><b class="cap">Long Context 방식의 매력</b>
+      검색 단계가 없으므로 <b>백엔드도, 임베딩도 필요 없습니다.</b> 판결 요지 CSV를 Chat·Cowork에 첨부하고 "전부 읽고 답해줘"라고 하면 끝 — 실제로 이 부트캠프의 판례 분석 보고서(895건 유형 분류)도 이 계열의 방식으로 만들어졌습니다. <b>혼자 쓰는 연구라면 가장 단순하고 강력한 선택지</b>입니다. (서비스로 만들 때는 §2의 이유로 다시 API·비용 문제가 돌아옵니다.)</div>
+      <table class="doc-table">
+        <thead><tr><th style="width:130px"></th><th>RAG (검색 후 로딩)</th><th>Long Context (통째로 로딩)</th></tr></thead>
+        <tbody>
+          <tr><td><b>코퍼스 규모</b></td><td>수만~수백만 건도 가능 (검색이 골라줌)</td><td>컨텍스트 창에 들어가는 만큼</td></tr>
+          <tr><td><b>구현 난이도</b></td><td>임베딩 + 벡터 DB + 백엔드 필요</td><td><b>매우 낮음</b> — 파일 첨부 + 프롬프트</td></tr>
+          <tr><td><b>1회 비용</b></td><td>낮음 (관련 5건만 로딩)</td><td>높음 (매 질문마다 전체 토큰 과금)</td></tr>
+          <tr><td><b>실패 모드</b></td><td>검색이 놓치면 답도 틀림</td><td>자료가 컨텍스트 창을 넘거나(§6), 긴 문맥 중간의 정보를 놓칠 수 있음</td></tr>
+          <tr><td><b>강점</b></td><td>반복 질문·서비스화·대규모</td><td>전체 조망이 필요한 질문("전반적 경향은?")</td></tr>
+        </tbody>
+      </table>
+      <div class="copy-block"><span class="cb-label">💬 Long Context 방식 프롬프트 예시 (Chat·Cowork에서)</span><button class="copy-btn" data-copy="r4">복사</button>
+<pre id="r4">첨부한 CSV는 직장 내 괴롭힘 판결 347건의 요지야. 전부 읽고 답해줘:
+동료 직원에 의한 따돌림 사건들에서 손해배상이 인정된 경우와
+기각된 경우를 나눠서, 갈림길이 된 요소를 사건번호와 함께 정리해줘.</pre></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>두 방식의 컨텍스트 구조 차이를 그림으로 설명할 수 있다</span></label></div>
+    </section>
+
+    <!-- ============ S6 ============ -->
+    <section class="section" id="s6">
+      <div class="sec-head"><span class="sec-num">6</span><h2>Long Context 사용 전 점검 — 얼마나 담을 수 있는 모델인가</h2></div>
+      <p class="sec-lead">Long Context 방식을 쓰기로 했다면 첫 질문은 하나입니다 — <b>"내 자료가 이 모델의 컨텍스트 창에 들어가는가?"</b> 컨텍스트 길이는 모델마다 크게 다릅니다.</p>
+
+      <h3>주요 모델 컨텍스트 길이 비교 (2026년 기준 공개 정보)</h3>
+      <table class="doc-table">
+        <thead><tr><th style="width:110px">구분</th><th>모델</th><th style="text-align:right;width:110px">컨텍스트 창</th><th style="width:170px">판결 요지 347건<br/>(약 4~5만 토큰) 수용?</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="3"><b>해외 상용</b></td><td>Google Gemini 3.1 Pro</td><td class="r">100만 토큰</td><td>✅ 여유 (약 1/20 사용)</td></tr>
+          <tr><td>OpenAI GPT-5.5</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
+          <tr><td>Anthropic Claude Opus 4.8 / Sonnet 4.6</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
+          <tr><td rowspan="3"><b>중국 오픈소스</b></td><td>DeepSeek V4</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
+          <tr><td>Qwen3.5-Plus (알리바바)</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
+          <tr><td>Kimi K2.5 (문샷)</td><td class="r">26만 토큰</td><td>✅ 가능</td></tr>
+          <tr><td rowspan="2"><b>국내</b></td><td>LG K-EXAONE (236B)</td><td class="r">26만 토큰</td><td>✅ 가능</td></tr>
+          <tr><td>네이버 HyperCLOVA X SEED Think</td><td class="r">3.2만 토큰</td><td>⚠️ <b>들어가지 않음</b> — 요약·분할 필요</td></tr>
+        </tbody>
+      </table>
+      <p class="ctx-note">공개 자료 기준이며 버전에 따라 달라집니다 — 사용 전 그 모델의 공식 문서에서 확인하는 습관이 중요합니다. 참고로 오픈소스 진영에는 1,000만 토큰을 내건 모델(Llama 4 Scout)도 있습니다.</p>
+
+      <div class="callout"><b class="cap">표가 말해주는 것</b>
+      같은 자료(판결 요지 347건 ≈ 4~5만 토큰)라도 <b>어떤 모델을 고르느냐에 따라 Long Context 방식이 되기도, 안 되기도</b> 합니다. 프런티어 상용 모델과 중국 오픈소스 상위 모델은 100만 토큰 시대에 들어섰고, 국내 모델은 LG K-EXAONE이 26만 토큰으로 수용 가능한 반면 네이버 공개 모델(3.2만)에는 이 자료가 통째로 들어가지 않습니다 — 이 경우 요약본을 쓰거나, 나눠 묻거나, RAG로 전환해야 합니다.</div>
+
+      <h3>사용 전 점검 3가지</h3>
+      <div class="insight"><span class="n">1</span><p><b>내 자료의 토큰 수를 추정한다.</b> 한국어는 대략 글자 수 × 0.7~1이 토큰 수입니다. 판결 요지 347건(약 6.5만 자) ≈ 4~5만 토큰. AI에게 "이 파일 토큰 수 세줘"라고 시켜도 됩니다.</p></div>
+      <div class="insight"><span class="n">2</span><p><b>모델의 컨텍스트 창과 비교한다.</b> 자료가 창의 절반을 넘으면 여유가 없는 것입니다 — 대화가 오갈수록 컨텍스트는 계속 쌓이기 때문입니다.</p></div>
+      <div class="insight"><span class="n">3</span><p><b>명목 길이 ≠ 실제 독해력.</b> 창이 크다고 그 끝까지 꼼꼼히 읽는 것은 아닙니다 — 아주 긴 입력에서는 중간의 정보를 놓치는 경향이 보고되어 있으니, 중요한 지시·자료는 앞이나 뒤에 배치하고 여유를 두세요.</p></div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>자료 토큰 수 추정 → 모델 컨텍스트 확인의 점검 순서를 안다</span></label></div>
+    </section>
+
+    <!-- ============ S7 (하이브리드) ============ -->
+    <section class="section" id="s7">
+      <div class="sec-head"><span class="sec-num">7</span><h2>하이브리드 — 요지는 통째로 싣고, 전문은 골라 읽힌다</h2></div>
+      <p class="sec-lead">RAG와 Long Context는 섞어 쓸 수 있습니다. 아이디어: <b>컨텍스트에는 판결 요지 347건만 통째로 싣고</b>(목차 역할), 모델이 요지를 훑어 관련 사건을 고르면 <b>그 판결문 전문만 저장된 파일에서 도구로 읽어와</b> 컨텍스트에 추가하는 구조입니다.</p>
+
+      <div class="diagram-card">
+        <h4>하이브리드 구조 — Long Context(요지) + 도구 호출(전문)</h4>
+        <div class="sub">임베딩도 벡터 DB도 없이, "요지 훑기"가 검색을 대신합니다</div>
+        <svg viewBox="0 0 680 470" role="img" aria-label="하이브리드 구조도">
+          <!-- A: 초기 컨텍스트 -->
+          <rect x="8" y="10" width="300" height="150" rx="12" fill="#f4f9fd" stroke="#bcdcf3"/>
+          <text x="24" y="34" font-size="12.5" font-weight="900" fill="#1b6fa6">① 초기 컨텍스트 (Long Context)</text>
+          <rect x="24" y="46" width="268" height="26" rx="6" fill="#20242a"/>
+          <text x="158" y="63" text-anchor="middle" font-size="11" fill="#f0c987">지시: 요지를 훑고, 필요한 전문은 파일로 읽어라</text>
+          <rect x="24" y="78" width="268" height="46" rx="6" fill="#eaf3fb" stroke="#9dc4de"/>
+          <text x="158" y="97" text-anchor="middle" font-size="11.5" font-weight="800" fill="#2d4a63">판결 요지 347건 전부 (~4.5만 토큰)</text>
+          <text x="158" y="113" text-anchor="middle" font-size="10" fill="#7d97ab">코퍼스 전체의 "목차" 역할</text>
+          <rect x="24" y="130" width="268" height="22" rx="6" fill="#e7f2ea" stroke="#bfe0c9"/>
+          <text x="158" y="145" text-anchor="middle" font-size="11" fill="#2b4a37">질문: 동료들의 따돌림도 배상되나?</text>
+          <!-- arrow A->B -->
+          <text x="340" y="90" text-anchor="middle" font-size="15" font-weight="900" fill="#2e9bdb">→</text>
+          <!-- B: 모델이 선별 -->
+          <rect x="372" y="34" width="300" height="100" rx="12" fill="#1b6fa6"/>
+          <text x="522" y="60" text-anchor="middle" font-size="12.5" font-weight="900" fill="#fff">② 모델이 요지 전체를 훑고 선별</text>
+          <text x="522" y="82" text-anchor="middle" font-size="11" fill="#cde2fb">"관련 사건은 대구 2024가단138550,</text>
+          <text x="522" y="98" text-anchor="middle" font-size="11" fill="#cde2fb">수원 2022가단546552, 울산 2022가단128995 —</text>
+          <text x="522" y="114" text-anchor="middle" font-size="11" fill="#cde2fb">이 3건은 전문을 읽어야겠다"</text>
+          <!-- arrow B->C -->
+          <path d="M522 134 v34" stroke="#b8792e" stroke-width="2.5" fill="none"/>
+          <path d="M522 168 l-6 -10 h12 z" fill="#b8792e"/>
+          <text x="600" y="156" text-anchor="middle" font-size="11.5" font-weight="800" fill="#8a5a13">③ 도구 호출</text>
+          <!-- C: 도구 -->
+          <rect x="372" y="176" width="300" height="88" rx="12" fill="#fdf8ef" stroke="#e8d9bd"/>
+          <text x="522" y="199" text-anchor="middle" font-size="12" font-weight="900" fill="#8a5a13">파일 읽기 도구 (저장된 판결문 폴더)</text>
+          <text x="522" y="219" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#52514e">read_file("대구지방법원_2024가단138550.md")</text>
+          <text x="522" y="235" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#52514e">read_file("수원지방법원_2022가단546552.md")</text>
+          <text x="522" y="251" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#52514e">read_file("울산지방법원_2022가단128995.md")</text>
+          <!-- arrow C->D -->
+          <path d="M372 220 H340 V300 H316" stroke="#2f765b" stroke-width="2.5" fill="none"/>
+          <path d="M316 300 l10 -6 v12 z" fill="#2f765b"/>
+          <!-- D: 확장된 컨텍스트 -->
+          <rect x="8" y="230" width="300" height="140" rx="12" fill="#f4f9fd" stroke="#bcdcf3"/>
+          <text x="24" y="254" font-size="12.5" font-weight="900" fill="#1b6fa6">④ 확장된 컨텍스트</text>
+          <rect x="24" y="266" width="268" height="26" rx="6" fill="#eaf3fb" stroke="#9dc4de"/>
+          <text x="158" y="283" text-anchor="middle" font-size="10.5" fill="#7d97ab">(요지 347건 + 질문 — 그대로 유지)</text>
+          <rect x="24" y="298" width="268" height="60" rx="6" fill="#e3f1fb" stroke="#2e9bdb"/>
+          <text x="158" y="318" text-anchor="middle" font-size="11.5" font-weight="800" fill="#1b6fa6">+ 선별된 3건의 판결문 전문</text>
+          <text x="158" y="335" text-anchor="middle" font-size="10" fill="#5c7fa3">도구가 읽어온 원문이 컨텍스트에 추가됨</text>
+          <text x="158" y="350" text-anchor="middle" font-size="10" fill="#5c7fa3">(전문이 필요한 사건만, 필요한 만큼)</text>
+          <!-- arrow D->E -->
+          <path d="M158 370 v28" stroke="#2f765b" stroke-width="2.5" fill="none"/>
+          <path d="M158 398 l-6 -10 h12 z" fill="#2f765b"/>
+          <!-- E: 답변 -->
+          <rect x="8" y="406" width="664" height="52" rx="12" fill="#edf4ef" stroke="#bfe0c9"/>
+          <text x="340" y="428" text-anchor="middle" font-size="12.5" font-weight="900" fill="#2f765b">⑤ 전문을 근거로 한 정밀 답변 — 요지에는 없는 판시 이유·인용액 산정까지 인용 가능</text>
+          <text x="340" y="447" text-anchor="middle" font-size="10.5" fill="#628a72">"대구 사건에서 법원은 … 라고 판시하며 위자료를 인정하였고 [대구지방법원 2024가단138550, 판결 이유 2.가.] …"</text>
+        </svg>
+      </div>
+
+      <div class="compare">
+        <div class="col"><h4 style="color:var(--green)">이 구조의 장점</h4>
+          <ul>
+            <li>임베딩·벡터 DB·검색 서버가 <b>전혀 필요 없음</b> — "요지 훑기"가 검색을 대신</li>
+            <li>답변 근거가 요약이 아니라 <b>판결문 전문</b> — 판시 이유까지 정밀 인용</li>
+            <li>사실 Cowork·Claude Code가 일하는 방식이 바로 이것 — 목록을 훑고 필요한 파일만 읽기. 이 부트캠프의 판례 보고서도 이렇게 만들어졌습니다</li>
+          </ul></div>
+        <div class="col"><h4 style="color:var(--amber)">치르는 비용</h4>
+          <ul>
+            <li>요지 4~5만 토큰이 <b>매 질문마다</b> 컨텍스트에 상주 (Long Context의 비용 그대로)</li>
+            <li>도구 왕복만큼 응답이 느려짐</li>
+            <li>파일 읽기 도구를 붙일 수 있는 환경이 필요 — Chat 웹화면으로는 안 되고, Cowork·Claude Code 또는 도구 호출을 지원하는 API로 구현</li>
+          </ul></div>
+      </div>
+      <h3>하이브리드로 질문하기 — 프롬프트 예시</h3>
+      <div class="copy-block"><span class="cb-label">💬 Cowork에서 (요지 CSV + 전문 폴더가 연동된 상태)</span><button class="copy-btn" data-copy="r5">복사</button>
+<pre id="r5">연동 폴더에 판결 요지 CSV(347건)와 판결문 전문 파일들(rulings_md/)이 있어.
+질문: 동료 직원들의 따돌림에 대해 손해배상이 인정된 사건과 기각된 사건의
+갈림길은 무엇이었나?
+
+먼저 요지 전체를 훑어서 관련 사건을 고르고, 고른 사건은 반드시
+전문 파일을 읽은 다음, 전문을 근거로 사건번호와 판시 대목을
+인용해서 답해줘. 요지만 보고 답하지 마.</pre></div>
+      <div class="tip-card"><b>사실 이렇게 지시하지 않아도 됩니다 (대체로)</b> — Cowork·Claude Code는 <b>과제의 성질에 따라 기본적으로 이렇게 동작</b>합니다: 질문이 코퍼스 전반에 걸치면 목록·요지부터 훑고, 정밀한 근거가 필요해지면 해당 파일을 스스로 열어 읽습니다. 다만 가끔 요지만 보고 요약 수준으로 답하고 마는 경우가 있는데, 답변에 전문 인용이 없다면 그때 위 프롬프트처럼 <b>"고른 사건은 반드시 전문을 읽고 답하라"고 명시적으로 지시</b>하면 됩니다. 지시는 기본 동작을 만드는 것이 아니라 <b>보장</b>하는 장치입니다.</div>
+
+      <div class="tip-card"><b>세 구조의 자리</b> — <b>RAG</b>는 대규모·서비스용, <b>Long Context</b>는 소규모·전체 조망용, <b>하이브리드</b>는 그 사이 — "요지는 다 보되 전문은 골라 읽어야 하는" 연구 작업에 특히 잘 맞습니다. 코퍼스가 커져 요지조차 컨텍스트에 안 들어가게 되면, 그때 요지 훑기를 임베딩 검색으로 바꾸는 것이 자연스러운 진로입니다. 그리고 이 하이브리드 절차를 매번 프롬프트로 다시 쓰지 않도록 <b>파일(스킬)로 저장하는 방법</b>을 다음 강의에서 다룹니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s7" /><span>하이브리드(요지 통째 + 전문 도구 읽기) 구조를 설명할 수 있다</span></label></div>
+    </section>
+
+    <!-- ============ S8 ============ -->
+    <section class="section" id="s8">
+      <div class="sec-head"><span class="sec-num">8</span><h2>마무리 체크리스트</h2></div>
+      <ul class="final-list">
+        <li>RAG = 검색(기존 검색엔진 재사용) → 증강(질문 앞에 문서 끼워 넣기) → 생성(인용 강제)</li>
+        <li>답변 생성은 Chat·Cowork가 아니라 외부 API — 서비스는 프로그램이 호출할 수 있어야 확장된다</li>
+        <li>증강의 실물 = 지시 + 검색 문서 + 질문이 담긴 하나의 컨텍스트</li>
+        <li>답이 이상하면 생성보다 검색 결과부터 디버깅</li>
+        <li>Long Context는 "통째로 싣기" — 수만 토큰 이내 혼자 쓰는 분석이면 최선의 단순함</li>
+        <li>Long Context 사용 전: 자료 토큰 수 추정 → 모델 컨텍스트 창 확인 (모델마다 3.2만~100만 토큰으로 천차만별)</li>
+        <li>하이브리드: 요지는 통째로(목차), 전문은 도구로 골라 읽기 — Cowork·Claude Code가 일하는 방식</li>
+      </ul>
+      <div class="next-card-grid">
+        <div class="next-card"><b>과제 — 내 데이터로 구현하기</b><span>여러분이 스크래핑했거나 보관하고 있는 데이터(리뷰·기사·논문 초록·업무 문서 등)로 셋 중 하나를 구현해 보세요: ① <b>임베딩 검색엔진</b> ② <b>RAG 답변 시스템</b> ③ <b>하이브리드 질의응답</b>(요지 통째 + 전문 골라 읽기). 판결문은 예시였을 뿐 — 데이터가 바뀌어도 파이프라인과 프롬프트는 동일합니다.</span></div>
+        <div class="next-card"><b>다음 강의 — 나만의 스킬 만들기</b><span>§7의 하이브리드 프롬프트를 매번 다시 쓰지 않도록 <b>SKILL.md 파일 한 장</b>으로 저장합니다 — 판례 질문이 오면 AI가 알아서 같은 절차로 움직이게 만드는 법입니다.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s8" /><span>RAG 강의를 마쳤다!</span></label></div>
+    </section>
+      <a class="back-home" href="index.html">
+        <span class="bh-ic">←</span>
+        <span><strong>2주차 강의자료 목록으로 돌아가기</strong><small>다음 자료로 이어가려면 목록에서 골라보세요</small></span>
+      </a>
+
+  </main>
+</div>
+
+<div class="toast" id="toast">복사되었습니다</div>
+<script>
+/* 공통: 프롬프트 복사 / 진행률 / scroll-spy / 라이트박스 (요소 없으면 자동 생략) */
+const $ = s => document.querySelector(s);
+function showToast(msg){
+  const t = $("#toast"); if(!t) return;
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){}
+  ta.remove();
+}
+document.querySelectorAll(".copy-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const text = document.getElementById(btn.dataset.copy).textContent;
+    const done = () => showToast("복사되었습니다");
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+    } else fallbackCopy(text, done);
+  });
+});
+/* 진행률 + 축하 배너 (상태는 메모리에만) */
+const checks = [...document.querySelectorAll("input[data-progress]")];
+if(checks.length){
+  $("#progressTotal").textContent = checks.length;
+  let celebrated = false;
+  const updateProgress = () => {
+    const done = checks.filter(c => c.checked).length;
+    $("#progressCount").textContent = done;
+    $("#progressBar").style.width = (done/checks.length*100)+"%";
+    checks.forEach(c => {
+      const a = document.querySelector(`.toc a[data-sec="${c.dataset.progress}"]`);
+      if(a) a.classList.toggle("done", c.checked);
+    });
+    if(done===checks.length && !celebrated){
+      celebrated = true;
+      const b = document.createElement("div");
+      b.className = "celebrate-banner";
+      b.innerHTML = document.body.dataset.celebrate || "🎉 <b>완료!</b> 수고하셨습니다.";
+      $("#celebrateSlot").appendChild(b);
+      b.scrollIntoView({behavior:"smooth", block:"center"});
+    }
+  };
+  checks.forEach(c => c.addEventListener("change", updateProgress));
+  updateProgress();
+}
+/* scroll-spy */
+const tocLinks = {};
+document.querySelectorAll(".toc a[data-sec]").forEach(a => tocLinks[a.dataset.sec] = a);
+const secIds = Object.keys(tocLinks);
+if(secIds.length){
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { en.target._visible = en.isIntersecting; });
+    let current = null;
+    for(const id of secIds){ const el = document.getElementById(id); if(el && el._visible){ current = id; break; } }
+    if(current){
+      Object.values(tocLinks).forEach(a => a.classList.remove("active"));
+      tocLinks[current].classList.add("active");
+    }
+  }, {rootMargin:"-15% 0px -55% 0px"});
+  secIds.forEach(id => { const el = document.getElementById(id); if(el) io.observe(el); });
+}
+/* 라이트박스 — data-doc 카드 여러 개 지원 */
+const lb = $("#exampleLightbox");
+if(lb){
+  const lbFrame = $("#exampleLightboxFrame");
+  const closeLb = () => { lb.hidden = true; lbFrame.src = "about:blank"; document.body.style.overflow=""; };
+  document.querySelectorAll(".example-card[data-doc]").forEach(card => {
+    const docURL = "data:text/html;base64," + window[card.dataset.doc];
+    const thumb = card.querySelector("iframe");
+    if(thumb) thumb.src = docURL;
+    const openLb = () => { lbFrame.src = docURL; lb.hidden = false; document.body.style.overflow="hidden"; };
+    card.addEventListener("click", openLb);
+    card.addEventListener("keydown", e => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openLb(); } });
+  });
+  $("#lightboxClose").addEventListener("click", closeLb);
+  lb.addEventListener("click", e => { if(e.target===lb) closeLb(); });
+  document.addEventListener("keydown", e => { if(e.key==="Escape" && !lb.hidden) closeLb(); });
+}
+
+</script>
+</body>
+</html>
