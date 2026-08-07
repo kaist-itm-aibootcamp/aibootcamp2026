@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Week 2 — 나만의 스킬 만들기: 하이브리드를 SKILL.md 한 장에</title>
+<title>Week 2 — 나만의 스킬 만들기: 반복 절차를 SKILL.md 한 장에</title>
 <style>
 :root{
   --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
@@ -186,7 +186,7 @@ p{margin:10px 0;}
 @media (max-width:640px){.back-home{padding:18px;gap:12px;}}
 </style>
 </head>
-<body id="top" data-celebrate="🎉 <b>스킬 제작 완료!</b> 매번 다시 쓰던 프롬프트가 자동으로 발동되는 절차가 되었습니다. 이 스킬은 4주차 자율 에이전트의 부품이 됩니다.">
+<body id="top" data-celebrate="🎉 <b>스킬 제작 완료!</b> 매번 다시 쓰던 프롬프트가 자동으로 발동되는 절차가 되었습니다. 이번 주에 쌓은 데이터와 절차가 3주차 검색엔진·RAG의 재료가 됩니다.">
 
 <header class="topbar">
   <div class="topbar-left">
@@ -212,7 +212,8 @@ p{margin:10px 0;}
       <a href="#s3" data-sec="s3">3. 데이터는 프로젝트에<span class="done-mark">✔</span></a>
       <a href="#s4" data-sec="s4">4. 실전 — 판례 QA 스킬 만들기<span class="done-mark">✔</span></a>
       <a href="#s5" data-sec="s5">5. 설치하기<span class="done-mark">✔</span></a>
-      <a href="#s6" data-sec="s6">6. 마무리 체크리스트<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. 실전 사례 — 7년 치 컬럼을 스킬로<span class="done-mark">✔</span></a>
+      <a href="#s7" data-sec="s7">7. 마무리 체크리스트<span class="done-mark">✔</span></a>
     </div>
   </nav>
 
@@ -220,15 +221,15 @@ p{margin:10px 0;}
     <div id="celebrateSlot"></div>
 
     <div class="hero">
-      <span class="hero-kicker">WEEK 2 · STEP 8 — 나만의 스킬 만들기</span>
-      <h1>매번 긴 프롬프트 대신 —<br/>하이브리드를 스킬 한 장에 담기</h1>
-      <p>RAG 강의 마지막에 만든 하이브리드 프롬프트("요지를 훑고, 고른 사건은 반드시 전문을 읽고 답하라")를 매번 복사해 붙일 필요는 없습니다. 그 절차를 <b>SKILL.md 파일 하나</b>로 저장해 두면, 판례 질문이 나올 때마다 AI가 <b>알아서 같은 절차로</b> 움직입니다. 오늘은 이 파일을 만들고 설치하는 법을 배웁니다.</p>
+      <span class="hero-kicker">WEEK 2 · STEP 6 — 나만의 스킬 만들기</span>
+      <h1>매번 긴 프롬프트 대신 —<br/>반복 절차를 스킬 한 장에 담기</h1>
+      <p>이번 주 내내 우리는 좋은 프롬프트를 여럿 만들었습니다 — 수집의 4요소, 두 단계 수집, EDA 지시. 그런데 이런 프롬프트에는 약점이 있습니다: 다음에 또 쓰려면 <b>사람이 기억해서 다시 써야</b> 합니다. 예컨대 판례 코퍼스에 질문할 때마다 "요지 목록을 훑고, 고른 사건은 반드시 전문을 읽고 답하라"는 절차를 반복해 붙여넣는 대신, 그 절차를 <b>SKILL.md 파일 하나</b>로 저장해 두면 관련 질문이 나올 때마다 AI가 <b>알아서 같은 절차로</b> 움직입니다. 오늘은 이 파일을 만들고 설치하는 법을 배웁니다.</p>
     </div>
 
     <!-- ============ S1 ============ -->
     <section class="section" id="s1">
       <div class="sec-head"><span class="sec-num">1</span><h2>스킬이란 — AI에게 주는 업무 매뉴얼</h2></div>
-      <p class="sec-lead">하이브리드 프롬프트는 잘 작동하지만 약점이 하나 있습니다 — <b>사람이 매번 기억해서 다시 써야 한다</b>는 것. 하루 지나 절차의 한 줄("요지만 보고 답하지 마")을 빼먹으면 답변 품질이 조용히 떨어집니다.</p>
+      <p class="sec-lead">"요지 목록을 훑고, 고른 사건은 전문을 읽고 답하라" — 이 두 단계 질의응답 절차는 잘 작동하지만 약점이 하나 있습니다: <b>사람이 매번 기억해서 다시 써야 한다</b>는 것. 하루 지나 절차의 한 줄("요지만 보고 답하지 마")을 빼먹으면 답변 품질이 조용히 떨어집니다.</p>
 
       <p><b>스킬(Skill)</b>은 이 절차를 파일로 저장해 AI에게 넘겨주는 장치입니다. 신입 직원에게 건네는 업무 매뉴얼처럼, "이런 질문이 오면 → 이 순서로 일하라"를 적어 둔 <b>마크다운 파일(SKILL.md)</b>이며, 한 번 설치하면 관련 질문이 올 때마다 자동으로 발동됩니다.</p>
 
@@ -248,7 +249,7 @@ p{margin:10px 0;}
           <tr><td><b>③ 딸린 파일</b></td><td>절차가 지시할 때</td><td>스킬 폴더에 같이 넣어 둔 참고 문서·스크립트</td></tr>
         </tbody>
       </table>
-      <div class="tip-card"><b>어디서 본 구조 아닌가요?</b> — "목차는 항상 보고, 본문은 골라 읽는다". 하이브리드(요지 통째 + 전문 골라 읽기)와 같은 원리입니다. 스킬 시스템 자체가 하이브리드 구조로 만들어져 있습니다.</div>
+      <div class="tip-card"><b>어디서 본 구조 아닌가요?</b> — "목차는 항상 보고, 본문은 골라 읽는다". 우리의 판례 질의응답 절차(요지 통째 + 전문 골라 읽기)와 같은 원리입니다. 이런 구조는 3주차(RAG와 Long Context)에서 '하이브리드'라는 이름으로 다시 만나게 됩니다.</div>
 
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>스킬이 무엇이고 언제 발동되는지 이해했다</span></label></div>
     </section>
@@ -281,12 +282,12 @@ p{margin:10px 0;}
     <!-- ============ S3 ============ -->
     <section class="section" id="s3">
       <div class="sec-head"><span class="sec-num">3</span><h2>데이터는 프로젝트에 — 스킬과 파일의 분업</h2></div>
-      <p class="sec-lead">하이브리드가 돌아가려면 AI가 <b>요지 목록과 판결문 전문 파일을 읽을 수 있어야</b> 합니다. 판결문 347건을 스킬 폴더에 욱여넣을 수도 있지만, 그러면 데이터가 바뀔 때마다 스킬을 다시 만들어야 합니다. 자리를 나누는 것이 정답입니다 — <b>절차는 스킬에, 데이터는 프로젝트에.</b></p>
+      <p class="sec-lead">이 절차가 돌아가려면 AI가 <b>요지 목록과 판결문 전문 파일을 읽을 수 있어야</b> 합니다. 판결문 347건을 스킬 폴더에 욱여넣을 수도 있지만, 그러면 데이터가 바뀔 때마다 스킬을 다시 만들어야 합니다. 자리를 나누는 것이 정답입니다 — <b>절차는 스킬에, 데이터는 프로젝트에.</b></p>
 
       <p>Claude의 <b>프로젝트(Projects)</b>는 대화 여러 개가 공유하는 자료실입니다. 프로젝트에 파일을 올려 두면, 그 프로젝트 안에서 시작한 대화는 어느 것이든 그 파일을 읽을 수 있습니다. 스킬의 절차가 "프로젝트의 요지 목록을 읽어라"라고 지시하면 연결이 완성됩니다.</p>
 
       <div class="diagram-card">
-        <h4>하이브리드 실행의 세 자리 — 절차 · 데이터 · 질문</h4>
+        <h4>절차 실행의 세 자리 — 절차 · 데이터 · 질문</h4>
         <div class="sub">스킬은 얇게(절차만), 프로젝트는 두껍게(데이터), 대화는 가볍게(질문만)</div>
         <svg viewBox="0 0 680 330" role="img" aria-label="스킬-프로젝트-대화 구성도">
           <!-- 스킬 -->
@@ -318,7 +319,7 @@ p{margin:10px 0;}
           <path d="M340 182 l-6 -10 h12 z" fill="#2e9bdb"/>
           <!-- 실행 박스 -->
           <rect x="120" y="192" width="440" height="120" rx="12" fill="#1b6fa6"/>
-          <text x="340" y="220" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">하이브리드 실행 (스킬이 절차를 지휘)</text>
+          <text x="340" y="220" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">절차 실행 (스킬이 지휘)</text>
           <text x="340" y="245" text-anchor="middle" font-size="11.5" fill="#cde2fb">① 요지 목록 347건을 읽고 관련 사건 선별</text>
           <text x="340" y="266" text-anchor="middle" font-size="11.5" fill="#cde2fb">② 고른 사건의 전문 파일을 rulings/에서 읽기</text>
           <text x="340" y="287" text-anchor="middle" font-size="11.5" fill="#cde2fb">③ 전문을 근거로 사건번호·판시 대목을 인용해 답변</text>
@@ -367,7 +368,7 @@ description: 직장 내 괴롭힘 판례 코퍼스(347건)에 대한 질문에 �
   묻는 질문이 오면 이 절차대로 요지를 훑고 전문을 인용해 답한다.
 ---
 
-# 판례 하이브리드 질의응답
+# 판례 두 단계 질의응답
 
 ## 절차
 1. 프로젝트의 `판결요지_목록.md`(347건)를 읽고,
@@ -391,7 +392,7 @@ description: 직장 내 괴롭힘 판례 코퍼스(347건)에 대한 질문에 �
         <div class="skill-chip">⚙ case-qa 스킬 사용 중 — 요지 훑기 → 전문 3건 읽기</div>
         <div class="bubble ai">코퍼스의 관련 사건을 검토하면, 동료에 의한 따돌림도 손해배상이 인정될 수 있으나 갈림길은 <b>사용자(회사)가 알았거나 알 수 있었는지</b>입니다. [대구지방법원 2024가단138550]은 "…"라고 판시하며 위자료를 인정한 반면, [울산지방법원 2022가단128995]는 회사가 인지 후 즉시 조치한 점을 들어 기각했습니다…<small>참고한 사건: 대구 2024가단138550 · 수원 2022가단546552 · 울산 2022가단128995</small></div>
       </div>
-      <div class="tip-card"><b>발동이 안 되면</b> — 질문이 description과 잘 안 맞으면 스킬 없이 답할 때가 있습니다. 그때는 <b>"case-qa 스킬을 써서 답해줘"</b>라고 한 줄만 붙이면 됩니다. RAG 강의에서와 같은 원리 — 명시적 지시는 기본 동작을 만드는 것이 아니라 <b>보장</b>하는 장치입니다.</div>
+      <div class="tip-card"><b>발동이 안 되면</b> — 질문이 description과 잘 안 맞으면 스킬 없이 답할 때가 있습니다. 그때는 <b>"case-qa 스킬을 써서 답해줘"</b>라고 한 줄만 붙이면 됩니다. 3주차 RAG 강의에서와 같은 원리 — 명시적 지시는 기본 동작을 만드는 것이 아니라 <b>보장</b>하는 장치입니다.</div>
 
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>프롬프트로 스킬 파일을 만들 수 있다</span></label></div>
     </section>
@@ -424,24 +425,69 @@ description: 직장 내 괴롭힘 판례 코퍼스(347건)에 대한 질문에 �
 
     <!-- ============ S6 ============ -->
     <section class="section" id="s6">
-      <div class="sec-head"><span class="sec-num">6</span><h2>마무리 체크리스트</h2></div>
+      <div class="sec-head"><span class="sec-num">6</span><h2>실전 사례 — 7년 치 컬럼을 스킬 파일 한 장으로</h2></div>
+      <p class="sec-lead">판례 QA는 수업용 예제였습니다. 이번에는 강사가 <b>실제 업무에서 만든 스킬</b>을 보여드립니다 — 재료는 중앙일보에 7년간 연재한 컬럼 「김병필의 인공지능 개척시대」(2019.01~2026.03, 총 83회) 전체입니다.</p>
+
+      <h3>만든 과정 — 지시는 한 문장이었습니다</h3>
+      <div class="flow">
+        <div class="step"><b>① 원문을 폴더에</b><span>83편의 컬럼 파일을 폴더 하나에 저장하고 Cowork에 연동</span></div>
+        <span class="arrow">→</span>
+        <div class="step"><b>② 한 문장 지시</b><span>"이 컬럼을 작성하는 스킬 파일을 만들어 줘"</span></div>
+        <span class="arrow">→</span>
+        <div class="step"><b>③ 전수 분석</b><span>Cowork가 83편을 읽고 문체·논증·구조를 통계로 추출</span></div>
+        <span class="arrow">→</span>
+        <div class="step"><b>④ instruction.md</b><span>집필 보조 지침 한 장 완성</span></div>
+      </div>
+      <div class="tip-card"><b>§4와 같은 방법입니다</b> — 판례 QA 스킬을 만들 때처럼, 절차를 사람이 쓰지 않았습니다. <b>데이터(원문 83편)를 주고 절차의 추출을 AI에게 맡긴 것</b>입니다. 데이터가 판결문에서 컬럼으로 바뀌었을 뿐입니다.</div>
+
+      <h3>나온 파일의 구조 — "감"이 아니라 "실측"</h3>
+      <p>결과물은 목차가 9개 절인 지침 문서입니다. 놀라운 점은 AI가 문체를 <b>인상비평이 아니라 통계</b>로 기술했다는 것입니다:</p>
+      <table class="doc-table">
+        <thead><tr><th style="width:190px">절</th><th>내용 (실제 추출된 수치)</th></tr></thead>
+        <tbody>
+          <tr><td><b>0. 지면 컨텍스트</b></td><td>분량 제약을 절대 조건으로: 2026년 지면 개편 반영 <b>2,000자 이내</b>, 40~43문장, 문장당 45~48자</td></tr>
+          <tr><td><b>1. 문체</b></td><td>종결어미 실측 분포 — "~있다/없다" 724회, "~것이다" 292회. 역접은 <b>"하지만"(193회)이 "그러나"(25회)를 압도</b>. 주어는 "우리" 300회 vs "필자" 14회. 예시 도입은 "예컨대" 우선</td></tr>
+          <tr><td><b>2. 논증 방식</b></td><td>장점 먼저, 위험은 다음. 금지 일변도 반대·절충안 제시. <b>반론 처리 3단계</b>(주장 → 물론/하지만으로 반론 인정 → 재확인)가 신뢰감의 비결이라는 분석까지</td></tr>
+          <tr><td><b>3. 구조</b></td><td>훅 → 현상 정의 → 사례 → 쟁점 → 대안 → 매듭의 <b>6블록 표준 구조</b>와 구간별 목표 자수. 도입 5유형·결말 5유형을 빈도순으로 정리. 제목 공식(10~22자, 비유형)</td></tr>
+          <tr><td><b>4. 리서치 보조</b></td><td>사실엔 출처 병기, 불확실하면 <b>"[확인 필요]"</b> 표시 — 날조 금지를 절차로 명문화</td></tr>
+          <tr><td><b>5~9. 점검·샘플·부록</b></td><td>제출 전 11항목 체크리스트, 실제 도입·결말 문장 모음, 그대로 투입 가능한 시스템 프롬프트 템플릿, 주제 분포·실측 지표 표</td></tr>
+        </tbody>
+      </table>
+      <div class="callout"><b class="cap">이 문서가 곧 SKILL.md입니다</b>
+      §2에서 본 구조 그대로입니다 — "무엇을·언제"(컬럼 초안 요청이 오면)와 "어떻게"(위 절차와 수치대로). 다른 점은 절차의 정밀도뿐입니다. 사람이 자기 문체를 이렇게 수치로 설명하기는 어렵습니다. <b>7년의 습관이 AI에게는 셀 수 있는 데이터</b>였던 셈입니다.</div>
+
+      <h3>사용해 보면 — 그리고 솔직한 관찰 하나</h3>
+      <p>사용법은 단순합니다. 새 대화에 이 파일을 로드하고 "다음 주제로 초안을 써 줘"라고 지시하면, <b>실제 컬럼과 매우 유사한 초안</b>이 나옵니다 — 문장 길이, "하지만"의 자리, 비유가 도입에서 결말로 되돌아오는 구조까지.</p>
+      <div class="callout ok"><b class="cap">다만, 모델마다 재현도가 다릅니다</b>
+      같은 지침 파일을 써도 결과는 모델에 따라 다릅니다. 강사의 경험으로는 <b>문체 유사도는 ChatGPT 쪽이 더 높았습니다.</b> 여기서 얻을 교훈은 두 가지입니다 — ① 스킬 파일은 특정 모델 전용이 아니라 <b>어느 AI에나 투입할 수 있는 이식 가능한 자산</b>이라는 것, ② 그러니 작업 성격에 따라 <b>모델을 골라 쓰는 것도 사용자의 몫</b>이라는 것.</div>
+
+      <div class="tip-card"><b>여러분에게 적용하면</b> — 반복해 온 글쓰기가 있다면(보고서, 이메일, 리뷰, 논문 초록…) 같은 방법이 통합니다. 과거 산출물을 폴더에 모아 연동하고 "이 스타일로 쓰는 스킬 파일을 만들어 줘" 한 문장이면, 여러분의 축적이 지침이 됩니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>내 과거 산출물로 스타일 스킬을 만드는 방법을 이해했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 7 ================= -->
+    <section class="section" id="s7">
+      <div class="sec-head"><span class="sec-num">7</span><h2>마무리 체크리스트</h2></div>
       <ul class="final-list">
         <li>스킬 = 반복 프롬프트를 파일로 저장한 업무 매뉴얼 — 관련 질문이 오면 자동 발동</li>
         <li>SKILL.md = 머리말(name + description = 발동 조건) + 본문(절차)</li>
         <li>발동이 이상하면 절차보다 description부터 — "무엇을 + 언제"가 들어 있는가</li>
         <li>절차는 스킬에, 데이터는 프로젝트에 — 데이터가 바뀌면 프로젝트만, 절차가 바뀌면 스킬만</li>
         <li>설치는 쓰는 곳마다: 앱은 ZIP 업로드, Cowork는 대화로 받아 저장, Claude Code는 skills 폴더</li>
+        <li>과거 산출물 폴더 + "이 스타일로 쓰는 스킬을 만들어 줘" 한 문장 = 나의 스타일 스킬 (7년 치 컬럼 사례)</li>
+        <li>스킬 파일은 특정 모델 전용이 아니다 — 모델마다 재현도를 비교해 골라 쓴다</li>
       </ul>
       <div class="next-card-grid">
-        <div class="next-card"><b>과제 — 내 스킬 만들기</b><span>RAG 강의 과제에서 만든 내 데이터(요지 목록 + 전문 파일)를 프로젝트에 올리고, §4 프롬프트를 변형해 <b>나만의 질의응답 스킬</b>을 만들어 설치해 보세요. 데이터가 바뀌어도 스킬의 뼈대는 같습니다.</span></div>
-        <div class="next-card"><b>다음 강의 — 네트워크 분석</b><span>2주차 마지막 강의는 데이터 시각화의 또 다른 유형인 <b>네트워크 분석</b>입니다 — 논문 인용 계보도로 문헌 리서치를 지도로 만듭니다. (오늘 만든 스킬은 4주차 자율 에이전트의 부품으로 다시 등장합니다.)</span></div>
+        <div class="next-card"><b>직접 해보기 — 내 스킬 만들기</b><span>이번 주에 수집한 내 데이터(요지 목록 + 본문 파일)를 프로젝트에 올리고, §4 프롬프트를 변형해 <b>나만의 질의응답 스킬</b>을 만들어 설치해 보세요. 여력이 되면 §6처럼 <b>내가 반복해 온 글(보고서·이메일)의 스타일 스킬</b>도 하나 만들어 보세요.</span></div>
+        <div class="next-card"><b>다음 강의 — 논문 계보도 (⑦)</b><span>마지막 강의 ⑦(논문 계보도)에서 같은 파이프라인을 논문 데이터에 얹어 <b>네트워크 분석</b>까지 보고, 3주차로 넘어갑니다 — 이번 주에 만든 임베딩으로 <b>검색엔진과 RAG 챗봇</b>을 만들어 세상에 공개합니다. 절차를 파일로 남기는 오늘의 습관은 4주차의 <b>루틴 자동화</b>로도 이어집니다 — 스킬이 "어떻게"라면 루틴은 "언제"입니다.</span></div>
       </div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>스킬 만들기 강의를 마쳤다!</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s7" /><span>스킬 만들기 강의를 마쳤다!</span></label></div>
     </section>
 
       <a class="back-home" href="index.html">
         <span class="bh-ic">←</span>
-        <span><strong>2주차 강의자료 목록으로 돌아가기</strong><small>다음 자료로 이어가려면 목록에서 골라보세요</small></span>
+        <span><strong>2주차 강의자료 목록으로 돌아가기</strong><small>다음 자료: 논문 계보도 — 네트워크 분석</small></span>
       </a>
 
   </main>

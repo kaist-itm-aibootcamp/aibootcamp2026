@@ -201,12 +201,9 @@ p{margin:10px 0;}
   <nav class="sidebar" aria-label="목차">
     <div class="sidebar-title">이 페이지의 흐름</div>
     <div class="toc" id="toc">
-      <a href="#s1" data-sec="s1">1. 웹에서 무엇을 모을 수 있나<span class="done-mark">✔</span></a>
-      <a href="#s2" data-sec="s2">2. 유의사항 — 법적·윤리적 경계<span class="done-mark">✔</span></a>
-      <a href="#s3" data-sec="s3">3. 실습 — 정적 사이트 소량 수집<span class="done-mark">✔</span></a>
-      <a href="#s4" data-sec="s4">4. 동적 사이트와 브라우저 플러그인<span class="done-mark">✔</span></a>
-      <a href="#s5" data-sec="s5">5. 수집 후 — 탐색적 분석(EDA)<span class="done-mark">✔</span></a>
-      <a href="#s6" data-sec="s6">6. 마무리 체크리스트<span class="done-mark">✔</span></a>
+      <a href="#s1" data-sec="s1">1. 실습 — 정적 사이트 소량 수집<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. 수집 후 — 탐색적 분석(EDA)<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 마무리 체크리스트<span class="done-mark">✔</span></a>
     </div>
   </nav>
 
@@ -214,61 +211,15 @@ p{margin:10px 0;}
     <div id="celebrateSlot"></div>
 
     <div class="hero">
-      <span class="hero-kicker">WEEK 2 · STEP 1 — 데이터 수집</span>
+      <span class="hero-kicker">WEEK 2 · STEP 3 — 실습: 데이터 수집</span>
       <h1>Cowork로 웹 스크래핑 —<br/>복사–붙여넣기 수백 번 대신, 문장 하나</h1>
-      <p>웹페이지를 일일이 복사해 엑셀에 붙여넣던 일을, AI에게 "이 페이지에서 이런 정보를 뽑아줘"라고 요청하는 것으로 끝냅니다. 이 자료의 수집·분석 사례는 모두 <b>이 강의자료를 만들면서 실제로 실행한 결과</b>입니다.</p>
+      <p>앞 강의(② 크롤링 이론)에서 세운 판단 기준을 실전에 적용합니다. 웹페이지를 일일이 복사해 엑셀에 붙여넣던 일을, AI에게 "이 페이지에서 이런 정보를 뽑아줘"라고 요청하는 것으로 끝냅니다. 결과는 화면에만 뜨는 것이 아니라 <b>①번 자료에서 연동한 내 PC 폴더에 CSV와 본문 파일로 저장</b>됩니다 — 이 파일들이 이번 주 나머지 전부의 재료입니다. 이 자료의 수집·분석 사례는 모두 <b>이 강의자료를 만들면서 실제로 실행한 결과</b>입니다.</p>
     </div>
 
     <!-- ================= SECTION 1 ================= -->
     <section class="section" id="s1">
-      <div class="sec-head"><span class="sec-num">1</span><h2>웹에서 무엇을 모을 수 있나</h2></div>
-      <p class="sec-lead">스크래핑(scraping)은 웹페이지에 이미 공개되어 있는 정보를 <b>구조화된 데이터(표·CSV·JSON)</b>로 긁어 모으는 일입니다. 연구와 업무에서 쓰이는 대표적인 원천들:</p>
-
-      <div class="concept-grid">
-        <div class="concept"><div class="ico">📰</div><b>뉴스 기사 · 보도자료</b><span>특정 이슈가 언제, 얼마나, 어떤 논조로 다뤄졌는지</span><em class="use">이슈 트렌드 분석</em></div>
-        <div class="concept"><div class="ico">🛒</div><b>커머스 목록 · 상품 리뷰</b><span>베스트셀러 순위, 가격 변동, 소비자 불만 키워드</span><em class="use">시장·소비자 분석</em></div>
-        <div class="concept"><div class="ico">⚖️</div><b>판례 · 법령 · 특허</b><span>판결문에서 반복되는 인정 요건, 유사 선행 특허</span><em class="use">요건 분석 · 선행 조사</em></div>
-        <div class="concept"><div class="ico">💼</div><b>채용 공고</b><span>직무별 요구 스킬, 연봉 범위, 채용 수요의 변화</span><em class="use">노동시장 분석</em></div>
-        <div class="concept"><div class="ico">🎓</div><b>학술 초록 · 연구 동향</b><span>특정 주제의 연구가 언제부터 급증했는지, 핵심 저자는 누구인지</span><em class="use">문헌 지형 파악</em></div>
-        <div class="concept"><div class="ico">💬</div><b>커뮤니티 · 앱 리뷰</b><span>사용자 여론, 반복되는 불만, 경쟁 제품과의 비교 담론</span><em class="use">여론 · VOC 분석</em></div>
-      </div>
-
-      <div class="callout"><b class="cap">오늘 실제로 해 본 것</b>
-      온라인 서점의 <b>경제·경영 베스트셀러</b>를 성별×연령대(남/여 × 10대~60대 이상, 12개 그룹) 조합별 Top 20씩 — 분석에 필요한 <b>소량(239권)</b>만 수집했습니다. (240권이 아닌 이유: 10대 여성 베스트셀러는 사이트에 19위까지만 존재합니다.) "지금 한국에서 세대·성별에 따라 어떤 경제경영서를 읽는가?"라는 질문에 데이터로 답해 봅니다(§3). 그리고 같은 방법을 판결문 <b>895건</b>에 적용한 연구용 분석 사례를 §5에서 보여드립니다.</div>
-
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>어떤 데이터를 모아 무엇을 분석할 수 있는지 감을 잡았다</span></label></div>
-    </section>
-
-    <!-- ================= SECTION 2 ================= -->
-    <section class="section" id="s2">
-      <div class="sec-head"><span class="sec-num">2</span><h2>유의사항 — 법적·윤리적 경계</h2></div>
-      <p class="sec-lead">기술적으로 "긁을 수 있다"와 법적으로 "긁어도 된다"는 다른 문제입니다. 시작 전에 세 가지를 확인하세요.</p>
-
-      <h3>① 페이월(paywall) 뒤의 콘텐츠 — 하지 마세요</h3>
-      <div class="callout caution"><b class="cap">원칙적 금지</b>
-      구독·결제·로그인 장벽 뒤에 있는 콘텐츠(유료 기사, 구독형 DB, 전자책 등)의 자동 수집은 <b>거의 예외 없이 이용약관에서 금지</b>되어 있고, 접근 제한을 우회하는 행위 자체가 별도의 법적 문제(기술적 보호조치 침해, 부정 접근 등)를 일으킬 수 있습니다. <b>페이월이 보이면 스크래핑 대상에서 제외</b>하는 것을 기본값으로 삼으세요.</div>
-
-      <h3>② 약관상 금지 = 항상 불법? — 그렇지는 않습니다</h3>
-      <p>공개된 페이지라도 약관에 "자동화된 수집 금지" 조항이 있는 사이트가 많습니다. 다만 약관이 곧 최종 결론은 아닙니다. <b>공정이용(fair use)까지 금지하는 약관 조항은 무효로 판단될 수 있다</b>는 것이 중요한 포인트입니다. 결국 핵심은 <b>내 수집이 공정이용에 해당하는지 스스로 평가</b>하는 것입니다.</p>
-      <div class="callout ok"><b class="cap">공정이용 평가의 감각</b>
-      <b>오로지 비영리 목적</b> — 수업 과제나 연구 목적으로, 공개된 페이지를 소량 수집해 내부 분석에만 쓰는 경우라면 공정이용으로 인정될 가능성이 높습니다. 반대로 수집물을 <b>상업적으로 재배포</b>하거나, 원본 사이트를 <b>대체하는 서비스</b>를 만들거나, 대량 수집으로 <b>서버에 부담</b>을 주면 공정이용과 멀어집니다. 오늘 실습(상업 서점의 공개 목록을 수업 목적으로 소량 수집·내부 분석)이 바로 이 평가를 통과하는 전형적인 사례입니다.</div>
-
-      <h3>③ 그 밖의 기본 수칙</h3>
-      <ul style="margin-left:22px;">
-        <li><b>robots.txt 확인</b> — 사이트 주소 뒤에 <code>/robots.txt</code>를 붙이면 수집 허용/금지 경로가 나옵니다. Cowork에 "이 사이트 robots.txt 확인해줘"라고 요청하면 됩니다.</li>
-        <li><b>서버 배려</b> — 요청 사이에 간격을 두고, 필요한 만큼만 수집하세요. (오늘 실습도 그룹별 Top 20, 분석에 필요한 소량만 수집)</li>
-        <li><b>개인정보</b> — 닉네임·프로필·작성자 정보도 개인정보일 수 있습니다. 분석에 불필요하면 수집 단계에서 제외(익명화)하세요.</li>
-        <li><b>출처 기록</b> — 수집 일시·URL·조건을 데이터와 함께 저장해 두면 연구 재현성과 인용 문제를 함께 해결합니다.</li>
-      </ul>
-      <div class="tip-card"><b>수업의 관점</b> — 이 부트캠프의 실습은 전부 "비영리·소량·내부 분석"의 범위 안에서 설계되어 있습니다. 각자 연구에 응용할 때도 이 세 단어를 기준으로 삼으세요. (본 자료는 일반적인 교육 안내이며, 구체적 사안에 대한 법률 자문이 아닙니다.)</div>
-
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>페이월 금지 원칙과 공정이용 평가 기준을 이해했다</span></label></div>
-    </section>
-
-    <!-- ================= SECTION 3 ================= -->
-    <section class="section" id="s3">
-      <div class="sec-head"><span class="sec-num">3</span><h2>실습 — 정적 사이트에서 소량 수집하기</h2></div>
-      <p class="sec-lead"><b>정적(static) 사이트</b>는 주소(URL)만 요청하면 서버가 내용이 이미 담긴 HTML을 통째로 보내주는 사이트입니다. 이런 사이트는 Cowork에 문장 하나로 요청해도 수집이 잘 됩니다.</p>
+      <div class="sec-head"><span class="sec-num">1</span><h2>실습 — 정적 사이트에서 소량 수집하기</h2></div>
+      <p class="sec-lead">②번 자료(크롤링 이론)에서 배웠듯 <b>정적(static) 사이트</b>는 주소(URL)만 요청하면 서버가 내용이 이미 담긴 HTML을 통째로 보내주는 사이트입니다. 이런 사이트는 Cowork에 문장 하나로 요청해도 수집이 잘 됩니다. (스크롤·클릭이 필요한 동적 사이트는 크롬 확장으로 — 판별법은 ②번 자료의 "10초 테스트"를 떠올리세요.)</p>
 
       <h3>실습 대상 — YES24 경제·경영 베스트셀러 (성별 × 연령대)</h3>
       <p>YES24 베스트셀러 목록은 URL의 파라미터로 조건이 표현되는, 스크래핑 입문에 좋은 구조입니다:</p>
@@ -283,10 +234,27 @@ https://www.yes24.com/product/category/bestseller?categoryNumber=001001025&pageN
 
 URL의 age(10~60, 60은 60대 이상)와 sex(F/M) 파라미터를 바꿔가며
 성별×연령대 12개 조합 각각의 Top 20 도서를 수집해줘. 각 도서의 순위·제목·저자·출판사·출간월·판매가·평점을 뽑아서
-그룹 정보(성별, 연령대)와 함께 CSV 파일 하나로 저장해줘.
+그룹 정보(성별, 연령대)와 함께 CSV 파일 하나로 만들고, 연동한 폴더의 data/ 아래에
+bestseller.csv 로 저장해줘. 인코딩은 엑셀에서 한글이 깨지지 않게 UTF-8 BOM으로.
 서버에 부담이 없도록 요청 사이에 간격을 두고, 끝나면 그룹별 수집 건수를 표로 보여줘.</pre></div>
 
-      <div class="tip-card"><b>프롬프트의 핵심 3요소</b> — ① 시작 URL과 <b>규칙</b>(무엇을 바꾸면 다른 목록이 나오는지) ② 뽑을 <b>항목</b>(컬럼) ③ 저장 <b>형식</b>(CSV/JSON). 이 세 가지만 정확히 알려주면 나머지는 AI가 알아서 합니다.</div>
+      <div class="tip-card"><b>프롬프트의 핵심 4요소</b> — ① 시작 URL과 <b>규칙</b>(무엇을 바꾸면 다른 목록이 나오는지) ② 뽑을 <b>항목</b>(컬럼) ③ 저장 <b>형식</b>(CSV/JSON) ④ 저장할 <b>위치</b>(연동 폴더 안의 경로). ④를 빼먹으면 결과가 클라우드 작업 공간에만 남아 내 PC에서 열 수 없습니다.</div>
+
+      <h3>수집 결과는 내 PC에 파일로 남습니다</h3>
+      <p>요청이 끝나면 탐색기(또는 Finder)에서 연동 폴더를 열어 보세요. 대화 기록이 아니라 <b>실제 파일</b>이 들어와 있습니다. 이번 주 내내 이 폴더 하나에 산출물이 층층이 쌓입니다:</p>
+      <div class="card" style="font-size:13.5px;overflow-x:auto;">
+        <pre style="margin:0;font-size:13px;line-height:1.85;">week2/
+├─ data/
+│   ├─ bestseller.csv      ← 이번 §1에서 만든 표 (239행)
+│   └─ rulings.csv         ← §2의 판결문 목록 (사건번호·법원·선고일·링크)
+├─ rulings/                ← 판결문 <b>본문</b> 파일들 (347개)
+│   ├─ 2021가단5012345.txt
+│   └─ …
+└─ embeddings/             ← ④번 자료에서 여기에 JSON 347개가 생깁니다</pre>
+        <p style="color:var(--muted);font-size:13px;margin-top:10px;"><b>표는 CSV, 긴 본문은 개별 파일</b>로 나누는 것이 요령입니다. CSV 한 칸에 판결문 전문을 밀어 넣으면 줄바꿈·쉼표 때문에 파일이 깨지고, 엑셀에서도 열리지 않습니다. 목록(메타데이터)은 CSV로, 본문은 사건번호를 파일명으로 한 텍스트 파일로 저장하세요.</p>
+      </div>
+      <div class="callout ok"><b class="cap">왜 굳이 내 PC에 파일로 두는가</b>
+      3주차에 Claude Code가 켤 검색 서버는 <b>내 컴퓨터의 파일</b>을 읽습니다. 지금 이 폴더에 제대로 저장해 두는 것이 곧 검색엔진의 재료를 준비하는 일입니다. 반대로 클라우드 작업 공간에만 있던 파일은 세션이 끝나면 사라집니다.</div>
 
       <h3>실제 수집 결과 — 239권 (10대 여성은 목록 자체가 19권)</h3>
       <div class="explorer">
@@ -318,41 +286,12 @@ URL의 age(10~60, 60은 60대 이상)와 sex(F/M) 파라미터를 바꿔가며
         </div>
       </div>
 
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>정적 사이트 수집 프롬프트의 구조(URL 규칙·항목·형식)를 이해했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>정적 사이트 수집 프롬프트의 구조(URL 규칙·항목·형식)를 이해했다</span></label></div>
     </section>
 
-    <!-- ================= SECTION 4 ================= -->
-    <section class="section" id="s4">
-      <div class="sec-head"><span class="sec-num">4</span><h2>동적 사이트 — 브라우저 플러그인이 필요한 이유</h2></div>
-      <p class="sec-lead">그런데 요즘 웹사이트 대부분은 이렇게 호락호락하지 않습니다. <b>동적(dynamic) 로딩</b> — 서버가 빈 껍데기 HTML만 먼저 주고, 실제 내용은 자바스크립트가 나중에 채워 넣는 방식이 표준이 되었기 때문입니다.</p>
-
-      <div class="callout"><b class="cap">이 자료를 만들면서 실제로 겪은 일</b>
-      YES24 목록도 서버는 한 번에 <b>12권까지만</b> HTML에 담아 보내고, 나머지는 화면을 스크롤할 때 자바스크립트가 추가로 불러옵니다. 오늘은 pageSize·pageNumber 파라미터를 조절해 우회했지만, <b>이런 우회로가 아예 없는 사이트가 대부분</b>입니다 — 무한 스크롤 SNS, "더보기" 버튼 뒤의 리뷰, 로그인해야 보이는 화면들.</div>
-
-      <div class="compare">
-        <div class="col static-col"><h4>정적 — URL만으로 수집 가능</h4>
-          <ul><li>주소만 바꿔도 원하는 목록이 그대로 열림</li><li>정부·공공기관 게시판, 오래된 게시판형 사이트</li><li>Cowork에서 바로 수집 가능 (§3 방식)</li></ul></div>
-        <div class="col dyn-col"><h4>동적 — 브라우저가 필요</h4>
-          <ul><li>스크롤·클릭해야 내용이 나타남, URL은 그대로</li><li>SNS 피드, 쇼핑몰 리뷰 더보기, 지도, 로그인 화면</li><li>브라우저 플러그인(Claude in Chrome)으로 수집</li></ul></div>
-      </div>
-
-      <div class="tip-card"><b>판별법 10초 테스트</b> — 브라우저 주소창의 URL만 바꿔서(페이지 번호, 조건 등) 원하는 목록이 바로 열리면 정적으로 접근 가능. 스크롤하거나 버튼을 눌러야만 내용이 나타나고 URL은 그대로라면 동적입니다.</div>
-
-      <h3>해법 — Claude in Chrome (브라우저 확장)</h3>
-      <p>Claude 크롬 확장을 쓰면 AI가 <b>내 브라우저가 이미 렌더링을 끝낸 화면</b>을 읽습니다. 자바스크립트가 채워 넣은 내용, 스크롤로 불러온 목록, (내 계정으로) 로그인된 화면까지 — 사람 눈에 보이는 그대로를 대상으로 하므로 동적 로딩 문제가 사라집니다. 스크롤과 클릭도 AI가 대신 수행합니다.</p>
-      <div class="copy-block"><span class="cb-label">💬 크롬 확장에서 쓰는 프롬프트 예시</span><button class="copy-btn" data-copy="p2">복사</button>
-<pre id="p2">지금 열려 있는 이 페이지에서 리뷰를 100개 수집하고 싶어.
-"더보기" 버튼을 눌러가며 리뷰가 100개 보일 때까지 스크롤한 다음,
-각 리뷰의 별점·날짜·본문을 뽑아 CSV로 정리해줘. 작성자 이름은 수집하지 마.</pre></div>
-      <div class="callout caution" style="font-size:13.5px;"><b class="cap">로그인 화면 수집 시 주의</b>
-      내 계정으로 보이는 화면은 편리한 만큼 책임도 내 계정에 귀속됩니다. §2의 원칙(페이월 금지, 비영리·소량, 개인정보 제외)은 브라우저 방식에서도 똑같이 적용됩니다.</div>
-
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>정적/동적을 구분할 수 있고, 언제 크롬 확장이 필요한지 안다</span></label></div>
-    </section>
-
-    <!-- ================= SECTION 5 ================= -->
-    <section class="section" id="s5">
-      <div class="sec-head"><span class="sec-num">5</span><h2>수집 후 — 탐색적 분석(EDA)</h2></div>
+    <!-- ================= SECTION 2 ================= -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>수집 후 — 탐색적 분석(EDA)</h2></div>
       <p class="sec-lead">수집은 절반입니다. 나머지 절반은 "이 데이터가 무슨 이야기를 하는가"를 찾는 <b>탐색적 분석(Exploratory Data Analysis)</b>입니다. 이것도 프롬프트 하나로 시작합니다.</p>
 
       <div class="copy-block"><span class="cb-label">💬 EDA 프롬프트 — 수집 직후 이어서 요청하세요</span><button class="copy-btn" data-copy="p3">복사</button>
@@ -425,15 +364,18 @@ URL의 age(10~60, 60은 60대 이상)와 sex(F/M) 파라미터를 바꿔가며
       <p>같은 파이프라인(수집 → 분류 → 반복 패턴 추출)을 판례 데이터에 적용한 실제 사례입니다. "직장 내 괴롭힘"이 언급된 지방법원 판결 <b>895건</b>을 수집해 유형별로 분류하고, 법원이 손해배상을 인정할 때 반복 적용하는 요건을 추출해 보고서로 정리했습니다. 카드를 클릭하면 보고서 전문이 열립니다.</p>
 
       <div class="callout"><b class="cap">대량 텍스트 수집 요령 — 목록 먼저, 본문은 천천히</b>
-      판결문처럼 <b>본문이 긴 자료를 수백 건</b> 수집할 때는 한 번에 긁지 마세요. <b>① 먼저 전체 목록(사건번호·법원·선고일·링크 등 메타데이터)만 수집해 CSV로 저장</b>하고, <b>② 본문은 그 목록을 보며 시간 간격을 두고 조금씩</b>(예: 한 번에 수십 건씩) 수집합니다. 서버에 부하를 주지 않기 위한 예의이자(§2의 서버 배려), 중간에 끊겨도 목록 CSV에 진행 상황이 남아 이어서 수집할 수 있는 실전 요령입니다. 위 895건도 이 방식으로 모았습니다.</div>
+      판결문처럼 <b>본문이 긴 자료를 수백 건</b> 수집할 때는 한 번에 긁지 마세요. <b>① 먼저 전체 목록(사건번호·법원·선고일·링크 등 메타데이터)만 수집해 CSV로 저장</b>하고, <b>② 본문은 그 목록을 보며 시간 간격을 두고 조금씩</b>(예: 한 번에 수십 건씩) 수집합니다. 서버에 부하를 주지 않기 위한 예의이자(②번 자료의 "서버 배려" 원칙), 중간에 끊겨도 목록 CSV에 진행 상황이 남아 이어서 수집할 수 있는 실전 요령입니다. 위 895건도 이 방식으로 모았습니다.</div>
 
       <div class="copy-block"><span class="cb-label">💬 두 단계 수집 프롬프트</span><button class="copy-btn" data-copy="p5">복사</button>
 <pre id="p5">1단계: 검색 결과의 전체 목록(사건번호, 법원, 선고일, 링크)만 먼저 수집해서
-목록.csv로 저장해줘. 본문은 아직 수집하지 마.
+연동 폴더의 data/rulings.csv로 저장해줘. 본문은 아직 수집하지 마.
+'수집완료' 컬럼을 만들고 전부 비워 둬.
 
-2단계: 목록.csv에서 아직 본문을 수집하지 않은 사건 30건만 골라,
-요청 사이에 간격을 두면서 본문을 수집하고, 수집 완료 여부를 목록.csv에
-표시해줘. (이 단계를 시간을 두고 여러 번 반복)</pre></div>
+2단계: data/rulings.csv에서 수집완료가 비어 있는 사건 30건만 골라,
+요청 사이에 간격을 두면서 본문을 수집해줘. 본문은 rulings/ 폴더에
+사건번호.txt 로 한 건씩 저장하고, 저장한 행의 수집완료를 Y로 바꿔줘.
+(이 단계를 시간을 두고 여러 번 반복)</pre></div>
+      <div class="tip-card"><b>이 방식의 진짜 이점</b> — 진행 상황이 <b>내 PC의 CSV 파일에</b> 남습니다. 대화가 끊겨도, 며칠 뒤에 이어서 해도, "수집완료가 비어 있는 것부터"라고만 말하면 정확히 그 지점부터 다시 시작합니다.</div>
 
       <div class="example-card" id="reportCard" tabindex="0" role="button" aria-label="판례 분석 보고서 열기">
         <div class="example-thumb"><iframe id="reportThumb" title="판례 분석 보고서 미리보기" loading="lazy"></iframe><span class="zoom">🔍 클릭해서 전문 보기</span></div>
@@ -447,24 +389,24 @@ URL의 age(10~60, 60은 60대 이상)와 sex(F/M) 파라미터를 바꿔가며
 수집한 사건을 (1) 유형별로 분류하고, (2) 약 2줄로 사건 개요를 요약하라.</pre></div>
       <div class="tip-card"><b>여기서도 마찬가지</b> — 분석의 <b>목적</b>과 최소한의 산출물(분류·요약)만 지시했고, 인정 요건 ①~⑥의 추출과 긍정/부정 사례 대비 같은 구성은 AI가 목적에 맞춰 스스로 발전시킨 것입니다.</div>
 
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>수집 → EDA → 보고서로 이어지는 흐름을 이해했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>수집 → EDA → 보고서로 이어지는 흐름을 이해했다</span></label></div>
     </section>
 
-    <!-- ================= SECTION 6 ================= -->
-    <section class="section" id="s6">
-      <div class="sec-head"><span class="sec-num">6</span><h2>마무리 체크리스트</h2></div>
+    <!-- ================= SECTION 3 ================= -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>마무리 체크리스트</h2></div>
       <ul class="final-list">
-        <li>스크래핑 대상 6유형과 각각의 분석 용도를 말할 수 있다</li>
-        <li>페이월 콘텐츠는 수집하지 않는다 — 약관 금지 조항은 공정이용(비영리·소량·내부 분석) 관점에서 평가한다</li>
-        <li>정적 사이트는 "URL 규칙 + 뽑을 항목 + 저장 형식"의 3요소 프롬프트로 수집한다</li>
-        <li>스크롤·클릭해야 내용이 나오는 동적 사이트는 Claude 크롬 확장으로 수집한다</li>
+        <li>정적 사이트는 "URL 규칙 + 뽑을 항목 + 저장 형식 + 저장 위치"의 4요소 프롬프트로 수집한다</li>
+        <li>결과는 연동 폴더에 파일로 남긴다 — 표는 CSV, 긴 본문은 사건번호를 파일명으로 한 개별 파일</li>
+        <li>②번 자료의 경계는 실습에서도 그대로 — 페이월 금지, 비영리·소량·내부 분석, 서버 배려</li>
+        <li>대량 수집은 목록 CSV 먼저, 본문은 나눠서 — 진행 상황이 CSV에 남아 언제든 이어서 할 수 있다</li>
         <li>수집 직후 EDA 프롬프트로 유사도·공통항목·키워드 주제·시계열 패턴을 탐색한다</li>
       </ul>
       <div class="next-card-grid">
-        <div class="next-card"><b>직접 해보기 (이번 주 과제)</b><span>관심 분야의 정적 사이트 하나를 골라 §3 프롬프트를 변형해 100건 이상 수집하고, §5 프롬프트로 패턴 3가지를 찾아보세요.</span></div>
-        <div class="next-card"><b>다음 강의 — 임베딩 추출</b><span>수집한 데이터를 <b>의미의 좌표(임베딩)</b>로 바꾸면 "비슷한 문서 찾기"가 됩니다. 다음 강의에서는 여기서 모은 판결문을 실제로 숫자 벡터로 바꾸고, 그것이 판례 검색기로 이어지는 원리를 봅니다.</span></div>
+        <div class="next-card"><b>직접 해보기</b><span>관심 분야의 정적 사이트 하나를 골라 §1 프롬프트를 변형해 100건 이상 수집하고, §2 프롬프트로 패턴 3가지를 찾아보세요. 결과 CSV가 내 폴더에 실제로 저장됐는지 꼭 확인하세요.</span></div>
+        <div class="next-card"><b>다음 강의 — 임베딩 추출</b><span>방금 폴더에 쌓은 판결문 파일을 <b>의미의 좌표(임베딩)</b>로 바꿉니다. 같은 폴더의 <code>embeddings/</code> 아래에 JSON 347개가 생기고, 그것이 지도와 검색의 재료가 됩니다.</span></div>
       </div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>Week 2 웹 스크래핑 파트를 마쳤다!</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>Week 2 웹 스크래핑 파트를 마쳤다!</span></label></div>
     </section>
 
       <a class="back-home" href="index.html">
@@ -806,7 +748,7 @@ function updateProgress(){
     celebrated = true;
     const b = document.createElement("div");
     b.className = "celebrate-banner";
-    b.innerHTML = "🎉 <b>Week 2 스크래핑 파트 완주!</b> 이제 여러분은 웹의 공개 데이터를 문장 하나로 수집하고, 그 안의 패턴을 찾아낼 수 있습니다. 다음 시간에는 이 데이터로 유사 문서 검색기를 만듭니다.";
+    b.innerHTML = "🎉 <b>Week 2 스크래핑 실습 완주!</b> 이제 여러분은 웹의 공개 데이터를 문장 하나로 수집하고, 그 안의 패턴을 찾아낼 수 있습니다. 다음 강의에서 이 데이터를 의미의 좌표(임베딩)로 바꿉니다.";
     $("#celebrateSlot").appendChild(b);
     b.scrollIntoView({behavior:"smooth", block:"center"});
   }
@@ -814,7 +756,7 @@ function updateProgress(){
 checks.forEach(c => c.addEventListener("change", updateProgress));
 
 /* ===== ⑦ 사이드바 scroll-spy ===== */
-const secIds = ["s1","s2","s3","s4","s5","s6"];
+const secIds = ["s1","s2","s3"];
 const tocLinks = {};
 document.querySelectorAll(".toc a").forEach(a => tocLinks[a.dataset.sec] = a);
 const io = new IntersectionObserver(entries => {

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 4 — MCP(커넥터): AI를 내 데이터에 연결하는 표준</title>
+<style>
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
+  --brand:#2e9bdb; --brand-dark:#1b6fa6; --green:#2f765b; --amber:#b8792e; --red:#b0483f;
+  --blue:#375f8f; --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12); --radius:14px; --sidebar-width:250px;
+  /* dataviz roles (validated) */
+  --viz-surface:#ffffff; --viz-ink:#0b0b0b; --viz-ink2:#52514e; --viz-muted:#898781;
+  --viz-grid:#e1e0d9; --viz-axis:#c3c2b7;
+  --series-1:#2a78d6; --series-2:#eb6834;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15.5px;
+}
+/* ---------- topbar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+/* ---------- layout ---------- */
+.layout{display:flex;align-items:flex-start;}
+.sidebar{
+  position:sticky;top:63px;flex:0 0 var(--sidebar-width);width:var(--sidebar-width);
+  height:calc(100vh - 63px);overflow-y:auto;padding:22px 14px 40px 22px;border-right:1px solid var(--line);
+}
+.sidebar-title{font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+.toc a{
+  display:block;padding:7px 11px;margin:2px 0;border-radius:8px;border-left:3px solid transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;line-height:1.4;
+}
+.toc a:hover{background:#eef3ec;color:var(--ink);}
+.toc a.active{background:var(--sky-light);border-left-color:var(--brand);color:var(--brand-dark);font-weight:800;}
+.toc a .done-mark{color:var(--green);font-weight:900;margin-left:4px;display:none;}
+.toc a.done .done-mark{display:inline;}
+.content{flex:1;min-width:0;max-width:920px;padding:clamp(20px,4vw,44px) clamp(16px,4vw,44px) 100px;}
+/* ---------- hero ---------- */
+.hero{margin-bottom:16px;}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.07em;color:var(--brand-dark);background:var(--sky-light);padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+.hero h1{font-size:clamp(23px,3.6vw,32px);line-height:1.3;letter-spacing:-.015em;margin-bottom:10px;}
+.hero p{color:var(--muted);max-width:640px;}
+/* ---------- sections ---------- */
+.section{margin-top:44px;padding-top:8px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
+.sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
+.sec-lead{color:var(--muted);margin:4px 0 18px;max-width:700px;}
+h3{font-size:16.5px;margin:26px 0 10px;}
+p{margin:10px 0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:14px 0;box-shadow:0 3px 14px rgba(54,42,31,.05);}
+/* concept grid */
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+.concept{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.concept .ico{font-size:21px;}
+.concept b{display:block;margin:7px 0 4px;font-size:14.5px;}
+.concept span{display:block;color:var(--muted);font-size:13px;line-height:1.55;}
+.concept .use{display:inline-block;margin-top:9px;font-size:12px;font-weight:800;color:var(--brand-dark);background:var(--sky-light);border-radius:999px;padding:2px 10px;}
+/* callouts */
+.callout{border-left:4px solid var(--brand);background:var(--sky-light);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;font-size:14.5px;}
+.callout.caution{border-left-color:var(--red);background:#faeeec;}
+.callout.ok{border-left-color:var(--green);background:#edf4ef;}
+.callout b.cap{display:block;font-size:13px;letter-spacing:.03em;margin-bottom:4px;}
+.callout.caution b.cap{color:var(--red);}
+.callout.ok b.cap{color:var(--green);}
+.callout b.cap{color:var(--brand-dark);}
+.tip-card{border-left:4px solid var(--brand);background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 17px;margin:14px 0;font-size:14px;color:var(--muted);}
+.tip-card b{color:var(--ink);}
+/* prompt copy block */
+.copy-block{position:relative;background:#20242a;color:#e8ecf1;border-radius:12px;padding:18px 20px;margin:14px 0;font-size:14px;line-height:1.8;}
+.copy-block .cb-label{position:absolute;top:-10px;left:14px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--brand);padding:3px 10px;border-radius:999px;}
+.copy-block pre{white-space:pre-wrap;word-break:keep-all;font-family:inherit;margin-top:4px;}
+.copy-btn{position:absolute;top:12px;right:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 11px;cursor:pointer;}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+/* two-col compare */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+.compare .col{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.compare .col h4{font-size:14px;margin-bottom:8px;}
+.compare .col.static-col h4{color:var(--green);}
+.compare .col.dyn-col h4{color:var(--amber);}
+.compare ul{margin:0 0 0 18px;font-size:13.5px;color:var(--muted);}
+.compare li{margin:5px 0;}
+/* stat tiles */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 15px;}
+.stat .v{font-size:26px;font-weight:900;letter-spacing:-.02em;color:var(--brand-dark);line-height:1.15;}
+.stat .k{margin-top:5px;font-size:12.5px;color:var(--muted);line-height:1.5;}
+/* explorer table */
+.explorer{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:16px 0;}
+.radio-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:12px;}
+.radio-row .rlabel{font-size:12.5px;font-weight:800;color:var(--muted);margin-right:2px;}
+.radio-group{display:flex;flex-wrap:wrap;gap:6px;}
+.radio-option{display:flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--line);border-radius:8px;background:#fafcf9;font-size:13px;font-weight:600;cursor:pointer;}
+.radio-option input{accent-color:var(--brand);}
+.radio-option:has(input:checked){border-color:var(--brand);background:var(--sky-light);color:var(--brand-dark);font-weight:800;}
+.book-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+.book-table th{background:#f2f6f0;border:1px solid var(--line);padding:7px 10px;text-align:left;font-size:12.5px;}
+.book-table td{border:1px solid var(--line);padding:6px 10px;}
+.book-table td.num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);}
+.dl-btn{border:1px solid var(--brand);color:var(--brand-dark);background:var(--sky-light);font-weight:800;font-size:13px;border-radius:9px;padding:8px 15px;cursor:pointer;}
+.dl-btn:hover{background:#d3e9f8;}
+/* charts */
+.chart-card{background:var(--viz-surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px 12px;margin:16px 0;}
+.chart-card h4{font-size:15px;color:var(--viz-ink);margin-bottom:2px;}
+.chart-card .sub{font-size:12.5px;color:var(--viz-ink2);margin-bottom:10px;}
+.legend{display:flex;gap:16px;align-items:center;margin:2px 0 8px;font-size:12.5px;color:var(--viz-ink2);}
+.legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;transform:translateY(1px);}
+.chart-svg{width:100%;height:auto;display:block;}
+.viz-tooltip{position:fixed;z-index:60;pointer-events:none;background:#20242a;color:#fff;font-size:12.5px;line-height:1.5;border-radius:8px;padding:7px 11px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .12s;max-width:280px;}
+.chart-note{font-size:12px;color:var(--viz-muted);margin:6px 0 4px;}
+/* insight list */
+.insight{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0;}
+.insight .n{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;border-radius:999px;background:var(--sky-light);color:var(--brand-dark);font-weight:900;font-size:13px;transform:translateY(2px);}
+.insight p{margin:0;font-size:14.5px;}
+/* example embed (lightbox) */
+.example-card{display:flex;gap:0;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;margin:16px 0;box-shadow:var(--shadow);max-width:560px;}
+.example-card:focus-visible{outline:3px solid var(--brand);}
+.example-thumb{position:relative;height:210px;overflow:hidden;background:#eef1ec;}
+.example-thumb iframe{position:absolute;top:0;left:0;width:400%;height:400%;transform:scale(.25);transform-origin:top left;border:none;pointer-events:none;}
+.example-thumb .zoom{position:absolute;right:12px;bottom:12px;background:rgba(32,36,42,.85);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:5px 12px;}
+.example-body{padding:14px 18px;}
+.example-body b{font-size:14.5px;}
+.example-body p{margin:4px 0 0;font-size:13px;color:var(--muted);}
+.example-lightbox{position:fixed;inset:0;z-index:80;background:rgba(20,24,20,.62);display:flex;align-items:center;justify-content:center;padding:3vh 3vw;}
+.example-lightbox[hidden]{display:none;}
+.lightbox-inner{position:relative;width:min(980px,96vw);height:92vh;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);}
+.lightbox-inner iframe{width:100%;height:100%;border:none;}
+.lightbox-close{position:absolute;top:10px;right:10px;z-index:2;border:none;background:#20242a;color:#fff;width:34px;height:34px;border-radius:999px;font-size:16px;font-weight:900;cursor:pointer;}
+/* completion */
+.completion-row{margin:22px 0 6px;}
+.check{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 18px;cursor:pointer;font-size:14px;font-weight:700;color:var(--muted);}
+.check input{width:17px;height:17px;accent-color:var(--green);}
+.check:has(input:checked){border-color:var(--green);color:var(--green);background:#edf4ef;}
+/* celebrate banner */
+.celebrate-banner{border:1px solid #bfe0c9;background:linear-gradient(120deg,#edf7ef,#e3f1fb);border-radius:var(--radius);padding:18px 22px;margin:0 0 22px;font-size:15px;box-shadow:var(--shadow);}
+.celebrate-banner b{color:var(--green);}
+/* checklist */
+.final-list{list-style:none;margin:14px 0;}
+.final-list li{display:flex;gap:10px;margin:9px 0;font-size:14.5px;}
+.final-list li::before{content:"✔";color:var(--green);font-weight:900;}
+.next-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.next-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.next-card b{display:block;font-size:14.5px;margin-bottom:5px;color:var(--brand-dark);}
+.next-card span{font-size:13.5px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#20242a;color:#fff;font-size:13.5px;font-weight:700;border-radius:999px;padding:10px 20px;opacity:0;transition:all .25s;z-index:90;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media (max-width:900px){ .layout{display:block;} .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  .concept-grid{grid-template-columns:1fr 1fr;} .stat-row{grid-template-columns:1fr 1fr;} .compare{grid-template-columns:1fr;} .next-card-grid{grid-template-columns:1fr;} }
+@media (max-width:640px){ .topbar{flex-wrap:wrap;row-gap:10px;} .topbar-left{flex-wrap:wrap;row-gap:8px;} .progress-wrap{width:100%;} .concept-grid{grid-template-columns:1fr;} }
+
+/* ---- 목록으로 돌아가기 (week1과 동일 패턴) ---- */
+.back-week{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:color .15s ease,border-color .15s ease,background .15s ease;}
+.back-week:hover{color:var(--brand-dark);border-color:var(--brand);background:var(--sky-light);}
+.back-home{display:flex;align-items:center;gap:15px;max-width:840px;margin:34px 0 10px;padding:20px 24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s ease,border-color .18s ease;}
+.back-home:hover{transform:translateY(-2px);border-color:var(--brand);}
+.back-home .bh-ic{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;border-radius:11px;background:var(--sky-light);color:var(--brand-dark);font-size:19px;font-weight:900;}
+.back-home strong{display:block;font-size:15.5px;font-weight:800;}
+.back-home small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;font-weight:600;}
+@media (max-width:640px){.back-home{padding:18px;gap:12px;}}
+
+/* ---- week3 공통 추가 ---- */
+.flowline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0;padding:15px 17px;background:var(--surface);border:1px solid var(--line);border-radius:12px;}
+.flowline .fnode{display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:9px 14px;border-radius:10px;background:var(--sky-light);border:1px solid #c9e2f5;font-size:13px;font-weight:800;color:var(--brand-dark);text-align:center;line-height:1.35;}
+.flowline .fnode small{font-size:11px;font-weight:600;color:var(--muted);}
+.flowline .fnode.dark{background:#20242a;border-color:#20242a;color:#fff;}
+.flowline .fnode.dark small{color:#aab4c0;}
+.flowline .fnode.ok{background:#edf4ef;border-color:#bfe0c9;color:var(--green);}
+.flowline .farrow{color:var(--muted);font-weight:900;}
+.step-table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0;}
+.step-table th{background:#f2f6f0;border:1px solid var(--line);padding:8px 12px;text-align:left;font-size:13px;}
+.step-table td{border:1px solid var(--line);padding:8px 12px;vertical-align:top;}
+.step-table td b{color:var(--brand-dark);}
+.badge{display:inline-block;font-size:11.5px;font-weight:800;border-radius:999px;padding:2px 10px;vertical-align:1px;}
+.badge.b-green{background:#edf4ef;color:var(--green);}
+.badge.b-red{background:#faeeec;color:var(--red);}
+.badge.b-blue{background:var(--sky-light);color:var(--brand-dark);}
+.badge.b-amber{background:#fbf1de;color:var(--amber);}
+.kv{display:grid;grid-template-columns:170px 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0;font-size:13.5px;}
+.kv > div{padding:9px 14px;border-bottom:1px solid var(--line);background:var(--surface);}
+.kv > div:nth-child(odd){background:#f2f6f0;font-weight:800;font-size:12.5px;}
+.kv > div:nth-last-child(-n+2){border-bottom:none;}
+.ws-steps{counter-reset:ws;margin:16px 0;}
+.workshop-step{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px 14px 58px;margin:12px 0;}
+.workshop-step .ws-num{position:absolute;left:16px;top:16px;display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:13.5px;}
+.workshop-step b.ws-t{display:block;font-size:14.5px;margin-bottom:4px;}
+.workshop-step p{font-size:14px;color:var(--muted);margin:4px 0;}
+.workshop-step code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.5px;}
+code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.88em;font-family:ui-monospace,'SF Mono',Consolas,monospace;}
+.copy-block code{background:transparent;border:none;padding:0;color:#9fd0f5;font-size:inherit;}
+.quad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.quad .q{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.quad .q h4{font-size:14px;margin-bottom:6px;}
+.quad .q p{font-size:13.5px;color:var(--muted);margin:4px 0;}
+.term-list{margin:14px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+.term-list .term{display:grid;grid-template-columns:150px 1fr;border-bottom:1px solid var(--line);background:var(--surface);}
+.term-list .term:last-child{border-bottom:none;}
+.term-list .term > b{padding:11px 14px;background:#f2f6f0;font-size:13.5px;}
+.term-list .term > span{padding:11px 14px;font-size:13.5px;color:var(--muted);}
+@media (max-width:700px){.quad{grid-template-columns:1fr;}.kv{grid-template-columns:1fr;}.kv > div:nth-child(odd){border-bottom:none;padding-bottom:2px;}.term-list .term{grid-template-columns:1fr;}}
+</style>
+</head>
+<body id="top">
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+    </a>
+    <div class="week-tag"><span class="week-num">WEEK 4</span><span class="week-title">MCP(커넥터)</span></div>
+    <a class="back-week" href="index.html">← 4주차 목록</a>
+  </div>
+  <div class="progress-wrap" aria-label="진행률">
+    <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="목차">
+    <div class="sidebar-title">이 페이지의 흐름</div>
+    <div class="toc" id="toc">
+      <a href="#s1" data-sec="s1">1. 문제 — AI는 내 데이터를 모른다<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. MCP — 연결 방법의 표준 규격<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. Claude의 커넥터 = MCP 서버<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 실습 — Drive 커넥터로 내 시트 분석하기<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 커넥터의 한계, 그리고 오늘의 질문<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. 마무리 — MCP가 없다면?<span class="done-mark">✔</span></a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div id="celebrateSlot"></div>
+
+    <div class="hero">
+      <span class="hero-kicker">WEEK 4 · STEP 2 — 연결의 표준</span>
+      <h1>MCP(커넥터) —<br/>AI를 내 데이터에 연결하는 표준</h1>
+      <p>①에서 안전 원칙을 세웠으니 이제 연결을 시작합니다. AI에게 일을 맡기려면 먼저 AI가 <b>내 데이터와 도구</b>(내 드라이브, 내 시트, 사내 시스템)에 닿아야 합니다. 이 자료는 그 연결의 <b>표준 규격인 MCP</b>와, Claude에서 그것을 켜는 <b>커넥터</b>를 다룹니다. 규격이 없는 레거시 시스템을 잇는 만능 어댑터(CLI)는 다음 자료 ③에서, 내 웹앱이 직접 데이터를 읽고 쓰는 길은 ④에서 만납니다.</p>
+    </div>
+
+
+    <!-- ================= SECTION 1 ================= -->
+    <section class="section" id="s1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>문제 — AI는 내 데이터를 모른다</h2></div>
+      <p class="sec-lead">Claude에게 "우리 조 과제 진행률 정리해줘"라고 물으면 답하지 못합니다. 그 데이터는 여러분의 구글 시트에 있고, AI는 거기 접근할 수 없기 때문입니다.</p>
+      <p>지금까지의 해결책은 <b>복사–붙여넣기</b>였습니다. 시트를 열어 내용을 복사해 대화창에 붙이고, 파일이면 업로드하고, 바뀌면 다시 반복합니다. 되긴 하지만 두 가지가 아쉽습니다:</p>
+      <div class="concept-grid">
+        <div class="concept"><div class="ico">🔁</div><b>매번 수동</b><span>데이터가 바뀔 때마다 사람이 다시 날라야 합니다. "연결"이 아니라 "배달"입니다.</span></div>
+        <div class="concept"><div class="ico">📏</div><b>양의 한계</b><span>시트 수십 장, 메일 수백 통을 붙여넣을 수는 없습니다. AI가 필요한 부분을 스스로 찾아 읽어야 합니다.</span></div>
+        <div class="concept"><div class="ico">✍️</div><b>읽기만 가능</b><span>붙여넣기로는 AI가 시트에 값을 쓰거나 메일을 보내는 일은 아예 불가능합니다.</span></div>
+      </div>
+      <p>필요한 것은 AI가 내 데이터 창고에 <b>스스로 드나들 수 있는 문</b>입니다. 그 문을 만드는 표준이 MCP입니다.</p>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>복사–붙여넣기 방식의 한계를 이해했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 2 ================= -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>MCP — 연결 방법의 표준 규격</h2></div>
+      <p class="sec-lead">MCP(Model Context Protocol)는 <b>AI가 외부 도구·데이터에 연결하는 방법을 하나로 통일한 표준 규약</b>입니다. Anthropic이 2024년 말 공개했고, 지금은 OpenAI·구글을 포함한 업계 전반이 채택한 사실상의 공통 표준이 되었습니다.</p>
+      <p>표준이 없던 시절의 문제부터 봅시다. 구글 드라이브, 노션, 슬랙은 각자 자기만의 접속 방법(API)을 갖고 있습니다. AI 서비스가 이들과 연결하려면 <b>서비스마다 전용 연결 코드를 따로</b> 만들어야 했습니다. AI가 10개, 도구가 100개면 연결 코드가 최대 1,000벌 필요한 구조입니다.</p>
+      <p>MCP는 이 사이에 <b>공통 규격</b>을 놓습니다. 도구 쪽은 "MCP 서버" 하나만 만들어 두면 되고, AI 쪽은 MCP를 말할 줄만 알면 어떤 도구든 꽂아 쓸 수 있습니다.</p>
+
+      <div class="compare">
+        <div class="col dyn-col"><h4>표준 이전 — 제각각 연결</h4>
+          <ul>
+            <li>AI × 도구 조합마다 전용 연결 코드</li>
+            <li>도구가 사양을 바꾸면 연결한 쪽 전부 수리</li>
+            <li>새 도구 지원 = 매번 새 개발</li>
+          </ul>
+        </div>
+        <div class="col static-col"><h4>MCP — 하나의 규격</h4>
+          <ul>
+            <li>도구는 MCP 서버 <b>1개</b>만 제공</li>
+            <li>MCP를 아는 AI라면 무엇이든 즉시 연결</li>
+            <li>연결 규격이 같으니 조합이 자유로움</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="term-list">
+        <div class="term"><b>MCP 서버</b><span>어떤 도구·데이터를 MCP 규격으로 노출하는 프로그램. "이 시트를 읽어라 / 이 행에 써라" 같은 기능 목록을 AI에게 알려주고 실행해 줍니다.</span></div>
+        <div class="term"><b>MCP 클라이언트</b><span>MCP 서버에 접속해 기능을 쓰는 쪽 — Claude 같은 AI 앱입니다.</span></div>
+        <div class="term"><b>커넥터</b><span>Claude 제품에서 MCP 연결을 부르는 이름. 설정에서 커넥터를 켜는 것 = 그 서비스의 MCP 서버에 내 계정으로 접속을 허용하는 것.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>MCP가 무엇을 통일한 표준인지 설명할 수 있다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 3 ================= -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>Claude의 커넥터 = MCP 서버</h2></div>
+      <p class="sec-lead">Claude 설정의 커넥터 목록(Google Drive, Gmail, Notion, Slack…)이 바로 각 서비스의 MCP 서버들입니다. 켜는 순간 무슨 일이 일어나는지 봅시다.</p>
+
+      <div class="flowline">
+        <span class="fnode">① 커넥터 켜기<small>설정 → Connectors</small></span>
+        <span class="farrow">→</span>
+        <span class="fnode">② 로그인 화면<small>구글이 직접 띄움</small></span>
+        <span class="farrow">→</span>
+        <span class="fnode">③ 권한 동의<small>"Drive 읽기를 허용?"</small></span>
+        <span class="farrow">→</span>
+        <span class="fnode ok">④ 연결 완료<small>대화에서 내 파일 사용 가능</small></span>
+      </div>
+
+      <p>주목할 점: ②에서 비밀번호는 <b>구글에게만</b> 입력합니다. Claude는 비밀번호를 받지 않고, 구글이 발급한 <b>권한 증표(토큰)</b>만 받습니다. 증표에는 범위가 적혀 있어(예: "Drive 읽기만") 그 밖의 일은 할 수 없고, 언제든 구글 계정 설정에서 회수할 수 있습니다. 이 방식(OAuth)은 3주차 인증 자료에서 배운 "비밀번호 대신 증표" 원칙과 같은 계열입니다.</p>
+      <div class="tip-card"><b>커넥터는 계정 단위 연결입니다.</b> 한 번 켜면 이후 모든 대화에서 Claude가 필요할 때 내 드라이브를 검색해 읽을 수 있습니다. 반대로 말하면, 회사 기밀이 담긴 계정을 연결할 때는 어떤 범위를 허용하는지 동의 화면을 반드시 읽어야 합니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>커넥터 연결 시 비밀번호가 아닌 토큰이 오간다는 것을 이해했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 4 ================= -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>실습 — Drive 커넥터로 내 시트 분석하기</h2></div>
+      <p class="sec-lead">직접 해 봅니다. 5분이면 충분합니다.</p>
+
+      <div class="ws-steps">
+        <div class="workshop-step"><span class="ws-num">1</span>
+          <b class="ws-t">연습용 시트 만들기</b>
+          <p>구글 시트를 새로 만들어 간단한 표를 입력합니다. 예: 이번 달 지출 내역(날짜·항목·금액 10행) 또는 조별과제 할 일 목록. 실제 민감 정보는 넣지 마세요.</p>
+        </div>
+        <div class="workshop-step"><span class="ws-num">2</span>
+          <b class="ws-t">Google Drive 커넥터 켜기</b>
+          <p>Claude → 설정(Settings) → <b>Connectors</b> → Google Drive <b>Connect</b> → 구글 로그인 → 권한 동의. 동의 화면에서 어떤 권한을 요구하는지 한 줄씩 읽어 보세요.</p>
+        </div>
+        <div class="workshop-step"><span class="ws-num">3</span>
+          <b class="ws-t">대화로 분석 요청</b>
+          <div class="copy-block"><span class="cb-label">💬 프롬프트</span>
+            <button class="copy-btn" data-copy="p42">복사</button>
+            <pre id="p42">내 구글 드라이브에서 "[시트 제목]" 스프레드시트를 찾아서 읽어줘.
+그 데이터로 다음을 정리해줘:
+1. 전체 요약 (몇 행, 어떤 열)
+2. 눈에 띄는 패턴이나 특이점 2가지
+3. 이 표에 추가하면 좋을 열 1개 제안</pre>
+          </div>
+          <p>파일을 업로드한 적이 없는데 Claude가 시트 내용을 정확히 읽어 옵니다. 시트를 수정하고 같은 질문을 다시 하면 <b>바뀐 내용이 반영</b>됩니다 — 배달이 아니라 연결이기 때문입니다.</p>
+        </div>
+      </div>
+      <div class="callout ok"><b class="cap">방금 일어난 일</b>
+      Claude(MCP 클라이언트)가 구글의 MCP 서버에 "이 이름의 시트를 찾아 내용을 달라"고 요청했고, 여러분이 허용한 토큰의 범위 안에서 데이터가 대화로 들어왔습니다. 복사–붙여넣기가 사라진 첫 경험입니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>커넥터로 내 시트를 대화에서 읽어 분석했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 5 ================= -->
+    <section class="section" id="s5">
+      <div class="sec-head"><span class="sec-num">5</span><h2>커넥터의 한계, 그리고 오늘의 질문</h2></div>
+      <p class="sec-lead">커넥터는 강력하지만, 지금 우리가 만들려는 것 — 남에게 서비스하는 웹앱 — 에는 그대로 쓸 수 없습니다.</p>
+
+      <table class="step-table">
+        <thead><tr><th></th><th>커넥터 (지금 한 것)</th><th>웹앱의 데이터 연동 (③에서 다룰 것)</th></tr></thead>
+        <tbody>
+          <tr><td><b>어디서 동작</b></td><td>Claude 대화 안</td><td>내가 배포한 웹앱 안</td></tr>
+          <tr><td><b>누가 쓰나</b></td><td>연결한 나 자신</td><td>URL을 아는 누구나</td></tr>
+          <tr><td><b>형태</b></td><td>질문–답변 (대화형)</td><td>화면·차트·버튼 (서비스형)</td></tr>
+          <tr><td><b>갱신</b></td><td>물어볼 때마다</td><td>자동 (폴링·실시간)</td></tr>
+          <tr><td><b>알맞은 용도</b></td><td>내 데이터의 분석·정리·탐색</td><td>여러 사람이 함께 쓰는 도구</td></tr>
+        </tbody>
+      </table>
+
+      <p>즉 커넥터는 "<b>나의</b> 데이터 작업"의 도구이고, 서비스를 만들려면 다른 길이 필요합니다 — 웹앱이 구글 시트를 직접 읽고 쓰는 연동은 다음 자료 ③에서 다룹니다. 데이터가 <b>공개</b>냐 <b>비공개</b>냐에 따라 답이 완전히 달라진다는 것만 미리 기억해 두세요.</p>
+      <p>그런데 그 전에, 커넥터에는 더 근본적인 전제가 하나 숨어 있습니다 — <b>상대 시스템에 MCP 서버가 있어야 한다</b>는 것. 없다면? 마지막 절이 그 답입니다.</p>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>커넥터(대화형)와 웹앱 연동(서비스형)의 차이를 설명할 수 있다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 6 ================= -->
+    <section class="section" id="s6">
+      <div class="sec-head"><span class="sec-num">6</span><h2>마무리 — 그런데 MCP가 없는 시스템은?</h2></div>
+      <p class="sec-lead">지금까지의 연동 대상(구글 드라이브·시트)은 운이 좋은 경우였습니다 — 잘 만든 MCP 서버가 이미 있으니까요. 회사의 10년 된 ERP, 부서 NAS의 엑셀 수천 개, 담당자가 퇴사한 구형 DB에는 MCP가 없습니다. 그럴 때 쓰는 <b>만능 어댑터</b>가 다음 강의의 주제입니다.</p>
+      <div class="next-card-grid">
+        <div class="next-card"><b>다음 자료 ③ — CLI: AI에게 도구를 쥐여준다</b><span>통로(MCP)를 만드는 대신 발상을 뒤집어 <b>AI에게 명령줄 도구(CLI)를 쥐여주는</b> 방법 — 이미 있는 도구를 부리는 법부터, 없는 도구를 만들어 꽂는 법까지.</span></div>
+        <div class="next-card"><b>⑤⑥과의 연결</b><span>오늘의 MCP는 에이전트의 <b>표준 도구함</b>이 됩니다. 에르메스 대시보드의 MCP 카탈로그에서 다시 만납니다.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>MCP 커넥터 강의를 마쳤다</span></label></div>
+    </section>
+
+
+    <a class="back-home" href="index.html">
+      <span class="bh-ic">📚</span>
+      <span><strong>4주차 강의자료 목록으로 돌아가기</strong><small>다음 자료: CLI — AI의 만능 어댑터</small></span>
+    </a>
+  </main>
+</div>
+
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+const CELEBRATE_HTML = "🎉 <b>두 가지 연결 길을 얻었습니다!</b> 표준이 있으면 MCP, 없으면 CLI 어댑터. 다음 자료 ③에서 세 번째 길 — 내 앱이 직접 시트를 읽고 쓰는 연동 — 을 만납니다.";
+
+const $ = s => document.querySelector(s);
+/* 프롬프트 복사 */
+function showToast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1800);}
+function fallbackCopy(text,done){const ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done();}catch(e){}ta.remove();}
+document.querySelectorAll(".copy-btn").forEach(btn=>{btn.addEventListener("click",()=>{const text=document.getElementById(btn.dataset.copy).textContent;const done=()=>showToast("프롬프트가 복사되었습니다");if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));}else fallbackCopy(text,done);});});
+/* 진행률 + 축하 배너 (상태는 메모리에만) */
+const checks=[...document.querySelectorAll("input[data-progress]")];
+$("#progressTotal").textContent=checks.length;
+let celebrated=false;
+function updateProgress(){
+  const done=checks.filter(c=>c.checked).length;
+  $("#progressCount").textContent=done;
+  $("#progressBar").style.width=(done/checks.length*100)+"%";
+  checks.forEach(c=>{const a=document.querySelector(`.toc a[data-sec="${c.dataset.progress}"]`);if(a)a.classList.toggle("done",c.checked);});
+  if(done===checks.length&&!celebrated){
+    celebrated=true;
+    const b=document.createElement("div");b.className="celebrate-banner";
+    b.innerHTML=CELEBRATE_HTML;
+    $("#celebrateSlot").appendChild(b);
+    b.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+}
+checks.forEach(c=>c.addEventListener("change",updateProgress));
+/* 사이드바 scroll-spy */
+const secIds=[...document.querySelectorAll("main .section")].map(s=>s.id);
+const tocLinks={};
+document.querySelectorAll(".toc a").forEach(a=>tocLinks[a.dataset.sec]=a);
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(en=>{en.target._visible=en.isIntersecting;});
+  let current=null;
+  for(const id of secIds){const el=document.getElementById(id);if(el&&el._visible){current=id;break;}}
+  if(current){Object.values(tocLinks).forEach(a=>a.classList.remove("active"));tocLinks[current].classList.add("active");}
+},{rootMargin:"-15% 0px -55% 0px"});
+secIds.forEach(id=>io.observe(document.getElementById(id)));
+updateProgress();
+
+
+
+</script>
+</body>
+</html>

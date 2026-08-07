@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 4 — CLI: MCP가 없는 시스템을 잇는 만능 어댑터</title>
+<style>
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
+  --brand:#2e9bdb; --brand-dark:#1b6fa6; --green:#2f765b; --amber:#b8792e; --red:#b0483f;
+  --blue:#375f8f; --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12); --radius:14px; --sidebar-width:250px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15.5px;
+}
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.back-week{font-size:13px;font-weight:700;color:var(--brand-dark);text-decoration:none;white-space:nowrap;}
+.back-week:hover{text-decoration:underline;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+.layout{display:flex;align-items:flex-start;}
+.sidebar{
+  position:sticky;top:63px;flex:0 0 var(--sidebar-width);width:var(--sidebar-width);
+  height:calc(100vh - 63px);overflow-y:auto;padding:22px 14px 40px 22px;border-right:1px solid var(--line);
+}
+.sidebar-title{font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+.toc a{
+  display:block;padding:7px 11px;margin:2px 0;border-radius:8px;border-left:3px solid transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;line-height:1.4;
+}
+.toc a:hover{background:#eef3ec;color:var(--ink);}
+.toc a.active{background:var(--sky-light);border-left-color:var(--brand);color:var(--brand-dark);font-weight:800;}
+.toc a .done-mark{color:var(--green);font-weight:900;margin-left:4px;display:none;}
+.toc a.done .done-mark{display:inline;}
+.content{flex:1;min-width:0;max-width:920px;padding:clamp(20px,4vw,44px) clamp(16px,4vw,44px) 100px;}
+.hero{margin-bottom:16px;}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.07em;color:var(--brand-dark);background:var(--sky-light);padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+.hero h1{font-size:clamp(23px,3.6vw,32px);line-height:1.3;letter-spacing:-.015em;margin-bottom:10px;}
+.hero p{color:var(--muted);max-width:660px;}
+.section{margin-top:44px;padding-top:8px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
+.sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
+.sec-lead{color:var(--muted);margin:4px 0 18px;max-width:700px;}
+h3{font-size:16.5px;margin:26px 0 10px;}
+h4{font-size:15px;margin:16px 0 8px;}
+p{margin:10px 0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:14px 0;box-shadow:0 3px 14px rgba(54,42,31,.05);}
+.callout{border-left:4px solid var(--brand);background:var(--sky-light);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;font-size:14.5px;}
+.callout.caution{border-left-color:var(--red);background:#faeeec;}
+.callout.ok{border-left-color:var(--green);background:#edf4ef;}
+.callout b.cap{display:block;font-size:13px;letter-spacing:.03em;margin-bottom:4px;color:var(--brand-dark);}
+.callout.caution b.cap{color:var(--red);}
+.callout.ok b.cap{color:var(--green);}
+.tip-card{border-left:4px solid var(--brand);background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 17px;margin:14px 0;font-size:14px;color:var(--muted);}
+.tip-card b{color:var(--ink);}
+.copy-block{position:relative;background:#20242a;color:#e8ecf1;border-radius:12px;padding:18px 20px;margin:14px 0;font-size:14px;line-height:1.8;}
+.copy-block .cb-label{position:absolute;top:-10px;left:14px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--brand);padding:3px 10px;border-radius:999px;}
+.copy-block pre{white-space:pre-wrap;word-break:break-word;font-family:inherit;margin-top:4px;}
+.copy-btn{position:absolute;top:12px;right:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 11px;cursor:pointer;}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+.doc-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--surface);}
+.doc-table th{background:#f2f6f0;text-align:left;padding:8px 12px;border:1px solid var(--line);font-size:12.5px;}
+.doc-table td{padding:8px 12px;border:1px solid var(--line);}
+.doc-table td code, p code, li code, span code{background:#eef3ec;border-radius:5px;padding:1px 6px;font-family:ui-monospace,Consolas,monospace;font-size:.9em;}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+.compare .col{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.compare .col h4{font-size:14px;margin:0 0 8px;}
+.compare .col.dyn-col h4{color:var(--amber);}
+.compare .col.static-col h4{color:var(--green);}
+.compare ul{margin:0 0 0 18px;font-size:13.5px;color:var(--muted);}
+.compare li{margin:5px 0;}
+.concept-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:16px 0;}
+.concept{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.concept .ico{font-size:21px;}
+.concept b{display:block;margin:7px 0 4px;font-size:14.5px;}
+.concept span{display:block;color:var(--muted);font-size:13px;line-height:1.6;}
+.workshop-step{display:flex;gap:14px;margin:14px 0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+.ws-num{flex:0 0 auto;display:grid;place-items:center;width:30px;height:30px;border-radius:999px;background:var(--sky-light);color:var(--brand-dark);font-weight:900;font-size:14px;}
+.ws-body{min-width:0;flex:1;}
+.ws-body b.ws-title{display:block;font-size:14.5px;margin-bottom:4px;}
+.ws-body p{margin:6px 0;font-size:14px;color:var(--muted);}
+.final-list{margin:14px 0 0 0;list-style:none;}
+.final-list li{position:relative;padding:7px 0 7px 30px;font-size:14.5px;border-bottom:1px dashed var(--line);}
+.final-list li::before{content:"✔";position:absolute;left:4px;color:var(--green);font-weight:900;}
+.completion-row{margin:22px 0 6px;}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;font-weight:700;cursor:pointer;}
+.check input{width:18px;height:18px;margin-top:3px;accent-color:var(--brand);}
+.celebrate-banner{background:linear-gradient(135deg,#eaf6ee,#e3f1fb);border:1px solid #bfe0cd;border-radius:12px;padding:16px 20px;margin:0 0 18px;font-size:15px;}
+.next-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.next-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.next-card b{display:block;font-size:14.5px;margin-bottom:5px;color:var(--brand-dark);}
+.next-card span{font-size:13.5px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#20242a;color:#fff;font-size:13.5px;font-weight:700;padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:all .25s ease;z-index:60;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media (max-width:900px){ .layout{display:block;} .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);} .next-card-grid,.compare,.concept-grid{grid-template-columns:1fr;} }
+@media (max-width:640px){ .topbar{flex-wrap:wrap;row-gap:10px;} .topbar-left{flex-wrap:wrap;row-gap:8px;} .progress-wrap{width:100%;} }
+</style>
+</head>
+<body id="top" data-celebrate="🎉 <b>만능 어댑터 획득!</b> 이미 있는 CLI는 쥐여주고, 없는 CLI는 만들어 꽂는다 — 이제 MCP가 없는 시스템도 AI의 손이 닿는 곳이 되었습니다.">
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+    </a>
+    <div class="week-tag"><span class="week-num">WEEK 4</span><span class="week-title">CLI — 만능 어댑터</span></div>
+    <a class="back-week" href="index.html">← 4주차 목록</a>
+  </div>
+  <div class="progress-wrap" aria-label="진행률">
+    <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="목차">
+    <div class="sidebar-title">이 페이지의 흐름</div>
+    <div class="toc">
+      <a href="#s1" data-sec="s1">1. 발상의 전환 — 통로 대신 도구<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. 이미 있는 도구 쥐여주기 (예시 4)<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 없는 도구는 만든다 — 레거시 어댑터<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. MCP vs CLI — 판단과 마무리<span class="done-mark">✔</span></a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div id="celebrateSlot"></div>
+
+    <div class="hero">
+      <span class="hero-kicker">WEEK 4 · STEP 3 — 만능 어댑터</span>
+      <h1>CLI — MCP가 없는 시스템을<br/>AI에 잇는 만능 어댑터</h1>
+      <p>②의 연동 대상(구글 드라이브·시트)은 운이 좋은 경우였습니다 — 잘 만든 MCP 서버가 이미 있으니까요. 회사에 들어가면 다른 풍경을 만납니다: 10년 전 구축한 ERP, 부서 NAS의 엑셀 수천 개, 담당자가 퇴사한 구형 DB. 이런 시스템을 위해 MCP 서버를 개발하는 것은 정석이지만 개발자와 예산이 필요합니다. 오늘은 훨씬 가벼운 우회로 — <b>명령줄 도구(CLI)</b>를 배웁니다.</p>
+    </div>
+
+    <!-- ================= SECTION 1 ================= -->
+    <section class="section" id="s1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>발상의 전환 — 통로를 만드는 대신, 도구를 쥐여준다</h2></div>
+      <p class="sec-lead"><b>CLI(Command-Line Interface)</b>는 화면 없이 명령줄에서 텍스트로 부리는 프로그램입니다. Claude Code와 3주차 내내 함께 일한 그 터미널의 세계죠. 연결의 발상을 뒤집는 열쇠가 여기 있습니다.</p>
+
+      <div class="compare">
+        <div class="col dyn-col"><h4>지금까지 — 통로를 만든다</h4>
+          <ul>
+            <li>시스템 쪽에 문(MCP 서버·API)을 만들어</li>
+            <li>AI가 그 문으로 들어가게 한다</li>
+            <li>문이 없으면? → 연결 불가</li>
+          </ul>
+        </div>
+        <div class="col static-col"><h4>발상 전환 — 도구를 쥐여준다</h4>
+          <ul>
+            <li>그 시스템을 다룰 줄 아는 <b>작은 프로그램(CLI)</b>을 준비해</li>
+            <li>AI에게 "필요하면 이 도구를 실행해"라고 알려준다</li>
+            <li>AI가 스스로 도구를 골라 실행하고 결과를 읽는다</li>
+          </ul>
+        </div>
+      </div>
+
+      <p>이것이 가능한 이유는 이미 경험했습니다 — <b>Claude Code는 터미널 명령을 실행할 수 있습니다.</b> 그리고 CLI의 세 성질이 AI와 정확히 맞물립니다:</p>
+      <table class="doc-table">
+        <thead><tr><th style="width:160px">CLI의 성질</th><th>AI와의 궁합</th></tr></thead>
+        <tbody>
+          <tr><td><b>입출력이 전부 텍스트</b></td><td>텍스트는 AI가 가장 잘 읽고 쓰는 것 — 화면을 볼 필요가 없다</td></tr>
+          <tr><td><b>한 가지 일만 한다</b></td><td>언제 쓸지 판단하기 쉽고, 잘못 써도 피해 범위가 좁다</td></tr>
+          <tr><td><b>조립이 된다</b></td><td>A의 출력을 B의 입력으로 — 조립 설계는 AI가 스스로 한다</td></tr>
+        </tbody>
+      </table>
+      <div class="tip-card"><b>하나 더 — 도구가 스스로 설명서를 들고 다닙니다.</b> 거의 모든 CLI는 <code>--help</code>를 붙이면 사용법을 출력합니다. 처음 보는 도구를 만나면 AI가 <b>먼저 --help를 읽고 문법을 익힌 뒤</b> 씁니다 — 사용자가 문법을 외울 필요가 없는 이유입니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>"통로 만들기"와 "도구 쥐여주기"의 차이를 설명할 수 있다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 2 ================= -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>이미 있는 도구 쥐여주기 — 사용 예시 네 가지</h2></div>
+      <p class="sec-lead">세상에는 수십 년간 다듬어진 명품 CLI가 이미 가득합니다. <b>설치만 되어 있으면 전부 AI의 도구함</b>이 됩니다. 문법을 몰라도 됩니다 — 한국어로 시키면 AI가 알맞은 명령을 조립해 실행합니다.</p>
+
+      <div class="concept-grid">
+        <div class="concept"><div class="ico">🐙</div><b>gh — GitHub CLI</b><span>깃허브를 명령줄로 다루는 공식 도구. 이슈·PR·릴리스 관리가 전부 텍스트로 됩니다.</span></div>
+        <div class="concept"><div class="ico">🎬</div><b>ffmpeg — 영상·음성 변환</b><span>영상 편집 프로그램 없이 변환·자르기·추출을 하는 사실상의 업계 표준.</span></div>
+        <div class="concept"><div class="ico">📄</div><b>pandoc — 문서 변환</b><span>마크다운↔워드↔HTML↔PDF 등 문서 형식 사이의 만능 번역기.</span></div>
+        <div class="concept"><div class="ico">🗃️</div><b>sqlite3 — 파일 DB 조회</b><span>파일 하나짜리 데이터베이스(.db)를 열어 SQL로 묻는 도구. 뜻밖에 많은 프로그램이 내부 데이터를 이 형식으로 저장합니다.</span></div>
+      </div>
+
+      <h3>실제로 시켜 보면 — 프롬프트는 그냥 한국어입니다</h3>
+      <div class="copy-block"><span class="cb-label">💬 예시 1 · gh — 저장소 현황 브리핑</span><button class="copy-btn" data-copy="e1">복사</button>
+<pre id="e1">gh로 이 저장소의 열린 이슈를 전부 가져와서,
+오래된 순으로 정리하고 이번 주에 처리할 것 3개를 추천해줘.</pre></div>
+      <div class="copy-block"><span class="cb-label">💬 예시 2 · ffmpeg — 강의 녹화에서 음성 추출</span><button class="copy-btn" data-copy="e2">복사</button>
+<pre id="e2">recordings/ 폴더의 강의 녹화 mp4들에서 음성만 mp3로 추출해줘.
+파일명은 그대로 두고 확장자만 바꿔서 audio/ 폴더에 저장해줘.</pre></div>
+      <div class="copy-block"><span class="cb-label">💬 예시 3 · pandoc — 보고서 형식 변환</span><button class="copy-btn" data-copy="e3">복사</button>
+<pre id="e3">report.md를 회사에 제출할 워드 문서(docx)로 변환해줘.
+제목·표·각주가 깨지지 않는지 변환 후 확인해줘.</pre></div>
+      <div class="copy-block"><span class="cb-label">💬 예시 4 · sqlite3 — 낯선 DB 파일 탐색</span><button class="copy-btn" data-copy="e4">복사</button>
+<pre id="e4">전임자가 남긴 sales.db 파일이 있어. 어떤 테이블과 컬럼이 있는지
+먼저 훑어보고, 지난 분기 거래처별 매출 상위 10곳을 표로 뽑아줘.</pre></div>
+
+      <p>네 예시의 공통점을 보세요 — 사용자는 <b>ffmpeg의 옵션도, SQL 문법도 쓰지 않았습니다.</b> "무엇을 원하는지"만 말하면, AI가 도구를 고르고(--help를 읽어서라도) 명령을 조립해 실행하고 결과를 해석합니다. 도구가 설치되어 있지 않으면 설치부터 제안합니다 — 이때 ①의 원칙대로 <b>설치 승인은 읽고 누르세요</b>.</p>
+      <div class="callout ok"><b class="cap">직접 해보기 (2분)</b>
+      Claude Code에 이렇게 물어보세요: <b>"지금 이 컴퓨터에 설치된 CLI 도구 중 내가 업무에 쓸 만한 것들을 찾아서 각각 뭘 하는 도구인지 설명해줘."</b> — 내 도구함에 뭐가 있는지 AI가 목록을 만들어 줍니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>기존 CLI를 한국어 프롬프트로 부리는 감각을 익혔다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 3 ================= -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>없는 도구는 만든다 — 레거시 어댑터</h2></div>
+      <p class="sec-lead">사내 구형 시스템에는 gh 같은 기성 CLI가 없습니다. 하지만 우리에게는 <b>CLI를 만들어 주는 AI</b>가 있습니다 — 시스템은 한 줄도 고치지 않고, 그 시스템을 다룰 줄 아는 작은 도구를 옆에 만들어 꽂는 것입니다.</p>
+
+      <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
+        <b class="ws-title">어댑터 제작 — 접속 방법을 알려주고 만들게 한다</b>
+        <div class="copy-block"><span class="cb-label">💬 예시: 부서 공유폴더의 엑셀 수백 개</span><button class="copy-btn" data-copy="e5">복사</button>
+<pre id="e5">부서 공유폴더(N:\팀자료\주간보고)에 주간보고 엑셀이 몇 년치 쌓여 있어.
+파일명 규칙은 "주간보고_YYYYMMDD_작성자.xlsx"이고 시트 구조는 다 똑같아.
+이 폴더를 조회하는 CLI 도구(report.py)를 만들어줘:
+- 기간과 작성자로 검색해서 해당 파일들의 핵심 내용을 요약 출력
+- 특정 프로젝트명이 언급된 보고서만 골라내는 검색 기능
+사용법은 --help에 담아줘.</pre></div>
+        <p>구형 DB라면 접속 주소와 계정(읽기 전용 권장)을, 사내 웹 시스템이라면 화면 구조를 알려주면 됩니다. <b>접속 정보를 설명할 수 있으면 어댑터는 만들 수 있습니다.</b></p>
+      </div></div>
+      <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
+        <b class="ws-title">도구의 존재를 CLAUDE.md에 기록</b>
+        <div class="copy-block"><span class="cb-label">💬 이어서</span><button class="copy-btn" data-copy="e6">복사</button>
+<pre id="e6">방금 만든 report.py의 존재와 사용법을 CLAUDE.md에 추가해줘 —
+"주간보고 관련 질문이 오면 이 도구를 사용할 것"이라고.</pre></div>
+        <p>3주차 문서화에서 배운 그대로입니다 — CLAUDE.md는 <b>다음 세션의 AI가 읽는 문서</b>이므로, 여기 적어 두면 내일의 AI도 이 도구를 압니다.</p>
+      </div></div>
+      <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
+        <b class="ws-title">이후로는 그냥 일상어로</b>
+        <p>"이번 달 A프로젝트 언급된 주간보고 정리해줘"라고 물으면, AI가 <b>스스로 report.py를 골라 실행하고 출력을 해석해</b> 답합니다. 레거시 시스템은 한 줄도 바뀌지 않았는데, AI가 그 시스템을 쓰게 되었습니다.</p>
+      </div></div>
+
+      <div class="callout caution"><b class="cap">어댑터에도 ①의 원칙</b>
+      어댑터는 되도록 <b>읽기 전용</b>으로 시작하세요(조회만, 수정·삭제 없음). 쓰기 기능이 필요해지면 그때 별도 명령으로 추가하고, 실행 승인을 반드시 읽습니다. DB 계정도 읽기 전용 계정을 따로 받는 것이 안전합니다 — 도구의 권한이 곧 AI의 권한입니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>레거시 어댑터의 3단계(제작 → CLAUDE.md 기록 → 일상어 사용)를 이해했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 4 ================= -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>MCP vs CLI — 판단 기준과 마무리</h2></div>
+      <table class="doc-table">
+        <thead><tr><th></th><th>MCP (커넥터) — ②</th><th>CLI (어댑터) — 오늘</th></tr></thead>
+        <tbody>
+          <tr><td><b>언제</b></td><td>표준 규격의 MCP 서버가 <b>이미 있는</b> 서비스 (드라이브·슬랙·노션…)</td><td>MCP가 <b>없는</b> 시스템 — 레거시, 사내 전용, 파일 뭉치</td></tr>
+          <tr><td><b>준비물</b></td><td>커넥터 켜기 + 권한 승인</td><td>기성 CLI 설치, 또는 AI에게 어댑터 제작 요청</td></tr>
+          <tr><td><b>강점</b></td><td>표준이라 어디서나 같은 방식, 관리되는 보안</td><td>무엇이든 연결 가능, 시스템 무수정, 즉시 제작</td></tr>
+          <tr><td><b>주의</b></td><td>권한 승인 화면을 읽을 것 (②)</td><td>읽기 전용부터, 도구의 권한 = AI의 권한</td></tr>
+        </tbody>
+      </table>
+      <div class="callout"><b class="cap">이번 주의 표어</b>
+      <b>MCP는 표준 규격, CLI는 만능 어댑터.</b> 규격이 있으면 MCP로 깔끔하게, 없으면 CLI를 쥐여줍니다. 그리고 도구 선택–실행–해석을 스스로 반복하는 이 구조가 바로 ①에서 정의한 <b>에이전트</b>입니다 — ⑤⑥의 에르메스는 MCP(표준 도구함)와 CLI(맞춤 도구)를 모두 쥐게 됩니다.</div>
+      <ul class="final-list">
+        <li>CLI = 텍스트로 부리는 프로그램 — 텍스트 입출력·단일 기능·조립성이 AI와 맞물린다</li>
+        <li>이미 있는 도구(gh·ffmpeg·pandoc·sqlite3…)는 설치만 되면 AI의 도구함 — 문법은 AI가 --help로 익힌다</li>
+        <li>없는 도구는 만든다: 어댑터 제작 → CLAUDE.md 기록 → 일상어로 사용</li>
+        <li>어댑터는 읽기 전용부터 — 도구의 권한이 곧 AI의 권한</li>
+      </ul>
+      <div class="next-card-grid">
+        <div class="next-card"><b>다음 자료 ④ — 구글 시트 연동</b><span>세 번째 길 — 내 웹앱이 구글 시트를 직접 읽고 쓰는 연동. "웹에 게시"의 백엔드 없는 읽기부터 서비스 계정, 팀 현황판까지 한 편에.</span></div>
+        <div class="next-card"><b>직접 해보기</b><span>§2의 "내 도구함 목록" 프롬프트를 실행해 보고, 내 업무의 레거시(공유폴더·오래된 파일 뭉치) 하나를 골라 §3의 어댑터 제작 프롬프트를 변형해 보세요.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>MCP와 CLI 중 무엇을 쓸지 판단할 수 있다</span></label></div>
+    </section>
+
+      <a class="back-week" href="index.html" style="display:inline-block;margin-top:30px;">← 4주차 강의자료 목록으로</a>
+  </main>
+</div>
+
+<div class="toast" id="toast">복사되었습니다</div>
+<script>
+const $ = s => document.querySelector(s);
+function showToast(msg){
+  const t = $("#toast"); if(!t) return;
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){}
+  ta.remove();
+}
+document.querySelectorAll(".copy-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const text = document.getElementById(btn.dataset.copy).textContent;
+    const done = () => showToast("복사되었습니다");
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+    } else fallbackCopy(text, done);
+  });
+});
+const checks = [...document.querySelectorAll("input[data-progress]")];
+if(checks.length){
+  $("#progressTotal").textContent = checks.length;
+  let celebrated = false;
+  const updateProgress = () => {
+    const done = checks.filter(c => c.checked).length;
+    $("#progressCount").textContent = done;
+    $("#progressBar").style.width = (done/checks.length*100)+"%";
+    checks.forEach(c => {
+      const a = document.querySelector(`.toc a[data-sec="${c.dataset.progress}"]`);
+      if(a) a.classList.toggle("done", c.checked);
+    });
+    if(done===checks.length && !celebrated){
+      celebrated = true;
+      const b = document.createElement("div");
+      b.className = "celebrate-banner";
+      b.innerHTML = document.body.dataset.celebrate || "🎉 <b>완료!</b>";
+      $("#celebrateSlot").appendChild(b);
+      b.scrollIntoView({behavior:"smooth", block:"center"});
+    }
+  };
+  checks.forEach(c => c.addEventListener("change", updateProgress));
+  updateProgress();
+}
+const tocLinks = {};
+document.querySelectorAll(".toc a[data-sec]").forEach(a => tocLinks[a.dataset.sec] = a);
+const secIds = Object.keys(tocLinks);
+if(secIds.length){
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { en.target._visible = en.isIntersecting; });
+    let current = null;
+    for(const id of secIds){ const el = document.getElementById(id); if(el && el._visible){ current = id; break; } }
+    if(current){
+      Object.values(tocLinks).forEach(a => a.classList.remove("active"));
+      tocLinks[current].classList.add("active");
+    }
+  }, {rootMargin:"-15% 0px -55% 0px"});
+  secIds.forEach(id => { const el = document.getElementById(id); if(el) io.observe(el); });
+}
+</script>
+</body>
+</html>

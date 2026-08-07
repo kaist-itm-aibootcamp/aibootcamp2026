@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 4 — 에르메스 에이전트 ①: 설치와 텔레그램·OpenRouter 연동</title>
+<style>
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
+  --brand:#2e9bdb; --brand-dark:#1b6fa6; --green:#2f765b; --amber:#b8792e; --red:#b0483f;
+  --blue:#375f8f; --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12); --radius:14px; --sidebar-width:250px;
+  /* dataviz roles (validated) */
+  --viz-surface:#ffffff; --viz-ink:#0b0b0b; --viz-ink2:#52514e; --viz-muted:#898781;
+  --viz-grid:#e1e0d9; --viz-axis:#c3c2b7;
+  --series-1:#2a78d6; --series-2:#eb6834;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15.5px;
+}
+/* ---------- topbar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+/* ---------- layout ---------- */
+.layout{display:flex;align-items:flex-start;}
+.sidebar{
+  position:sticky;top:63px;flex:0 0 var(--sidebar-width);width:var(--sidebar-width);
+  height:calc(100vh - 63px);overflow-y:auto;padding:22px 14px 40px 22px;border-right:1px solid var(--line);
+}
+.sidebar-title{font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+.toc a{
+  display:block;padding:7px 11px;margin:2px 0;border-radius:8px;border-left:3px solid transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;line-height:1.4;
+}
+.toc a:hover{background:#eef3ec;color:var(--ink);}
+.toc a.active{background:var(--sky-light);border-left-color:var(--brand);color:var(--brand-dark);font-weight:800;}
+.toc a .done-mark{color:var(--green);font-weight:900;margin-left:4px;display:none;}
+.toc a.done .done-mark{display:inline;}
+.content{flex:1;min-width:0;max-width:920px;padding:clamp(20px,4vw,44px) clamp(16px,4vw,44px) 100px;}
+/* ---------- hero ---------- */
+.hero{margin-bottom:16px;}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.07em;color:var(--brand-dark);background:var(--sky-light);padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+.hero h1{font-size:clamp(23px,3.6vw,32px);line-height:1.3;letter-spacing:-.015em;margin-bottom:10px;}
+.hero p{color:var(--muted);max-width:640px;}
+/* ---------- sections ---------- */
+.section{margin-top:44px;padding-top:8px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
+.sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
+.sec-lead{color:var(--muted);margin:4px 0 18px;max-width:700px;}
+h3{font-size:16.5px;margin:26px 0 10px;}
+p{margin:10px 0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:14px 0;box-shadow:0 3px 14px rgba(54,42,31,.05);}
+/* concept grid */
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+.concept{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.concept .ico{font-size:21px;}
+.concept b{display:block;margin:7px 0 4px;font-size:14.5px;}
+.concept span{display:block;color:var(--muted);font-size:13px;line-height:1.55;}
+.concept .use{display:inline-block;margin-top:9px;font-size:12px;font-weight:800;color:var(--brand-dark);background:var(--sky-light);border-radius:999px;padding:2px 10px;}
+/* callouts */
+.callout{border-left:4px solid var(--brand);background:var(--sky-light);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;font-size:14.5px;}
+.callout.caution{border-left-color:var(--red);background:#faeeec;}
+.callout.ok{border-left-color:var(--green);background:#edf4ef;}
+.callout b.cap{display:block;font-size:13px;letter-spacing:.03em;margin-bottom:4px;}
+.callout.caution b.cap{color:var(--red);}
+.callout.ok b.cap{color:var(--green);}
+.callout b.cap{color:var(--brand-dark);}
+.tip-card{border-left:4px solid var(--brand);background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 17px;margin:14px 0;font-size:14px;color:var(--muted);}
+.tip-card b{color:var(--ink);}
+/* prompt copy block */
+.copy-block{position:relative;background:#20242a;color:#e8ecf1;border-radius:12px;padding:18px 20px;margin:14px 0;font-size:14px;line-height:1.8;}
+.copy-block .cb-label{position:absolute;top:-10px;left:14px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--brand);padding:3px 10px;border-radius:999px;}
+.copy-block pre{white-space:pre-wrap;word-break:keep-all;font-family:inherit;margin-top:4px;}
+.copy-btn{position:absolute;top:12px;right:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 11px;cursor:pointer;}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+/* two-col compare */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+.compare .col{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.compare .col h4{font-size:14px;margin-bottom:8px;}
+.compare .col.static-col h4{color:var(--green);}
+.compare .col.dyn-col h4{color:var(--amber);}
+.compare ul{margin:0 0 0 18px;font-size:13.5px;color:var(--muted);}
+.compare li{margin:5px 0;}
+/* stat tiles */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 15px;}
+.stat .v{font-size:26px;font-weight:900;letter-spacing:-.02em;color:var(--brand-dark);line-height:1.15;}
+.stat .k{margin-top:5px;font-size:12.5px;color:var(--muted);line-height:1.5;}
+/* explorer table */
+.explorer{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:16px 0;}
+.radio-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:12px;}
+.radio-row .rlabel{font-size:12.5px;font-weight:800;color:var(--muted);margin-right:2px;}
+.radio-group{display:flex;flex-wrap:wrap;gap:6px;}
+.radio-option{display:flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--line);border-radius:8px;background:#fafcf9;font-size:13px;font-weight:600;cursor:pointer;}
+.radio-option input{accent-color:var(--brand);}
+.radio-option:has(input:checked){border-color:var(--brand);background:var(--sky-light);color:var(--brand-dark);font-weight:800;}
+.book-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+.book-table th{background:#f2f6f0;border:1px solid var(--line);padding:7px 10px;text-align:left;font-size:12.5px;}
+.book-table td{border:1px solid var(--line);padding:6px 10px;}
+.book-table td.num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);}
+.dl-btn{border:1px solid var(--brand);color:var(--brand-dark);background:var(--sky-light);font-weight:800;font-size:13px;border-radius:9px;padding:8px 15px;cursor:pointer;}
+.dl-btn:hover{background:#d3e9f8;}
+/* charts */
+.chart-card{background:var(--viz-surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px 12px;margin:16px 0;}
+.chart-card h4{font-size:15px;color:var(--viz-ink);margin-bottom:2px;}
+.chart-card .sub{font-size:12.5px;color:var(--viz-ink2);margin-bottom:10px;}
+.legend{display:flex;gap:16px;align-items:center;margin:2px 0 8px;font-size:12.5px;color:var(--viz-ink2);}
+.legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;transform:translateY(1px);}
+.chart-svg{width:100%;height:auto;display:block;}
+.viz-tooltip{position:fixed;z-index:60;pointer-events:none;background:#20242a;color:#fff;font-size:12.5px;line-height:1.5;border-radius:8px;padding:7px 11px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .12s;max-width:280px;}
+.chart-note{font-size:12px;color:var(--viz-muted);margin:6px 0 4px;}
+/* insight list */
+.insight{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0;}
+.insight .n{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;border-radius:999px;background:var(--sky-light);color:var(--brand-dark);font-weight:900;font-size:13px;transform:translateY(2px);}
+.insight p{margin:0;font-size:14.5px;}
+/* example embed (lightbox) */
+.example-card{display:flex;gap:0;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;margin:16px 0;box-shadow:var(--shadow);max-width:560px;}
+.example-card:focus-visible{outline:3px solid var(--brand);}
+.example-thumb{position:relative;height:210px;overflow:hidden;background:#eef1ec;}
+.example-thumb iframe{position:absolute;top:0;left:0;width:400%;height:400%;transform:scale(.25);transform-origin:top left;border:none;pointer-events:none;}
+.example-thumb .zoom{position:absolute;right:12px;bottom:12px;background:rgba(32,36,42,.85);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:5px 12px;}
+.example-body{padding:14px 18px;}
+.example-body b{font-size:14.5px;}
+.example-body p{margin:4px 0 0;font-size:13px;color:var(--muted);}
+.example-lightbox{position:fixed;inset:0;z-index:80;background:rgba(20,24,20,.62);display:flex;align-items:center;justify-content:center;padding:3vh 3vw;}
+.example-lightbox[hidden]{display:none;}
+.lightbox-inner{position:relative;width:min(980px,96vw);height:92vh;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);}
+.lightbox-inner iframe{width:100%;height:100%;border:none;}
+.lightbox-close{position:absolute;top:10px;right:10px;z-index:2;border:none;background:#20242a;color:#fff;width:34px;height:34px;border-radius:999px;font-size:16px;font-weight:900;cursor:pointer;}
+/* completion */
+.completion-row{margin:22px 0 6px;}
+.check{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 18px;cursor:pointer;font-size:14px;font-weight:700;color:var(--muted);}
+.check input{width:17px;height:17px;accent-color:var(--green);}
+.check:has(input:checked){border-color:var(--green);color:var(--green);background:#edf4ef;}
+/* celebrate banner */
+.celebrate-banner{border:1px solid #bfe0c9;background:linear-gradient(120deg,#edf7ef,#e3f1fb);border-radius:var(--radius);padding:18px 22px;margin:0 0 22px;font-size:15px;box-shadow:var(--shadow);}
+.celebrate-banner b{color:var(--green);}
+/* checklist */
+.final-list{list-style:none;margin:14px 0;}
+.final-list li{display:flex;gap:10px;margin:9px 0;font-size:14.5px;}
+.final-list li::before{content:"✔";color:var(--green);font-weight:900;}
+.next-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.next-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.next-card b{display:block;font-size:14.5px;margin-bottom:5px;color:var(--brand-dark);}
+.next-card span{font-size:13.5px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#20242a;color:#fff;font-size:13.5px;font-weight:700;border-radius:999px;padding:10px 20px;opacity:0;transition:all .25s;z-index:90;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media (max-width:900px){ .layout{display:block;} .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  .concept-grid{grid-template-columns:1fr 1fr;} .stat-row{grid-template-columns:1fr 1fr;} .compare{grid-template-columns:1fr;} .next-card-grid{grid-template-columns:1fr;} }
+@media (max-width:640px){ .topbar{flex-wrap:wrap;row-gap:10px;} .topbar-left{flex-wrap:wrap;row-gap:8px;} .progress-wrap{width:100%;} .concept-grid{grid-template-columns:1fr;} }
+
+/* ---- 목록으로 돌아가기 (week1과 동일 패턴) ---- */
+.back-week{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:color .15s ease,border-color .15s ease,background .15s ease;}
+.back-week:hover{color:var(--brand-dark);border-color:var(--brand);background:var(--sky-light);}
+.back-home{display:flex;align-items:center;gap:15px;max-width:840px;margin:34px 0 10px;padding:20px 24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s ease,border-color .18s ease;}
+.back-home:hover{transform:translateY(-2px);border-color:var(--brand);}
+.back-home .bh-ic{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;border-radius:11px;background:var(--sky-light);color:var(--brand-dark);font-size:19px;font-weight:900;}
+.back-home strong{display:block;font-size:15.5px;font-weight:800;}
+.back-home small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;font-weight:600;}
+@media (max-width:640px){.back-home{padding:18px;gap:12px;}}
+
+/* ---- week3 공통 추가 ---- */
+.flowline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0;padding:15px 17px;background:var(--surface);border:1px solid var(--line);border-radius:12px;}
+.flowline .fnode{display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:9px 14px;border-radius:10px;background:var(--sky-light);border:1px solid #c9e2f5;font-size:13px;font-weight:800;color:var(--brand-dark);text-align:center;line-height:1.35;}
+.flowline .fnode small{font-size:11px;font-weight:600;color:var(--muted);}
+.flowline .fnode.dark{background:#20242a;border-color:#20242a;color:#fff;}
+.flowline .fnode.dark small{color:#aab4c0;}
+.flowline .fnode.ok{background:#edf4ef;border-color:#bfe0c9;color:var(--green);}
+.flowline .farrow{color:var(--muted);font-weight:900;}
+.step-table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0;}
+.step-table th{background:#f2f6f0;border:1px solid var(--line);padding:8px 12px;text-align:left;font-size:13px;}
+.step-table td{border:1px solid var(--line);padding:8px 12px;vertical-align:top;}
+.step-table td b{color:var(--brand-dark);}
+.badge{display:inline-block;font-size:11.5px;font-weight:800;border-radius:999px;padding:2px 10px;vertical-align:1px;}
+.badge.b-green{background:#edf4ef;color:var(--green);}
+.badge.b-red{background:#faeeec;color:var(--red);}
+.badge.b-blue{background:var(--sky-light);color:var(--brand-dark);}
+.badge.b-amber{background:#fbf1de;color:var(--amber);}
+.kv{display:grid;grid-template-columns:170px 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0;font-size:13.5px;}
+.kv > div{padding:9px 14px;border-bottom:1px solid var(--line);background:var(--surface);}
+.kv > div:nth-child(odd){background:#f2f6f0;font-weight:800;font-size:12.5px;}
+.kv > div:nth-last-child(-n+2){border-bottom:none;}
+.ws-steps{counter-reset:ws;margin:16px 0;}
+.workshop-step{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px 14px 58px;margin:12px 0;}
+.workshop-step .ws-num{position:absolute;left:16px;top:16px;display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:13.5px;}
+.workshop-step b.ws-t{display:block;font-size:14.5px;margin-bottom:4px;}
+.workshop-step p{font-size:14px;color:var(--muted);margin:4px 0;}
+.workshop-step code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.5px;}
+code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.88em;font-family:ui-monospace,'SF Mono',Consolas,monospace;}
+.copy-block code{background:transparent;border:none;padding:0;color:#9fd0f5;font-size:inherit;}
+.quad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.quad .q{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.quad .q h4{font-size:14px;margin-bottom:6px;}
+.quad .q p{font-size:13.5px;color:var(--muted);margin:4px 0;}
+.term-list{margin:14px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+.term-list .term{display:grid;grid-template-columns:150px 1fr;border-bottom:1px solid var(--line);background:var(--surface);}
+.term-list .term:last-child{border-bottom:none;}
+.term-list .term > b{padding:11px 14px;background:#f2f6f0;font-size:13.5px;}
+.term-list .term > span{padding:11px 14px;font-size:13.5px;color:var(--muted);}
+@media (max-width:700px){.quad{grid-template-columns:1fr;}.kv{grid-template-columns:1fr;}.kv > div:nth-child(odd){border-bottom:none;padding-bottom:2px;}.term-list .term{grid-template-columns:1fr;}}
+</style>
+</head>
+<body id="top">
+
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+    </a>
+    <div class="week-tag"><span class="week-num">WEEK 4</span><span class="week-title">에르메스 설치·연동</span></div>
+    <a class="back-week" href="index.html">← 4주차 목록</a>
+  </div>
+  <div class="progress-wrap" aria-label="진행률">
+    <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="목차">
+    <div class="sidebar-title">이 페이지의 흐름</div>
+    <div class="toc" id="toc">
+      <a href="#s1" data-sec="s1">1. 에르메스란 — Claude와 뭐가 다른가<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. 설치 — Hostinger VPS 원클릭<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. OpenRouter 연동 — 두뇌 꽂기<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 텔레그램 게이트웨이 — 페어링으로 연결<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 첫 대화와 안전 점검<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. 마무리<span class="done-mark">✔</span></a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div id="celebrateSlot"></div>
+
+    <div class="hero">
+      <span class="hero-kicker">WEEK 4 · STEP 5 — 에르메스 에이전트 ①</span>
+      <h1>에르메스 에이전트 ① —<br/>설치, 그리고 텔레그램·OpenRouter 연동</h1>
+      <p>이론(①)과 연결(②③④)을 지나, 드디어 <b>자율 에이전트를 직접 설치</b>합니다. 에르메스(Hermes Agent)는 서버에 상주하며 텔레그램으로 말을 걸 수 있는 오픈소스 에이전트입니다. 설치는 <b>Hostinger 호스팅의 원클릭 템플릿</b>을 씁니다 — 24시간 켜져 있는 내 서버가 생기고, 도메인까지 붙이면 훌륭한 개인 서버가 됩니다. 이 자료에서 서버 만들기 → 두뇌(OpenRouter) 연결 → 텔레그램 연결 → 첫 대화까지 갑니다. ①에서 배운 안전 원칙이 <b>실물</b>로 등장하는 지점들을 놓치지 마세요.</p>
+    </div>
+
+
+    <!-- ================= SECTION 1 ================= -->
+    <section class="section" id="s1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>에르메스란 — Claude와 뭐가 다른가</h2></div>
+      <p class="sec-lead"><b>에르메스(Hermes Agent)</b>는 Nous Research가 공개한 오픈소스(MIT 라이선스) 자율 AI 에이전트입니다. 지금까지 쓰던 Claude와의 차이는 기능이 아니라 <b>존재 방식</b>에 있습니다.</p>
+
+      <table class="step-table">
+        <thead><tr><th></th><th>Claude (지금까지)</th><th>에르메스 (오늘부터)</th></tr></thead>
+        <tbody>
+          <tr><td><b>어디서 사나</b></td><td>Anthropic의 서버 (나는 접속)</td><td><b>내 컴퓨터/서버</b> (자가 호스팅)</td></tr>
+          <tr><td><b>언제 사나</b></td><td>내가 대화창을 열 때</td><td><b>상시 상주(persistent)</b> — 세션이 끝나도 기억 유지</td></tr>
+          <tr><td><b>어떻게 부르나</b></td><td>앱·웹·터미널</td><td>메신저 게이트웨이 <b>21개+</b> — 텔레그램·디스코드·슬랙 등</td></tr>
+          <tr><td><b>두뇌(모델)</b></td><td>Claude 고정</td><td>자유 — <b>OpenRouter(200+ 모델)</b>·OpenAI·자체 엔드포인트</td></tr>
+          <tr><td><b>확장</b></td><td>스킬·MCP·커넥터</td><td>스킬 <b>자가 생성</b> + MCP + cron 루틴(⑥)</td></tr>
+        </tbody>
+      </table>
+      <p>요약하면: <b>몸(실행 환경)은 내 것, 두뇌(모델)는 골라 꽂고, 입(대화 통로)은 메신저.</b> 이 조합이 "내가 자는 동안 일하는 AI"를 가능하게 합니다 — 그리고 ①에서 배웠듯, 바로 이 조합(사적 데이터 + 외부 콘텐츠 + 외부 통신)이 치명적 3요소이기도 합니다. 설치 과정 내내 안전장치를 함께 챙기는 이유입니다.</p>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>에르메스와 Claude의 존재 방식 차이를 설명할 수 있다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 2 ================= -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>설치 — Hostinger VPS에 원클릭으로</h2></div>
+      <p class="sec-lead">에이전트는 <b>24시간 상주</b>해야 의미가 있는데, 내 PC는 덮개를 닫으면 꺼집니다. 그래서 <b>호스팅 서비스(Hostinger)의 VPS</b>(가상 개인 서버)에 올립니다 — 원클릭 템플릿이 있어 설치 난이도가 크게 낮고, 도메인까지 연결하면 훌륭한 개인 서버가 됩니다.</p>
+
+      <div class="ws-steps">
+        <div class="workshop-step"><span class="ws-num">1</span>
+          <b class="ws-t">VPS 플랜 + 에르메스 템플릿 선택</b>
+          <p><a href="https://www.hostinger.com/applications/hermes-agent" target="_blank" rel="noopener">hostinger.com</a>에서 VPS 플랜(KVM 2 권장, 월 몇 달러대 — 요금제는 결제 화면에서 확인)을 고르고, 설정 단계에서 템플릿으로 <b>Hermes Agent</b>를 선택합니다. 결제하면 <b>시스템이 알아서 전부 설치</b>합니다. 이 과정에서 웹 터미널 접속용 <b>사용자명·비밀번호</b>를 만들게 됩니다 — 길게, 문장형으로.</p>
+        </div>
+        <div class="workshop-step"><span class="ws-num">2</span>
+          <b class="ws-t">Docker Manager에서 열기</b>
+          <p>설치가 끝나면 관리 화면(hPanel)의 <b>Docker Manager</b>에 Hermes Agent가 프로젝트로 나타납니다. <b>Open</b>을 눌러 방금 만든 계정으로 로그인하면 — 브라우저 안에서 에르메스의 <b>웹 터미널</b>이 열립니다. 이후 이 자료의 모든 <code>hermes ...</code> 명령은 여기서 실행합니다. 이상하면 <code>hermes doctor</code>가 진단해 줍니다.</p>
+        </div>
+        <div class="workshop-step"><span class="ws-num">3</span>
+          <b class="ws-t">(선택) 도메인 연결 — 개인 서버 완성</b>
+          <p>hPanel → Domains → <b>DNS/Nameservers</b>에서 <b>A 레코드</b>를 추가합니다: <code>hermes.내도메인.com</code> → 내 VPS의 IP 주소. 1주차에 배운 도메인 연결과 같은 원리입니다 — 이제 IP 숫자가 아니라 <b>내 도메인이 붙은 24시간 개인 서버</b>가 생겼습니다.</p>
+        </div>
+      </div>
+
+      <div class="callout ok"><b class="cap">왜 이 방식인가 — 난이도는 내려가고, 안전장치는 기본으로</b>
+      ① 내 PC를 켜 둘 필요 없이 <b>24시간 상주</b> ② API 키·대화 기록·데이터가 <b>내 서버에만</b> 남음 ③ 템플릿이 에르메스를 <b>Docker 컨테이너</b>로 돌리므로, ①강에서 배운 <b>컨테이너 고립</b>이 처음부터 적용된 상태로 시작합니다. 로컬 설치의 WSL2 준비·의존성 설치가 통째로 사라지는 것은 덤입니다.</div>
+
+      <div class="tip-card"><b>내 PC에 직접 설치하고 싶다면 (대안)</b> — Linux·macOS·WSL2에서 공식 스크립트 한 줄로도 됩니다: <code>curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash</code> 후 <code>source ~/.bashrc</code>. 단, <code>curl … | bash</code>는 <b>인터넷의 코드를 그대로 내 컴퓨터에서 실행</b>하는 명령입니다(①의 위험 구조와 같은 모양) — 주소가 공식 저장소(NousResearch/hermes-agent)인지 반드시 확인하고 실행하세요.</div>
+
+      <h3>설치 후 서버에 생기는 것 — <code>~/.hermes/</code> 홈 폴더</h3>
+      <div class="kv">
+        <div><code>config.yaml</code></div><div>에이전트 설정 — 모델, 게이트웨이, terminal backend 등</div>
+        <div><code>.env</code></div><div><b>API 키 보관소.</b> 3주차 공식("비밀은 환경변수로")의 에르메스 버전 — §3에서 채웁니다</div>
+        <div><code>SOUL.md</code></div><div>에이전트의 성격·말투를 정하는 파일 — 마크다운으로 자유롭게 수정</div>
+        <div><code>memories/</code></div><div>세션이 끝나도 유지되는 장기 기억</div>
+        <div><code>skills/</code></div><div>스킬 폴더 — 3주차에 만든 SKILL.md 구조와 같은 계열이며, 에르메스는 스스로 스킬을 만들어 여기 저장하기도 합니다</div>
+        <div><code>sessions/</code> · <code>logs/</code></div><div>대화 기록과 동작 로그 — 에이전트가 무슨 일을 했는지 확인하는 감사 창구</div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>에르메스를 설치하고 ~/.hermes/ 구조를 파악했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 3 ================= -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>OpenRouter 연동 — 두뇌 꽂기</h2></div>
+      <p class="sec-lead">에르메스는 몸일 뿐, 두뇌(모델)는 밖에서 꽂아야 합니다. 2·3주차에 만들어 둔 <b>OpenRouter API 키를 그대로 재사용</b>합니다 — 새로 발급할 필요 없습니다.</p>
+
+      <div class="ws-steps">
+        <div class="workshop-step"><span class="ws-num">1</span>
+          <b class="ws-t">.env에 키 넣기</b>
+          <div class="copy-block"><span class="cb-label">📄 ~/.hermes/.env</span>
+            <button class="copy-btn" data-copy="h3">복사</button>
+            <pre id="h3">OPENROUTER_API_KEY=sk-or-v1-여기에-내-키</pre>
+          </div>
+        </div>
+        <div class="workshop-step"><span class="ws-num">2</span>
+          <b class="ws-t">config.yaml에서 기본 모델 지정</b>
+          <div class="copy-block"><span class="cb-label">📄 ~/.hermes/config.yaml</span>
+            <button class="copy-btn" data-copy="h4">복사</button>
+            <pre id="h4">model:
+  provider: "openrouter"
+  default: "anthropic/claude-sonnet-4.6"</pre>
+          </div>
+          <p>OpenRouter를 통해 200개 이상의 모델을 같은 키로 바꿔 낄 수 있습니다. 한 번만 써 보려면 설정 없이 <code>hermes chat --provider openrouter --model anthropic/claude-sonnet-4.6</code>처럼 실행 시 지정할 수도 있습니다.</p>
+        </div>
+      </div>
+      <div class="callout"><b class="cap">.env는 내 서버에만</b>
+      3주차에는 키를 Vercel의 환경변수에 두었습니다. 에르메스는 자가 호스팅이므로 <b>키가 내 서버(VPS)의 <code>.env</code>에 놓입니다</b> — 편리하지만, OpenClaw 사고 원인 중 하나가 "평문으로 놓인 비밀"이었음을 기억하세요. 이 파일을 절대 git에 커밋하거나 메신저로 보내지 말고, 에이전트의 작업 폴더 안에 복사해 두지도 마세요(울타리 안의 비밀은 보호 대상이 아니라 작업 대상이 됩니다).</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>OpenRouter 키를 .env에 넣고 기본 모델을 지정했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 4 ================= -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>텔레그램 게이트웨이 — 페어링으로 연결</h2></div>
+      <p class="sec-lead">이제 입을 답니다. 텔레그램 봇을 만들어 에르메스에 연결하면, 폰에서 말 거는 것만으로 내 서버의 에이전트가 움직입니다.</p>
+
+      <div class="ws-steps">
+        <div class="workshop-step"><span class="ws-num">1</span>
+          <b class="ws-t">BotFather로 봇 만들기</b>
+          <p>텔레그램에서 <b>@BotFather</b>를 검색해 대화 시작 → <code>/newbot</code> → 봇 이름과 아이디(…bot으로 끝나야 함) 지정 → 발급된 <b>봇 토큰</b>을 복사해 둡니다. 이 토큰도 비밀입니다 — 키와 같은 등급으로 다루세요.</p>
+        </div>
+        <div class="workshop-step"><span class="ws-num">2</span>
+          <b class="ws-t">게이트웨이 설정</b>
+          <div class="copy-block"><span class="cb-label">⌨️ 터미널</span>
+            <button class="copy-btn" data-copy="h5">복사</button>
+            <pre id="h5">hermes gateway setup</pre>
+          </div>
+          <p>목록에서 <b>Telegram</b>을 선택하고, 1단계의 봇 토큰을 붙여넣습니다.</p>
+        </div>
+        <div class="workshop-step"><span class="ws-num">3</span>
+          <b class="ws-t">페어링 — 사용자 승인</b>
+          <p>텔레그램에서 내 봇에게 첫 메시지를 보내면 <b>페어링 코드</b>가 표시됩니다. 터미널에서 그 코드를 승인해야 대화가 시작됩니다:</p>
+          <div class="copy-block"><span class="cb-label">⌨️ 터미널</span>
+            <button class="copy-btn" data-copy="h6">복사</button>
+            <pre id="h6">hermes pairing approve telegram 페어링코드</pre>
+          </div>
+        </div>
+        <div class="workshop-step"><span class="ws-num">4</span>
+          <b class="ws-t">게이트웨이 시작</b>
+          <div class="copy-block"><span class="cb-label">⌨️ 터미널</span>
+            <button class="copy-btn" data-copy="h7">복사</button>
+            <pre id="h7">hermes gateway start</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout ok"><b class="cap">①의 원칙, 두 번째 실물 — 페어링 코드가 곧 human-in-the-loop</b>
+      왜 봇에게 바로 말을 걸 수 없게 해 놓았을까요? 봇 아이디는 사실상 공개 정보라, 승인 절차가 없다면 <b>아무나</b> 내 컴퓨터의 에이전트에게 명령을 보낼 수 있기 때문입니다. 페어링 코드는 "이 사람의 명령만 받는다"를 <b>사람이 직접 승인</b>하는 장치 — ①에서 배운 화이트리스트 + HITL이 실물로 구현된 모습입니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>텔레그램 봇을 페어링 승인으로 연결하고 게이트웨이를 시작했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 5 ================= -->
+    <section class="section" id="s5">
+      <div class="sec-head"><span class="sec-num">5</span><h2>첫 대화와 안전 점검</h2></div>
+      <p class="sec-lead">폰을 들고 봇에게 말을 걸어 보세요 — "안녕, 너는 지금 어디서 실행되고 있어?" 응답이 오면, 여러분의 첫 자가 호스팅 에이전트가 깨어난 것입니다.</p>
+      <div class="kv">
+        <div><code>hermes status</code></div><div>에이전트·게이트웨이 동작 상태 확인</div>
+        <div><code>hermes doctor</code></div><div>환경 문제 진단 — 뭔가 안 될 때 첫 번째로 실행</div>
+        <div><code>hermes version</code></div><div>설치된 버전 확인</div>
+      </div>
+
+      <h3>운영 전 안전 점검 — ①의 체크리스트를 이 자리에</h3>
+      <div class="insight"><span class="n">1</span><p><b>terminal backend는 docker로.</b> <code>config.yaml</code>에서 에이전트의 셸 실행을 Docker 컨테이너로 두면, 명령이 서버 본체가 아니라 일회용 컨테이너 안에서 돕니다 — ①에서 배운 "모델이 속아도 OS가 막는" 구조입니다. Hostinger 템플릿은 처음부터 Docker 기반이라 이 원칙이 기본 적용되어 있습니다 — 설정을 바꿀 때 이 구조를 깨지 않는 것이 핵심입니다.</p></div>
+      <div class="insight"><span class="n">2</span><p><b>페어링은 내 계정 하나만.</b> 가족·친구 계정을 무심코 승인하지 않기. 승인 목록이 곧 화이트리스트입니다.</p></div>
+      <div class="insight"><span class="n">3</span><p><b>비밀은 <code>.env</code>에만, 작업 폴더 밖에.</b> 에이전트가 읽고 다니는 폴더에 키·토큰 사본을 두지 않기.</p></div>
+      <div class="insight"><span class="n">4</span><p><b>logs/를 가끔 열어 본다.</b> 자율은 무감독이 아닙니다 — 에이전트가 무슨 일을 했는지 확인하는 습관이 마지막 안전장치입니다.</p></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>텔레그램으로 첫 대화를 나누고 안전 점검 4가지를 확인했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 6 ================= -->
+    <section class="section" id="s6">
+      <div class="sec-head"><span class="sec-num">6</span><h2>마무리</h2></div>
+      <ul class="final-list">
+        <li>에르메스 = 자가 호스팅 · 상시 상주 · 메신저로 부르는 오픈소스(MIT) 에이전트</li>
+        <li>설치는 Hostinger VPS 원클릭 템플릿 — 24시간 상주 + Docker 고립 기본, 도메인을 붙이면 개인 서버</li>
+        <li>두뇌는 OpenRouter로 — 2·3주차의 키 재사용, 키는 .env에만</li>
+        <li>텔레그램 연결의 관문은 페어링 코드 — HITL·화이트리스트의 실물</li>
+        <li>terminal backend는 docker — 템플릿에 기본 적용된 "속아도 막히는" 구조를 깨지 않기</li>
+      </ul>
+      <div class="next-card-grid">
+        <div class="next-card"><b>다음 자료 ⑥</b><span>이제 에이전트에게 <b>반복 업무</b>를 맡깁니다 — cron 루틴으로 매일 아침 브리핑을 받고, 대시보드에서 진행상황을 관리합니다.</span></div>
+        <div class="next-card"><b>직접 해보기</b><span><code>SOUL.md</code>를 열어 에이전트의 성격을 바꿔 보세요 — 말투, 보고 형식, 존댓말 여부. 절차를 파일로 남기는 ④의 습관이 여기서도 그대로 통합니다.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>에르메스 설치·연동을 마쳤다!</span></label></div>
+    </section>
+
+
+    <a class="back-home" href="index.html">
+      <span class="bh-ic">📚</span>
+      <span><strong>4주차 강의자료 목록으로 돌아가기</strong><small>다음 자료: cron 루틴과 대시보드</small></span>
+    </a>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+const CELEBRATE_HTML = "🎉 <b>내 에이전트가 깨어났습니다!</b> 텔레그램으로 부르는 나만의 상주 에이전트가 생겼습니다. 다음 자료 ⑥에서 이 에이전트에게 아침 브리핑 루틴을 맡깁니다.";
+
+const $ = s => document.querySelector(s);
+/* 프롬프트 복사 */
+function showToast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1800);}
+function fallbackCopy(text,done){const ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done();}catch(e){}ta.remove();}
+document.querySelectorAll(".copy-btn").forEach(btn=>{btn.addEventListener("click",()=>{const text=document.getElementById(btn.dataset.copy).textContent;const done=()=>showToast("프롬프트가 복사되었습니다");if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));}else fallbackCopy(text,done);});});
+/* 진행률 + 축하 배너 (상태는 메모리에만) */
+const checks=[...document.querySelectorAll("input[data-progress]")];
+$("#progressTotal").textContent=checks.length;
+let celebrated=false;
+function updateProgress(){
+  const done=checks.filter(c=>c.checked).length;
+  $("#progressCount").textContent=done;
+  $("#progressBar").style.width=(done/checks.length*100)+"%";
+  checks.forEach(c=>{const a=document.querySelector(`.toc a[data-sec="${c.dataset.progress}"]`);if(a)a.classList.toggle("done",c.checked);});
+  if(done===checks.length&&!celebrated){
+    celebrated=true;
+    const b=document.createElement("div");b.className="celebrate-banner";
+    b.innerHTML=CELEBRATE_HTML;
+    $("#celebrateSlot").appendChild(b);
+    b.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+}
+checks.forEach(c=>c.addEventListener("change",updateProgress));
+/* 사이드바 scroll-spy */
+const secIds=[...document.querySelectorAll("main .section")].map(s=>s.id);
+const tocLinks={};
+document.querySelectorAll(".toc a").forEach(a=>tocLinks[a.dataset.sec]=a);
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(en=>{en.target._visible=en.isIntersecting;});
+  let current=null;
+  for(const id of secIds){const el=document.getElementById(id);if(el&&el._visible){current=id;break;}}
+  if(current){Object.values(tocLinks).forEach(a=>a.classList.remove("active"));tocLinks[current].classList.add("active");}
+},{rootMargin:"-15% 0px -55% 0px"});
+secIds.forEach(id=>io.observe(document.getElementById(id)));
+updateProgress();
+
+
+
+</script>
+</body>
+</html>

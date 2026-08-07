@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2주차 강의자료 · 데이터 수집과 임베딩 | 2026 에이전틱 AI 부트캠프</title>
-<meta name="description" content="KAIST 기술경영전문대학원 2026 에이전틱 AI 부트캠프 2주차 강의자료 모음입니다. 전 과정 Cowork로 웹에서 데이터를 수집해 내 PC 폴더에 파일로 쌓고, 임베딩으로 의미를 재고, 지도로 그리는 과정을 순서대로 따라갈 수 있습니다." />
+<title>4주차 강의자료 · 연동과 자율 에이전트 | 2026 에이전틱 AI 부트캠프</title>
+<meta name="description" content="KAIST 기술경영전문대학원 2026 에이전틱 AI 부트캠프 4주차(마지막 주차) 강의자료 모음입니다. 자율 실행의 위험과 안전장치에서 시작해 MCP 커넥터·CLI·구글 시트 연동을 거쳐, 자가 호스팅 에이전트 에르메스를 설치하고 텔레그램·cron 루틴으로 'AI에게 일을 맡기는 법'을 완성합니다." />
 <style>
   :root{
     --bg:#f4f6f3;
@@ -99,12 +99,13 @@
   }
   .hero-back:hover{color:#7cc4ee;}
   .hero-kicker{
-    display:inline-flex;align-items:center;gap:10px;margin-bottom:18px;
+    display:inline-flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;
   }
   .hero-badge{
     font-size:11.5px;font-weight:900;letter-spacing:.06em;
     color:#08202f;background:#7cc4ee;padding:5px 13px;border-radius:999px;
   }
+  .hero-badge.final{background:#f5c96b;}
   .hero-date{font-size:13px;font-weight:700;color:#a9c6da;}
   .hero h1{
     font-size:clamp(28px,4vw,42px);line-height:1.28;color:#fff;margin-bottom:18px;letter-spacing:-.02em;
@@ -183,7 +184,7 @@
   .material:hover .go{transform:translateX(4px);}
 
   /* ================= PREP ================= */
-  .prep-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .prep-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
   .prep{
     background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);
     padding:20px 22px;box-shadow:var(--shadow-sm);
@@ -210,10 +211,7 @@
   .footer-copy{margin-top:24px;font-size:12px;color:#9aa39a;}
 
   /* ================= RESPONSIVE ================= */
-  @media (max-width:1040px){
-    .prep-grid{grid-template-columns:repeat(2,1fr);}
-  }
-  @media (max-width:640px){
+  @media (max-width:900px){
     .prep-grid{grid-template-columns:1fr;}
   }
   @media (max-width:760px){
@@ -250,22 +248,22 @@
     <div class="wrap">
       <a class="hero-back" href="../index.html">← 부트캠프 홈으로</a>
       <div class="hero-kicker">
-        <span class="hero-badge">WEEK 2</span>
-        <span class="hero-date">2026년 8월 11일 (화) · 저녁 8:00–9:30</span>
+        <span class="hero-badge">WEEK 4</span>
+        <span class="hero-badge final">마지막 주차</span>
+        <span class="hero-date">2026년 8월 25일 (화) · 저녁 8:00–9:30</span>
       </div>
-      <h1>데이터 수집과 임베딩 —<br/>텍스트를 의미로 재다</h1>
+      <h1>연동과 자율 에이전트 —<br/>AI에게 일을 맡기는 법</h1>
       <p class="hero-lead">
-        1주차는 브라우저의 claude.ai만으로 충분했습니다. 2주차부터는 <b>작업대가 내 PC로 내려옵니다</b> —
-        이번 주는 <b>전 과정을 Cowork(데스크톱 앱)</b>에서 진행하며, 산출물은 전부 <b>내 PC 폴더의 파일</b>로 남습니다.
-        웹에서 데이터를 모아 폴더에 쌓고(크롤링), 텍스트를 <b>의미의 좌표(임베딩)</b>로 바꾼 뒤, 클러스터링과
-        차원축소로 <b>한 장의 지도</b>를 그립니다. 강의는 시작에 오늘 만들 것을 킥오프하고, 강의안을 따라간 뒤,
-        완성된 결과를 시연으로 확인하는 흐름으로 진행합니다. 아래 자료를 <b>순서대로</b> 열어 따라가시면 됩니다.
+        부트캠프의 마지막 주차입니다. 자율 실행의 <b>위험과 안전장치</b>(프롬프트 인젝션·샌드박스·human-in-the-loop)에서
+        출발해, MCP 커넥터·CLI·구글 시트 연동으로 <b>AI의 도구함</b>을 채우고, 자가 호스팅 에이전트
+        <b>에르메스(Hermes)</b>를 설치해 텔레그램으로 부르고 cron 루틴으로 <b>"내가 자는 동안 일하는 AI"</b>를
+        완성합니다. 강의는 킥오프 시연으로 시작합니다 — 에르메스 설치 → 텔레그램 연결 → 루틴 등록을
+        한 흐름으로 보여드린 뒤, 자료를 <b>순서대로</b> 따라갑니다.
       </p>
       <div class="hero-meta">
         <span class="meta-chip">📘 강의자료 <b>7개</b></span>
-        <span class="meta-chip">🛠 작업대 <b>전 과정 Cowork(데스크톱 앱) + 크롬 확장</b></span>
-        <span class="meta-chip">🧪 예제 데이터 <b>베스트셀러 239권 · 판결문 347건</b></span>
-        <span class="meta-chip">🎯 산출물 <b>내 PC 폴더의 수집 데이터 · 임베딩 · 판결문 지도</b></span>
+        <span class="meta-chip">🧪 실습 <b>에르메스 설치 + 텔레그램 페어링 + 루틴 등록</b></span>
+        <span class="meta-chip">🎯 산출물 <b>매일 아침 브리핑을 보내는 나의 자율 에이전트</b></span>
       </div>
     </div>
   </section>
@@ -274,133 +272,123 @@
   <section class="section" id="materials">
     <div class="wrap">
       <div class="section-head">
-        <span class="eyebrow">2주차 강의자료</span>
-        <h2>수집에서 계보도까지 — 하나의 파이프라인, 7개의 자료</h2>
-        <p>①②는 도구를 내 PC에 세팅하고 크롤링의 판단 기준을 세우는 과정, ③④⑤는 Cowork로 데이터를 모아 의미로 재고 지도로 그리는 실습 파이프라인, ⑥은 이번 주에 반복한 절차를 스킬 파일로 저장하는 법, ⑦은 같은 파이프라인을 논문 데이터에 얹는 네트워크 분석입니다. 앞 자료의 산출물이 뒤 자료의 재료가 되므로 <b>순서대로</b> 보시는 것을 권합니다.</p>
+        <span class="eyebrow">4주차 강의자료</span>
+        <h2>원칙을 세우고, 연결하고, 맡기는 7개의 자료</h2>
+        <p>①은 자율 에이전트를 들이기 전에 반드시 알아야 할 위험과 안전장치, ②~④는 AI의 도구함을 채우는 과정(MCP, CLI, 시트 연동), ⑤~⑦은 자율 에이전트를 직접 설치·운영하고 4주 전체를 판단 기준으로 접는 과정입니다. 앞 자료의 원칙이 뒤 자료의 실물로 등장하므로 <b>순서대로</b> 보시는 것을 권합니다.</p>
       </div>
 
       <div class="flow-strip">
-        <span class="fs-item"><span>1</span>도구·설치</span>
+        <span class="fs-item"><span>1</span>위험·안전장치</span>
         <span class="fs-arrow">→</span>
-        <span class="fs-item"><span>2</span>크롤링 이론</span>
+        <span class="fs-item"><span>2</span>MCP</span>
         <span class="fs-arrow">→</span>
-        <span class="fs-item"><span>3</span>수집 실습</span>
+        <span class="fs-item"><span>3</span>CLI</span>
         <span class="fs-arrow">→</span>
-        <span class="fs-item"><span>4</span>임베딩</span>
+        <span class="fs-item"><span>4</span>시트 연동</span>
         <span class="fs-arrow">→</span>
-        <span class="fs-item"><span>5</span>지도</span>
+        <span class="fs-item"><span>5</span>에르메스 설치</span>
         <span class="fs-arrow">→</span>
-        <span class="fs-item"><span>6</span>스킬</span>
+        <span class="fs-item"><span>6</span>루틴·대시보드</span>
         <span class="fs-arrow">→</span>
-        <span class="fs-item"><span>7</span>계보도</span>
+        <span class="fs-item"><span>7</span>총정리</span>
       </div>
 
       <div class="part-head">
-        <span class="part-num">도구와 이론</span>
-        <h3>작업대를 내 PC에 세팅하고, 수집의 판단 기준을 세운다</h3>
-        <small>①–② · 설치와 개념</small>
+        <span class="part-num">PART 1</span>
+        <h3>위험을 알고 시작한다</h3>
+        <small>① · 이론</small>
       </div>
 
       <div class="material-list">
 
-        <a class="material" href="week2-01-chat-cowork-code.html">
+        <a class="material" href="week4-01-autonomous-execution-risks.html">
           <span class="num">01</span>
           <div class="material-body">
-            <h3>Chat · Cowork · Claude Code <span class="kind kind-concept">개념</span> <span class="kind kind-practice">설치</span></h3>
-            <p>1주차는 브라우저의 claude.ai면 충분했지만, 2주차부터는 산출물이 <b>파일</b>이라 작업대가 내 PC로 내려옵니다. 세 작업대의 차이와 주차별 배치(이번 주는 전 과정 Cowork, 3주차부터 Claude Code)를 이해하고, <b>데스크톱 앱 · 크롬 확장 · Claude Code</b>를 설치해 작업 폴더 연동까지 확인합니다.</p>
+            <h3>자율 실행의 위험과 안전장치 <span class="kind kind-concept">개념</span></h3>
+            <p>자율 에이전트에게 열쇠를 주기 전에 잠금장치부터 — 치명적 3요소(사적 데이터·불신 콘텐츠·외부 통신)와 간접 프롬프트 인젝션의 구조, OpenClaw(2026) 실제 사례, 그리고 두 겹의 방어: 샌드박스·컨테이너 고립과 human-in-the-loop.</p>
           </div>
           <span class="go">→</span>
         </a>
 
-        <a class="material" href="week2-02-web-crawling-theory.html">
+      </div>
+
+      <div class="part-head">
+        <span class="part-num">PART 2</span>
+        <h3>AI의 도구함을 채운다</h3>
+        <small>②–④ · 개념 + 실습</small>
+      </div>
+
+      <div class="material-list">
+
+        <a class="material" href="week4-02-mcp-connectors.html">
           <span class="num">02</span>
           <div class="material-body">
-            <h3>이론 — 크롤링 <span class="kind kind-concept">개념</span></h3>
-            <p>실습 전에 판단 기준부터 — 웹에서 <b>무엇을</b> 모을 수 있는지(6가지 데이터 원천), <b>어디까지</b> 모아도 되는지(페이월·공정이용·robots.txt), 그리고 사이트 구조에 따라 <b>어떤 도구가</b> 필요한지(정적 vs 동적, 10초 판별법)를 배웁니다.</p>
+            <h3>MCP(커넥터) — 연결의 표준 <span class="kind kind-concept">개념</span> <span class="kind kind-practice">실습</span></h3>
+            <p>AI를 내 데이터에 연결하는 표준 규약 MCP를 이해하고, Claude의 커넥터가 곧 MCP 서버임을 확인한 뒤, Google Drive 커넥터로 내 시트를 대화에서 직접 분석해 봅니다.</p>
           </div>
           <span class="go">→</span>
         </a>
 
-      </div>
-
-      <div class="part-head">
-        <span class="part-num">실습 파이프라인</span>
-        <h3>Cowork로 데이터를 모아, 의미로 재고, 지도로 그리고, 절차를 저장한다</h3>
-        <small>③–⑥ · Claude 데스크톱 앱(Cowork)에서 실행 · 산출물은 내 PC 폴더에</small>
-      </div>
-
-      <div class="material-list">
-
-        <a class="material" href="week2-03-cowork-web-scraping.html">
+        <a class="material" href="week4-03-cli-tools.html">
           <span class="num">03</span>
           <div class="material-body">
-            <h3>실습 — Cowork로 웹 스크래핑 <span class="kind kind-practice">실습</span></h3>
-            <p>복사–붙여넣기 수백 번 대신 요청 문장 하나로 웹 데이터를 모아 <b>연동한 내 폴더에 CSV와 본문 파일로 저장</b>합니다. 베스트셀러 239권 수집부터 판결문 895건 사례까지, 수집 직후의 탐색적 분석(EDA)을 실제 수집 기록으로 따라갑니다.</p>
+            <h3>CLI — MCP가 없는 시스템을 잇는 만능 어댑터 <span class="kind kind-concept">개념</span> <span class="kind kind-practice">실습</span></h3>
+            <p>통로를 만드는 대신 AI에게 도구를 쥐여주는 발상의 전환. gh·ffmpeg·pandoc·sqlite3 같은 기성 CLI를 한국어로 부리는 예시 네 가지, 그리고 레거시 시스템용 어댑터를 직접 만들어 CLAUDE.md에 꽂는 3단계까지.</p>
           </div>
           <span class="go">→</span>
         </a>
 
-        <a class="material" href="week2-04-embedding-extraction.html">
+        <a class="material" href="week4-04-google-sheets-integration.html">
           <span class="num">04</span>
           <div class="material-body">
-            <h3>임베딩 추출 파이프라인 <span class="kind kind-concept">개념</span> <span class="kind kind-practice">실습</span></h3>
-            <p>텍스트를 "읽는" 대신 "재는" 방법 — 판결문 347건을 4,096차원 벡터로 바꿉니다. 임베딩이 무엇인지, OpenRouter로 모델을 어떻게 고르는지, API 키를 어떻게 안전하게 다루는지를 실제 실행 기록으로 배웁니다.</p>
+            <h3>구글 시트 연동 — 읽기 전용에서 서비스 계정까지 <span class="kind kind-concept">개념</span> <span class="kind kind-reading">시연</span></h3>
+            <p>"웹에 게시"로 백엔드 없이 도는 대시보드부터, 정식 출입구(Sheets API + 서비스 계정)와 열쇠 보관 원칙, 그리고 "시트는 그대로, 화면만 서비스로" 팀 현황판 활용사례까지 — 시트 연동의 전체 지도를 한 편에 담았습니다.</p>
           </div>
           <span class="go">→</span>
         </a>
 
-        <a class="material" href="week2-05-judgment-map-clustering.html">
+      </div>
+
+      <div class="part-head">
+        <span class="part-num">PART 3</span>
+        <h3>자율 에이전트를 설치하고, 맡기고, 판단한다</h3>
+        <small>⑤–⑦ · 실습 + 총정리</small>
+      </div>
+
+      <div class="material-list">
+
+        <a class="material" href="week4-05-hermes-agent-setup.html">
           <span class="num">05</span>
           <div class="material-body">
-            <h3>판결문 347건의 지도 <span class="kind kind-practice">실습</span></h3>
-            <p>클러스터링으로 다섯 개의 사건 유형을 찾고, 차원축소로 4,096차원을 한 장의 2D 지도로 만듭니다. 페이지 안의 지도는 실제 데이터이며, 직접 점을 눌러 탐색할 수 있습니다.</p>
+            <h3>에르메스 에이전트 ① — 설치·텔레그램·OpenRouter <span class="kind kind-practice">실습</span></h3>
+            <p>Nous Research의 오픈소스 자율 에이전트 에르메스를 <b>Hostinger VPS의 원클릭 템플릿</b>으로 설치합니다 — 24시간 도는 내 서버가 생기고, 도메인까지 붙이면 개인 서버 완성. OpenRouter 키로 두뇌를 꽂고, BotFather 봇과 페어링 코드로 텔레그램을 연결합니다. ①의 안전 원칙이 실물로 등장합니다.</p>
           </div>
           <span class="go">→</span>
         </a>
 
-        <a class="material" href="week2-06-building-skills.html">
+        <a class="material" href="week4-06-hermes-agent-routines.html">
           <span class="num">06</span>
           <div class="material-body">
-            <h3>나만의 스킬 만들기 <span class="kind kind-practice">실습</span></h3>
-            <p>이번 주 내내 반복한 절차("요지를 훑고, 고른 사건은 전문을 읽고 답하라" 등)를 <code>SKILL.md</code> 파일 한 장으로 저장합니다. 관련 질문이 올 때마다 AI가 알아서 같은 절차로 움직입니다 — 강사가 7년 치 컬럼으로 만든 <b>실제 스킬 사례</b>까지.</p>
+            <h3>에르메스 에이전트 ② — cron 루틴·대시보드 <span class="kind kind-practice">실습</span></h3>
+            <p>매일 아침 9시, 스스로 조사해 텔레그램으로 브리핑을 보내는 cron 루틴을 등록하고, 관리 대시보드를 한 바퀴 돕니다. 그리고 솔직한 비교 — "사실 Claude로도 됩니다": 자가 호스팅이 진짜 의미 있는 네 가지 경우.</p>
           </div>
           <span class="go">→</span>
         </a>
 
-      </div>
-
-      <div class="part-head">
-        <span class="part-num">확장</span>
-        <h3>같은 파이프라인을 다른 데이터에</h3>
-        <small>⑦ · 네트워크 분석</small>
-      </div>
-
-      <div class="material-list">
-
-        <a class="material" href="week2-07-citation-genealogy-research.html">
+        <a class="material" href="week4-07-integration-decision-guide.html">
           <span class="num">07</span>
           <div class="material-body">
-            <h3>논문 계보도 — 네트워크 분석 <span class="kind kind-practice">실습</span></h3>
-            <p>수집 → 구조화 → 시각화 파이프라인을 논문 데이터에 적용합니다. "AI는 인간 노동을 대체하는가"를 둘러싼 문헌 23편의 인용 관계를 시간축 네트워크로 그리고, 후속 프롬프트로 <b>읽기 계획과 열린 연구 질문</b>까지 뽑아냅니다.</p>
+            <h3>총정리 — 판단 기준과 4주의 마무리 <span class="kind kind-reading">정리</span></h3>
+            <p>커넥터·정적·백엔드·인증·CLI에 "루틴/자율 에이전트" 갈래를 더한 판단표 한 장, 일곱 사례 자가 점검, 난이도별 도전 과제 — 그리고 1~4주차 전체 여정의 마무리와 수료 축하까지.</p>
           </div>
           <span class="go">→</span>
         </a>
 
-      </div>
-
-      <div class="part-head">
-        <span class="part-num">선택</span>
-        <h3>자율 실습 — 해 보고 싶은 분들께</h3>
-        <small>제출도 정답도 없습니다 · 단계별 프롬프트가 담긴 상세 안내</small>
-      </div>
-
-      <div class="material-list">
-
-        <a class="material" href="week2-assignment.html">
+        <a class="material" href="week4-assignment.html">
           <span class="num">＋</span>
           <div class="material-body">
-            <h3>자율 실습 — 특허 지도 · 계보도 · 내 업무 스킬 <span class="kind kind-optional">선택</span></h3>
-            <p>수업의 파이프라인을 내 데이터로 한 번 더: ① 관심 기술의 특허 200건을 수집해 임베딩·기술 지도 그리기 ② 내 관심 주제의 논문 계보도 ③ 내가 반복해 쓰는 업무 문서의 작성 스킬 만들기. 단계별 프롬프트와 힌트를 담았습니다.</p>
+            <h3>자율 실습 — 포트폴리오 수익률 앱 <span class="kind kind-optional">선택</span></h3>
+            <p>해 보고 싶은 분들을 위한 상세 안내입니다. 시트에 포트폴리오 원장을 만들고, 앱이 매일 시세를 수집해 기록으로 쌓아 수익률과 자산 추이 그래프를 보여주게 하고, 비밀번호 잠금까지 — 4주 동안 배운 것을 한 화면에 모으는 실습입니다.</p>
           </div>
           <span class="go">→</span>
         </a>
@@ -414,45 +402,40 @@
     <div class="wrap">
       <div class="section-head">
         <span class="eyebrow">강의 전 준비물</span>
-        <h2>네 가지만 준비하면 됩니다</h2>
-        <p>2주차부터는 브라우저가 아니라 <b>내 PC에서</b> 실습합니다. ①번 자료에 설치 방법이 단계별로 나와 있으니, 강의 전에 미리 해두면 실습 시간을 온전히 쓸 수 있습니다.</p>
+        <h2>세 가지만 확인하면 됩니다</h2>
+        <p>새로 만들 것은 텔레그램 봇 하나뿐이고, 나머지는 지난 3주 동안 만든 것들의 재사용입니다.</p>
       </div>
       <div class="prep-grid">
         <div class="prep">
-          <span class="ic">🖥</span>
-          <b>Claude 데스크톱 앱 + 작업 폴더</b>
-          <span><a href="https://claude.ai/download" target="_blank" rel="noopener">claude.ai/download</a>에서 설치하고 1주차와 같은 계정으로 로그인. 이번 주 산출물이 쌓일 폴더(예: <code>바탕화면/week2</code>)를 만들어 Cowork에 연동합니다. ①번 자료 §3 참고.</span>
-        </div>
-        <div class="prep">
-          <span class="ic">🧩</span>
-          <b>Claude in Chrome (크롬 확장)</b>
-          <span>스크롤·클릭해야 내용이 나오는 동적 사이트를 수집할 때 씁니다. 크롬 웹스토어에서 설치 후 같은 계정으로 로그인. ①번 자료 §3에서 설치하고, ②번 자료(크롤링 이론)에서 왜 필요한지 배웁니다.</span>
-        </div>
-        <div class="prep">
-          <span class="ic">💻</span>
-          <b>Claude Code 설치</b>
-          <span>3주차부터 본격 사용하지만 이번 주에 미리 설치합니다. 터미널에 명령 한 줄이면 끝나고, Pro 이상 구독 계정으로 로그인해 추가 비용 없이 씁니다. 설치 후 "파이썬 버전 확인해줘"까지 해보세요. ①번 자료 §4 참고.</span>
+          <span class="ic">✈️</span>
+          <b>텔레그램 계정</b>
+          <span>에이전트와 대화할 통로입니다. 폰에 텔레그램을 설치하고 로그인해 두세요. 수업 중 @BotFather로 봇을 만들어 연결합니다.</span>
         </div>
         <div class="prep">
           <span class="ic">🔑</span>
-          <b>OpenRouter 계정 · API 키</b>
-          <span><a href="https://openrouter.ai" target="_blank" rel="noopener">openrouter.ai</a> 가입 후 소액(몇 달러) 충전과 키 발급. ④번 자료(임베딩)에서 씁니다 — 판결문 347건 전체 임베딩 비용이 약 2센트 수준이니 부담 없습니다.</span>
+          <b>OpenRouter API 키</b>
+          <span>2·3주차에 발급한 키를 그대로 재사용합니다. 키를 어디에 적어 두었는지(예: openrouterkey.txt) 미리 확인해 두세요.</span>
+        </div>
+        <div class="prep">
+          <span class="ic">🖥️</span>
+          <b>Hostinger 계정 (VPS 호스팅)</b>
+          <span>에르메스를 올릴 VPS를 <a href="https://www.hostinger.com/applications/hermes-agent" target="_blank" rel="noopener">Hostinger</a>에서 만듭니다(원클릭 템플릿, KVM 2 권장, 월 몇 달러대). 수업 전 결제까지는 필요 없고 계정만 만들어 두면 됩니다. 연결할 도메인이 있다면(1주차 것 재사용 가능) 더 좋습니다.</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ NEXT ============ -->
+  <!-- ============ AFTER ============ -->
   <section class="section">
     <div class="wrap">
       <div class="section-head">
-        <span class="eyebrow">다음 주차</span>
-        <h2>3주차 — 검색엔진과 RAG: 서비스로 만들어 세상에 내놓기</h2>
-        <p>Claude Code 주간입니다. 이번 주에 내 PC 폴더에 쌓은 임베딩 파일을 재료로, 키워드 검색과 임베딩 검색을 비교해 보고 유사 판례 검색엔진을 내 컴퓨터에 띄웁니다. 그 위에 RAG로 근거가 달린 답변을 얹고, Vercel 배포로 내 서비스를 세상에 내놓습니다.</p>
+        <span class="eyebrow">수료 후</span>
+        <h2>데이터가 바뀌어도 절차는 같다</h2>
+        <p>4주 동안 판결문 347건은 재료였을 뿐입니다. 수집 → 구조화 → 검색 → 서비스 → 자동화 — 여러분의 회사 문서, 고객 문의, 시장 데이터를 넣어도 절차는 같습니다. 모든 주차의 자료는 계속 열려 있으니, 필요할 때 ⑦의 판단표부터 다시 펴 보세요.</p>
       </div>
       <div class="note">
-        <span>💡</span>
-        <span><b>자율 실습(선택)</b> — 수업의 파이프라인을 내 데이터로 돌려 보고 싶다면, 목록 맨 아래의 <a href="week2-assignment.html" style="font-weight:800;color:var(--green);">자율 실습 안내</a>를 따라가 보세요. 제출도 정답도 없습니다.</span>
+        <span>🎓</span>
+        <span><b>자율 실습(선택)</b> — 4주 동안 배운 것을 한 화면에 모으는 <b>포트폴리오 수익률 앱</b>을 만들어 보고 싶다면, 목록 맨 아래의 <a href="week4-assignment.html" style="font-weight:800;color:var(--green);">자율 실습 안내</a>를 따라가 보세요. 제출도 정답도 없습니다. 전체 커리큘럼은 <a href="../index.html#curriculum" style="font-weight:800;color:var(--green);">부트캠프 홈</a>에서 언제든 다시 볼 수 있습니다.</span>
       </div>
     </div>
   </section>
@@ -473,7 +456,9 @@
         <a href="../index.html">부트캠프 홈</a>
         <a href="../index.html#curriculum">커리큘럼</a>
         <a href="../week1/index.html">1주차 강의자료</a>
-        <a href="#materials">2주차 강의자료</a>
+        <a href="../week2/index.html">2주차 강의자료</a>
+        <a href="../week3/index.html">3주차 강의자료</a>
+        <a href="#materials">4주차 강의자료</a>
       </nav>
     </div>
     <div class="footer-copy">© 2026 KAIST 기술경영전문대학원. 이 페이지는 부트캠프 안내를 위해 제작되었습니다.</div>

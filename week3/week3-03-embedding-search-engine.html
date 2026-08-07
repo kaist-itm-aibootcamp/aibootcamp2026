@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Week 2 — 임베딩 기반 검색엔진: 아키텍처와 구축</title>
+<title>Week 3 — 임베딩 기반 검색엔진: 아키텍처와 구축</title>
 <style>
 :root{
   --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
@@ -219,8 +219,8 @@ p{margin:10px 0;}
       <span class="brand-mark">AI</span>
       <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
     </a>
-    <div class="week-tag"><span class="week-num">WEEK 2</span><span class="week-title">임베딩 검색엔진 구축</span></div>
-    <a class="back-week" href="index.html">← 2주차 목록</a>
+    <div class="week-tag"><span class="week-num">WEEK 3</span><span class="week-title">임베딩 검색엔진 구축</span></div>
+    <a class="back-week" href="index.html">← 3주차 목록</a>
   </div>
   <div class="progress-wrap" aria-label="진행률">
     <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
@@ -236,7 +236,8 @@ p{margin:10px 0;}
       <a href="#s2" data-sec="s2">2. 전체 아키텍처 — 색인과 검색<span class="done-mark">✔</span></a>
       <a href="#s3" data-sec="s3">3. 실습 ① — 검색 백엔드 서버<span class="done-mark">✔</span></a>
       <a href="#s4" data-sec="s4">4. 실습 ② — 검색 웹앱 연결<span class="done-mark">✔</span></a>
-      <a href="#s5" data-sec="s5">5. 마무리 체크리스트<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 문서화 — 기록을 남긴다<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. 마무리 체크리스트<span class="done-mark">✔</span></a>
     </div>
   </nav>
 
@@ -244,7 +245,7 @@ p{margin:10px 0;}
     <div id="celebrateSlot"></div>
 
     <div class="hero">
-      <span class="hero-kicker">WEEK 2 · STEP 6 — 임베딩 검색엔진 구축</span>
+      <span class="hero-kicker">WEEK 3 · STEP 3 — 임베딩 검색엔진 구축</span>
       <h1>유사 판례 검색엔진 —<br/>산업 표준 아키텍처를 내 손으로</h1>
       <p>앞 페이지에서 키워드 검색의 한계와 임베딩 검색의 가능성을 확인했습니다. 이번 강의는 임베딩 기반 검색엔진의 <b>전체 아키텍처</b>를 이해하고, Claude Code로 판결문 347건짜리 검색엔진을 실제로 구축합니다.</p>
     </div>
@@ -443,7 +444,7 @@ p{margin:10px 0;}
     <section class="section" id="s3">
       <div class="sec-head"><span class="sec-num">3</span><h2>실습 ① — 검색 백엔드: 계획서부터 대화로</h2></div>
       <p class="sec-lead">비개발자가 개발을 시킬 때 가장 좋은 방법은 <b>사양서를 쓰는 것이 아니라 대화를 하는 것</b>입니다. 순서는 넷입니다 — <b>원하는 것만 서술 → AI가 계획서 작성 → 피드백 주고받기 → 확정된 계획서대로 구현</b>. 코드는 못 읽어도 계획서는 읽고 고칠 수 있기 때문입니다.</p>
-      <p>준비물: Claude Code 설치·로그인, 작업 폴더의 <code>embeddings_json/</code> 347개, 그리고 같은 폴더에 <b>OpenRouter 키를 한 줄 저장한 <code>openrouterkey.txt</code></b>. 작업 폴더에서 <code>claude</code>를 실행합니다.</p>
+      <p>준비물: Claude Code 로그인(2주차 1강에서 설치해 둔 그것 — 이번 주부터 본격적으로 씁니다), 작업 폴더의 <code>embeddings_json/</code> 347개, 그리고 같은 폴더에 <b>OpenRouter 키를 한 줄 저장한 <code>openrouterkey.txt</code></b>. 작업 폴더에서 <code>claude</code>를 실행합니다.</p>
 
       <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
         <b class="ws-title">원하는 것만 서술한다 — 기술 용어 없이</b>
@@ -558,23 +559,66 @@ p{margin:10px 0;}
 
     <!-- ============ S5 ============ -->
     <section class="section" id="s5">
-      <div class="sec-head"><span class="sec-num">5</span><h2>마무리 체크리스트</h2></div>
+      <div class="sec-head"><span class="sec-num">5</span><h2>문서화 — 코드만 남기지 말고, 기록을 남긴다</h2></div>
+      <p class="sec-lead">서버가 돌기 시작하면 끝난 것 같지만, 하나가 빠졌습니다. <b>한 달 뒤의 나는 남입니다.</b> 코드는 "무엇을 하는지"만 남기고 "왜 이렇게 했는지"는 남기지 않습니다 — 특히 AI와 대화로 만들면 그 논리가 전부 <b>휘발되는 대화 기록</b> 속에 있습니다. 오늘 §3에서 검토한 계획서, 왕복하며 내린 결정들을 파일로 남겨야 다음에 이어서 일할 수 있습니다.</p>
+
+      <h3>실무 표준을 1인용으로 — 파일 3 + 1</h3>
+      <p>소프트웨어 업계의 표준은 설계 문서(design doc), 결정 기록(ADR, Architecture Decision Record), 운영 문서(README·runbook)의 세 겹입니다. 1인 프로젝트에서는 이것을 <b>저장소 안의 파일 네 개</b>로 줄이면 충분합니다.</p>
+      <table class="doc-table">
+        <thead><tr><th style="width:150px">파일</th><th>담는 것</th><th style="width:190px">실무 표준으로 치면</th></tr></thead>
+        <tbody>
+          <tr><td><b>PLAN.md</b></td><td>만들기 전에 합의한 <b>계획서의 최종본</b> — 무엇을, 어떤 구조로, 어떤 순서로. §3에서 AI가 써 주고 내가 검토한 바로 그 문서를 파일로 저장</td><td>설계 문서 (design doc)</td></tr>
+          <tr><td><b>DECISIONS.md</b></td><td><b>왜 이렇게 했는지</b> — 날짜 + 결정 + 이유 + 검토했다가 버린 대안. 항목당 2~5줄, 지우지 않고 아래로만 추가</td><td>결정 기록 (ADR)</td></tr>
+          <tr><td><b>README.md</b></td><td><b>처음 보는 사람이 실행·배포까지</b> — 필요한 것(파이썬·키), 설치, 실행 명령, 환경변수 목록, 배포 방법, 자주 나는 문제</td><td>README + runbook</td></tr>
+          <tr><td><b>CLAUDE.md</b></td><td><b>AI가 읽는 문서</b> — Claude Code가 폴더에서 자동으로 읽는 프로젝트 메모. 폴더 구조, 규칙, 자주 쓰는 명령. 다음 세션의 AI가 맥락을 이어받는 통로</td><td>팀 온보딩 문서</td></tr>
+        </tbody>
+      </table>
+      <div class="tip-card"><b>문서도 코드와 같은 저장소에</b> — 네 파일 모두 프로젝트 폴더에 두고 코드와 함께 커밋합니다. 코드가 바뀐 시점의 문서를 나중에 그대로 찾을 수 있고, "README만 보고 <b>다른 컴퓨터에서 실행되는가</b>"가 문서 품질의 합격선입니다 — 다음 강의(⑥ Vercel 배포)에서 실제로 시험당하게 됩니다.</div>
+
+      <h3>프롬프트 두 개 — 만들 때 한 번, 규칙으로 한 번</h3>
+      <div class="copy-block"><span class="cb-label">💬 작업 마무리 문서화 프롬프트 — 서버가 돈 직후에</span><button class="copy-btn" data-copy="doc1">복사</button>
+<pre id="doc1">오늘 작업을 문서로 남기자. 프로젝트 폴더에 네 파일을 만들어줘.
+1. PLAN.md — 우리가 합의한 계획서의 최종본 (실제 구현과 달라진 부분은 반영해서)
+2. DECISIONS.md — 오늘 내린 주요 결정을 항목별로: 날짜, 결정, 이유,
+   검토했다가 버린 대안. 앞으로 결정이 갈릴 때마다 아래에 추가하는 형식으로.
+3. README.md — 이 폴더를 처음 보는 사람이 실행까지 갈 수 있게:
+   필요한 것, 설치, 실행 명령, 환경변수 목록(값은 빼고 이름과 용도만),
+   자주 나는 문제와 해결.
+4. CLAUDE.md — 다음 세션의 네가 읽을 프로젝트 메모: 폴더 구조,
+   지켜야 할 규칙, 자주 쓰는 명령.
+전부 코드에서 확인되는 사실만 쓰고, 확실하지 않은 것은 [확인 필요]로 표시해줘.</pre></div>
+      <div class="copy-block"><span class="cb-label">💬 유지 규칙 프롬프트 — 문서가 낡지 않게</span><button class="copy-btn" data-copy="doc2">복사</button>
+<pre id="doc2">CLAUDE.md에 다음 규칙을 추가해줘:
+"코드를 변경하면 관련된 문서(README.md, PLAN.md)를 같은 커밋에서 갱신한다.
+ 방향을 정하는 결정을 내렸으면 DECISIONS.md에 항목을 추가한다."</pre></div>
+      <div class="callout"><b class="cap">두 번째 프롬프트가 진짜 핵심입니다</b>
+      문서화의 실패는 처음 만들 때가 아니라 <b>안 고칠 때</b> 일어납니다. 낡은 문서는 없는 문서보다 나쁩니다 — 틀린 안내를 하니까요. 갱신 규칙을 CLAUDE.md에 박아 두면 이후에는 <b>AI가 알아서 문서를 코드와 함께</b> 고칩니다. 사람은 DECISIONS.md에 쌓이는 기록을 가끔 읽어주기만 하면 됩니다.</div>
+      <div class="tip-card"><b>스킬(2주차 ⑥)과의 관계</b> — SKILL.md가 "여러 프로젝트에서 반복하는 <b>절차</b>"의 자리라면, 오늘의 네 파일은 "<b>이 프로젝트</b>의 계획·결정·사용법"의 자리입니다. 절차는 스킬로, 프로젝트의 기억은 문서로.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>네 파일(PLAN·DECISIONS·README·CLAUDE)의 역할을 구분하고 문서화 프롬프트를 실행했다</span></label></div>
+    </section>
+
+    <!-- ============ S6 ============ -->
+    <section class="section" id="s6">
+      <div class="sec-head"><span class="sec-num">6</span><h2>마무리 체크리스트</h2></div>
       <ul class="final-list">
         <li>임베딩 검색엔진 = 색인 국면(문서 벡터를 미리 DB에) + 검색 국면(①질의 → ②백엔드 → ③질의 임베딩 → ④최근접 탐색 → ⑤목록 반환)</li>
         <li>질의 임베딩 모델은 색인 모델과 반드시 동일</li>
         <li>키와 호출량 통제를 위해 임베딩 호출은 백엔드에서만</li>
         <li>소규모는 전수 코사인, 대규모는 전용 벡터 DB — 구조는 동일</li>
         <li>출력은 문서 목록: 읽고 판단하는 것은 사람</li>
+        <li>코드만 남기지 말고 기록을 — PLAN(계획)·DECISIONS(왜)·README(사용·배포)·CLAUDE.md(AI 메모) 네 파일을 코드와 함께 커밋</li>
+        <li>문서 갱신 규칙을 CLAUDE.md에 박아 두면 이후에는 AI가 코드와 문서를 함께 고친다</li>
       </ul>
       <div class="next-card-grid">
         <div class="next-card"><b>다음 강의 — RAG</b><span>검색엔진이 "문서 목록"을 돌려준다면, RAG는 검색된 문서를 AI가 읽고 "답변"을 씁니다. 목적이 다른 별개 기법을 새로 배웁니다.</span></div>
         <div class="next-card"><b>직접 해보기</b><span>여러분의 임베딩 JSON으로 같은 두 실습을 반복해 보세요 — 프롬프트에서 폴더명과 시험 질의만 바꾸면 됩니다.</span></div>
       </div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>임베딩 검색엔진 강의를 마쳤다!</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>임베딩 검색엔진 강의를 마쳤다!</span></label></div>
     </section>
       <a class="back-home" href="index.html">
         <span class="bh-ic">←</span>
-        <span><strong>2주차 강의자료 목록으로 돌아가기</strong><small>다음 자료로 이어가려면 목록에서 골라보세요</small></span>
+        <span><strong>3주차 강의자료 목록으로 돌아가기</strong><small>다음 자료로 이어가려면 목록에서 골라보세요</small></span>
       </a>
 
   </main>

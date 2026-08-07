@@ -349,9 +349,9 @@
       <div class="hero-card">
         <div class="hero-card-title">4주 로드맵</div>
         <div class="hero-week"><span class="num">1</span><span class="txt"><strong>웹앱 만들고 배포하기</strong><span>2026.8.4 · GitHub Pages 배포</span></span></div>
-        <div class="hero-week"><span class="num">2</span><span class="txt"><strong>데이터 분석 &amp; 백엔드 아키텍처</strong><span>2026.8.11 · 임베딩 · API</span></span></div>
-        <div class="hero-week"><span class="num">3</span><span class="txt"><strong>외부 데이터 연동하기</strong><span>2026.8.18 · 실시간 대시보드</span></span></div>
-        <div class="hero-week"><span class="num">4</span><span class="txt"><strong>에이전틱 AI 활용하기</strong><span>2026.8.25 · 자율 AI 에이전트</span></span></div>
+        <div class="hero-week"><span class="num">2</span><span class="txt"><strong>데이터 수집과 임베딩</strong><span>2026.8.11 · 크롤링 · 임베딩 지도</span></span></div>
+        <div class="hero-week"><span class="num">3</span><span class="txt"><strong>검색엔진과 RAG</strong><span>2026.8.18 · 백엔드 · Vercel 배포</span></span></div>
+        <div class="hero-week"><span class="num">4</span><span class="txt"><strong>연동과 자율 에이전트</strong><span>2026.8.25 · MCP · Hermes 루틴</span></span></div>
       </div>
     </div>
   </section>
@@ -423,19 +423,17 @@
             <span class="week-date">2026년 8월 11일 (화)</span>
           </div>
           <div class="week-body">
-            <h3>데이터 분석 &amp; 백엔드 서버 아키텍처 이해하기</h3>
-            <p class="desc">웹에서 데이터를 모으고, 텍스트를 벡터로 바꾸는 임베딩으로 의미를 잰 뒤, 그 결과로 지도와 검색엔진과 RAG 챗봇을 만듭니다. 판결문 데이터 하나를 수집부터 질의응답까지 끝까지 따라가며, 왜 AI API에 비용을 지불하고 언제 백엔드가 필요한지 몸으로 이해합니다.</p>
+            <h3>데이터 수집과 임베딩 — 텍스트를 의미로 재다</h3>
+            <p class="desc">작업대를 웹에서 내 PC로 내립니다. 크롤링의 원리와 법적 경계를 배우고, Cowork로 웹 데이터를 수집해 내 폴더에 파일로 쌓은 뒤, 텍스트를 벡터로 바꾸는 임베딩으로 의미를 재고 판결문 347건의 지도를 그립니다. 마지막으로 반복한 절차를 스킬(SKILL.md)로 저장합니다 — 이 산출물이 3주차 검색엔진의 재료가 됩니다.</p>
             <div class="tag-row">
-              <span class="tag">웹 스크래핑</span>
+              <span class="tag">Claude 데스크톱 · Cowork</span>
+              <span class="tag">웹 스크래핑(크롤링)</span>
               <span class="tag">임베딩(Embedding)</span>
               <span class="tag">클러스터링 · 시각화</span>
-              <span class="tag">유사도 검색</span>
-              <span class="tag">로컬 백엔드 서버</span>
-              <span class="tag">RAG</span>
-              <span class="tag">나만의 스킬</span>
+              <span class="tag">나만의 스킬(SKILL.md)</span>
             </div>
             <div><a class="material-link" href="week2/index.html">📘 2주차 강의자료 보러가기 <span class="arrow">→</span></a></div>
-            <div class="outcome-box"><span>🎯</span><span><b>산출물</b> — 새 문장을 입력하면 실시간으로 임베딩을 계산해 가장 유사한 사례를 찾아주는 검색 웹앱입니다.</span></div>
+            <div class="outcome-box"><span>🎯</span><span><b>산출물</b> — 내 PC 폴더에 쌓인 수집 데이터(CSV·본문 파일)와 임베딩, 그리고 클릭해 탐색하는 판결문 347건의 2D 지도입니다.</span></div>
           </div>
         </div>
 
@@ -445,16 +443,17 @@
             <span class="week-date">2026년 8월 18일 (화)</span>
           </div>
           <div class="week-body">
-            <h3>외부 데이터 연동하기</h3>
-            <p class="desc">외부 데이터 출처(구글 드라이브·구글 폼 등)를 읽어와 실시간으로 갱신되는 대시보드를 만들고 배포합니다. 2주차의 로컬 앱을 클라우드에 배포해보고, 데이터가 공개인지 비공개인지에 따라 백엔드 서버가 필요한지 아닌지를 판단하는 기준을 익힙니다.</p>
+            <h3>검색엔진과 RAG — 서비스로 만들어 세상에 내놓기</h3>
+            <p class="desc">개인정보·보안·인증의 원칙을 배우고, 2주차에 만든 임베딩으로 Claude Code와 함께 내 PC에 유사 판례 검색엔진을 켭니다. 검색 위에 근거가 달린 답변을 얹는 RAG 챗봇으로 승격한 뒤, Vercel로 세상에 공개하고 이메일 인증코드로 문을 답니다.</p>
             <div class="tag-row">
-              <span class="tag">외부 데이터 연동</span>
-              <span class="tag">실시간 대시보드</span>
-              <span class="tag">클라우드 배포</span>
-              <span class="tag">백엔드 필요 여부 판단</span>
+              <span class="tag">Claude Code</span>
+              <span class="tag">유사도 검색 · 백엔드</span>
+              <span class="tag">RAG</span>
+              <span class="tag">Vercel 배포</span>
+              <span class="tag">인증 · 접근 통제</span>
             </div>
-            <div><span class="material-soon">📘 3주차 강의자료 — 추가 예정</span></div>
-            <div class="outcome-box"><span>🎯</span><span><b>산출물</b> — 외부 파일·설문 응답을 자동으로 불러와 실시간으로 갱신되는 대시보드입니다.</span></div>
+            <div><a class="material-link" href="week3/index.html">📘 3주차 강의자료 보러가기 <span class="arrow">→</span></a></div>
+            <div class="outcome-box"><span>🎯</span><span><b>산출물</b> — URL로 공유되고 이메일 인증으로 보호되는, 내가 만든 유사 판례 검색·RAG 챗봇 서비스입니다.</span></div>
           </div>
         </div>
 
@@ -464,16 +463,16 @@
             <span class="week-date">2026년 8월 25일 (화)</span>
           </div>
           <div class="week-body">
-            <h3>에이전틱 AI 활용하기</h3>
-            <p class="desc">스스로 판단하고 스케줄대로 움직이는 자율 AI 에이전트를 다룹니다. 에르메스(Hermes)를 활용하여 여러 도구를 조율해 작업을 수행하는 원리를 이해하고, 3주간 쌓아온 웹앱·데이터·배포 지식을 자동화된 에이전트로 확장합니다.</p>
+            <h3>연동과 자율 에이전트 — AI에게 일을 맡기는 법</h3>
+            <p class="desc">자율 실행의 위험(프롬프트 인젝션·치명적 3요소)과 안전장치(샌드박스·human-in-the-loop)를 먼저 배우고, MCP·구글 시트로 AI를 내 데이터에 연결합니다. 그리고 오픈소스 에이전트 에르메스(Hermes)를 Hostinger VPS에 원클릭으로 설치해 텔레그램으로 말을 걸고, cron 루틴으로 반복 작업을 맡깁니다 — Claude만으로 충분한 경우와의 판단 기준까지.</p>
             <div class="tag-row">
-              <span class="tag">자율 AI 에이전트</span>
-              <span class="tag">Hermes</span>
-              <span class="tag">멀티 도구 조율</span>
-              <span class="tag">스케줄 자동화</span>
+              <span class="tag">프롬프트 인젝션 · 샌드박스</span>
+              <span class="tag">MCP · 구글 시트 연동</span>
+              <span class="tag">Hermes 에이전트</span>
+              <span class="tag">cron 루틴 자동화</span>
             </div>
-            <div><span class="material-soon">📘 4주차 강의자료 — 추가 예정</span></div>
-            <div class="outcome-box"><span>🎯</span><span><b>산출물</b> — 여러 도구를 스스로 조율해 정해진 작업을 자동으로 수행하는 에이전트입니다.</span></div>
+            <div><a class="material-link" href="week4/index.html">📘 4주차 강의자료 보러가기 <span class="arrow">→</span></a></div>
+            <div class="outcome-box"><span>🎯</span><span><b>산출물</b> — 텔레그램으로 대화하고 아침마다 스스로 브리핑을 보내는, 내 서버에서 도는 자율 에이전트입니다.</span></div>
           </div>
         </div>
       </div>

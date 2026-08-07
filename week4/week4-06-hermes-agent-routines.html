@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 4 — 에르메스 에이전트 ②: cron 루틴과 대시보드</title>
+<style>
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
+  --brand:#2e9bdb; --brand-dark:#1b6fa6; --green:#2f765b; --amber:#b8792e; --red:#b0483f;
+  --blue:#375f8f; --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12); --radius:14px; --sidebar-width:250px;
+  /* dataviz roles (validated) */
+  --viz-surface:#ffffff; --viz-ink:#0b0b0b; --viz-ink2:#52514e; --viz-muted:#898781;
+  --viz-grid:#e1e0d9; --viz-axis:#c3c2b7;
+  --series-1:#2a78d6; --series-2:#eb6834;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15.5px;
+}
+/* ---------- topbar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+/* ---------- layout ---------- */
+.layout{display:flex;align-items:flex-start;}
+.sidebar{
+  position:sticky;top:63px;flex:0 0 var(--sidebar-width);width:var(--sidebar-width);
+  height:calc(100vh - 63px);overflow-y:auto;padding:22px 14px 40px 22px;border-right:1px solid var(--line);
+}
+.sidebar-title{font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+.toc a{
+  display:block;padding:7px 11px;margin:2px 0;border-radius:8px;border-left:3px solid transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;line-height:1.4;
+}
+.toc a:hover{background:#eef3ec;color:var(--ink);}
+.toc a.active{background:var(--sky-light);border-left-color:var(--brand);color:var(--brand-dark);font-weight:800;}
+.toc a .done-mark{color:var(--green);font-weight:900;margin-left:4px;display:none;}
+.toc a.done .done-mark{display:inline;}
+.content{flex:1;min-width:0;max-width:920px;padding:clamp(20px,4vw,44px) clamp(16px,4vw,44px) 100px;}
+/* ---------- hero ---------- */
+.hero{margin-bottom:16px;}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.07em;color:var(--brand-dark);background:var(--sky-light);padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+.hero h1{font-size:clamp(23px,3.6vw,32px);line-height:1.3;letter-spacing:-.015em;margin-bottom:10px;}
+.hero p{color:var(--muted);max-width:640px;}
+/* ---------- sections ---------- */
+.section{margin-top:44px;padding-top:8px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
+.sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
+.sec-lead{color:var(--muted);margin:4px 0 18px;max-width:700px;}
+h3{font-size:16.5px;margin:26px 0 10px;}
+p{margin:10px 0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:14px 0;box-shadow:0 3px 14px rgba(54,42,31,.05);}
+/* concept grid */
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+.concept{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.concept .ico{font-size:21px;}
+.concept b{display:block;margin:7px 0 4px;font-size:14.5px;}
+.concept span{display:block;color:var(--muted);font-size:13px;line-height:1.55;}
+.concept .use{display:inline-block;margin-top:9px;font-size:12px;font-weight:800;color:var(--brand-dark);background:var(--sky-light);border-radius:999px;padding:2px 10px;}
+/* callouts */
+.callout{border-left:4px solid var(--brand);background:var(--sky-light);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;font-size:14.5px;}
+.callout.caution{border-left-color:var(--red);background:#faeeec;}
+.callout.ok{border-left-color:var(--green);background:#edf4ef;}
+.callout b.cap{display:block;font-size:13px;letter-spacing:.03em;margin-bottom:4px;}
+.callout.caution b.cap{color:var(--red);}
+.callout.ok b.cap{color:var(--green);}
+.callout b.cap{color:var(--brand-dark);}
+.tip-card{border-left:4px solid var(--brand);background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 17px;margin:14px 0;font-size:14px;color:var(--muted);}
+.tip-card b{color:var(--ink);}
+/* prompt copy block */
+.copy-block{position:relative;background:#20242a;color:#e8ecf1;border-radius:12px;padding:18px 20px;margin:14px 0;font-size:14px;line-height:1.8;}
+.copy-block .cb-label{position:absolute;top:-10px;left:14px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--brand);padding:3px 10px;border-radius:999px;}
+.copy-block pre{white-space:pre-wrap;word-break:keep-all;font-family:inherit;margin-top:4px;}
+.copy-btn{position:absolute;top:12px;right:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 11px;cursor:pointer;}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+/* two-col compare */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+.compare .col{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.compare .col h4{font-size:14px;margin-bottom:8px;}
+.compare .col.static-col h4{color:var(--green);}
+.compare .col.dyn-col h4{color:var(--amber);}
+.compare ul{margin:0 0 0 18px;font-size:13.5px;color:var(--muted);}
+.compare li{margin:5px 0;}
+/* stat tiles */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 15px;}
+.stat .v{font-size:26px;font-weight:900;letter-spacing:-.02em;color:var(--brand-dark);line-height:1.15;}
+.stat .k{margin-top:5px;font-size:12.5px;color:var(--muted);line-height:1.5;}
+/* explorer table */
+.explorer{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:16px 0;}
+.radio-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:12px;}
+.radio-row .rlabel{font-size:12.5px;font-weight:800;color:var(--muted);margin-right:2px;}
+.radio-group{display:flex;flex-wrap:wrap;gap:6px;}
+.radio-option{display:flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--line);border-radius:8px;background:#fafcf9;font-size:13px;font-weight:600;cursor:pointer;}
+.radio-option input{accent-color:var(--brand);}
+.radio-option:has(input:checked){border-color:var(--brand);background:var(--sky-light);color:var(--brand-dark);font-weight:800;}
+.book-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+.book-table th{background:#f2f6f0;border:1px solid var(--line);padding:7px 10px;text-align:left;font-size:12.5px;}
+.book-table td{border:1px solid var(--line);padding:6px 10px;}
+.book-table td.num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);}
+.dl-btn{border:1px solid var(--brand);color:var(--brand-dark);background:var(--sky-light);font-weight:800;font-size:13px;border-radius:9px;padding:8px 15px;cursor:pointer;}
+.dl-btn:hover{background:#d3e9f8;}
+/* charts */
+.chart-card{background:var(--viz-surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px 12px;margin:16px 0;}
+.chart-card h4{font-size:15px;color:var(--viz-ink);margin-bottom:2px;}
+.chart-card .sub{font-size:12.5px;color:var(--viz-ink2);margin-bottom:10px;}
+.legend{display:flex;gap:16px;align-items:center;margin:2px 0 8px;font-size:12.5px;color:var(--viz-ink2);}
+.legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;transform:translateY(1px);}
+.chart-svg{width:100%;height:auto;display:block;}
+.viz-tooltip{position:fixed;z-index:60;pointer-events:none;background:#20242a;color:#fff;font-size:12.5px;line-height:1.5;border-radius:8px;padding:7px 11px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .12s;max-width:280px;}
+.chart-note{font-size:12px;color:var(--viz-muted);margin:6px 0 4px;}
+/* insight list */
+.insight{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0;}
+.insight .n{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;border-radius:999px;background:var(--sky-light);color:var(--brand-dark);font-weight:900;font-size:13px;transform:translateY(2px);}
+.insight p{margin:0;font-size:14.5px;}
+/* example embed (lightbox) */
+.example-card{display:flex;gap:0;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;margin:16px 0;box-shadow:var(--shadow);max-width:560px;}
+.example-card:focus-visible{outline:3px solid var(--brand);}
+.example-thumb{position:relative;height:210px;overflow:hidden;background:#eef1ec;}
+.example-thumb iframe{position:absolute;top:0;left:0;width:400%;height:400%;transform:scale(.25);transform-origin:top left;border:none;pointer-events:none;}
+.example-thumb .zoom{position:absolute;right:12px;bottom:12px;background:rgba(32,36,42,.85);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:5px 12px;}
+.example-body{padding:14px 18px;}
+.example-body b{font-size:14.5px;}
+.example-body p{margin:4px 0 0;font-size:13px;color:var(--muted);}
+.example-lightbox{position:fixed;inset:0;z-index:80;background:rgba(20,24,20,.62);display:flex;align-items:center;justify-content:center;padding:3vh 3vw;}
+.example-lightbox[hidden]{display:none;}
+.lightbox-inner{position:relative;width:min(980px,96vw);height:92vh;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);}
+.lightbox-inner iframe{width:100%;height:100%;border:none;}
+.lightbox-close{position:absolute;top:10px;right:10px;z-index:2;border:none;background:#20242a;color:#fff;width:34px;height:34px;border-radius:999px;font-size:16px;font-weight:900;cursor:pointer;}
+/* completion */
+.completion-row{margin:22px 0 6px;}
+.check{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 18px;cursor:pointer;font-size:14px;font-weight:700;color:var(--muted);}
+.check input{width:17px;height:17px;accent-color:var(--green);}
+.check:has(input:checked){border-color:var(--green);color:var(--green);background:#edf4ef;}
+/* celebrate banner */
+.celebrate-banner{border:1px solid #bfe0c9;background:linear-gradient(120deg,#edf7ef,#e3f1fb);border-radius:var(--radius);padding:18px 22px;margin:0 0 22px;font-size:15px;box-shadow:var(--shadow);}
+.celebrate-banner b{color:var(--green);}
+/* checklist */
+.final-list{list-style:none;margin:14px 0;}
+.final-list li{display:flex;gap:10px;margin:9px 0;font-size:14.5px;}
+.final-list li::before{content:"✔";color:var(--green);font-weight:900;}
+.next-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.next-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.next-card b{display:block;font-size:14.5px;margin-bottom:5px;color:var(--brand-dark);}
+.next-card span{font-size:13.5px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#20242a;color:#fff;font-size:13.5px;font-weight:700;border-radius:999px;padding:10px 20px;opacity:0;transition:all .25s;z-index:90;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media (max-width:900px){ .layout{display:block;} .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  .concept-grid{grid-template-columns:1fr 1fr;} .stat-row{grid-template-columns:1fr 1fr;} .compare{grid-template-columns:1fr;} .next-card-grid{grid-template-columns:1fr;} }
+@media (max-width:640px){ .topbar{flex-wrap:wrap;row-gap:10px;} .topbar-left{flex-wrap:wrap;row-gap:8px;} .progress-wrap{width:100%;} .concept-grid{grid-template-columns:1fr;} }
+
+/* ---- 목록으로 돌아가기 (week1과 동일 패턴) ---- */
+.back-week{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:color .15s ease,border-color .15s ease,background .15s ease;}
+.back-week:hover{color:var(--brand-dark);border-color:var(--brand);background:var(--sky-light);}
+.back-home{display:flex;align-items:center;gap:15px;max-width:840px;margin:34px 0 10px;padding:20px 24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s ease,border-color .18s ease;}
+.back-home:hover{transform:translateY(-2px);border-color:var(--brand);}
+.back-home .bh-ic{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;border-radius:11px;background:var(--sky-light);color:var(--brand-dark);font-size:19px;font-weight:900;}
+.back-home strong{display:block;font-size:15.5px;font-weight:800;}
+.back-home small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;font-weight:600;}
+@media (max-width:640px){.back-home{padding:18px;gap:12px;}}
+
+/* ---- week3 공통 추가 ---- */
+.flowline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0;padding:15px 17px;background:var(--surface);border:1px solid var(--line);border-radius:12px;}
+.flowline .fnode{display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:9px 14px;border-radius:10px;background:var(--sky-light);border:1px solid #c9e2f5;font-size:13px;font-weight:800;color:var(--brand-dark);text-align:center;line-height:1.35;}
+.flowline .fnode small{font-size:11px;font-weight:600;color:var(--muted);}
+.flowline .fnode.dark{background:#20242a;border-color:#20242a;color:#fff;}
+.flowline .fnode.dark small{color:#aab4c0;}
+.flowline .fnode.ok{background:#edf4ef;border-color:#bfe0c9;color:var(--green);}
+.flowline .farrow{color:var(--muted);font-weight:900;}
+.step-table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0;}
+.step-table th{background:#f2f6f0;border:1px solid var(--line);padding:8px 12px;text-align:left;font-size:13px;}
+.step-table td{border:1px solid var(--line);padding:8px 12px;vertical-align:top;}
+.step-table td b{color:var(--brand-dark);}
+.badge{display:inline-block;font-size:11.5px;font-weight:800;border-radius:999px;padding:2px 10px;vertical-align:1px;}
+.badge.b-green{background:#edf4ef;color:var(--green);}
+.badge.b-red{background:#faeeec;color:var(--red);}
+.badge.b-blue{background:var(--sky-light);color:var(--brand-dark);}
+.badge.b-amber{background:#fbf1de;color:var(--amber);}
+.kv{display:grid;grid-template-columns:170px 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0;font-size:13.5px;}
+.kv > div{padding:9px 14px;border-bottom:1px solid var(--line);background:var(--surface);}
+.kv > div:nth-child(odd){background:#f2f6f0;font-weight:800;font-size:12.5px;}
+.kv > div:nth-last-child(-n+2){border-bottom:none;}
+.ws-steps{counter-reset:ws;margin:16px 0;}
+.workshop-step{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px 14px 58px;margin:12px 0;}
+.workshop-step .ws-num{position:absolute;left:16px;top:16px;display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:13.5px;}
+.workshop-step b.ws-t{display:block;font-size:14.5px;margin-bottom:4px;}
+.workshop-step p{font-size:14px;color:var(--muted);margin:4px 0;}
+.workshop-step code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.5px;}
+code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.88em;font-family:ui-monospace,'SF Mono',Consolas,monospace;}
+.copy-block code{background:transparent;border:none;padding:0;color:#9fd0f5;font-size:inherit;}
+.quad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.quad .q{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.quad .q h4{font-size:14px;margin-bottom:6px;}
+.quad .q p{font-size:13.5px;color:var(--muted);margin:4px 0;}
+.term-list{margin:14px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+.term-list .term{display:grid;grid-template-columns:150px 1fr;border-bottom:1px solid var(--line);background:var(--surface);}
+.term-list .term:last-child{border-bottom:none;}
+.term-list .term > b{padding:11px 14px;background:#f2f6f0;font-size:13.5px;}
+.term-list .term > span{padding:11px 14px;font-size:13.5px;color:var(--muted);}
+@media (max-width:700px){.quad{grid-template-columns:1fr;}.kv{grid-template-columns:1fr;}.kv > div:nth-child(odd){border-bottom:none;padding-bottom:2px;}.term-list .term{grid-template-columns:1fr;}}
+</style>
+</head>
+<body id="top">
+
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+    </a>
+    <div class="week-tag"><span class="week-num">WEEK 4</span><span class="week-title">루틴과 대시보드</span></div>
+    <a class="back-week" href="index.html">← 4주차 목록</a>
+  </div>
+  <div class="progress-wrap" aria-label="진행률">
+    <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="목차">
+    <div class="sidebar-title">이 페이지의 흐름</div>
+    <div class="toc" id="toc">
+      <a href="#s1" data-sec="s1">1. 루틴 — 반복 업무를 에이전트에게<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. 실습 — 아침 브리핑 루틴 만들기<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 대시보드 — 에이전트 관리 화면<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 사실, Claude로도 됩니다<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 안전 수칙 재확인<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. 마무리<span class="done-mark">✔</span></a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div id="celebrateSlot"></div>
+
+    <div class="hero">
+      <span class="hero-kicker">WEEK 4 · STEP 6 — 에르메스 에이전트 ②</span>
+      <h1>에르메스 에이전트 ② —<br/>cron 루틴과 진행상황 대시보드</h1>
+      <p>⑤에서 깨운 에이전트에게 이제 <b>반복 업무</b>를 맡깁니다. 3주차 총정리에서 남겨 둔 숙제 — "아무도 안 볼 때는 누가 일하나" — 가 오늘 풀립니다. 정해진 시각에 스스로 일하고 결과를 텔레그램으로 보내는 <b>cron 루틴</b>, 그리고 에이전트를 한눈에 관리하는 <b>대시보드</b>까지. 마지막에는 솔직한 비교도 합니다: 이 일, 사실 Claude로도 됩니다.</p>
+    </div>
+
+
+    <!-- ================= SECTION 1 ================= -->
+    <section class="section" id="s1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>루틴 — 반복 업무를 에이전트에게</h2></div>
+      <p class="sec-lead">지금까지 만든 것들은 전부 <b>요청이 와야</b> 움직였습니다. 서버리스 함수는 브라우저가 부를 때, 챗봇은 질문이 올 때, 에이전트는 내가 말을 걸 때. 루틴은 그 반대입니다 — <b>정해진 때에, 사람 없이, 알아서.</b></p>
+
+      <h3>cron 표기법 — 시각을 다섯 칸으로 적는 법</h3>
+      <p>예약 시각은 유닉스 전통의 <b>cron 표기법</b>으로 적습니다. 다섯 칸이 각각 분·시·일·월·요일이고, <code>*</code>는 "매번"이라는 뜻입니다.</p>
+      <div class="kv">
+        <div>다섯 칸의 의미</div><div><code>분(0-59) 시(0-23) 일(1-31) 월(1-12) 요일(0-6, 일요일=0)</code></div>
+        <div><code>0 9 * * *</code></div><div>매일 아침 9시 정각</div>
+        <div><code>30 18 * * 5</code></div><div>매주 금요일 저녁 6시 30분</div>
+        <div><code>0 9 1 * *</code></div><div>매월 1일 아침 9시</div>
+      </div>
+      <div class="tip-card"><b>셸 cron과의 결정적 차이</b> — 전통적인 cron은 <b>고정된 명령</b>을 반복합니다(같은 스크립트, 같은 결과 형식). 에르메스의 cron 작업은 <b>에이전트 태스크</b>로 실행됩니다 — 목표(프롬프트)를 주면 매번 판단–실행–해석을 거쳐 일합니다. "뉴스를 요약해줘"라는 같은 목표라도 그날의 뉴스에 맞게 스스로 검색하고 고르고 정리한다는 뜻입니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>cron 다섯 칸을 읽고 쓸 수 있고, 셸 cron과의 차이를 안다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 2 ================= -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>실습 — 아침 브리핑 루틴 만들기</h2></div>
+      <p class="sec-lead">매일 아침 9시, 관심 분야 소식을 요약해 텔레그램으로 받아 봅시다. 명령 한 줄입니다.</p>
+
+      <div class="ws-steps">
+        <div class="workshop-step"><span class="ws-num">1</span>
+          <b class="ws-t">루틴 등록</b>
+          <div class="copy-block"><span class="cb-label">⌨️ 터미널</span>
+            <button class="copy-btn" data-copy="c1">복사</button>
+            <pre id="c1">hermes cron create \
+  --prompt "AI 업계의 최근 24시간 주요 소식을 조사해서, 한국어로 5줄 요약해줘. 각 항목에 출처 링크를 붙이고, 마지막에 오늘 내가 주목할 한 가지를 골라줘." \
+  --schedule "0 9 * * *" \
+  --deliver telegram</pre>
+          </div>
+          <p><code>--prompt</code>가 목표, <code>--schedule</code>이 시각(매일 9시), <code>--deliver</code>가 결과를 받을 통로입니다. 프롬프트는 여러분의 관심사로 바꾸세요 — "우리 업계 규제 동향", "관심 종목 공시", "경쟁사 채용 공고" 무엇이든.</p>
+        </div>
+        <div class="workshop-step"><span class="ws-num">2</span>
+          <b class="ws-t">등록 확인</b>
+          <div class="copy-block"><span class="cb-label">⌨️ 터미널</span>
+            <button class="copy-btn" data-copy="c2">복사</button>
+            <pre id="c2">hermes cron list
+hermes cron status</pre>
+          </div>
+          <p>등록된 루틴 목록과 다음 실행 시각, 최근 실행 결과를 확인합니다.</p>
+        </div>
+      </div>
+      <div class="callout ok"><b class="cap">재시작에도 살아남는다</b>
+      루틴은 에르메스 홈 폴더에 저장되므로 <b>컴퓨터나 에이전트를 재시작해도 유지</b>됩니다. 내일 아침 9시, 아무것도 하지 않아도 텔레그램에 브리핑이 도착합니다 — 3주차의 남은 숙제("요청이 와야 움직인다")가 풀리는 순간입니다.</div>
+      <div class="tip-card"><b>④와 이어 보기</b> — 루틴의 프롬프트에 "결과를 구글 시트에 한 행 추가해줘"를 더하면? ③의 서비스 계정 + append 패턴과 오늘의 루틴이 합쳐져, <b>매일 데이터가 쌓이고 대시보드가 자동 갱신되는 완전 자동 파이프라인</b>이 됩니다. 이번 주 과제의 힌트입니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>아침 브리핑 루틴을 등록하고 cron list로 확인했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 3 ================= -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>대시보드 — 에이전트 관리 화면</h2></div>
+      <p class="sec-lead">터미널 명령이 익숙하지 않아도 괜찮습니다. 에르메스에는 웹 관리 화면이 내장되어 있습니다.</p>
+      <div class="copy-block"><span class="cb-label">⌨️ 터미널</span>
+        <button class="copy-btn" data-copy="c3">복사</button>
+        <pre id="c3">hermes dashboard</pre>
+      </div>
+      <p>브라우저에서 대시보드가 열립니다(로컬 설치라면 <code>http://localhost:8000</code>, VPS라면 안내되는 접속 주소). 한 바퀴 둘러보면:</p>
+      <div class="kv">
+        <div>MCP 카탈로그</div><div>에이전트에 꽂을 수 있는 MCP 서버 목록 — ②에서 배운 "표준 도구함"이 여기서 에이전트의 도구가 됩니다</div>
+        <div>자격증명</div><div>API 키·토큰 관리 — .env의 내용을 화면에서 관리</div>
+        <div>게이트웨이 설정</div><div>텔레그램 등 메신저 연결과 페어링 상태</div>
+        <div>메모리 설정</div><div>장기 기억(memories/)의 동작 방식 조정</div>
+        <div>진단</div><div>hermes doctor의 화면 버전 — 환경 문제를 한눈에</div>
+      </div>
+      <div class="tip-card"><b>대시보드는 관리자 화면입니다</b> — 자격증명·게이트웨이까지 만질 수 있는 화면이므로, VPS에서 외부 접속을 열어 둘 때는 <b>반드시 강한 비밀번호(④에서 만든 계정)로만</b> 접근되게 유지하세요. 로컬 설치라면 localhost 주소라 내 컴퓨터 안에서만 열립니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>대시보드를 열어 다섯 메뉴를 둘러봤다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 4 ================= -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>사실, Claude로도 됩니다 — 솔직한 비교</h2></div>
+      <p class="sec-lead">여기까지 오면 물어야 할 질문이 있습니다. <b>"이거, 꼭 에르메스여야 하나?"</b> — 아니요. 방금 만든 것의 대부분은 이미 쓰던 Claude에도 있습니다.</p>
+
+      <table class="step-table">
+        <thead><tr><th>오늘 한 일</th><th>Claude에서는</th></tr></thead>
+        <tbody>
+          <tr><td><b>예약 루틴</b> (아침 브리핑)</td><td>Claude의 <b>스케줄 루틴(scheduled tasks)</b> — 정해진 시각에 작업을 실행하고 결과를 받아볼 수 있음</td></tr>
+          <tr><td><b>장시간 자율 작업</b></td><td>Cowork·Claude Code가 이미 수십 분짜리 작업을 자율 수행 — 2·3주차 내내 경험</td></tr>
+          <tr><td><b>절차 저장</b> (스킬)</td><td>3주차에 만든 SKILL.md 그대로</td></tr>
+          <tr><td><b>도구 연결</b> (MCP)</td><td>②에서 켠 커넥터 그대로</td></tr>
+        </tbody>
+      </table>
+
+      <p>그렇다면 자가 호스팅 에이전트가 <b>의미 있어지는 경우</b>는 언제일까요? 네 가지입니다:</p>
+      <div class="quad">
+        <div class="q"><h4>🖥️ 내 서버에 24시간 상주</h4><p>회사 내부망의 컴퓨터, 집의 미니 PC에 두고 그 환경의 파일·시스템을 계속 다뤄야 할 때.</p></div>
+        <div class="q"><h4>💬 메신저가 접점일 때</h4><p>팀이 이미 사는 텔레그램·슬랙·디스코드 안에서 에이전트를 부르고 결과를 받아야 할 때.</p></div>
+        <div class="q"><h4>💰 오픈 모델로 비용 통제</h4><p>OpenRouter로 저렴한 오픈 모델을 꽂아 대량 반복 작업의 비용을 직접 조절하고 싶을 때.</p></div>
+        <div class="q"><h4>🔒 데이터 주권</h4><p>데이터를 내 인프라 밖으로 내보낼 수 없는 규정·계약이 있을 때 — 처리 전 과정이 내 서버 안에서 끝나야 할 때.</p></div>
+      </div>
+
+      <div class="callout"><b class="cap">솔직한 결론</b>
+      실무적으로는 <b>Claude만으로 충분한 경우가 많습니다.</b> 관리 부담(설치·업데이트·보안·키 관리)이 전부 내 몫이 되는 것이 자가 호스팅의 대가이기 때문입니다. 오늘 에르메스를 배운 가치는 "갈아타라"가 아니라 <b>선택지를 아는 것</b>입니다 — 위의 네 경우에 해당하면 자가 호스팅, 아니면 관리형(Claude). 이 판단 기준은 ⑦의 판단표에 마지막 행으로 들어갑니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>자가 호스팅이 의미 있는 네 경우를 말할 수 있다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 5 ================= -->
+    <section class="section" id="s5">
+      <div class="sec-head"><span class="sec-num">5</span><h2>안전 수칙 재확인 — 루틴은 무인 실행이다</h2></div>
+      <p class="sec-lead">루틴은 <b>내가 안 보는 시간에</b> 도는 실행입니다. ①의 안전장치가 가장 필요한 순간이 바로 지금입니다.</p>
+      <div class="insight"><span class="n">1</span><p><b>페어링 목록을 정기 점검.</b> 결과가 배달되는 통로(텔레그램)에 승인된 사람이 나뿐인지 확인 — 통로가 곧 3요소의 ③(외부 통신)입니다.</p></div>
+      <div class="insight"><span class="n">2</span><p><b>terminal backend는 docker.</b> 루틴이 실수로(혹은 속아서) 파괴적 명령을 만들어도 컨테이너 안에서 끝나게 — ①의 "속아도 막히는 구조"를 무인 시간에도 유지합니다.</p></div>
+      <div class="insight"><span class="n">3</span><p><b>루틴이 읽는 것은 전부 "남이 쓴 글".</b> 뉴스·웹페이지를 매일 읽는 루틴은 3요소의 ②(불신 콘텐츠)에 매일 노출됩니다. 루틴의 목표를 "조사·요약·전달"로 한정하고, 파일 삭제·설정 변경 같은 능력과 한 루틴에 섞지 마세요.</p></div>
+      <div class="insight"><span class="n">4</span><p><b>logs/와 cron status를 아침 브리핑처럼.</b> 무인 실행일수록 사후 확인이 안전장치입니다 — 자율은 무감독이 아니다, 마지막으로 한 번 더.</p></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>무인 실행의 안전 수칙 4가지를 내 설정에 적용했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 6 ================= -->
+    <section class="section" id="s6">
+      <div class="sec-head"><span class="sec-num">6</span><h2>마무리</h2></div>
+      <ul class="final-list">
+        <li>루틴 = 목표 + cron 시각 + 전달 통로 — 고정 스크립트가 아니라 매번 판단하는 에이전트 태스크</li>
+        <li>재시작에도 유지, 결과는 메신저로 — "요청이 와야 움직인다"의 한계를 넘었다</li>
+        <li>대시보드(hermes dashboard) = MCP·자격증명·게이트웨이·메모리·진단의 관리 화면</li>
+        <li>솔직한 비교: 스케줄 루틴·자율 작업·스킬·MCP는 Claude에도 있다 — 자가 호스팅의 가치는 상주·메신저·비용·데이터 주권</li>
+        <li>무인 실행일수록 안전장치: 페어링 점검 · docker · 능력 분리 · 로그 확인</li>
+      </ul>
+      <div class="next-card-grid">
+        <div class="next-card"><b>다음 자료 ⑦</b><span>마지막 자료 — 4주 동안 배운 모든 연동·에이전트를 판단표 한 장으로 접고, 부트캠프 전체를 마무리합니다.</span></div>
+        <div class="next-card"><b>직접 해보기</b><span>내 업무 루틴 하나를 골라 에이전트 루틴(에르메스 cron 또는 Claude 스케줄 루틴)으로 자동화해 보세요. §2의 팁처럼 결과를 시트에 쌓으면 ③과 합쳐진 완전 자동 파이프라인이 됩니다.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>루틴과 대시보드 강의를 마쳤다!</span></label></div>
+    </section>
+
+
+    <a class="back-home" href="index.html">
+      <span class="bh-ic">📚</span>
+      <span><strong>4주차 강의자료 목록으로 돌아가기</strong><small>다음 자료: 총정리 — 판단 기준과 4주의 마무리</small></span>
+    </a>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+const CELEBRATE_HTML = "🎉 <b>내가 자는 동안 일하는 AI 완성!</b> '요청이 와야 움직인다'는 한계가 루틴으로 풀렸습니다. 마지막 자료 ⑦에서 4주 전체를 판단표 한 장으로 접습니다.";
+
+const $ = s => document.querySelector(s);
+/* 프롬프트 복사 */
+function showToast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1800);}
+function fallbackCopy(text,done){const ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done();}catch(e){}ta.remove();}
+document.querySelectorAll(".copy-btn").forEach(btn=>{btn.addEventListener("click",()=>{const text=document.getElementById(btn.dataset.copy).textContent;const done=()=>showToast("프롬프트가 복사되었습니다");if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));}else fallbackCopy(text,done);});});
+/* 진행률 + 축하 배너 (상태는 메모리에만) */
+const checks=[...document.querySelectorAll("input[data-progress]")];
+$("#progressTotal").textContent=checks.length;
+let celebrated=false;
+function updateProgress(){
+  const done=checks.filter(c=>c.checked).length;
+  $("#progressCount").textContent=done;
+  $("#progressBar").style.width=(done/checks.length*100)+"%";
+  checks.forEach(c=>{const a=document.querySelector(`.toc a[data-sec="${c.dataset.progress}"]`);if(a)a.classList.toggle("done",c.checked);});
+  if(done===checks.length&&!celebrated){
+    celebrated=true;
+    const b=document.createElement("div");b.className="celebrate-banner";
+    b.innerHTML=CELEBRATE_HTML;
+    $("#celebrateSlot").appendChild(b);
+    b.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+}
+checks.forEach(c=>c.addEventListener("change",updateProgress));
+/* 사이드바 scroll-spy */
+const secIds=[...document.querySelectorAll("main .section")].map(s=>s.id);
+const tocLinks={};
+document.querySelectorAll(".toc a").forEach(a=>tocLinks[a.dataset.sec]=a);
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(en=>{en.target._visible=en.isIntersecting;});
+  let current=null;
+  for(const id of secIds){const el=document.getElementById(id);if(el&&el._visible){current=id;break;}}
+  if(current){Object.values(tocLinks).forEach(a=>a.classList.remove("active"));tocLinks[current].classList.add("active");}
+},{rootMargin:"-15% 0px -55% 0px"});
+secIds.forEach(id=>io.observe(document.getElementById(id)));
+updateProgress();
+
+
+
+</script>
+</body>
+</html>

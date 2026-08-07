@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 4 — 총정리: 판단 기준과 4주의 마무리</title>
+<style>
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
+  --brand:#2e9bdb; --brand-dark:#1b6fa6; --green:#2f765b; --amber:#b8792e; --red:#b0483f;
+  --blue:#375f8f; --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12); --radius:14px; --sidebar-width:250px;
+  /* dataviz roles (validated) */
+  --viz-surface:#ffffff; --viz-ink:#0b0b0b; --viz-ink2:#52514e; --viz-muted:#898781;
+  --viz-grid:#e1e0d9; --viz-axis:#c3c2b7;
+  --series-1:#2a78d6; --series-2:#eb6834;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15.5px;
+}
+/* ---------- topbar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+/* ---------- layout ---------- */
+.layout{display:flex;align-items:flex-start;}
+.sidebar{
+  position:sticky;top:63px;flex:0 0 var(--sidebar-width);width:var(--sidebar-width);
+  height:calc(100vh - 63px);overflow-y:auto;padding:22px 14px 40px 22px;border-right:1px solid var(--line);
+}
+.sidebar-title{font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+.toc a{
+  display:block;padding:7px 11px;margin:2px 0;border-radius:8px;border-left:3px solid transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;line-height:1.4;
+}
+.toc a:hover{background:#eef3ec;color:var(--ink);}
+.toc a.active{background:var(--sky-light);border-left-color:var(--brand);color:var(--brand-dark);font-weight:800;}
+.toc a .done-mark{color:var(--green);font-weight:900;margin-left:4px;display:none;}
+.toc a.done .done-mark{display:inline;}
+.content{flex:1;min-width:0;max-width:920px;padding:clamp(20px,4vw,44px) clamp(16px,4vw,44px) 100px;}
+/* ---------- hero ---------- */
+.hero{margin-bottom:16px;}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.07em;color:var(--brand-dark);background:var(--sky-light);padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+.hero h1{font-size:clamp(23px,3.6vw,32px);line-height:1.3;letter-spacing:-.015em;margin-bottom:10px;}
+.hero p{color:var(--muted);max-width:640px;}
+/* ---------- sections ---------- */
+.section{margin-top:44px;padding-top:8px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
+.sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
+.sec-lead{color:var(--muted);margin:4px 0 18px;max-width:700px;}
+h3{font-size:16.5px;margin:26px 0 10px;}
+p{margin:10px 0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:14px 0;box-shadow:0 3px 14px rgba(54,42,31,.05);}
+/* concept grid */
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+.concept{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.concept .ico{font-size:21px;}
+.concept b{display:block;margin:7px 0 4px;font-size:14.5px;}
+.concept span{display:block;color:var(--muted);font-size:13px;line-height:1.55;}
+.concept .use{display:inline-block;margin-top:9px;font-size:12px;font-weight:800;color:var(--brand-dark);background:var(--sky-light);border-radius:999px;padding:2px 10px;}
+/* callouts */
+.callout{border-left:4px solid var(--brand);background:var(--sky-light);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;font-size:14.5px;}
+.callout.caution{border-left-color:var(--red);background:#faeeec;}
+.callout.ok{border-left-color:var(--green);background:#edf4ef;}
+.callout b.cap{display:block;font-size:13px;letter-spacing:.03em;margin-bottom:4px;}
+.callout.caution b.cap{color:var(--red);}
+.callout.ok b.cap{color:var(--green);}
+.callout b.cap{color:var(--brand-dark);}
+.tip-card{border-left:4px solid var(--brand);background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 17px;margin:14px 0;font-size:14px;color:var(--muted);}
+.tip-card b{color:var(--ink);}
+/* prompt copy block */
+.copy-block{position:relative;background:#20242a;color:#e8ecf1;border-radius:12px;padding:18px 20px;margin:14px 0;font-size:14px;line-height:1.8;}
+.copy-block .cb-label{position:absolute;top:-10px;left:14px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--brand);padding:3px 10px;border-radius:999px;}
+.copy-block pre{white-space:pre-wrap;word-break:keep-all;font-family:inherit;margin-top:4px;}
+.copy-btn{position:absolute;top:12px;right:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 11px;cursor:pointer;}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+/* two-col compare */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+.compare .col{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.compare .col h4{font-size:14px;margin-bottom:8px;}
+.compare .col.static-col h4{color:var(--green);}
+.compare .col.dyn-col h4{color:var(--amber);}
+.compare ul{margin:0 0 0 18px;font-size:13.5px;color:var(--muted);}
+.compare li{margin:5px 0;}
+/* stat tiles */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 15px;}
+.stat .v{font-size:26px;font-weight:900;letter-spacing:-.02em;color:var(--brand-dark);line-height:1.15;}
+.stat .k{margin-top:5px;font-size:12.5px;color:var(--muted);line-height:1.5;}
+/* explorer table */
+.explorer{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:16px 0;}
+.radio-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:12px;}
+.radio-row .rlabel{font-size:12.5px;font-weight:800;color:var(--muted);margin-right:2px;}
+.radio-group{display:flex;flex-wrap:wrap;gap:6px;}
+.radio-option{display:flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--line);border-radius:8px;background:#fafcf9;font-size:13px;font-weight:600;cursor:pointer;}
+.radio-option input{accent-color:var(--brand);}
+.radio-option:has(input:checked){border-color:var(--brand);background:var(--sky-light);color:var(--brand-dark);font-weight:800;}
+.book-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+.book-table th{background:#f2f6f0;border:1px solid var(--line);padding:7px 10px;text-align:left;font-size:12.5px;}
+.book-table td{border:1px solid var(--line);padding:6px 10px;}
+.book-table td.num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);}
+.dl-btn{border:1px solid var(--brand);color:var(--brand-dark);background:var(--sky-light);font-weight:800;font-size:13px;border-radius:9px;padding:8px 15px;cursor:pointer;}
+.dl-btn:hover{background:#d3e9f8;}
+/* charts */
+.chart-card{background:var(--viz-surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px 12px;margin:16px 0;}
+.chart-card h4{font-size:15px;color:var(--viz-ink);margin-bottom:2px;}
+.chart-card .sub{font-size:12.5px;color:var(--viz-ink2);margin-bottom:10px;}
+.legend{display:flex;gap:16px;align-items:center;margin:2px 0 8px;font-size:12.5px;color:var(--viz-ink2);}
+.legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;transform:translateY(1px);}
+.chart-svg{width:100%;height:auto;display:block;}
+.viz-tooltip{position:fixed;z-index:60;pointer-events:none;background:#20242a;color:#fff;font-size:12.5px;line-height:1.5;border-radius:8px;padding:7px 11px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .12s;max-width:280px;}
+.chart-note{font-size:12px;color:var(--viz-muted);margin:6px 0 4px;}
+/* insight list */
+.insight{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0;}
+.insight .n{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;border-radius:999px;background:var(--sky-light);color:var(--brand-dark);font-weight:900;font-size:13px;transform:translateY(2px);}
+.insight p{margin:0;font-size:14.5px;}
+/* example embed (lightbox) */
+.example-card{display:flex;gap:0;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;margin:16px 0;box-shadow:var(--shadow);max-width:560px;}
+.example-card:focus-visible{outline:3px solid var(--brand);}
+.example-thumb{position:relative;height:210px;overflow:hidden;background:#eef1ec;}
+.example-thumb iframe{position:absolute;top:0;left:0;width:400%;height:400%;transform:scale(.25);transform-origin:top left;border:none;pointer-events:none;}
+.example-thumb .zoom{position:absolute;right:12px;bottom:12px;background:rgba(32,36,42,.85);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:5px 12px;}
+.example-body{padding:14px 18px;}
+.example-body b{font-size:14.5px;}
+.example-body p{margin:4px 0 0;font-size:13px;color:var(--muted);}
+.example-lightbox{position:fixed;inset:0;z-index:80;background:rgba(20,24,20,.62);display:flex;align-items:center;justify-content:center;padding:3vh 3vw;}
+.example-lightbox[hidden]{display:none;}
+.lightbox-inner{position:relative;width:min(980px,96vw);height:92vh;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);}
+.lightbox-inner iframe{width:100%;height:100%;border:none;}
+.lightbox-close{position:absolute;top:10px;right:10px;z-index:2;border:none;background:#20242a;color:#fff;width:34px;height:34px;border-radius:999px;font-size:16px;font-weight:900;cursor:pointer;}
+/* completion */
+.completion-row{margin:22px 0 6px;}
+.check{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 18px;cursor:pointer;font-size:14px;font-weight:700;color:var(--muted);}
+.check input{width:17px;height:17px;accent-color:var(--green);}
+.check:has(input:checked){border-color:var(--green);color:var(--green);background:#edf4ef;}
+/* celebrate banner */
+.celebrate-banner{border:1px solid #bfe0c9;background:linear-gradient(120deg,#edf7ef,#e3f1fb);border-radius:var(--radius);padding:18px 22px;margin:0 0 22px;font-size:15px;box-shadow:var(--shadow);}
+.celebrate-banner b{color:var(--green);}
+/* checklist */
+.final-list{list-style:none;margin:14px 0;}
+.final-list li{display:flex;gap:10px;margin:9px 0;font-size:14.5px;}
+.final-list li::before{content:"✔";color:var(--green);font-weight:900;}
+.next-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.next-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.next-card b{display:block;font-size:14.5px;margin-bottom:5px;color:var(--brand-dark);}
+.next-card span{font-size:13.5px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#20242a;color:#fff;font-size:13.5px;font-weight:700;border-radius:999px;padding:10px 20px;opacity:0;transition:all .25s;z-index:90;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media (max-width:900px){ .layout{display:block;} .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  .concept-grid{grid-template-columns:1fr 1fr;} .stat-row{grid-template-columns:1fr 1fr;} .compare{grid-template-columns:1fr;} .next-card-grid{grid-template-columns:1fr;} }
+@media (max-width:640px){ .topbar{flex-wrap:wrap;row-gap:10px;} .topbar-left{flex-wrap:wrap;row-gap:8px;} .progress-wrap{width:100%;} .concept-grid{grid-template-columns:1fr;} }
+
+/* ---- 목록으로 돌아가기 (week1과 동일 패턴) ---- */
+.back-week{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:color .15s ease,border-color .15s ease,background .15s ease;}
+.back-week:hover{color:var(--brand-dark);border-color:var(--brand);background:var(--sky-light);}
+.back-home{display:flex;align-items:center;gap:15px;max-width:840px;margin:34px 0 10px;padding:20px 24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s ease,border-color .18s ease;}
+.back-home:hover{transform:translateY(-2px);border-color:var(--brand);}
+.back-home .bh-ic{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;border-radius:11px;background:var(--sky-light);color:var(--brand-dark);font-size:19px;font-weight:900;}
+.back-home strong{display:block;font-size:15.5px;font-weight:800;}
+.back-home small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;font-weight:600;}
+@media (max-width:640px){.back-home{padding:18px;gap:12px;}}
+
+/* ---- week3 공통 추가 ---- */
+.flowline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0;padding:15px 17px;background:var(--surface);border:1px solid var(--line);border-radius:12px;}
+.flowline .fnode{display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:9px 14px;border-radius:10px;background:var(--sky-light);border:1px solid #c9e2f5;font-size:13px;font-weight:800;color:var(--brand-dark);text-align:center;line-height:1.35;}
+.flowline .fnode small{font-size:11px;font-weight:600;color:var(--muted);}
+.flowline .fnode.dark{background:#20242a;border-color:#20242a;color:#fff;}
+.flowline .fnode.dark small{color:#aab4c0;}
+.flowline .fnode.ok{background:#edf4ef;border-color:#bfe0c9;color:var(--green);}
+.flowline .farrow{color:var(--muted);font-weight:900;}
+.step-table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0;}
+.step-table th{background:#f2f6f0;border:1px solid var(--line);padding:8px 12px;text-align:left;font-size:13px;}
+.step-table td{border:1px solid var(--line);padding:8px 12px;vertical-align:top;}
+.step-table td b{color:var(--brand-dark);}
+.badge{display:inline-block;font-size:11.5px;font-weight:800;border-radius:999px;padding:2px 10px;vertical-align:1px;}
+.badge.b-green{background:#edf4ef;color:var(--green);}
+.badge.b-red{background:#faeeec;color:var(--red);}
+.badge.b-blue{background:var(--sky-light);color:var(--brand-dark);}
+.badge.b-amber{background:#fbf1de;color:var(--amber);}
+.kv{display:grid;grid-template-columns:170px 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0;font-size:13.5px;}
+.kv > div{padding:9px 14px;border-bottom:1px solid var(--line);background:var(--surface);}
+.kv > div:nth-child(odd){background:#f2f6f0;font-weight:800;font-size:12.5px;}
+.kv > div:nth-last-child(-n+2){border-bottom:none;}
+.ws-steps{counter-reset:ws;margin:16px 0;}
+.workshop-step{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px 14px 58px;margin:12px 0;}
+.workshop-step .ws-num{position:absolute;left:16px;top:16px;display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:13.5px;}
+.workshop-step b.ws-t{display:block;font-size:14.5px;margin-bottom:4px;}
+.workshop-step p{font-size:14px;color:var(--muted);margin:4px 0;}
+.workshop-step code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.5px;}
+code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.88em;font-family:ui-monospace,'SF Mono',Consolas,monospace;}
+.copy-block code{background:transparent;border:none;padding:0;color:#9fd0f5;font-size:inherit;}
+.quad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.quad .q{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.quad .q h4{font-size:14px;margin-bottom:6px;}
+.quad .q p{font-size:13.5px;color:var(--muted);margin:4px 0;}
+.term-list{margin:14px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+.term-list .term{display:grid;grid-template-columns:150px 1fr;border-bottom:1px solid var(--line);background:var(--surface);}
+.term-list .term:last-child{border-bottom:none;}
+.term-list .term > b{padding:11px 14px;background:#f2f6f0;font-size:13.5px;}
+.term-list .term > span{padding:11px 14px;font-size:13.5px;color:var(--muted);}
+@media (max-width:700px){.quad{grid-template-columns:1fr;}.kv{grid-template-columns:1fr;}.kv > div:nth-child(odd){border-bottom:none;padding-bottom:2px;}.term-list .term{grid-template-columns:1fr;}}
+</style>
+</head>
+<body id="top">
+
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+    </a>
+    <div class="week-tag"><span class="week-num">WEEK 4</span><span class="week-title">총정리 · 수료</span></div>
+    <a class="back-week" href="index.html">← 4주차 목록</a>
+  </div>
+  <div class="progress-wrap" aria-label="진행률">
+    <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="목차">
+    <div class="sidebar-title">이 페이지의 흐름</div>
+    <div class="toc" id="toc">
+      <a href="#s1" data-sec="s1">1. 판단표 — 여섯 가지 길<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. 새 갈래 — 시킬 때마다 vs 스스로 반복<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 자가 점검 — 사례를 배치해 보기<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 자율 도전 과제<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 4주의 여정 — 수료를 축하합니다<span class="done-mark">✔</span></a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div id="celebrateSlot"></div>
+
+    <div class="hero">
+      <span class="hero-kicker">WEEK 4 · STEP 7 — 총정리</span>
+      <h1>무엇을 쓸지 어떻게 정하나 —<br/>판단표 한 장, 그리고 4주의 마무리</h1>
+      <p>부트캠프의 마지막 자료입니다. 3주차의 연동 다섯 갈래에 이번 주의 <b>자율 에이전트·루틴</b> 갈래를 더해 판단표를 완성하고, 사례 자가 점검과 도전 과제를 거쳐, 4주 전체의 여정을 접어 넣습니다. 앞으로 "이런 걸 만들고 싶은데"라는 생각이 들 때마다 이 표에서 시작하면 됩니다.</p>
+    </div>
+
+
+    <!-- ================= SECTION 1 ================= -->
+    <section class="section" id="s1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>판단표 — 여섯 가지 길</h2></div>
+      <p class="sec-lead">질문 순서대로 내려가면 됩니다. "어디서 배웠나"가 복습 지도이기도 합니다.</p>
+      <table class="step-table">
+        <thead><tr><th>질문</th><th>답이 "예"라면</th><th>쓰는 것</th><th>어디서 배웠나</th></tr></thead>
+        <tbody>
+          <tr><td><b>Q1.</b> 나 혼자, 대화로 데이터를 분석·정리하고 싶은가?</td><td>서비스를 만들 필요가 없음</td><td><span class="badge b-blue">커넥터 (MCP)</span></td><td>4주차 ②</td></tr>
+          <tr><td><b>Q2.</b> 여럿이 쓰는 화면이 필요하고, 데이터가 <b>공개 + 읽기 전용</b>인가?</td><td>백엔드 불필요</td><td><span class="badge b-green">정적 페이지 + 게시 CSV</span></td><td>4주차 ③ §1</td></tr>
+          <tr><td><b>Q3.</b> <b>비공개 데이터</b>이거나 <b>쓰기</b>가 필요한가?</td><td>비밀(키)을 숨길 서버 필요</td><td><span class="badge b-amber">백엔드 (Vercel + 환경변수)</span></td><td>3주차 배포 · 4주차 ③</td></tr>
+          <tr><td><b>Q4.</b> 접속하는 <b>사람을 가려야</b> 하는가?</td><td>Q3에 문을 추가</td><td><span class="badge b-red">+ 인증 (이메일 코드 등)</span></td><td>3주차 인증</td></tr>
+          <tr><td><b>Q5.</b> 상대 시스템에 MCP도 API도 <b>없는가</b> (레거시)?</td><td>어댑터를 직접 제작</td><td><span class="badge b-blue">CLI 도구 + 에이전트</span></td><td>4주차 ②</td></tr>
+          <tr><td><b>Q6.</b> 시킬 때마다 한 번이 아니라, <b>스스로 반복</b>되어야 하는가?</td><td>실행 주체를 예약</td><td><span class="badge b-amber">루틴 / 자율 에이전트</span></td><td>4주차 ⑤⑥</td></tr>
+        </tbody>
+      </table>
+      <div class="callout"><b class="cap">전 구간을 관통한 한 문장</b>
+      <b>비밀은 서버에, 환경변수로.</b> OpenRouter 키(3주차 배포), 서비스 계정 키(④), Gmail 앱 비밀번호(3주차 인증), 에르메스의 <code>.env</code>와 봇 토큰(⑤) — 무엇이 등장하든 자리는 하나였습니다. 이 문장 하나를 지키는 것이 비개발자가 지킬 수 있는 가장 중요한 보안 수칙입니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>Q1~Q6을 순서대로 물어 연동·자동화 방식을 고를 수 있다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 2 ================= -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>새 갈래 — "사람이 시킬 때마다 하나, 스스로 반복되나"</h2></div>
+      <p class="sec-lead">Q6은 이번 주에 새로 생긴 축입니다. 앞의 다섯 질문이 "무엇을 어떻게 연결하나"였다면, Q6은 <b>"누가 실행 버튼을 누르나"</b>를 묻습니다.</p>
+      <p>Q6에 "예"라고 답했다면 한 번 더 갈립니다 — ⑥의 결론 그대로입니다:</p>
+      <div class="compare">
+        <div class="col static-col"><h4>Claude 루틴으로 충분한 경우 (대부분)</h4>
+          <ul>
+            <li>정해진 시각의 조사·요약·보고 작업</li>
+            <li>결과를 내가 확인하는 형태면 충분</li>
+            <li>설치·업데이트·보안을 <b>맡기고 싶다</b></li>
+            <li>→ Claude의 스케줄 루틴 + 스킬 + MCP 조합</li>
+          </ul>
+        </div>
+        <div class="col dyn-col"><h4>자가 호스팅(에르메스)이 필요한 경우</h4>
+          <ul>
+            <li>내 서버·내부망 환경에 <b>24시간 상주</b>해야 함</li>
+            <li>팀의 <b>메신저</b>(텔레그램·슬랙)가 접점</li>
+            <li>오픈 모델로 <b>비용을 직접 통제</b></li>
+            <li>데이터를 내 인프라 밖으로 <b>못 내보냄</b></li>
+          </ul>
+        </div>
+      </div>
+      <div class="tip-card"><b>순서 요령</b> — Q6는 항상 <b>마지막에</b> 묻습니다. 먼저 Q1~Q5로 연동의 모양을 정하고, 그다음 "이걸 사람이 돌리나, 루틴이 돌리나"를 정하는 순서입니다. 예: "매일 아침 재고를 요약해 시트에 기록" = Q5(레거시 CLI) + Q3(시트 쓰기) + Q6(루틴)의 조합.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>Claude 루틴 vs 자가 호스팅의 갈림 기준을 설명할 수 있다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 3 ================= -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>자가 점검 — 사례를 배치해 보기</h2></div>
+      <p class="sec-lead">아래 일곱 사례를 판단표에 넣어 보세요. 스스로 답한 뒤 펼쳐서 확인합니다.</p>
+
+      <div class="card">
+        <details style="margin:8px 0;"><summary style="cursor:pointer;font-weight:700;">1. 동아리 공지·행사 일정을 보여주는 페이지 (누구나 열람)</summary>
+          <p style="margin-top:8px;color:var(--muted);">공개 + 읽기 → <b>Q2: 정적 페이지 + 게시 CSV.</b> 일정 시트만 게시하면 백엔드가 필요 없습니다.</p></details>
+        <details style="margin:8px 0;"><summary style="cursor:pointer;font-weight:700;">2. 세미나 참가 신청 페이지 (이름·이메일 제출)</summary>
+          <p style="margin-top:8px;color:var(--muted);">쓰기 발생 + 신청자 명단은 비공개 → <b>Q3: 백엔드.</b> ③의 append 패턴에서 열과 화면만 바꾸면 됩니다.</p></details>
+        <details style="margin:8px 0;"><summary style="cursor:pointer;font-weight:700;">3. 회사 팀의 주간 실적 보드 (팀원만 열람·수정)</summary>
+          <p style="margin-top:8px;color:var(--muted);">쓰기 + 사람을 가려야 함 → <b>Q3+Q4: 백엔드 + 인증.</b> ③의 팀 현황판에 3주차의 이메일 인증을 얹은 구성입니다.</p></details>
+        <details style="margin:8px 0;"><summary style="cursor:pointer;font-weight:700;">4. 이번 달 내 지출 시트를 분석하고 절약 조언 받기</summary>
+          <p style="margin-top:8px;color:var(--muted);">나 혼자 + 대화형 → <b>Q1: 커넥터.</b> 서비스를 만들 이유가 없습니다. 5분이면 끝나는 일에 배포를 하지 마세요.</p></details>
+        <details style="margin:8px 0;"><summary style="cursor:pointer;font-weight:700;">5. 사내 구형 재고 시스템의 데이터를 매주 요약 보고</summary>
+          <p style="margin-top:8px;color:var(--muted);">MCP도 API도 없는 레거시 → <b>Q5: CLI 어댑터</b> — 그리고 "매주"이므로 <b>+Q6: 루틴.</b> 조회 CLI를 만들어 쥐여주고, 루틴이 매주 실행해 보고하게 합니다.</p></details>
+        <details style="margin:8px 0;"><summary style="cursor:pointer;font-weight:700;">6. 내 블로그 방문자에게 보여줄 실시간 인기글 순위 (원본 통계 시트는 비공개)</summary>
+          <p style="margin-top:8px;color:var(--muted);">함정 사례 — 화면은 공개지만 <b>원본이 비공개</b> → Q2가 아니라 <b>Q3: 백엔드.</b> 읽기 전용이어도 비공개 데이터면 키가 필요합니다. "공개인가"는 화면이 아니라 <b>데이터 원본</b>에 묻는 질문입니다.</p></details>
+        <details style="margin:8px 0;"><summary style="cursor:pointer;font-weight:700;">7. 팀 텔레그램 방에서 "어제 매출 알려줘"라고 물으면 답하는 봇 (사내 규정상 데이터 반출 금지)</summary>
+          <p style="margin-top:8px;color:var(--muted);">메신저 접점 + 데이터 주권 → <b>Q6의 자가 호스팅 갈래: 에르메스류 에이전트.</b> ⑥의 네 가지 경우 중 두 개(메신저, 데이터 주권)에 해당하므로 관리형이 아닌 자가 호스팅이 정답입니다. 페어링·docker 격리(①⑤)는 필수.</p></details>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>일곱 사례 중 6개 이상을 스스로 맞게 배치했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 4 ================= -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>자율 도전 과제</h2></div>
+      <p class="sec-lead">수료 후 도전할 것들입니다. 난이도 순이며, 하나만 해도 충분합니다. 결과는 수업 커뮤니티에 공유해 주세요.</p>
+      <table class="step-table">
+        <thead><tr><th>난이도</th><th>과제</th><th>사용 자료</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge b-green">기본</span></td><td>내 반복 업무 하나를 골라 절차를 SKILL.md로 저장하고, 관련 질문에 자동 발동되는지 확인</td><td>3주차 ⑤</td></tr>
+          <tr><td><span class="badge b-blue">권장</span></td><td>내 업무 루틴 하나를 자동화 — Claude 스케줄 루틴 또는 에르메스 cron으로 아침 브리핑·주간 보고를 예약</td><td>⑤⑥</td></tr>
+          <tr><td><span class="badge b-amber">도전</span></td><td>루틴 + 시트 연동 파이프라인 — 루틴이 매일 수집·요약한 결과를 시트에 append하고, 게시 CSV 대시보드로 보기</td><td>③⑤⑥</td></tr>
+          <tr><td><span class="badge b-red">심화</span></td><td>에르메스의 terminal backend를 docker로 구성하고, 페어링·화이트리스트·로그 확인까지 ①의 안전 체크리스트를 전부 적용</td><td>①⑤⑥</td></tr>
+        </tbody>
+      </table>
+      <div class="tip-card"><b>막혔을 때의 순서:</b> ① 에러 메시지·로그를 통째로 복사해 AI에게 → ② 해당 자료의 "막혔을 때" 콜아웃 확인 → ③ 커뮤니티에 스크린샷과 함께 질문. "안 돼요"보다 "이 로그가 나와요"가 열 배 빨리 해결됩니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>도전할 과제 하나를 골랐다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 5 ================= -->
+    <section class="section" id="s5">
+      <div class="sec-head"><span class="sec-num">5</span><h2>4주의 여정 — 수료를 축하합니다</h2></div>
+      <p class="sec-lead">4주 전, 터미널을 처음 여는 것부터 시작했습니다. 지금 여러분의 도구함에는:</p>
+      <ul class="final-list">
+        <li><b>1주차</b> — 터미널·Git·GitHub Pages·HTML: 만들고 <b>세상에 내놓는</b> 기본기</li>
+        <li><b>2주차</b> — 크롤링·수집·임베딩·판단 지도: 데이터를 <b>모으고 구조를 보는</b> 파이프라인 (판결문 347건이 지도가 되는 과정)</li>
+        <li><b>3주차</b> — 검색엔진·RAG·Vercel 배포·인증: 데이터를 <b>서비스로 바꾸고 보호하는</b> 법</li>
+        <li><b>4주차</b> — MCP·CLI·시트 연동·자율 에이전트: 그 전부를 <b>연결하고, AI에게 맡기는</b> 법</li>
+      </ul>
+      <p>이 과정에서 판결문은 재료였을 뿐입니다. 여러분의 회사 문서, 고객 문의, 시장 데이터 — 무엇을 넣어도 <b>수집 → 구조화 → 검색 → 서비스 → 자동화</b>의 절차는 같습니다. <b>데이터가 바뀌어도 절차는 같다</b> — 이 문장이 4주의 요약이고, 여러분이 가져가는 진짜 자산입니다.</p>
+      <div class="callout ok"><b class="cap">마지막 문장</b>
+      1주차의 여러분은 "AI를 써 보는 사람"이었습니다. 지금 여러분은 <b>URL이 있고, 파이프라인이 있고, 자는 동안 일하는 에이전트가 있는 사람</b>입니다. 수료를 진심으로 축하합니다. 이제 여러분의 데이터로, 여러분의 절차를 돌리세요. 👋🎓</div>
+      <div class="next-card-grid">
+        <div class="next-card"><b>수료 후에 해 보기</b><span>내 업무 루틴 하나를 에이전트/루틴으로 자동화하기 (§4의 권장 항목). 2주 안에 한 번 돌아가게 만드는 것을 목표로 삼아 보세요.</span></div>
+        <div class="next-card"><b>전체 커리큘럼 다시 보기</b><span><a href="../index.html" style="color:var(--brand-dark);font-weight:800;">부트캠프 홈</a>에서 1~4주차 자료 전체를 언제든 다시 열 수 있습니다. 필요할 때 판단표(§1)부터 펴 보세요.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>4주 전체 흐름을 한 문단으로 요약할 수 있다</span></label></div>
+    </section>
+
+
+    <a class="back-home" href="index.html">
+      <span class="bh-ic">🎓</span>
+      <span><strong>4주차 강의자료 목록으로 돌아가기</strong><small>부트캠프 완주를 축하합니다!</small></span>
+    </a>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+const CELEBRATE_HTML = "🎉 <b>4주 완주 — 수료를 축하합니다!</b> 수집 → 구조화 → 검색 → 서비스 → 자동화. 데이터가 바뀌어도 절차는 같습니다. 이제 여러분의 데이터로 여러분의 절차를 돌리세요. 🎓";
+
+const $ = s => document.querySelector(s);
+/* 프롬프트 복사 */
+function showToast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1800);}
+function fallbackCopy(text,done){const ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done();}catch(e){}ta.remove();}
+document.querySelectorAll(".copy-btn").forEach(btn=>{btn.addEventListener("click",()=>{const text=document.getElementById(btn.dataset.copy).textContent;const done=()=>showToast("프롬프트가 복사되었습니다");if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));}else fallbackCopy(text,done);});});
+/* 진행률 + 축하 배너 (상태는 메모리에만) */
+const checks=[...document.querySelectorAll("input[data-progress]")];
+$("#progressTotal").textContent=checks.length;
+let celebrated=false;
+function updateProgress(){
+  const done=checks.filter(c=>c.checked).length;
+  $("#progressCount").textContent=done;
+  $("#progressBar").style.width=(done/checks.length*100)+"%";
+  checks.forEach(c=>{const a=document.querySelector(`.toc a[data-sec="${c.dataset.progress}"]`);if(a)a.classList.toggle("done",c.checked);});
+  if(done===checks.length&&!celebrated){
+    celebrated=true;
+    const b=document.createElement("div");b.className="celebrate-banner";
+    b.innerHTML=CELEBRATE_HTML;
+    $("#celebrateSlot").appendChild(b);
+    b.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+}
+checks.forEach(c=>c.addEventListener("change",updateProgress));
+/* 사이드바 scroll-spy */
+const secIds=[...document.querySelectorAll("main .section")].map(s=>s.id);
+const tocLinks={};
+document.querySelectorAll(".toc a").forEach(a=>tocLinks[a.dataset.sec]=a);
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(en=>{en.target._visible=en.isIntersecting;});
+  let current=null;
+  for(const id of secIds){const el=document.getElementById(id);if(el&&el._visible){current=id;break;}}
+  if(current){Object.values(tocLinks).forEach(a=>a.classList.remove("active"));tocLinks[current].classList.add("active");}
+},{rootMargin:"-15% 0px -55% 0px"});
+secIds.forEach(id=>io.observe(document.getElementById(id)));
+updateProgress();
+
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 3 — Vercel 배포: 검색기에서 챗봇까지</title>
+<style>
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
+  --brand:#2e9bdb; --brand-dark:#1b6fa6; --green:#2f765b; --amber:#b8792e; --red:#b0483f;
+  --blue:#375f8f; --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12); --radius:14px; --sidebar-width:250px;
+  /* dataviz roles (validated) */
+  --viz-surface:#ffffff; --viz-ink:#0b0b0b; --viz-ink2:#52514e; --viz-muted:#898781;
+  --viz-grid:#e1e0d9; --viz-axis:#c3c2b7;
+  --series-1:#2a78d6; --series-2:#eb6834;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15.5px;
+}
+/* ---------- topbar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+/* ---------- layout ---------- */
+.layout{display:flex;align-items:flex-start;}
+.sidebar{
+  position:sticky;top:63px;flex:0 0 var(--sidebar-width);width:var(--sidebar-width);
+  height:calc(100vh - 63px);overflow-y:auto;padding:22px 14px 40px 22px;border-right:1px solid var(--line);
+}
+.sidebar-title{font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+.toc a{
+  display:block;padding:7px 11px;margin:2px 0;border-radius:8px;border-left:3px solid transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;line-height:1.4;
+}
+.toc a:hover{background:#eef3ec;color:var(--ink);}
+.toc a.active{background:var(--sky-light);border-left-color:var(--brand);color:var(--brand-dark);font-weight:800;}
+.toc a .done-mark{color:var(--green);font-weight:900;margin-left:4px;display:none;}
+.toc a.done .done-mark{display:inline;}
+.content{flex:1;min-width:0;max-width:920px;padding:clamp(20px,4vw,44px) clamp(16px,4vw,44px) 100px;}
+/* ---------- hero ---------- */
+.hero{margin-bottom:16px;}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.07em;color:var(--brand-dark);background:var(--sky-light);padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+.hero h1{font-size:clamp(23px,3.6vw,32px);line-height:1.3;letter-spacing:-.015em;margin-bottom:10px;}
+.hero p{color:var(--muted);max-width:640px;}
+/* ---------- sections ---------- */
+.section{margin-top:44px;padding-top:8px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
+.sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
+.sec-lead{color:var(--muted);margin:4px 0 18px;max-width:700px;}
+h3{font-size:16.5px;margin:26px 0 10px;}
+p{margin:10px 0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:14px 0;box-shadow:0 3px 14px rgba(54,42,31,.05);}
+/* concept grid */
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+.concept{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.concept .ico{font-size:21px;}
+.concept b{display:block;margin:7px 0 4px;font-size:14.5px;}
+.concept span{display:block;color:var(--muted);font-size:13px;line-height:1.55;}
+.concept .use{display:inline-block;margin-top:9px;font-size:12px;font-weight:800;color:var(--brand-dark);background:var(--sky-light);border-radius:999px;padding:2px 10px;}
+/* callouts */
+.callout{border-left:4px solid var(--brand);background:var(--sky-light);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;font-size:14.5px;}
+.callout.caution{border-left-color:var(--red);background:#faeeec;}
+.callout.ok{border-left-color:var(--green);background:#edf4ef;}
+.callout b.cap{display:block;font-size:13px;letter-spacing:.03em;margin-bottom:4px;}
+.callout.caution b.cap{color:var(--red);}
+.callout.ok b.cap{color:var(--green);}
+.callout b.cap{color:var(--brand-dark);}
+.tip-card{border-left:4px solid var(--brand);background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 17px;margin:14px 0;font-size:14px;color:var(--muted);}
+.tip-card b{color:var(--ink);}
+/* prompt copy block */
+.copy-block{position:relative;background:#20242a;color:#e8ecf1;border-radius:12px;padding:18px 20px;margin:14px 0;font-size:14px;line-height:1.8;}
+.copy-block .cb-label{position:absolute;top:-10px;left:14px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--brand);padding:3px 10px;border-radius:999px;}
+.copy-block pre{white-space:pre-wrap;word-break:keep-all;font-family:inherit;margin-top:4px;}
+.copy-btn{position:absolute;top:12px;right:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 11px;cursor:pointer;}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+/* two-col compare */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+.compare .col{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.compare .col h4{font-size:14px;margin-bottom:8px;}
+.compare .col.static-col h4{color:var(--green);}
+.compare .col.dyn-col h4{color:var(--amber);}
+.compare ul{margin:0 0 0 18px;font-size:13.5px;color:var(--muted);}
+.compare li{margin:5px 0;}
+/* stat tiles */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 15px;}
+.stat .v{font-size:26px;font-weight:900;letter-spacing:-.02em;color:var(--brand-dark);line-height:1.15;}
+.stat .k{margin-top:5px;font-size:12.5px;color:var(--muted);line-height:1.5;}
+/* explorer table */
+.explorer{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:16px 0;}
+.radio-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:12px;}
+.radio-row .rlabel{font-size:12.5px;font-weight:800;color:var(--muted);margin-right:2px;}
+.radio-group{display:flex;flex-wrap:wrap;gap:6px;}
+.radio-option{display:flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--line);border-radius:8px;background:#fafcf9;font-size:13px;font-weight:600;cursor:pointer;}
+.radio-option input{accent-color:var(--brand);}
+.radio-option:has(input:checked){border-color:var(--brand);background:var(--sky-light);color:var(--brand-dark);font-weight:800;}
+.book-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+.book-table th{background:#f2f6f0;border:1px solid var(--line);padding:7px 10px;text-align:left;font-size:12.5px;}
+.book-table td{border:1px solid var(--line);padding:6px 10px;}
+.book-table td.num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);}
+.dl-btn{border:1px solid var(--brand);color:var(--brand-dark);background:var(--sky-light);font-weight:800;font-size:13px;border-radius:9px;padding:8px 15px;cursor:pointer;}
+.dl-btn:hover{background:#d3e9f8;}
+/* charts */
+.chart-card{background:var(--viz-surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px 12px;margin:16px 0;}
+.chart-card h4{font-size:15px;color:var(--viz-ink);margin-bottom:2px;}
+.chart-card .sub{font-size:12.5px;color:var(--viz-ink2);margin-bottom:10px;}
+.legend{display:flex;gap:16px;align-items:center;margin:2px 0 8px;font-size:12.5px;color:var(--viz-ink2);}
+.legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;transform:translateY(1px);}
+.chart-svg{width:100%;height:auto;display:block;}
+.viz-tooltip{position:fixed;z-index:60;pointer-events:none;background:#20242a;color:#fff;font-size:12.5px;line-height:1.5;border-radius:8px;padding:7px 11px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .12s;max-width:280px;}
+.chart-note{font-size:12px;color:var(--viz-muted);margin:6px 0 4px;}
+/* insight list */
+.insight{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0;}
+.insight .n{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;border-radius:999px;background:var(--sky-light);color:var(--brand-dark);font-weight:900;font-size:13px;transform:translateY(2px);}
+.insight p{margin:0;font-size:14.5px;}
+/* example embed (lightbox) */
+.example-card{display:flex;gap:0;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;margin:16px 0;box-shadow:var(--shadow);max-width:560px;}
+.example-card:focus-visible{outline:3px solid var(--brand);}
+.example-thumb{position:relative;height:210px;overflow:hidden;background:#eef1ec;}
+.example-thumb iframe{position:absolute;top:0;left:0;width:400%;height:400%;transform:scale(.25);transform-origin:top left;border:none;pointer-events:none;}
+.example-thumb .zoom{position:absolute;right:12px;bottom:12px;background:rgba(32,36,42,.85);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:5px 12px;}
+.example-body{padding:14px 18px;}
+.example-body b{font-size:14.5px;}
+.example-body p{margin:4px 0 0;font-size:13px;color:var(--muted);}
+.example-lightbox{position:fixed;inset:0;z-index:80;background:rgba(20,24,20,.62);display:flex;align-items:center;justify-content:center;padding:3vh 3vw;}
+.example-lightbox[hidden]{display:none;}
+.lightbox-inner{position:relative;width:min(980px,96vw);height:92vh;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);}
+.lightbox-inner iframe{width:100%;height:100%;border:none;}
+.lightbox-close{position:absolute;top:10px;right:10px;z-index:2;border:none;background:#20242a;color:#fff;width:34px;height:34px;border-radius:999px;font-size:16px;font-weight:900;cursor:pointer;}
+/* completion */
+.completion-row{margin:22px 0 6px;}
+.check{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 18px;cursor:pointer;font-size:14px;font-weight:700;color:var(--muted);}
+.check input{width:17px;height:17px;accent-color:var(--green);}
+.check:has(input:checked){border-color:var(--green);color:var(--green);background:#edf4ef;}
+/* celebrate banner */
+.celebrate-banner{border:1px solid #bfe0c9;background:linear-gradient(120deg,#edf7ef,#e3f1fb);border-radius:var(--radius);padding:18px 22px;margin:0 0 22px;font-size:15px;box-shadow:var(--shadow);}
+.celebrate-banner b{color:var(--green);}
+/* checklist */
+.final-list{list-style:none;margin:14px 0;}
+.final-list li{display:flex;gap:10px;margin:9px 0;font-size:14.5px;}
+.final-list li::before{content:"✔";color:var(--green);font-weight:900;}
+.next-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.next-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.next-card b{display:block;font-size:14.5px;margin-bottom:5px;color:var(--brand-dark);}
+.next-card span{font-size:13.5px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#20242a;color:#fff;font-size:13.5px;font-weight:700;border-radius:999px;padding:10px 20px;opacity:0;transition:all .25s;z-index:90;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media (max-width:900px){ .layout{display:block;} .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  .concept-grid{grid-template-columns:1fr 1fr;} .stat-row{grid-template-columns:1fr 1fr;} .compare{grid-template-columns:1fr;} .next-card-grid{grid-template-columns:1fr;} }
+@media (max-width:640px){ .topbar{flex-wrap:wrap;row-gap:10px;} .topbar-left{flex-wrap:wrap;row-gap:8px;} .progress-wrap{width:100%;} .concept-grid{grid-template-columns:1fr;} }
+
+/* ---- 목록으로 돌아가기 (week1과 동일 패턴) ---- */
+.back-week{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:color .15s ease,border-color .15s ease,background .15s ease;}
+.back-week:hover{color:var(--brand-dark);border-color:var(--brand);background:var(--sky-light);}
+.back-home{display:flex;align-items:center;gap:15px;max-width:840px;margin:34px 0 10px;padding:20px 24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s ease,border-color .18s ease;}
+.back-home:hover{transform:translateY(-2px);border-color:var(--brand);}
+.back-home .bh-ic{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;border-radius:11px;background:var(--sky-light);color:var(--brand-dark);font-size:19px;font-weight:900;}
+.back-home strong{display:block;font-size:15.5px;font-weight:800;}
+.back-home small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;font-weight:600;}
+@media (max-width:640px){.back-home{padding:18px;gap:12px;}}
+
+/* ---- week3 공통 추가 ---- */
+.flowline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0;padding:15px 17px;background:var(--surface);border:1px solid var(--line);border-radius:12px;}
+.flowline .fnode{display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:9px 14px;border-radius:10px;background:var(--sky-light);border:1px solid #c9e2f5;font-size:13px;font-weight:800;color:var(--brand-dark);text-align:center;line-height:1.35;}
+.flowline .fnode small{font-size:11px;font-weight:600;color:var(--muted);}
+.flowline .fnode.dark{background:#20242a;border-color:#20242a;color:#fff;}
+.flowline .fnode.dark small{color:#aab4c0;}
+.flowline .fnode.ok{background:#edf4ef;border-color:#bfe0c9;color:var(--green);}
+.flowline .farrow{color:var(--muted);font-weight:900;}
+.step-table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0;}
+.step-table th{background:#f2f6f0;border:1px solid var(--line);padding:8px 12px;text-align:left;font-size:13px;}
+.step-table td{border:1px solid var(--line);padding:8px 12px;vertical-align:top;}
+.step-table td b{color:var(--brand-dark);}
+.badge{display:inline-block;font-size:11.5px;font-weight:800;border-radius:999px;padding:2px 10px;vertical-align:1px;}
+.badge.b-green{background:#edf4ef;color:var(--green);}
+.badge.b-red{background:#faeeec;color:var(--red);}
+.badge.b-blue{background:var(--sky-light);color:var(--brand-dark);}
+.badge.b-amber{background:#fbf1de;color:var(--amber);}
+.kv{display:grid;grid-template-columns:170px 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0;font-size:13.5px;}
+.kv > div{padding:9px 14px;border-bottom:1px solid var(--line);background:var(--surface);}
+.kv > div:nth-child(odd){background:#f2f6f0;font-weight:800;font-size:12.5px;}
+.kv > div:nth-last-child(-n+2){border-bottom:none;}
+.ws-steps{counter-reset:ws;margin:16px 0;}
+.workshop-step{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px 14px 58px;margin:12px 0;}
+.workshop-step .ws-num{position:absolute;left:16px;top:16px;display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:13.5px;}
+.workshop-step b.ws-t{display:block;font-size:14.5px;margin-bottom:4px;}
+.workshop-step p{font-size:14px;color:var(--muted);margin:4px 0;}
+.workshop-step code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.5px;}
+code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.88em;font-family:ui-monospace,'SF Mono',Consolas,monospace;}
+.copy-block code{background:transparent;border:none;padding:0;color:#9fd0f5;font-size:inherit;}
+.quad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.quad .q{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.quad .q h4{font-size:14px;margin-bottom:6px;}
+.quad .q p{font-size:13.5px;color:var(--muted);margin:4px 0;}
+.term-list{margin:14px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+.term-list .term{display:grid;grid-template-columns:150px 1fr;border-bottom:1px solid var(--line);background:var(--surface);}
+.term-list .term:last-child{border-bottom:none;}
+.term-list .term > b{padding:11px 14px;background:#f2f6f0;font-size:13.5px;}
+.term-list .term > span{padding:11px 14px;font-size:13.5px;color:var(--muted);}
+@media (max-width:700px){.quad{grid-template-columns:1fr;}.kv{grid-template-columns:1fr;}.kv > div:nth-child(odd){border-bottom:none;padding-bottom:2px;}.term-list .term{grid-template-columns:1fr;}}
+</style>
+</head>
+<body id="top">
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+    </a>
+    <div class="week-tag"><span class="week-num">WEEK 3</span><span class="week-title">Vercel 배포 — 검색기에서 챗봇까지</span></div>
+    <a class="back-week" href="index.html">← 3주차 목록</a>
+  </div>
+  <div class="progress-wrap" aria-label="진행률">
+    <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="목차">
+    <div class="sidebar-title">이 페이지의 흐름</div>
+    <div class="toc" id="toc">
+      <a href="#s1" data-sec="s1">1. [A] 지금까지의 한계 — 왜 나만 쓸 수 있었나<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. [A] Vercel과 서버리스 — push하면 서버가 된다<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. [A] 실습 — 검색기 배포 4단계<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. [A] 핵심 — API 키는 환경변수에<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. [B] 승격 — 검색기에서 RAG 챗봇으로<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. [B] 실습 — 챗봇 기능 추가와 재배포<span class="done-mark">✔</span></a>
+      <a href="#s7" data-sec="s7">7. [B] 라이브 데모 — 기록은 자산이자 책임<span class="done-mark">✔</span></a>
+      <a href="#s8" data-sec="s8">8. 확인 체크리스트<span class="done-mark">✔</span></a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div id="celebrateSlot"></div>
+
+    <div class="hero">
+      <span class="hero-kicker">WEEK 3 · STEP 5 — 배포: 검색기에서 챗봇까지</span>
+      <h1>내 PC의 검색기를 세상에 —<br/>배포하고, RAG 챗봇으로 승격하기</h1>
+      <p>③에서 만든 유사 판례 검색엔진은 <b>내 PC가 켜져 있을 때, 나만</b> 쓸 수 있었습니다. 이 실습은 두 부로 갑니다. <b>Part A</b> — 그 백엔드를 클라우드(Vercel)로 옮겨 <b>URL 하나로 누구에게나 공유되는 서비스</b>로 만듭니다. <b>Part B</b> — 배포된 검색기를 ④에서 배운 RAG로 승격해, <b>근거 판례를 달아 답변하는 판결문 챗봇</b>까지 완성합니다. ①에서 이론으로 본 원칙 — <b>비밀은 서버에, 환경변수로</b> — 를 오늘 처음 손으로 실행합니다.</p>
+    </div>
+
+
+    <!-- ================= SECTION 1 (Part A) ================= -->
+    <section class="section" id="s1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>Part A · 지금까지의 한계 — 왜 나만 쓸 수 있었나</h2></div>
+      <p class="sec-lead">③에서 만든 검색기의 구조를 다시 봅시다. 브라우저(프런트엔드)는 판결문을 검색할 때마다 <b>내 PC에서 도는 로컬 서버(FastAPI)</b>에 물어봤습니다.</p>
+
+      <div class="flowline">
+        <span class="fnode">브라우저<small>검색어 입력</small></span>
+        <span class="farrow">→</span>
+        <span class="fnode dark">내 PC의 FastAPI<small>OpenRouter 키 보관 · 임베딩 계산</small></span>
+        <span class="farrow">→</span>
+        <span class="fnode">OpenRouter API<small>임베딩 모델</small></span>
+        <span class="farrow">→</span>
+        <span class="fnode ok">유사 판례 결과</span>
+      </div>
+
+      <p>이 구조가 필요했던 이유는 하나였습니다: <b>OpenRouter API 키를 브라우저에 둘 수 없어서</b>입니다. 브라우저에 넣은 값은 화면을 여는 누구나 개발자도구로 꺼내 볼 수 있고, 꺼낸 키로 내 계정 요금이 청구됩니다. 그래서 키를 든 중개인(백엔드)이 필요했습니다.</p>
+      <p>그런데 그 중개인이 <b>내 PC</b>에 살고 있으니 문제가 생깁니다:</p>
+      <div class="concept-grid">
+        <div class="concept"><div class="ico">🔌</div><b>PC를 끄면 서비스도 꺼짐</b><span>노트북을 덮는 순간 검색기는 세상에서 사라집니다.</span></div>
+        <div class="concept"><div class="ico">🏠</div><b>주소가 localhost</b><span>127.0.0.1은 "내 컴퓨터 자신"이라는 뜻. 남에게 보내줄 수 있는 주소가 아닙니다.</span></div>
+        <div class="concept"><div class="ico">👤</div><b>동시 사용자 = 나 혼자</b><span>친구·동료·수강생에게 "이거 써봐"라고 말할 방법이 없습니다.</span></div>
+      </div>
+      <div class="callout"><b class="cap">Part A의 목표</b>
+      이 중개인을 내 PC에서 <b>클라우드로 이사</b>시킵니다. 그러면 (1) 24시간 켜져 있고 (2) 전 세계에서 접속 가능한 진짜 URL이 생기고 (3) 여러 명이 동시에 써도 됩니다. 코드는 거의 그대로입니다 — 사는 곳만 바뀝니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>로컬 백엔드의 세 가지 한계를 이해했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 2 ================= -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>Part A · Vercel과 서버리스 — push하면 서버가 된다</h2></div>
+      <p class="sec-lead">Vercel은 <b>GitHub 저장소를 연결하면 자동으로 배포해 주는 클라우드 서비스</b>입니다. 1주차의 GitHub Pages와 비교하면 위치가 명확해집니다.</p>
+
+      <table class="step-table">
+        <thead><tr><th></th><th>GitHub Pages (1주차)</th><th>Vercel (오늘)</th></tr></thead>
+        <tbody>
+          <tr><td><b>올릴 수 있는 것</b></td><td>정적 파일 (HTML·CSS·JS)</td><td>정적 파일 <b>+ 서버에서 도는 코드</b></td></tr>
+          <tr><td><b>비밀 보관</b></td><td>불가능 — 모든 파일이 공개</td><td>가능 — <b>환경변수</b>에 저장</td></tr>
+          <tr><td><b>배포 방법</b></td><td>저장소에 push</td><td>저장소에 push (동일!)</td></tr>
+          <tr><td><b>무료 범위</b></td><td>공개 저장소면 무제한</td><td>Hobby 플랜 — 개인 프로젝트에 충분</td></tr>
+          <tr><td><b>주소</b></td><td>아이디.github.io/저장소</td><td>프로젝트명.vercel.app</td></tr>
+        </tbody>
+      </table>
+
+      <p>중요한 것은 <b>작업 흐름이 1주차와 똑같다</b>는 점입니다. 코드를 GitHub에 push하면 Vercel이 알아서 감지하고 새 버전을 배포합니다. "서버 관리"라는 일이 통째로 사라진 것 — 이것이 요즘 배포 방식(서버리스)의 핵심입니다.</p>
+      <div class="tip-card"><b>이름에 속지 마세요.</b> "서버리스(serverless)"는 서버가 없다는 뜻이 아니라, <b>서버를 내가 관리하지 않는다</b>는 뜻입니다. 서버는 Vercel의 데이터센터에 있고, 나는 코드만 올립니다.</div>
+
+      <h3>서버리스 함수 — 로컬 FastAPI의 클라우드 버전</h3>
+      <p>Vercel에서 백엔드는 <b>서버리스 함수(serverless function)</b>라는 형태로 돕니다. 저장소의 <code>api/</code> 폴더에 파일을 넣으면, 그 파일 하나하나가 <code>주소/api/파일명</code>으로 호출되는 백엔드가 됩니다.</p>
+      <div class="compare">
+        <div class="col static-col"><h4>③ — 로컬 FastAPI</h4>
+          <ul>
+            <li>터미널에서 <code>uvicorn main:app</code>으로 직접 실행</li>
+            <li>내가 실행해 둔 동안만 살아 있음</li>
+            <li>주소: <code>localhost:8000/search</code></li>
+            <li>키: 내 PC의 <code>openrouterkey.txt</code>/.env 파일</li>
+          </ul>
+        </div>
+        <div class="col dyn-col"><h4>오늘 — Vercel 서버리스 함수</h4>
+          <ul>
+            <li><code>api/search.py</code> 파일을 저장소에 넣으면 끝</li>
+            <li>요청이 올 때만 깨어나 실행되고 다시 잠듦</li>
+            <li>주소: <code>내앱.vercel.app/api/search</code></li>
+            <li>키: Vercel의 <b>환경변수 설정 화면</b></li>
+          </ul>
+        </div>
+      </div>
+      <p>"요청이 올 때만 깨어난다"는 점이 무료로 운영 가능한 이유입니다. 24시간 컴퓨터를 빌리는 게 아니라, <b>실행된 순간만큼만</b> 자원을 쓰기 때문입니다. 개인 프로젝트나 MVP 수준의 트래픽이면 무료 한도를 넘기 어렵습니다.</p>
+      <div class="callout"><b class="cap">우리가 할 일은 "요청"뿐</b>
+      FastAPI 코드를 서버리스 함수 형식으로 고치는 일은 AI에게 맡깁니다. 우리가 알아야 할 것은 구조 — "로컬 서버가 하던 일을 <code>api/</code> 폴더의 함수가 대신한다" — 입니다. §3의 프롬프트가 이 변환을 요청합니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>Vercel·서버리스 함수가 무엇이고 왜 무료로 가능한지 이해했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 3 ================= -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>Part A · 실습 — 검색기 배포 4단계</h2></div>
+      <p class="sec-lead">여기서부터는 직접 합니다. 15분 안에 배포 URL까지 갑니다. 막히면 손을 드세요.</p>
+
+      <div class="ws-steps">
+        <div class="workshop-step"><span class="ws-num">1</span>
+          <b class="ws-t">Vercel 가입 — GitHub 계정으로</b>
+          <p><a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a> → <b>Sign Up</b> → <b>Continue with GitHub</b>. 새 비밀번호 없이 1주차에 만든 GitHub 계정으로 바로 들어갑니다. Hobby(무료) 플랜을 선택합니다.</p>
+        </div>
+        <div class="workshop-step"><span class="ws-num">2</span>
+          <b class="ws-t">코드 변환 — Claude Code에 요청</b>
+          <p>③의 검색기 폴더를 연 뒤 아래 프롬프트를 입력합니다. 로컬 FastAPI → Vercel 서버리스 구조로 바꾸는 작업입니다.</p>
+          <div class="copy-block"><span class="cb-label">💬 프롬프트</span>
+            <button class="copy-btn" data-copy="p31">복사</button>
+            <pre id="p31">이 폴더는 로컬 FastAPI 백엔드와 프런트엔드로 이루어진 유사 판례 검색 웹앱이야. 이걸 Vercel에 배포할 수 있게 바꿔줘.
+
+요구사항:
+1. FastAPI 엔드포인트를 Vercel 서버리스 함수(api/ 폴더)로 옮겨줘.
+2. OpenRouter API 키는 코드에 절대 넣지 말고, 환경변수 OPENROUTER_API_KEY에서 읽게 해줘. openrouterkey.txt 파일은 .gitignore에 추가해서 GitHub에 올라가지 않게 해줘.
+3. 프런트엔드가 localhost:8000 대신 상대 경로(/api/...)로 호출하게 수정해줘.
+4. 필요한 설정 파일(vercel.json, requirements.txt 등)을 만들어줘.
+5. 파일 변경까지만 하고, git commit과 push는 하지 마. 내가 검토 후 직접 할게.
+6. 끝나면 바뀐 파일 목록과 Vercel 배포 단계를 정리해줘.</pre>
+          </div>
+        </div>
+        <div class="workshop-step"><span class="ws-num">3</span>
+          <b class="ws-t">GitHub에 push → Vercel에서 Import</b>
+          <p>변경 사항을 확인하고 commit·push합니다. Vercel 대시보드 → <b>Add New… → Project</b> → 검색기 저장소 옆 <b>Import</b>. 설정은 기본값 그대로 두고 아직 <b>Deploy를 누르지 않습니다</b> — 키부터 넣어야 합니다.</p>
+        </div>
+        <div class="workshop-step"><span class="ws-num">4</span>
+          <b class="ws-t">환경변수 등록 → Deploy</b>
+          <p>Import 화면의 <b>Environment Variables</b> 항목에 이름 <code>OPENROUTER_API_KEY</code>, 값에 내 키(2주차에 발급한 그 키)를 붙여넣고 <b>Deploy</b>. 1~2분 뒤 <code>프로젝트명.vercel.app</code> 주소가 나옵니다. 열어서 검색이 되는지 확인하세요.</p>
+        </div>
+      </div>
+
+      <div class="callout ok"><b class="cap">성공의 순간</b>
+      옆 사람에게 내 <code>*.vercel.app</code> 주소를 보내고, 그 사람 폰에서 검색이 되는 것을 확인하세요. <b>내 PC는 꺼도 됩니다.</b> 이것이 "배포했다"의 의미입니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>내 검색기가 vercel.app 주소에서 동작한다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 4 ================= -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>Part A · 핵심 — API 키는 환경변수에</h2></div>
+      <p class="sec-lead">방금 한 일 중 가장 중요한 것은 4단계의 환경변수입니다. ①에서 이론으로 본 "비밀 관리"가 처음 실물이 된 순간이므로 정확히 짚고 갑니다.</p>
+
+      <div class="term-list">
+        <div class="term"><b>환경변수</b><span>코드 바깥, 서버의 설정 공간에 저장하는 이름=값 쌍. 코드는 "OPENROUTER_API_KEY라는 이름의 값을 읽어라"라고만 쓰여 있고, 실제 값은 Vercel 설정 화면에만 존재합니다.</span></div>
+        <div class="term"><b>왜 코드에 안 넣나</b><span>코드는 GitHub에 올라갑니다. 공개 저장소라면 전 세계가, 비공개라도 저장소 접근자 전원이 키를 봅니다. 실제로 GitHub에 노출된 키를 자동으로 긁어 도용하는 봇이 상시 돌고 있습니다.</span></div>
+        <div class="term"><b>왜 브라우저에 안 넣나</b><span>프런트엔드 JS에 넣은 값은 개발자도구 → Network/Sources에서 누구나 볼 수 있습니다. "숨긴" 것처럼 보여도 브라우저에 전달된 순간 공개된 것입니다.</span></div>
+      </div>
+
+      <div class="flowline">
+        <span class="fnode">브라우저<small>키 없음 · 검색어만 보냄</small></span>
+        <span class="farrow">→</span>
+        <span class="fnode dark">Vercel 서버리스 함수<small>환경변수에서 키를 읽어 대신 호출</small></span>
+        <span class="farrow">→</span>
+        <span class="fnode">OpenRouter API</span>
+        <span class="farrow">→</span>
+        <span class="fnode ok">결과만 브라우저로</span>
+      </div>
+
+      <div class="callout"><b class="cap">이번 주의 공식</b>
+      <b>비밀은 서버에, 환경변수로.</b> 오늘은 OpenRouter 키였습니다. ⑥에서 이메일 인증을 만들 때는 Gmail 앱 비밀번호가 정확히 같은 자리에 들어가고, 4주차에 구글 시트를 연동할 때는 서비스 계정 키가 또 같은 자리에 들어갑니다. 자리만 기억하면 새로운 것이 없습니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>키를 코드·브라우저에 두면 안 되는 이유를 설명할 수 있다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 5 (Part B) ================= -->
+    <section class="section" id="s5">
+      <div class="sec-head"><span class="sec-num">5</span><h2>Part B · 승격 — 검색기에서 RAG 챗봇으로</h2></div>
+      <p class="sec-lead">배포된 검색기는 <b>비슷한 판례 목록</b>을 돌려줍니다. ④에서 봤듯, 그 위에 LLM을 얹으면 <b>근거가 달린 답변</b>을 쓰는 RAG 챗봇이 됩니다. 원리는 ④의 챗봇과 완전히 같고, 다른 것은 <b>LLM이 어디서 도는가</b>뿐입니다.</p>
+
+      <div class="compare">
+        <div class="col dyn-col"><h4>④ — 내 PC의 RAG</h4>
+          <ul>
+            <li>로컬 백엔드가 검색 + LLM 호출 담당</li>
+            <li>내 PC가 켜져 있어야, 나만 사용</li>
+            <li>키는 내 PC의 키 파일</li>
+          </ul>
+        </div>
+        <div class="col static-col"><h4>오늘 — API 방식 (서버리스)</h4>
+          <ul>
+            <li>서버리스 함수가 임베딩·답변 생성 모두 <b>OpenRouter API 호출</b>로 처리</li>
+            <li>내 PC 꺼도 24시간, URL 아는 누구나 사용</li>
+            <li>키는 Vercel 환경변수 — §4의 공식 그대로</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flowline">
+        <span class="fnode">이용자<small>질문 입력</small></span>
+        <span class="farrow">→</span>
+        <span class="fnode dark">/api/chat<small>임베딩 → 유사 판례 검색<br/>→ LLM API로 답변 생성</small></span>
+        <span class="farrow">→</span>
+        <span class="fnode ok">답변 + 근거 판례<small>브라우저에 표시</small></span>
+      </div>
+
+      <p>서버리스 환경에는 무거운 모델을 올릴 수 없고 올릴 필요도 없습니다. 임베딩도 답변 생성도 <b>API 호출 한 번</b>이면 되기 때문입니다. 비용 감각도 2주차에 익힌 그대로입니다 — 질문 1건당 임베딩 호출 1회 + LLM 호출 1회, 수업 규모의 문답 수백 건이면 몇십 센트 수준입니다.</p>
+      <div class="tip-card"><b>모델 선택도 프롬프트로:</b> OpenRouter는 모델을 문자열 하나로 바꿉니다. 답변 품질이 아쉬우면 "모델을 ○○로 바꿔줘", 비용이 아쉬우면 "더 저렴한 모델로 바꿔줘"라고 요청하면 됩니다. 2주차에 모델을 고르던 방식 그대로입니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>API 방식 RAG가 서버리스에서 가능한 이유를 설명할 수 있다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 6 ================= -->
+    <section class="section" id="s6">
+      <div class="sec-head"><span class="sec-num">6</span><h2>Part B · 실습 — 챗봇 기능 추가와 재배포</h2></div>
+      <p class="sec-lead">Part A에서 배포한 검색기 폴더를 Claude Code로 열고 아래 프롬프트를 실행합니다. 새 계정도 새 키도 필요 없습니다 — 있는 재료의 조립입니다.</p>
+
+      <div class="copy-block"><span class="cb-label">💬 프롬프트 — RAG 챗봇 승격</span>
+        <button class="copy-btn" data-copy="p61">복사</button>
+        <pre id="p61">이 판례 검색기 웹앱을 RAG 챗봇으로 승격해줘.
+Vercel에 배포되어 있는 프로젝트야.
+
+구성:
+1. /api/chat : 질문을 받으면 (a) 기존 검색 로직으로 유사 판례 상위 3건을
+   찾고, (b) 그 판례들을 근거로 OpenRouter의 LLM API를 호출해 답변을
+   생성해서, (c) 답변과 근거 판례 목록을 함께 반환해줘.
+   답변에는 "이 답변은 참고용이며 법률 자문이 아닙니다" 문구를 포함해줘.
+2. 프런트엔드: 채팅 형태 화면. 답변 아래에 근거 판례 3건을 접을 수 있는
+   목록으로 표시. 기존 검색 화면도 남겨두고 서로 오갈 수 있게 해줘.
+3. 문답 기록: 답변이 나갈 때마다 시각·질문·답변 요약(200자 이내)을
+   서버 로그로 남겨줘. Vercel 대시보드의 Logs 화면에서 확인할 거야.
+4. 챗봇 화면에는 "질문과 답변이 서비스 개선을 위해 기록됩니다" 안내
+   문구를 작게 추가해줘.
+5. LLM은 기존 OPENROUTER_API_KEY 환경변수를 사용해. 키를 코드에 넣지 마.
+6. 로컬 확인 방법(vercel dev)과 .env.local 작성법을 알려주고,
+   .gitignore에 .env.local을 반드시 포함해줘.
+7. 파일 변경까지만 하고 git commit/push는 하지 마.</pre>
+      </div>
+
+      <div class="ws-steps">
+        <div class="workshop-step"><span class="ws-num">1</span>
+          <b class="ws-t">로컬에서 확인</b>
+          <p>AI가 알려준 대로 <code>.env.local</code>에 OpenRouter 키를 넣고 <code>vercel dev</code>로 로컬 실행 → 질문을 두어 개 던져 봅니다("직장 내 괴롭힘으로 인정된 사례는?") → 답변에 근거 판례 3건이 달리는지 확인합니다. <code>.env.local</code>은 <b>내 PC 전용</b>이며 <code>.gitignore</code> 덕에 GitHub로 올라가지 않습니다.</p>
+        </div>
+        <div class="workshop-step"><span class="ws-num">2</span>
+          <b class="ws-t">push → 자동 재배포</b>
+          <p>변경 파일을 검토한 뒤 commit·push. <code>.env.local</code>과 키 파일이 목록에 없는지 push 전에 한 번 더 확인하세요. push하면 Vercel이 자동으로 새 버전을 배포합니다 — §3에서 확인한 그 흐름이고, 환경변수는 이미 등록되어 있으므로 추가 설정이 없습니다.</p>
+        </div>
+        <div class="workshop-step"><span class="ws-num">3</span>
+          <b class="ws-t">폰으로 최종 확인</b>
+          <p>내 폰에서 <code>*.vercel.app</code> 챗봇을 열어 질문해 봅니다. 근거 판례가 달린 답변이 오면 — <b>완성입니다.</b> Vercel 대시보드의 <b>Logs</b> 화면에 방금의 문답이 기록된 것도 확인하세요.</p>
+        </div>
+      </div>
+      <div class="callout caution"><b class="cap">막혔을 때 확인 순서</b>
+      ① 환경변수 이름 철자가 코드와 일치하는가 → ② 답변만 안 나오면 OpenRouter 잔액을 확인 → ③ 그래도 안 되면 Vercel 프로젝트의 <b>Logs</b> 화면을 복사해 AI에게 "이 에러 원인 찾아줘".</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>배포된 챗봇이 근거 판례를 달아 답변한다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 7 ================= -->
+    <section class="section" id="s7">
+      <div class="sec-head"><span class="sec-num">7</span><h2>Part B · 라이브 데모 — 기록은 자산이자 책임</h2></div>
+      <p class="sec-lead">이제 강사의 챗봇 주소가 화면에 공개됩니다. 전원이 접속해, 궁금한 사건을 자유롭게 질문해 보세요. 옆에는 Vercel의 Logs 화면이 뜹니다 — 여러분이 질문할 때마다 문답 기록이 실시간으로 흘러갑니다.</p>
+      <div class="callout ok"><b class="cap">이 장면의 의미</b>
+      수십 명이 <b>동시에</b> 질문하고 있지만 서비스는 멀쩡합니다 — 모든 요청이 키를 든 서버리스 함수 한 곳을 거치고, Vercel이 함수를 필요한 만큼 깨우기 때문입니다. 이용자 누구도 API 키에는 접근하지 못하고, 서버가 허용한 동작(질문)만 열려 있습니다. 이것이 백엔드가 "문지기" 역할을 한다는 말의 실체입니다.</div>
+      <p>그리고 지금 쌓이는 문답 기록은 그 자체로 <b>"사람들이 판례에 대해 무엇을 궁금해하는가"라는 새 데이터</b>입니다:</p>
+      <ul class="final-list">
+        <li><b>자산</b> — 무엇을 자주 묻나, 근거 판례가 빈약했던(=데이터가 약한) 주제는 무엇인가. 다음 개선의 방향이 기록에서 나옵니다</li>
+        <li><b>책임</b> — 질문에는 이용자의 관심사, 때로는 민감한 사정이 담깁니다(법률 질문이라면 더욱). 그래서 프롬프트에 <b>기록 안내 문구</b>와 <b>"법률 자문이 아님" 고지</b>를 넣었습니다 — ①에서 본 최소 수집·고지 원칙의 실전입니다. 이용자 신원은 수집하지 않고, 목적이 끝난 기록은 지웁니다</li>
+      </ul>
+      <div class="tip-card"><b>기록의 완성은 4주차에</b> — 지금은 Vercel Logs에 흘러가는 기록이라 며칠 지나면 사라지고, 표로 모아 보기도 어렵습니다. 4주차에 <b>구글 시트를 데이터베이스로 연동</b>해, 문답 이력이 시트에 행으로 영구히 쌓이고 관리용 현황 페이지로 읽는 것까지 완성합니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s7" /><span>라이브 데모에 참여했고, 기록의 자산·책임 두 측면을 이해했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 8 ================= -->
+    <section class="section" id="s8">
+      <div class="sec-head"><span class="sec-num">8</span><h2>확인 체크리스트</h2></div>
+      <ul class="final-list">
+        <li>내 챗봇의 <code>*.vercel.app</code> URL이 있고, 다른 사람 기기에서도 열린다</li>
+        <li>OpenRouter 키가 코드 어디에도 없고, Vercel 환경변수에만 있다</li>
+        <li>GitHub에 push하면 Vercel이 자동으로 재배포한다는 것을 확인했다</li>
+        <li>"서버리스 = 서버를 내가 관리하지 않음"을 한 문장으로 설명할 수 있다</li>
+        <li>질문하면 근거 판례 3건이 달린 답변이 오고, 문답이 Logs에 기록된다</li>
+      </ul>
+      <div class="next-card-grid">
+        <div class="next-card"><b>다음 자료 ⑥ — 문 달기</b><span>지금 이 챗봇은 <b>URL만 알면 누구나</b> 들어옵니다. ①에서 본 접근 통제의 스펙트럼을 기억하나요? ⑥에서 이메일 인증코드로 챗봇에 문을 달아, 허용된 사람만 들어오게 만듭니다.</span></div>
+        <div class="next-card"><b>자율 심화</b><span>배포 URL에 1주차의 Cloudflare 커스텀 도메인을 연결해 보세요(Vercel 프로젝트 Settings → Domains). 또는 판결문 대신 <b>내 데이터</b>(리뷰·논문 초록·업무 문서)로 같은 파이프라인을 반복해 보세요.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s8" /><span>체크리스트를 모두 확인했다</span></label></div>
+    </section>
+
+
+    <a class="back-home" href="index.html">
+      <span class="bh-ic">📚</span>
+      <span><strong>3주차 강의자료 목록으로 돌아가기</strong><small>다음 자료: 인증 실습 — 이메일 인증코드</small></span>
+    </a>
+  </main>
+</div>
+
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+const CELEBRATE_HTML = "🎉 <b>배포 완주!</b> 내 PC에서만 돌던 검색기가, 근거 판례를 달아 답하는 <b>공개 RAG 챗봇 서비스</b>가 되었습니다. 남은 문제 하나 — URL만 알면 누구나 들어온다는 것. ⑥에서 이메일 인증으로 문을 답니다.";
+
+const $ = s => document.querySelector(s);
+/* 프롬프트 복사 */
+function showToast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1800);}
+function fallbackCopy(text,done){const ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done();}catch(e){}ta.remove();}
+document.querySelectorAll(".copy-btn").forEach(btn=>{btn.addEventListener("click",()=>{const text=document.getElementById(btn.dataset.copy).textContent;const done=()=>showToast("프롬프트가 복사되었습니다");if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));}else fallbackCopy(text,done);});});
+/* 진행률 + 축하 배너 (상태는 메모리에만) */
+const checks=[...document.querySelectorAll("input[data-progress]")];
+$("#progressTotal").textContent=checks.length;
+let celebrated=false;
+function updateProgress(){
+  const done=checks.filter(c=>c.checked).length;
+  $("#progressCount").textContent=done;
+  $("#progressBar").style.width=(done/checks.length*100)+"%";
+  checks.forEach(c=>{const a=document.querySelector(`.toc a[data-sec="${c.dataset.progress}"]`);if(a)a.classList.toggle("done",c.checked);});
+  if(done===checks.length&&!celebrated){
+    celebrated=true;
+    const b=document.createElement("div");b.className="celebrate-banner";
+    b.innerHTML=CELEBRATE_HTML;
+    $("#celebrateSlot").appendChild(b);
+    b.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+}
+checks.forEach(c=>c.addEventListener("change",updateProgress));
+/* 사이드바 scroll-spy */
+const secIds=[...document.querySelectorAll("main .section")].map(s=>s.id);
+const tocLinks={};
+document.querySelectorAll(".toc a").forEach(a=>tocLinks[a.dataset.sec]=a);
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(en=>{en.target._visible=en.isIntersecting;});
+  let current=null;
+  for(const id of secIds){const el=document.getElementById(id);if(el&&el._visible){current=id;break;}}
+  if(current){Object.values(tocLinks).forEach(a=>a.classList.remove("active"));tocLinks[current].classList.add("active");}
+},{rootMargin:"-15% 0px -55% 0px"});
+secIds.forEach(id=>io.observe(document.getElementById(id)));
+updateProgress();
+
+</script>
+</body>
+</html>

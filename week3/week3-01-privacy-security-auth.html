@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 3 — 개인정보 보안과 인증: 서비스를 공개하기 전에</title>
+<style>
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
+  --brand:#2e9bdb; --brand-dark:#1b6fa6; --green:#2f765b; --amber:#b8792e; --red:#b0483f;
+  --blue:#375f8f; --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12); --radius:14px; --sidebar-width:250px;
+  /* dataviz roles (validated) */
+  --viz-surface:#ffffff; --viz-ink:#0b0b0b; --viz-ink2:#52514e; --viz-muted:#898781;
+  --viz-grid:#e1e0d9; --viz-axis:#c3c2b7;
+  --series-1:#2a78d6; --series-2:#eb6834;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15.5px;
+}
+/* ---------- topbar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+/* ---------- layout ---------- */
+.layout{display:flex;align-items:flex-start;}
+.sidebar{
+  position:sticky;top:63px;flex:0 0 var(--sidebar-width);width:var(--sidebar-width);
+  height:calc(100vh - 63px);overflow-y:auto;padding:22px 14px 40px 22px;border-right:1px solid var(--line);
+}
+.sidebar-title{font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+.toc a{
+  display:block;padding:7px 11px;margin:2px 0;border-radius:8px;border-left:3px solid transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;line-height:1.4;
+}
+.toc a:hover{background:#eef3ec;color:var(--ink);}
+.toc a.active{background:var(--sky-light);border-left-color:var(--brand);color:var(--brand-dark);font-weight:800;}
+.toc a .done-mark{color:var(--green);font-weight:900;margin-left:4px;display:none;}
+.toc a.done .done-mark{display:inline;}
+.content{flex:1;min-width:0;max-width:920px;padding:clamp(20px,4vw,44px) clamp(16px,4vw,44px) 100px;}
+/* ---------- hero ---------- */
+.hero{margin-bottom:16px;}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.07em;color:var(--brand-dark);background:var(--sky-light);padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+.hero h1{font-size:clamp(23px,3.6vw,32px);line-height:1.3;letter-spacing:-.015em;margin-bottom:10px;}
+.hero p{color:var(--muted);max-width:640px;}
+/* ---------- sections ---------- */
+.section{margin-top:44px;padding-top:8px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
+.sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
+.sec-lead{color:var(--muted);margin:4px 0 18px;max-width:700px;}
+h3{font-size:16.5px;margin:26px 0 10px;}
+p{margin:10px 0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:14px 0;box-shadow:0 3px 14px rgba(54,42,31,.05);}
+/* concept grid */
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+.concept{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.concept .ico{font-size:21px;}
+.concept b{display:block;margin:7px 0 4px;font-size:14.5px;}
+.concept span{display:block;color:var(--muted);font-size:13px;line-height:1.55;}
+.concept .use{display:inline-block;margin-top:9px;font-size:12px;font-weight:800;color:var(--brand-dark);background:var(--sky-light);border-radius:999px;padding:2px 10px;}
+/* callouts */
+.callout{border-left:4px solid var(--brand);background:var(--sky-light);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;font-size:14.5px;}
+.callout.caution{border-left-color:var(--red);background:#faeeec;}
+.callout.ok{border-left-color:var(--green);background:#edf4ef;}
+.callout b.cap{display:block;font-size:13px;letter-spacing:.03em;margin-bottom:4px;}
+.callout.caution b.cap{color:var(--red);}
+.callout.ok b.cap{color:var(--green);}
+.callout b.cap{color:var(--brand-dark);}
+.tip-card{border-left:4px solid var(--brand);background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 17px;margin:14px 0;font-size:14px;color:var(--muted);}
+.tip-card b{color:var(--ink);}
+/* prompt copy block */
+.copy-block{position:relative;background:#20242a;color:#e8ecf1;border-radius:12px;padding:18px 20px;margin:14px 0;font-size:14px;line-height:1.8;}
+.copy-block .cb-label{position:absolute;top:-10px;left:14px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--brand);padding:3px 10px;border-radius:999px;}
+.copy-block pre{white-space:pre-wrap;word-break:keep-all;font-family:inherit;margin-top:4px;}
+.copy-btn{position:absolute;top:12px;right:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 11px;cursor:pointer;}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+/* two-col compare */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+.compare .col{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.compare .col h4{font-size:14px;margin-bottom:8px;}
+.compare .col.static-col h4{color:var(--green);}
+.compare .col.dyn-col h4{color:var(--amber);}
+.compare ul{margin:0 0 0 18px;font-size:13.5px;color:var(--muted);}
+.compare li{margin:5px 0;}
+/* stat tiles */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 15px;}
+.stat .v{font-size:26px;font-weight:900;letter-spacing:-.02em;color:var(--brand-dark);line-height:1.15;}
+.stat .k{margin-top:5px;font-size:12.5px;color:var(--muted);line-height:1.5;}
+/* explorer table */
+.explorer{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:16px 0;}
+.radio-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:12px;}
+.radio-row .rlabel{font-size:12.5px;font-weight:800;color:var(--muted);margin-right:2px;}
+.radio-group{display:flex;flex-wrap:wrap;gap:6px;}
+.radio-option{display:flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--line);border-radius:8px;background:#fafcf9;font-size:13px;font-weight:600;cursor:pointer;}
+.radio-option input{accent-color:var(--brand);}
+.radio-option:has(input:checked){border-color:var(--brand);background:var(--sky-light);color:var(--brand-dark);font-weight:800;}
+.book-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+.book-table th{background:#f2f6f0;border:1px solid var(--line);padding:7px 10px;text-align:left;font-size:12.5px;}
+.book-table td{border:1px solid var(--line);padding:6px 10px;}
+.book-table td.num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);}
+.dl-btn{border:1px solid var(--brand);color:var(--brand-dark);background:var(--sky-light);font-weight:800;font-size:13px;border-radius:9px;padding:8px 15px;cursor:pointer;}
+.dl-btn:hover{background:#d3e9f8;}
+/* charts */
+.chart-card{background:var(--viz-surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px 12px;margin:16px 0;}
+.chart-card h4{font-size:15px;color:var(--viz-ink);margin-bottom:2px;}
+.chart-card .sub{font-size:12.5px;color:var(--viz-ink2);margin-bottom:10px;}
+.legend{display:flex;gap:16px;align-items:center;margin:2px 0 8px;font-size:12.5px;color:var(--viz-ink2);}
+.legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;transform:translateY(1px);}
+.chart-svg{width:100%;height:auto;display:block;}
+.viz-tooltip{position:fixed;z-index:60;pointer-events:none;background:#20242a;color:#fff;font-size:12.5px;line-height:1.5;border-radius:8px;padding:7px 11px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .12s;max-width:280px;}
+.chart-note{font-size:12px;color:var(--viz-muted);margin:6px 0 4px;}
+/* insight list */
+.insight{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0;}
+.insight .n{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;border-radius:999px;background:var(--sky-light);color:var(--brand-dark);font-weight:900;font-size:13px;transform:translateY(2px);}
+.insight p{margin:0;font-size:14.5px;}
+/* example embed (lightbox) */
+.example-card{display:flex;gap:0;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;margin:16px 0;box-shadow:var(--shadow);max-width:560px;}
+.example-card:focus-visible{outline:3px solid var(--brand);}
+.example-thumb{position:relative;height:210px;overflow:hidden;background:#eef1ec;}
+.example-thumb iframe{position:absolute;top:0;left:0;width:400%;height:400%;transform:scale(.25);transform-origin:top left;border:none;pointer-events:none;}
+.example-thumb .zoom{position:absolute;right:12px;bottom:12px;background:rgba(32,36,42,.85);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:5px 12px;}
+.example-body{padding:14px 18px;}
+.example-body b{font-size:14.5px;}
+.example-body p{margin:4px 0 0;font-size:13px;color:var(--muted);}
+.example-lightbox{position:fixed;inset:0;z-index:80;background:rgba(20,24,20,.62);display:flex;align-items:center;justify-content:center;padding:3vh 3vw;}
+.example-lightbox[hidden]{display:none;}
+.lightbox-inner{position:relative;width:min(980px,96vw);height:92vh;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);}
+.lightbox-inner iframe{width:100%;height:100%;border:none;}
+.lightbox-close{position:absolute;top:10px;right:10px;z-index:2;border:none;background:#20242a;color:#fff;width:34px;height:34px;border-radius:999px;font-size:16px;font-weight:900;cursor:pointer;}
+/* completion */
+.completion-row{margin:22px 0 6px;}
+.check{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 18px;cursor:pointer;font-size:14px;font-weight:700;color:var(--muted);}
+.check input{width:17px;height:17px;accent-color:var(--green);}
+.check:has(input:checked){border-color:var(--green);color:var(--green);background:#edf4ef;}
+/* celebrate banner */
+.celebrate-banner{border:1px solid #bfe0c9;background:linear-gradient(120deg,#edf7ef,#e3f1fb);border-radius:var(--radius);padding:18px 22px;margin:0 0 22px;font-size:15px;box-shadow:var(--shadow);}
+.celebrate-banner b{color:var(--green);}
+/* checklist */
+.final-list{list-style:none;margin:14px 0;}
+.final-list li{display:flex;gap:10px;margin:9px 0;font-size:14.5px;}
+.final-list li::before{content:"✔";color:var(--green);font-weight:900;}
+.next-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.next-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.next-card b{display:block;font-size:14.5px;margin-bottom:5px;color:var(--brand-dark);}
+.next-card span{font-size:13.5px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#20242a;color:#fff;font-size:13.5px;font-weight:700;border-radius:999px;padding:10px 20px;opacity:0;transition:all .25s;z-index:90;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media (max-width:900px){ .layout{display:block;} .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  .concept-grid{grid-template-columns:1fr 1fr;} .stat-row{grid-template-columns:1fr 1fr;} .compare{grid-template-columns:1fr;} .next-card-grid{grid-template-columns:1fr;} }
+@media (max-width:640px){ .topbar{flex-wrap:wrap;row-gap:10px;} .topbar-left{flex-wrap:wrap;row-gap:8px;} .progress-wrap{width:100%;} .concept-grid{grid-template-columns:1fr;} }
+
+/* ---- 목록으로 돌아가기 (week1과 동일 패턴) ---- */
+.back-week{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:color .15s ease,border-color .15s ease,background .15s ease;}
+.back-week:hover{color:var(--brand-dark);border-color:var(--brand);background:var(--sky-light);}
+.back-home{display:flex;align-items:center;gap:15px;max-width:840px;margin:34px 0 10px;padding:20px 24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s ease,border-color .18s ease;}
+.back-home:hover{transform:translateY(-2px);border-color:var(--brand);}
+.back-home .bh-ic{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;border-radius:11px;background:var(--sky-light);color:var(--brand-dark);font-size:19px;font-weight:900;}
+.back-home strong{display:block;font-size:15.5px;font-weight:800;}
+.back-home small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;font-weight:600;}
+@media (max-width:640px){.back-home{padding:18px;gap:12px;}}
+
+/* ---- week3 공통 추가 ---- */
+.flowline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0;padding:15px 17px;background:var(--surface);border:1px solid var(--line);border-radius:12px;}
+.flowline .fnode{display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:9px 14px;border-radius:10px;background:var(--sky-light);border:1px solid #c9e2f5;font-size:13px;font-weight:800;color:var(--brand-dark);text-align:center;line-height:1.35;}
+.flowline .fnode small{font-size:11px;font-weight:600;color:var(--muted);}
+.flowline .fnode.dark{background:#20242a;border-color:#20242a;color:#fff;}
+.flowline .fnode.dark small{color:#aab4c0;}
+.flowline .fnode.ok{background:#edf4ef;border-color:#bfe0c9;color:var(--green);}
+.flowline .farrow{color:var(--muted);font-weight:900;}
+.step-table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0;}
+.step-table th{background:#f2f6f0;border:1px solid var(--line);padding:8px 12px;text-align:left;font-size:13px;}
+.step-table td{border:1px solid var(--line);padding:8px 12px;vertical-align:top;}
+.step-table td b{color:var(--brand-dark);}
+.badge{display:inline-block;font-size:11.5px;font-weight:800;border-radius:999px;padding:2px 10px;vertical-align:1px;}
+.badge.b-green{background:#edf4ef;color:var(--green);}
+.badge.b-red{background:#faeeec;color:var(--red);}
+.badge.b-blue{background:var(--sky-light);color:var(--brand-dark);}
+.badge.b-amber{background:#fbf1de;color:var(--amber);}
+.kv{display:grid;grid-template-columns:170px 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0;font-size:13.5px;}
+.kv > div{padding:9px 14px;border-bottom:1px solid var(--line);background:var(--surface);}
+.kv > div:nth-child(odd){background:#f2f6f0;font-weight:800;font-size:12.5px;}
+.kv > div:nth-last-child(-n+2){border-bottom:none;}
+.ws-steps{counter-reset:ws;margin:16px 0;}
+.workshop-step{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px 14px 58px;margin:12px 0;}
+.workshop-step .ws-num{position:absolute;left:16px;top:16px;display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:13.5px;}
+.workshop-step b.ws-t{display:block;font-size:14.5px;margin-bottom:4px;}
+.workshop-step p{font-size:14px;color:var(--muted);margin:4px 0;}
+.workshop-step code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.5px;}
+code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.88em;font-family:ui-monospace,'SF Mono',Consolas,monospace;}
+.copy-block code{background:transparent;border:none;padding:0;color:#9fd0f5;font-size:inherit;}
+.quad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.quad .q{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.quad .q h4{font-size:14px;margin-bottom:6px;}
+.quad .q p{font-size:13.5px;color:var(--muted);margin:4px 0;}
+.term-list{margin:14px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+.term-list .term{display:grid;grid-template-columns:150px 1fr;border-bottom:1px solid var(--line);background:var(--surface);}
+.term-list .term:last-child{border-bottom:none;}
+.term-list .term > b{padding:11px 14px;background:#f2f6f0;font-size:13.5px;}
+.term-list .term > span{padding:11px 14px;font-size:13.5px;color:var(--muted);}
+@media (max-width:700px){.quad{grid-template-columns:1fr;}.kv{grid-template-columns:1fr;}.kv > div:nth-child(odd){border-bottom:none;padding-bottom:2px;}.term-list .term{grid-template-columns:1fr;}}
+</style>
+</head>
+<body id="top">
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+    </a>
+    <div class="week-tag"><span class="week-num">WEEK 3</span><span class="week-title">개인정보 보안과 인증</span></div>
+    <a class="back-week" href="index.html">← 3주차 목록</a>
+  </div>
+  <div class="progress-wrap" aria-label="진행률">
+    <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="목차">
+    <div class="sidebar-title">이 페이지의 흐름</div>
+    <div class="toc" id="toc">
+      <a href="#s1" data-sec="s1">1. 왜 지금 이 주제인가 — 공개의 무게<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. 비밀 관리 — 키는 코드에 넣지 않는다<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 개인정보 — 최소 수집과 익명화<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 인증과 인가 — 두 개의 다른 질문<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 접근 통제의 스펙트럼 — 문은 몇 겹인가<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. 마무리 체크리스트<span class="done-mark">✔</span></a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div id="celebrateSlot"></div>
+
+    <div class="hero">
+      <span class="hero-kicker">WEEK 3 · STEP 1 — 개인정보·보안·인증</span>
+      <h1>서비스를 세상에 내놓기 전에 —<br/>비밀, 개인정보, 그리고 문</h1>
+      <p>지난 2주 동안 만든 모든 것은 <b>내 PC 안</b>에 있었습니다. 이번 주에는 그것을 <b>URL 하나로 세상에 공개</b>합니다 — 그 순간부터 낯선 사람과 봇이 내 서비스에 들어오고, 비용은 내 계정으로 청구되며, 담긴 데이터의 책임은 나에게 생깁니다. 오늘은 실습 없이, 서비스를 공개하는 사람이 갖춰야 할 세 가지 감각 — <b>비밀 관리 · 개인정보 · 접근 통제</b> — 를 개념과 판단 기준으로 정리합니다. 이번 주 내내, 그리고 여러분이 앞으로 만들 모든 서비스에서 반복될 원리입니다.</p>
+    </div>
+
+
+    <!-- ================= SECTION 1 ================= -->
+    <section class="section" id="s1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>왜 지금 이 주제인가 — 공개의 무게</h2></div>
+      <p class="sec-lead">2주차의 산출물(판결문 347건 본문, 임베딩 JSON 347개)은 전부 <b>내 PC 폴더의 파일</b>이었습니다. 파일은 내가 열어야만 존재합니다. 서비스는 다릅니다.</p>
+
+      <div class="flowline">
+        <span class="fnode">1~2주차<small>내 PC 속 파일<br/>나만 접근</small></span>
+        <span class="farrow">→</span>
+        <span class="fnode dark">이번 주 ⑤<small>Vercel 배포<br/>URL 발급</small></span>
+        <span class="farrow">→</span>
+        <span class="fnode">전 세계 누구나<small>사람 + 봇<br/>24시간 접근</small></span>
+      </div>
+
+      <p>URL이 생기는 순간 세 가지가 달라집니다:</p>
+      <div class="concept-grid">
+        <div class="concept"><div class="ico">🤖</div><b>모르는 방문자</b><span>내가 초대한 사람만 오지 않습니다. 주소를 추측해 두드리는 봇은 배포 몇 분 뒤부터 도착합니다.</span></div>
+        <div class="concept"><div class="ico">💸</div><b>비용은 내 계정으로</b><span>내 서비스가 부르는 API(임베딩·LLM)의 요금은 전부 내 키로 청구됩니다. 누가 얼마나 쓰게 할지는 내가 정해야 합니다.</span></div>
+        <div class="concept"><div class="ico">⚖️</div><b>데이터의 책임</b><span>서비스에 담긴 데이터, 서비스가 수집하는 데이터 — 공개하는 순간 그 데이터의 관리 책임이 나에게 생깁니다.</span></div>
+      </div>
+      <div class="callout"><b class="cap">오늘의 관점</b>
+      보안은 전문가의 전유물이 아니라 <b>서비스를 내놓는 사람의 기본기</b>입니다. 다행히 우리 수준에서 필요한 것은 방대한 지식이 아니라 <b>몇 개의 원칙과 판단 기준</b>입니다. 오늘 그것만 챙깁니다 — 구현은 ⑤(배포)와 ⑥(인증 실습)에서 손으로 합니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>공개(URL 발급)의 순간 무엇이 달라지는지 세 가지를 말할 수 있다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 2 ================= -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>비밀 관리 — 키는 코드에 넣지 않는다</h2></div>
+      <p class="sec-lead">첫 번째 감각은 <b>비밀(secret)</b>을 다루는 법입니다. 우리에게 비밀이란 무엇보다 <b>API 키</b> — 2주차 임베딩 실습에서 발급한 OpenRouter 키가 첫 사례였습니다.</p>
+
+      <h3>2주차의 키 관리를 복습하면</h3>
+      <p>임베딩 실습에서 키를 <code>openrouterkey.txt</code>라는 <b>평문 파일</b>로 폴더에 두고 썼습니다. 그때는 괜찮았습니다 — 그 폴더가 <b>내 PC 안</b>에만 있었기 때문입니다. 문제는 그 폴더가 밖으로 나가는 순간 시작됩니다: 폴더째 압축해 남에게 보내거나, 클라우드에 백업하거나, <b>GitHub에 올리는 순간</b> 키는 유출된 것입니다.</p>
+
+      <div class="callout caution"><b class="cap">실제로 벌어지는 일</b>
+      공개 저장소를 감시하며 API 키·클라우드 키를 자동으로 긁어 가는 봇이 상시 돌고 있습니다. 실수로 키를 push하면 <b>수 분 안에</b> 수집되어, 남의 가상화폐 채굴이나 LLM 호출에 쓰이고 요금은 키 주인에게 청구됩니다 — 하룻밤에 수백만 원이 과금된 사례가 꾸준히 보고됩니다. "비공개 저장소니까", "금방 지웠으니까"도 안전하지 않습니다. 한 번 올라간 키는 <b>유출된 키</b>입니다.</div>
+
+      <h3>원칙 세 가지</h3>
+      <div class="term-list">
+        <div class="term"><b>① 코드·브라우저에 없다</b><span>코드는 GitHub에 올라가고, 브라우저에 전달된 값은 개발자도구로 누구나 봅니다. 키가 이 둘 중 어디에도 등장하지 않아야 합니다.</span></div>
+        <div class="term"><b>② 서버만 갖는다</b><span>키는 서버의 <b>환경변수</b>(코드 바깥의 설정 공간)에만 둡니다. 브라우저는 서버에 요청만 보내고, 서버가 환경변수에서 키를 읽어 대신 API를 호출합니다. ⑤에서 실제로 해 봅니다.</span></div>
+        <div class="term"><b>③ 유출되면 폐기·재발급</b><span>키는 비밀번호와 달리 <b>버리고 새로 만드는 것</b>이 기본 대응입니다. 유출이 의심되면 고민하지 말고 즉시 해당 키를 폐기(revoke)하고 재발급하세요. 몇 분이면 끝나고, 그 순간 옛 키는 무용지물이 됩니다.</span></div>
+      </div>
+      <div class="tip-card"><b>키 파일을 쓰는 실습에서는</b> — ③(검색엔진 구축)에서 키를 파일로 두고 작업합니다. 로컬 실습에서는 허용되는 방식이지만, <b>그 폴더를 공유·백업·push하기 전에 키 파일부터 빼는 습관</b>을 함께 가져가세요. AI에게 "키 파일을 .gitignore에 추가해줘"라고 요청하는 것도 좋은 버릇입니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>비밀 관리 원칙 세 가지(코드에 없음·서버만·폐기 재발급)를 말할 수 있다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 3 ================= -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>개인정보 — 최소 수집과 익명화</h2></div>
+      <p class="sec-lead">두 번째 감각은 <b>남의 정보</b>를 다루는 법입니다. 내 서비스는 두 방향에서 개인정보와 만납니다 — 서비스에 <b>담는</b> 데이터와, 서비스가 <b>수집하는</b> 데이터.</p>
+
+      <h3>담는 데이터 — 수집 단계에서 걸러라</h3>
+      <p>2주차 크롤링 이론에서 봤듯, 우리가 쓰는 판결문은 법원이 <b>비실명화(익명화)</b> 처리를 거쳐 공개한 문서입니다. 그런데 세상의 많은 데이터는 그렇지 않습니다 — 리뷰에는 작성자 아이디가, 게시글에는 전화번호가, 상담 기록에는 사연이 담겨 있습니다. 원칙은 <b>수집 단계에서 익명화</b>하는 것입니다: 분석에 필요 없는 이름·아이디·연락처는 수집할 때부터 지우거나 가립니다. 나중에 지우려면 이미 사본이 퍼진 뒤일 수 있습니다.</p>
+      <div class="callout caution"><b class="cap">공개 배포의 책임</b>
+      내 PC에서 분석할 때와 <b>검색·챗봇 서비스로 공개할 때</b>는 책임의 무게가 다릅니다. 개인정보가 섞인 수집물을 서비스에 실어 공개하면, 나는 그 정보의 <b>제공자</b>가 됩니다. 실제로 2021년 국내의 한 챗봇 서비스는 수집한 대화 데이터에서 실명·주소가 답변으로 노출되어 서비스 중단과 과징금까지 이어졌습니다. 공개 전 자문: <b>"이 데이터에 남의 신원이 담겨 있지 않은가?"</b></div>
+
+      <h3>수집하는 데이터 — 최소 수집의 원칙</h3>
+      <ul class="final-list">
+        <li><b>필요한 것만 받는다</b> — 판단 기준은 하나: "이 항목이 없으면 서비스가 안 되는가?" 아니라면 받지 않습니다. 받지 않은 데이터는 유출될 수도 없습니다</li>
+        <li><b>받는다고 알린다</b> — 무엇을 왜 기록하는지 화면에 고지하는 것이 개인정보 원칙의 출발점입니다. ⑤의 챗봇에 "문답이 기록됩니다" 문구를 넣는 이유입니다</li>
+        <li><b>목적이 끝나면 지운다</b> — 기록은 목적(서비스 개선)이 있는 동안만 보관합니다</li>
+      </ul>
+      <p>챗봇의 질문 기록도 개인정보가 될 수 있음을 기억하세요 — 법률 챗봇에 던지는 질문에는 질문자의 사정이 담깁니다. ⑤에서 이 문제를 실전으로 다시 만납니다.</p>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>최소 수집·수집 단계 익명화·고지, 세 원칙을 설명할 수 있다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 4 ================= -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>인증과 인가 — 두 개의 다른 질문</h2></div>
+      <p class="sec-lead">세 번째 감각은 <b>누구를 들여보낼 것인가</b>입니다. 그 설계는 두 질문을 구분하는 데서 시작합니다. 이름이 비슷해 자주 섞이지만, 다른 층입니다.</p>
+      <div class="compare">
+        <div class="col static-col"><h4>인증 (Authentication) — 너는 누구인가</h4>
+          <ul>
+            <li>접속자가 <b>본인이 맞는지</b> 확인하는 절차</li>
+            <li>수단: 비밀번호, 인증코드, 지문, 구글 로그인…</li>
+            <li>매일 겪는 예: 배달앱의 문자 인증코드, 은행앱의 지문</li>
+          </ul>
+        </div>
+        <div class="col dyn-col"><h4>인가 (Authorization) — 무엇을 할 수 있나</h4>
+          <ul>
+            <li>확인된 사람에게 <b>어떤 권한을 줄지</b> 정하는 규칙</li>
+            <li>예: 구글 문서의 뷰어/댓글/편집자 구분</li>
+            <li>같은 로그인이라도 관리자와 일반 회원은 다른 화면을 봅니다</li>
+          </ul>
+        </div>
+      </div>
+      <p>순서에 주목하세요 — 인가는 인증을 전제로 합니다. "누구인지" 모르면 "무엇을 허락할지" 정할 수 없습니다. 이번 주 실습(⑥)에서 만드는 <b>이메일 인증코드</b>는 이 중 <b>인증</b>에 해당합니다: "이 이메일의 주인이 맞는가"를 확인하는 절차입니다. 인가는 가장 단순한 규칙 — "인증된 사람은 모두 동일 권한" — 에서 시작하고, 서비스가 자라면 역할별로 쪼갭니다.</p>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>인증과 인가를 각각 한 문장으로 구분해 말할 수 있다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 5 ================= -->
+    <section class="section" id="s5">
+      <div class="sec-head"><span class="sec-num">5</span><h2>접근 통제의 스펙트럼 — 문은 몇 겹인가</h2></div>
+      <p class="sec-lead">"공개 아니면 비공개"의 이분법이 아닙니다. 접근 통제는 스펙트럼이고, 서비스마다 <b>데이터에 맞는 수준</b>을 고르는 것이 설계입니다.</p>
+
+      <table class="step-table">
+        <thead><tr><th>수준</th><th>누가 들어오나</th><th>예</th><th>맞는 데이터</th></tr></thead>
+        <tbody>
+          <tr><td><b>1. 완전 공개</b> <span class="badge b-green">검색 노출</span></td><td>누구나 — 검색엔진에도 잡힘</td><td>1주차의 GitHub Pages 소개 사이트</td><td>공개해도 아무도 다치지 않는 정보 (홍보물, 공공 데이터)</td></tr>
+          <tr><td><b>2. URL만 아는 사람</b> <span class="badge b-amber">주소가 곧 열쇠</span></td><td>주소를 전달받은(또는 추측한) 누구나</td><td>⑤에서 배포하는 검색기·챗봇의 첫 모습</td><td>민감하지 않지만 굳이 광고할 필요 없는 것 — 단, <b>보안이 아니라 가림막</b>임을 알고 쓸 것</td></tr>
+          <tr><td><b>3. 인증된 사람</b> <span class="badge b-blue">문 있음</span></td><td>명단에 있고 본인임을 증명한 사람</td><td>⑥에서 만드는 이메일 인증코드</td><td>내부 자료, 팀 데이터, 유료 콘텐츠 — 외부인이 보면 곤란한 것</td></tr>
+          <tr><td><b>4. 권한별 차등</b> <span class="badge b-red">문 여러 겹</span></td><td>인증된 사람 중에서도 역할에 따라 다르게</td><td>관리자 화면 / 일반 회원 화면</td><td>남의 개인정보, 결제·삭제처럼 돌이킬 수 없는 조작</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout"><b class="cap">수준을 고르는 판단 기준</b>
+      질문은 하나입니다 — <b>"이것이 유출되면 누가, 얼마나 다치는가?"</b> 아무도 안 다치면 1, 나만 머쓱하면 2, 우리 팀·고객이 곤란하면 3, 법적 책임이 생기면 4. 그리고 하나 더: 접근 통제는 <b>데이터 단위</b>로 생각하세요. 같은 서비스 안에서도 챗봇 화면은 2, 문답 기록 열람은 3, 기록 삭제는 4일 수 있습니다.</div>
+      <div class="tip-card"><b>"URL만 알면 되는" 수준의 함정</b> — vercel.app 주소는 생각보다 잘 퍼지고, 봇은 흔한 주소 패턴을 자동으로 두드립니다. 2단계는 "임시 상태"로만 쓰고, 남의 데이터가 담기는 순간 3단계로 올리세요. 이번 주가 정확히 그 순서입니다: ⑤에서 2단계로 배포하고, ⑥에서 3단계로 올립니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>내 서비스의 데이터별로 필요한 접근 수준(1~4)을 매길 수 있다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 6 ================= -->
+    <section class="section" id="s6">
+      <div class="sec-head"><span class="sec-num">6</span><h2>마무리 체크리스트</h2></div>
+      <ul class="final-list">
+        <li>공개(URL)의 순간, 방문자·비용·데이터 책임이 달라진다</li>
+        <li>비밀은 코드·브라우저에 없고, 서버의 환경변수에만 있다 — 유출 의심 시 폐기·재발급</li>
+        <li>개인정보는 최소 수집, 수집 단계 익명화, 기록은 고지하고 목적이 끝나면 삭제</li>
+        <li>인증 = 너는 누구인가, 인가 = 무엇을 할 수 있나 — 인가는 인증을 전제로 한다</li>
+        <li>접근 통제는 4단계 스펙트럼 — "유출되면 누가 다치는가"로 수준을 고른다</li>
+      </ul>
+      <div class="next-card-grid">
+        <div class="next-card"><b>먼저, 만들 것을 만든다 (②~⑤)</b><span>다음 자료부터 이번 주의 본편입니다 — 키워드 vs 임베딩 비교(②)에서 출발해 검색엔진 구축(③), RAG(④)를 거쳐 ⑤에서 <b>내 서비스를 실제로 배포</b>합니다. 오늘 본 "비밀은 환경변수에"가 ⑤에서 첫 실물로 등장합니다.</span></div>
+        <div class="next-card"><b>그리고, 문을 단다 (⑥)</b><span>배포된 챗봇은 접근 수준 2(URL만 아는 사람)입니다. 마지막 자료 ⑥에서 오늘의 이론 — 인증, 이메일 인증코드 — 를 <b>직접 구현</b>해 수준 3으로 올립니다.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>보안·개인정보·인증 이론을 마쳤다!</span></label></div>
+    </section>
+
+
+    <a class="back-home" href="index.html">
+      <span class="bh-ic">📚</span>
+      <span><strong>3주차 강의자료 목록으로 돌아가기</strong><small>다음 자료: 키워드 vs 임베딩 검색</small></span>
+    </a>
+  </main>
+</div>
+
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+const CELEBRATE_HTML = "🎉 <b>이론 장착 완료!</b> 비밀은 서버에 · 개인정보는 최소로 · 문은 데이터에 맞게. 이 세 감각을 들고 이제 만들러 갑니다 — ②에서 두 가지 검색 방식을 직접 비교하는 것부터 시작하세요.";
+
+const $ = s => document.querySelector(s);
+/* 진행률 + 축하 배너 (상태는 메모리에만) */
+const checks=[...document.querySelectorAll("input[data-progress]")];
+$("#progressTotal").textContent=checks.length;
+let celebrated=false;
+function updateProgress(){
+  const done=checks.filter(c=>c.checked).length;
+  $("#progressCount").textContent=done;
+  $("#progressBar").style.width=(done/checks.length*100)+"%";
+  checks.forEach(c=>{const a=document.querySelector(`.toc a[data-sec="${c.dataset.progress}"]`);if(a)a.classList.toggle("done",c.checked);});
+  if(done===checks.length&&!celebrated){
+    celebrated=true;
+    const b=document.createElement("div");b.className="celebrate-banner";
+    b.innerHTML=CELEBRATE_HTML;
+    $("#celebrateSlot").appendChild(b);
+    b.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+}
+checks.forEach(c=>c.addEventListener("change",updateProgress));
+/* 사이드바 scroll-spy */
+const secIds=[...document.querySelectorAll("main .section")].map(s=>s.id);
+const tocLinks={};
+document.querySelectorAll(".toc a").forEach(a=>tocLinks[a.dataset.sec]=a);
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(en=>{en.target._visible=en.isIntersecting;});
+  let current=null;
+  for(const id of secIds){const el=document.getElementById(id);if(el&&el._visible){current=id;break;}}
+  if(current){Object.values(tocLinks).forEach(a=>a.classList.remove("active"));tocLinks[current].classList.add("active");}
+},{rootMargin:"-15% 0px -55% 0px"});
+secIds.forEach(id=>io.observe(document.getElementById(id)));
+updateProgress();
+
+</script>
+</body>
+</html>

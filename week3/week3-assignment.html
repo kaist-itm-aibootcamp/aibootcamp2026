@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 3 — 자율 실습(선택): 내 웹앱 만들어 Vercel로 배포하기</title>
+<style>
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
+  --brand:#2e9bdb; --brand-dark:#1b6fa6; --green:#2f765b; --amber:#b8792e; --red:#b0483f;
+  --blue:#375f8f; --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12); --radius:14px; --sidebar-width:250px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15.5px;
+}
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.back-week{font-size:13px;font-weight:700;color:var(--brand-dark);text-decoration:none;white-space:nowrap;}
+.back-week:hover{text-decoration:underline;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+.layout{display:flex;align-items:flex-start;}
+.sidebar{
+  position:sticky;top:63px;flex:0 0 var(--sidebar-width);width:var(--sidebar-width);
+  height:calc(100vh - 63px);overflow-y:auto;padding:22px 14px 40px 22px;border-right:1px solid var(--line);
+}
+.sidebar-title{font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+.toc a{
+  display:block;padding:7px 11px;margin:2px 0;border-radius:8px;border-left:3px solid transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;line-height:1.4;
+}
+.toc a:hover{background:#eef3ec;color:var(--ink);}
+.toc a.active{background:var(--sky-light);border-left-color:var(--brand);color:var(--brand-dark);font-weight:800;}
+.toc a .done-mark{color:var(--green);font-weight:900;margin-left:4px;display:none;}
+.toc a.done .done-mark{display:inline;}
+.content{flex:1;min-width:0;max-width:920px;padding:clamp(20px,4vw,44px) clamp(16px,4vw,44px) 100px;}
+.hero{margin-bottom:16px;}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.07em;color:var(--brand-dark);background:var(--sky-light);padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+.hero h1{font-size:clamp(23px,3.6vw,32px);line-height:1.3;letter-spacing:-.015em;margin-bottom:10px;}
+.hero p{color:var(--muted);max-width:660px;}
+.section{margin-top:44px;padding-top:8px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
+.sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
+.sec-lead{color:var(--muted);margin:4px 0 18px;max-width:700px;}
+h3{font-size:16.5px;margin:26px 0 10px;}
+p{margin:10px 0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:14px 0;box-shadow:0 3px 14px rgba(54,42,31,.05);}
+.callout{border-left:4px solid var(--brand);background:var(--sky-light);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;font-size:14.5px;}
+.callout.caution{border-left-color:var(--red);background:#faeeec;}
+.callout.ok{border-left-color:var(--green);background:#edf4ef;}
+.callout b.cap{display:block;font-size:13px;letter-spacing:.03em;margin-bottom:4px;color:var(--brand-dark);}
+.callout.caution b.cap{color:var(--red);}
+.callout.ok b.cap{color:var(--green);}
+.tip-card{border-left:4px solid var(--brand);background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 17px;margin:14px 0;font-size:14px;color:var(--muted);}
+.tip-card b{color:var(--ink);}
+.copy-block{position:relative;background:#20242a;color:#e8ecf1;border-radius:12px;padding:18px 20px;margin:14px 0;font-size:14px;line-height:1.8;}
+.copy-block .cb-label{position:absolute;top:-10px;left:14px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--brand);padding:3px 10px;border-radius:999px;}
+.copy-block pre{white-space:pre-wrap;word-break:break-word;font-family:inherit;margin-top:4px;}
+.copy-btn{position:absolute;top:12px;right:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 11px;cursor:pointer;}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+.doc-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--surface);}
+.doc-table th{background:#f2f6f0;text-align:left;padding:8px 12px;border:1px solid var(--line);font-size:12.5px;}
+.doc-table td{padding:8px 12px;border:1px solid var(--line);}
+.doc-table td code, p code, li code{background:#eef3ec;border-radius:5px;padding:1px 6px;font-family:ui-monospace,Consolas,monospace;font-size:.9em;}
+.workshop-step{display:flex;gap:14px;margin:14px 0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+.ws-num{flex:0 0 auto;display:grid;place-items:center;width:30px;height:30px;border-radius:999px;background:var(--sky-light);color:var(--brand-dark);font-weight:900;font-size:14px;}
+.ws-body{min-width:0;flex:1;}
+.ws-body b.ws-title{display:block;font-size:14.5px;margin-bottom:4px;}
+.ws-body p{margin:6px 0;font-size:14px;color:var(--muted);}
+.submit-box{display:flex;gap:12px;align-items:flex-start;background:#edf4ef;border:1px solid #cfe3d7;border-radius:10px;padding:14px 18px;margin:16px 0;font-size:14px;color:#204935;}
+.submit-box b{color:var(--green);}
+.completion-row{margin:22px 0 6px;}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;font-weight:700;cursor:pointer;}
+.check input{width:18px;height:18px;margin-top:3px;accent-color:var(--brand);}
+.celebrate-banner{background:linear-gradient(135deg,#eaf6ee,#e3f1fb);border:1px solid #bfe0cd;border-radius:12px;padding:16px 20px;margin:0 0 18px;font-size:15px;}
+.next-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.next-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.next-card b{display:block;font-size:14.5px;margin-bottom:5px;color:var(--brand-dark);}
+.next-card span{font-size:13.5px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#20242a;color:#fff;font-size:13.5px;font-weight:700;padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:all .25s ease;z-index:60;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media (max-width:900px){ .layout{display:block;} .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);} .next-card-grid{grid-template-columns:1fr;} }
+@media (max-width:640px){ .topbar{flex-wrap:wrap;row-gap:10px;} .topbar-left{flex-wrap:wrap;row-gap:8px;} .progress-wrap{width:100%;} }
+</style>
+</head>
+<body id="top" data-celebrate="🎉 <b>자율 실습 완주!</b> 내가 정한 주제의 웹앱이 실제 URL로 세상에 돌고 있습니다 — 아이디어에서 배포까지 한 사이클을 스스로 해냈습니다.">
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+    </a>
+    <div class="week-tag"><span class="week-num">WEEK 3</span><span class="week-title">자율 실습 (선택)</span></div>
+    <a class="back-week" href="index.html">← 3주차 목록</a>
+  </div>
+  <div class="progress-wrap" aria-label="진행률">
+    <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="목차">
+    <div class="sidebar-title">자율 실습</div>
+    <div class="toc">
+      <a href="#s1" data-sec="s1">1. 아이디어 정하기<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. 계획서부터, 문서와 함께<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. Vercel 배포<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 마무리<span class="done-mark">✔</span></a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div id="celebrateSlot"></div>
+
+    <div class="hero">
+      <span class="hero-kicker">WEEK 3 · 자율 실습 (선택) — 내가 만들고 싶은 것을, 세상에</span>
+      <h1>내 웹앱 하나를 만들어 Vercel로 배포하기</h1>
+      <p>제출도 정답도 없습니다 — <b>해 보고 싶은 분들을 위한 상세 안내</b>입니다. 내가 배포해 보고 싶은 웹앱을 만들어 Vercel에 올려 보세요. 강의에서 다룬 검색엔진이나 RAG 방식 문서 작성기여도 좋고, <b>전혀 다른 어떤 방식이어도 좋습니다.</b> 성공의 기준은 화려함이 아니라 "실제 URL로 동작하는가" 하나입니다.</p>
+    </div>
+
+    <!-- ============ S1 ============ -->
+    <section class="section" id="s1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>아이디어 정하기 — 무엇이든, 단 내 것으로</h2></div>
+      <p class="sec-lead">막막하면 아래에서 골라 변형하세요. 전부 이번 주 강의의 프롬프트를 재사용할 수 있는 방향들입니다.</p>
+      <table class="doc-table">
+        <thead><tr><th style="width:210px">방향</th><th>예시</th><th style="width:150px">재사용할 강의</th></tr></thead>
+        <tbody>
+          <tr><td><b>검색엔진</b></td><td>내 분야 문서(특허·논문·리뷰·규정) 유사 검색기 — 2주차 과제의 특허 임베딩 200건이 있다면 바로 재료가 됩니다</td><td>③</td></tr>
+          <tr><td><b>RAG 질의응답</b></td><td>내 자료를 근거로 답하는 챗봇 (사내 규정 안내, 논문 Q&amp;A)</td><td>④⑤</td></tr>
+          <tr><td><b>RAG 방식 문서 작성기</b></td><td>"작성 요청"을 받으면 관련 자료를 검색해 근거를 모아 <b>초안을 써 주는</b> 도구 — 질문에 답하는 대신 문서를 생성</td><td>④⑤ + 2주차 ⑥</td></tr>
+          <tr><td><b>완전히 다른 것</b></td><td>계산기·시뮬레이터·소개 사이트… 1주차의 정적 웹앱에 서버 기능을 얹은 무엇이든</td><td>1주차 + ⑤</td></tr>
+        </tbody>
+      </table>
+      <div class="tip-card"><b>범위는 작게</b> — "동작하는 작은 것"이 "거창한 미완성"보다 낫습니다. 기능 하나를 정해 그것만 끝까지 가세요.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>만들 것 한 줄 정의를 썼다 ("나는 ~하는 앱을 만든다")</span></label></div>
+    </section>
+
+    <!-- ============ S2 ============ -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>만들기 — 계획서부터, 문서와 함께</h2></div>
+      <p class="sec-lead">③에서 배운 방식 그대로입니다: 코드보다 <b>계획서를 먼저</b> 받아 검토하고, 완성되면 <b>문서 네 파일</b>을 남깁니다.</p>
+
+      <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
+        <b class="ws-title">계획서 왕복</b>
+        <div class="copy-block"><span class="cb-label">💬 시작 프롬프트 (한 줄 정의를 넣어 시작)</span><button class="copy-btn" data-copy="b1">복사</button>
+<pre id="b1">이런 웹앱을 만들려고 해: [나의 한 줄 정의].
+바로 코드를 쓰지 말고, 먼저 계획서를 작성해줘 — 화면 구성, 필요한
+API(백엔드 함수), 데이터·파일 구조, 만들 순서. 내가 검토한 뒤 시작하자.
+궁금한 점이 있으면 먼저 질문해줘.</pre></div>
+        <p>계획서에서 이해 안 되는 항목은 그냥 물어보세요 — "왜 이게 필요해?"가 ③에서 배운 검토의 핵심이었습니다.</p>
+      </div></div>
+      <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
+        <b class="ws-title">로컬에서 동작 확인</b>
+        <p>Claude Code와 함께 구현하고 내 PC에서 먼저 돌려 봅니다. API 키가 필요하면 <b>처음부터 환경변수로</b> — ①(보안 이론)의 원칙입니다.</p>
+      </div></div>
+      <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
+        <b class="ws-title">문서 남기기</b>
+        <p>③ §5의 문서화 프롬프트로 <code>PLAN.md</code> · <code>DECISIONS.md</code> · <code>README.md</code> · <code>CLAUDE.md</code>를 만들어 커밋합니다. README의 합격선: <b>처음 보는 사람이 README만 보고 실행할 수 있는가.</b></p>
+      </div></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>계획서 검토를 거쳐 로컬에서 동작하고, 문서 네 파일을 남겼다</span></label></div>
+    </section>
+
+    <!-- ============ S3 ============ -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>배포 — Vercel에 올려 URL 받기</h2></div>
+      <p class="sec-lead">⑤의 배포 절차를 내 앱에 적용합니다. GitHub에 올리고 → Vercel에 연결하고 → 환경변수를 넣고 → 배포.</p>
+      <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
+        <b class="ws-title">배포</b>
+        <p>⑤ 자료의 배포 4단계를 그대로 따라갑니다. 배포 후 <b>다른 기기(폰)로 접속</b>해 확인하고, 코드 안에 키가 0건인지 검사하세요.</p>
+      </div></div>
+      <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
+        <b class="ws-title">(선택) 문 달기</b>
+        <p>나만 쓸 앱이면 ⑥ §6의 <b>비밀번호 잠금</b>(해시 + 환경변수)으로 충분합니다. 여럿을 명단으로 들이려면 ⑥의 이메일 인증코드를 붙여 보세요.</p>
+      </div></div>
+      <div class="callout caution"><b class="cap">배포 전 3초 점검</b>
+      ① 코드·GitHub에 API 키가 없는가 ② 수집한 데이터에 개인정보가 없는가 ③ 공개해도 되는 데이터인가 — ①(이론)의 체크 그대로입니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>Vercel URL로 접속되는 것을 다른 기기에서 확인했다</span></label></div>
+    </section>
+
+    <!-- ============ S4 ============ -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>마무리</h2></div>
+      <p class="sec-lead">배포된 URL을 다른 기기(폰)에서 열어 보는 순간이 이 실습의 결승선입니다.</p>
+      <div class="next-card-grid">
+        <div class="next-card"><b>막히면</b><span>막힌 화면을 AI에게 보여주고 "여기서 왜 안 되는 거야?"라고 물어보세요. 계획서 단계로 돌아가 범위를 줄이는 것도 좋은 선택입니다 — 기능 하나를 끝까지.</span></div>
+        <div class="next-card"><b>4주차와의 연결</b><span>배포한 앱에 4주차의 구글 시트 연동(기록·대시보드)과 루틴 자동화를 얹으면 완전한 서비스가 됩니다. 만든 앱은 다음 수업에서 자랑해 주셔도 좋습니다.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>내 앱이 실제 URL로 동작한다</span></label></div>
+    </section>
+
+      <a class="back-week" href="index.html" style="display:inline-block;margin-top:30px;">← 3주차 강의자료 목록으로</a>
+  </main>
+</div>
+
+<div class="toast" id="toast">복사되었습니다</div>
+<script>
+const $ = s => document.querySelector(s);
+function showToast(msg){
+  const t = $("#toast"); if(!t) return;
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){}
+  ta.remove();
+}
+document.querySelectorAll(".copy-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const text = document.getElementById(btn.dataset.copy).textContent;
+    const done = () => showToast("복사되었습니다");
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+    } else fallbackCopy(text, done);
+  });
+});
+const checks = [...document.querySelectorAll("input[data-progress]")];
+if(checks.length){
+  $("#progressTotal").textContent = checks.length;
+  let celebrated = false;
+  const updateProgress = () => {
+    const done = checks.filter(c => c.checked).length;
+    $("#progressCount").textContent = done;
+    $("#progressBar").style.width = (done/checks.length*100)+"%";
+    checks.forEach(c => {
+      const a = document.querySelector(`.toc a[data-sec="${c.dataset.progress}"]`);
+      if(a) a.classList.toggle("done", c.checked);
+    });
+    if(done===checks.length && !celebrated){
+      celebrated = true;
+      const b = document.createElement("div");
+      b.className = "celebrate-banner";
+      b.innerHTML = document.body.dataset.celebrate || "🎉 <b>완료!</b>";
+      $("#celebrateSlot").appendChild(b);
+      b.scrollIntoView({behavior:"smooth", block:"center"});
+    }
+  };
+  checks.forEach(c => c.addEventListener("change", updateProgress));
+  updateProgress();
+}
+const tocLinks = {};
+document.querySelectorAll(".toc a[data-sec]").forEach(a => tocLinks[a.dataset.sec] = a);
+const secIds = Object.keys(tocLinks);
+if(secIds.length){
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { en.target._visible = en.isIntersecting; });
+    let current = null;
+    for(const id of secIds){ const el = document.getElementById(id); if(el && el._visible){ current = id; break; } }
+    if(current){
+      Object.values(tocLinks).forEach(a => a.classList.remove("active"));
+      tocLinks[current].classList.add("active");
+    }
+  }, {rootMargin:"-15% 0px -55% 0px"});
+  secIds.forEach(id => { const el = document.getElementById(id); if(el) io.observe(el); });
+}
+</script>
+</body>
+</html>

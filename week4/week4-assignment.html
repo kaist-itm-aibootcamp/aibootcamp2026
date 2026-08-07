@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 4 — 자율 실습(선택): 포트폴리오 수익률 앱</title>
+<style>
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
+  --brand:#2e9bdb; --brand-dark:#1b6fa6; --green:#2f765b; --amber:#b8792e; --red:#b0483f;
+  --blue:#375f8f; --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12); --radius:14px; --sidebar-width:250px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15.5px;
+}
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.back-week{font-size:13px;font-weight:700;color:var(--brand-dark);text-decoration:none;white-space:nowrap;}
+.back-week:hover{text-decoration:underline;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+.layout{display:flex;align-items:flex-start;}
+.sidebar{
+  position:sticky;top:63px;flex:0 0 var(--sidebar-width);width:var(--sidebar-width);
+  height:calc(100vh - 63px);overflow-y:auto;padding:22px 14px 40px 22px;border-right:1px solid var(--line);
+}
+.sidebar-title{font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+.toc a{
+  display:block;padding:7px 11px;margin:2px 0;border-radius:8px;border-left:3px solid transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;line-height:1.4;
+}
+.toc a:hover{background:#eef3ec;color:var(--ink);}
+.toc a.active{background:var(--sky-light);border-left-color:var(--brand);color:var(--brand-dark);font-weight:800;}
+.toc a .done-mark{color:var(--green);font-weight:900;margin-left:4px;display:none;}
+.toc a.done .done-mark{display:inline;}
+.content{flex:1;min-width:0;max-width:920px;padding:clamp(20px,4vw,44px) clamp(16px,4vw,44px) 100px;}
+.hero{margin-bottom:16px;}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.07em;color:var(--brand-dark);background:var(--sky-light);padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+.hero h1{font-size:clamp(23px,3.6vw,32px);line-height:1.3;letter-spacing:-.015em;margin-bottom:10px;}
+.hero p{color:var(--muted);max-width:660px;}
+.section{margin-top:44px;padding-top:8px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
+.sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
+.sec-lead{color:var(--muted);margin:4px 0 18px;max-width:700px;}
+h3{font-size:16.5px;margin:26px 0 10px;}
+p{margin:10px 0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:14px 0;box-shadow:0 3px 14px rgba(54,42,31,.05);}
+.callout{border-left:4px solid var(--brand);background:var(--sky-light);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;font-size:14.5px;}
+.callout.caution{border-left-color:var(--red);background:#faeeec;}
+.callout.ok{border-left-color:var(--green);background:#edf4ef;}
+.callout b.cap{display:block;font-size:13px;letter-spacing:.03em;margin-bottom:4px;color:var(--brand-dark);}
+.callout.caution b.cap{color:var(--red);}
+.callout.ok b.cap{color:var(--green);}
+.tip-card{border-left:4px solid var(--brand);background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 17px;margin:14px 0;font-size:14px;color:var(--muted);}
+.tip-card b{color:var(--ink);}
+.copy-block{position:relative;background:#20242a;color:#e8ecf1;border-radius:12px;padding:18px 20px;margin:14px 0;font-size:14px;line-height:1.8;}
+.copy-block .cb-label{position:absolute;top:-10px;left:14px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--brand);padding:3px 10px;border-radius:999px;}
+.copy-block pre{white-space:pre-wrap;word-break:break-word;font-family:inherit;margin-top:4px;}
+.copy-btn{position:absolute;top:12px;right:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 11px;cursor:pointer;}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+.doc-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--surface);}
+.doc-table th{background:#f2f6f0;text-align:left;padding:8px 12px;border:1px solid var(--line);font-size:12.5px;}
+.doc-table td{padding:8px 12px;border:1px solid var(--line);}
+.doc-table td code, p code, li code{background:#eef3ec;border-radius:5px;padding:1px 6px;font-family:ui-monospace,Consolas,monospace;font-size:.9em;}
+.workshop-step{display:flex;gap:14px;margin:14px 0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+.ws-num{flex:0 0 auto;display:grid;place-items:center;width:30px;height:30px;border-radius:999px;background:var(--sky-light);color:var(--brand-dark);font-weight:900;font-size:14px;}
+.ws-body{min-width:0;flex:1;}
+.ws-body b.ws-title{display:block;font-size:14.5px;margin-bottom:4px;}
+.ws-body p{margin:6px 0;font-size:14px;color:var(--muted);}
+.submit-box{display:flex;gap:12px;align-items:flex-start;background:#edf4ef;border:1px solid #cfe3d7;border-radius:10px;padding:14px 18px;margin:16px 0;font-size:14px;color:#204935;}
+.submit-box b{color:var(--green);}
+.completion-row{margin:22px 0 6px;}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;font-weight:700;cursor:pointer;}
+.check input{width:18px;height:18px;margin-top:3px;accent-color:var(--brand);}
+.celebrate-banner{background:linear-gradient(135deg,#eaf6ee,#e3f1fb);border:1px solid #bfe0cd;border-radius:12px;padding:16px 20px;margin:0 0 18px;font-size:15px;}
+.next-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.next-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.next-card b{display:block;font-size:14.5px;margin-bottom:5px;color:var(--brand-dark);}
+.next-card span{font-size:13.5px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#20242a;color:#fff;font-size:13.5px;font-weight:700;padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:all .25s ease;z-index:60;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media (max-width:900px){ .layout{display:block;} .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);} .next-card-grid{grid-template-columns:1fr;} }
+@media (max-width:640px){ .topbar{flex-wrap:wrap;row-gap:10px;} .topbar-left{flex-wrap:wrap;row-gap:8px;} .progress-wrap{width:100%;} }
+</style>
+</head>
+<body id="top" data-celebrate="🎉 <b>자율 실습 완주!</b> 매일 스스로 시세를 모아 기록하고, 수익률과 추이 그래프를 보여주고, 비밀번호로 잠긴 나만의 앱 — 4주 동안 배운 연동·자동화·배포·보안이 전부 이 한 화면에 들어 있습니다.">
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+    </a>
+    <div class="week-tag"><span class="week-num">WEEK 4</span><span class="week-title">자율 실습 (선택)</span></div>
+    <a class="back-week" href="index.html">← 4주차 목록</a>
+  </div>
+  <div class="progress-wrap" aria-label="진행률">
+    <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="목차">
+    <div class="sidebar-title">자율 실습</div>
+    <div class="toc">
+      <a href="#s1" data-sec="s1">1. 시트에 포트폴리오 만들기<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. 수익률 앱 만들기<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 비밀번호 잠금 + 배포<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 마무리<span class="done-mark">✔</span></a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div id="celebrateSlot"></div>
+
+    <div class="hero">
+      <span class="hero-kicker">WEEK 4 · 자율 실습 (선택) — 4주의 기술을 한 화면에</span>
+      <h1>내 포트폴리오 수익률 앱 만들기</h1>
+      <p>제출도 정답도 없습니다 — <b>해 보고 싶은 분들을 위한 상세 안내</b>입니다. 내 투자 포트폴리오(가상이어도 됩니다)를 <b>구글 드라이브의 시트</b>에 올리고, 앱이 <b>주기적으로 현재가를 수집해 DB에 쌓은 뒤</b>, 그 기록으로 <b>수익률과 자산 추이 그래프</b>를 보여주는 앱을 만듭니다. 마지막으로 <b>비밀번호를 입력해야 들어올 수 있는</b> 잠금까지 — 시트 연동(④), 루틴 수집(⑥의 원리), 배포(3주차 ⑤), 비밀번호 해시(3주차 ⑥ §6)를 한 번에 복습하게 됩니다.</p>
+    </div>
+
+    <!-- ============ S1 ============ -->
+    <section class="section" id="s1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>구글 시트에 포트폴리오 원장 만들기</h2></div>
+      <p class="sec-lead">구글 드라이브에서 새 스프레드시트를 만들어 <b>보유 내역(원장)</b>을 적습니다. 실제 계좌가 부담스러우면 <b>가상 포트폴리오</b>로 하세요 — 목적은 연동과 자동화이지 투자가 아닙니다.</p>
+      <p><b>탭 1 — <code>portfolio</code></b> (내가 적는 원장):</p>
+      <table class="doc-table">
+        <thead><tr><th>종목명</th><th>티커</th><th>수량</th><th>매수단가</th></tr></thead>
+        <tbody>
+          <tr><td>삼성전자</td><td>005930.KS</td><td class="r">10</td><td class="r">71,000</td></tr>
+          <tr><td>Apple</td><td>AAPL</td><td class="r">3</td><td class="r">185.2</td></tr>
+          <tr><td colspan="4" style="color:var(--muted);">… 5종목 이상 권장</td></tr>
+        </tbody>
+      </table>
+      <p><b>탭 2 — <code>prices</code></b> (앱이 채우는 가격 기록, 지금은 머리글만):</p>
+      <table class="doc-table">
+        <thead><tr><th>수집일시</th><th>티커</th><th>가격</th></tr></thead>
+        <tbody>
+          <tr><td colspan="3" style="color:var(--muted);">비워 두세요 — §2의 수집 함수가 매일 여기에 한 줄씩 쌓습니다</td></tr>
+        </tbody>
+      </table>
+      <div class="tip-card"><b>왜 현재가 열이 원장에 없을까</b> — 현재가는 <b>계속 변하는 값</b>이라 원장에 적는 순간 낡습니다. 그래서 앱이 주기적으로 시세를 수집해 <code>prices</code> 탭에 <b>기록으로 쌓습니다</b>. 기록이 쌓여야 "오늘의 수익률"만이 아니라 <b>"자산 가치가 어떻게 변해 왔는지" 그래프</b>를 그릴 수 있습니다 — 스냅숏이 아니라 시계열이 필요한 이유입니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>원장 탭과 빈 가격 기록 탭을 갖춘 시트를 만들었다</span></label></div>
+    </section>
+
+    <!-- ============ S2 ============ -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>주기 수집 백엔드 — 앱이 시세를 모아 DB에 쌓는다</h2></div>
+      <p class="sec-lead">이 실습의 심장입니다. 구조는 세 부분 — <b>수집 함수</b>(시세를 조회해 기록), <b>스케줄</b>(매일 자동 실행), <b>화면</b>(기록을 읽어 수익률·그래프 표시). ③에서 배운 <b>서비스 계정 읽기/쓰기</b>가 그대로 쓰입니다.</p>
+
+      <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
+        <b class="ws-title">서비스 계정 연결</b>
+        <p>④ §3~4의 절차대로 서비스 계정을 발급하고 시트에 편집자로 초대합니다. 시트는 <b>비공개인 채로</b> 앱만 읽고 쓸 수 있게 됩니다 — 포트폴리오는 민감 정보이므로 "웹에 게시"가 아니라 처음부터 이 방식으로 갑니다.</p>
+      </div></div>
+      <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
+        <b class="ws-title">수집 함수 + 스케줄 + 화면 만들기</b>
+        <div class="copy-block"><span class="cb-label">💬 Claude Code 프롬프트</span><button class="copy-btn" data-copy="c1">복사</button>
+<pre id="c1">포트폴리오 수익률 앱을 만들자. 먼저 계획서부터 보여줘.
+
+1. 데이터: 비공개 구글 시트를 서비스 계정으로 읽고 쓴다.
+   - portfolio 탭(원장): 종목명, 티커, 수량, 매수단가 — 읽기만
+   - prices 탭(가격 기록): 수집일시, 티커, 가격 — 수집 함수가 추가(append)
+
+2. 수집 함수 /api/collect:
+   원장의 티커별 현재가를 무료 시세 API에서 조회해
+   prices 탭에 한 줄씩 추가한다. 어떤 시세 API를 쓸지 후보와
+   장단점을 계획서에서 먼저 제안해줘.
+
+3. 스케줄: 이 함수가 매일 장 마감 후 1회 자동 실행되도록
+   Vercel Cron으로 등록한다.
+
+4. 화면:
+   - 맨 위: 총 평가금액과 전체 수익률 크게 (최신 가격 기준)
+   - 종목별 표: 수량, 매수단가, 현재가, 평가금액, 수익률
+   - 아래: prices 기록으로 그린 총 자산 가치 추이 그래프
+
+5. 비밀(서비스 계정 키 등)은 전부 서버 환경변수로. 코드에 넣지 마.</pre></div>
+        <p>2번처럼 시세 API 선택은 <b>계획서 단계에서 AI가 후보를 제안하게</b> 하세요 — 무료 API는 국가·종목별로 지원이 달라서, 내 포트폴리오 구성에 맞는 것을 골라야 합니다.</p>
+      </div></div>
+      <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
+        <b class="ws-title">첫 수집 실행 — 기록이 쌓이는지 확인</b>
+        <p>배포 전 로컬에서 <code>/api/collect</code>를 직접 한 번 호출해, <code>prices</code> 탭에 오늘 날짜의 행들이 실제로 생기는지 <b>시트를 열어 눈으로</b> 확인합니다. 스케줄 등록 후에는 다음 날 한 줄이 더 쌓였는지 봐야 진짜 완성입니다.</p>
+      </div></div>
+
+      <div class="callout"><b class="cap">"DB가 왜 구글 시트야?"</b>
+      맞습니다, 여기서 시트의 <code>prices</code> 탭이 <b>DB 역할</b>을 합니다. 이미 배운 서비스 계정 쓰기로 충분하고, 쌓이는 기록을 눈으로 열어 볼 수 있어 학습용으로 최적입니다. 기록이 수만 행으로 커지면 그때 진짜 DB(Postgres 등)로 옮기면 됩니다 — 3주차 검색엔진에서 "소규모는 전수 계산, 대규모는 전용 DB"라고 했던 것과 같은 판단입니다.</div>
+      <div class="tip-card"><b>그래프가 하루 만에 안 예뻐도 정상</b> — 추이 그래프는 기록이 쌓여야 선이 됩니다. 첫날은 점 하나입니다. 수집이 매일 도는 것을 확인했다면 완성이고, 일주일 뒤에 다시 열어 보세요.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>수집 함수가 prices 탭에 기록을 쌓고, 화면에 수익률과 추이 그래프가 나온다</span></label></div>
+    </section>
+
+    <!-- ============ S3 ============ -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>비밀번호 잠금 걸고 배포하기</h2></div>
+      <p class="sec-lead">포트폴리오는 <b>민감한 개인 정보</b>입니다. 3주차 ⑥ §6에서 배운 지름길 — 비밀번호를 단방향 해시해 환경변수에 두는 방식 — 그대로 문을 답니다.</p>
+      <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
+        <b class="ws-title">해시 만들기 → 환경변수로</b>
+        <p>비밀번호를 SHA-256으로 해시하는 스크립트를 실행해(3주차 ⑥ §6 프롬프트 재사용) 해시값을 얻고, Vercel 환경변수 <code>PASSWORD_HASH</code>에 넣습니다.</p>
+      </div></div>
+      <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
+        <b class="ws-title">입구 달기 + 배포</b>
+        <p>"입력값을 해시해 <code>PASSWORD_HASH</code>와 비교, 일치하면 세션 발급, 세션 없으면 화면과 API 모두 차단" — ⑥ §6의 프롬프트 그대로입니다. 배포 후 <b>시크릿 창</b>에서 열어 비밀번호 없이는 안 보이는지, 틀린 비밀번호가 거부되는지 확인하세요.</p>
+      </div></div>
+      <div class="callout caution"><b class="cap">점검 세 가지</b>
+      ① 비밀번호 없이 API 주소를 직접 열어도 데이터가 안 나오는가 (단, <code>/api/collect</code>는 Vercel Cron이 부를 수 있어야 하니 세션 대신 별도 시크릿으로 보호 — 계획서에서 AI에게 처리 방법을 물어보세요) ② 코드·GitHub에 서비스 계정 키와 비밀번호가 없는가(환경변수에만) ③ 비밀번호는 길게(문장형) 정했는가.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>비밀번호를 맞혀야만 들어갈 수 있는 상태로 배포했다</span></label></div>
+    </section>
+
+    <!-- ============ S4 ============ -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>마무리</h2></div>
+      <p class="sec-lead">다음 날 <code>prices</code> 탭에 한 줄이 더 쌓여 있는 것을 확인하는 순간 — 그것이 이 실습의 결승선입니다.</p>
+      <div class="tip-card"><b>더 가 보고 싶다면</b> — ⑥에서 배운 루틴으로 "매주 월요일 아침, 수익률 요약을 텔레그램으로"까지 얹으면 4주 전 과정의 완성판입니다.</div>
+      <div class="next-card-grid">
+        <div class="next-card"><b>이 실습에 들어 있는 4주</b><span>시트 읽기/쓰기 = 데이터 연동(4주차 ④), 매일 도는 수집 = 루틴 자동화(4주차 ⑥의 원리), 앱·배포 = 웹앱과 서버(1·3주차), 해시 잠금 = 보안(3주차), 그리고 이 모든 것을 AI에게 시키는 법(2주차·전 과정). 판결문도 특허도 아닌 <b>내 데이터</b>로 마무리합니다.</span></div>
+        <div class="next-card"><b>수고하셨습니다</b><span>다음에 자동화하고 싶은 업무가 생기면 — 이제 어디서부터 시작할지 아실 겁니다. 계획서부터, 폴더 하나 안에서, 승인은 읽고.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>다음 날에도 기록이 스스로 쌓이는 것을 확인했다</span></label></div>
+    </section>
+
+      <a class="back-week" href="index.html" style="display:inline-block;margin-top:30px;">← 4주차 강의자료 목록으로</a>
+  </main>
+</div>
+
+<div class="toast" id="toast">복사되었습니다</div>
+<script>
+const $ = s => document.querySelector(s);
+function showToast(msg){
+  const t = $("#toast"); if(!t) return;
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){}
+  ta.remove();
+}
+document.querySelectorAll(".copy-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const text = document.getElementById(btn.dataset.copy).textContent;
+    const done = () => showToast("복사되었습니다");
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+    } else fallbackCopy(text, done);
+  });
+});
+const checks = [...document.querySelectorAll("input[data-progress]")];
+if(checks.length){
+  $("#progressTotal").textContent = checks.length;
+  let celebrated = false;
+  const updateProgress = () => {
+    const done = checks.filter(c => c.checked).length;
+    $("#progressCount").textContent = done;
+    $("#progressBar").style.width = (done/checks.length*100)+"%";
+    checks.forEach(c => {
+      const a = document.querySelector(`.toc a[data-sec="${c.dataset.progress}"]`);
+      if(a) a.classList.toggle("done", c.checked);
+    });
+    if(done===checks.length && !celebrated){
+      celebrated = true;
+      const b = document.createElement("div");
+      b.className = "celebrate-banner";
+      b.innerHTML = document.body.dataset.celebrate || "🎉 <b>완료!</b>";
+      $("#celebrateSlot").appendChild(b);
+      b.scrollIntoView({behavior:"smooth", block:"center"});
+    }
+  };
+  checks.forEach(c => c.addEventListener("change", updateProgress));
+  updateProgress();
+}
+const tocLinks = {};
+document.querySelectorAll(".toc a[data-sec]").forEach(a => tocLinks[a.dataset.sec] = a);
+const secIds = Object.keys(tocLinks);
+if(secIds.length){
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { en.target._visible = en.isIntersecting; });
+    let current = null;
+    for(const id of secIds){ const el = document.getElementById(id); if(el && el._visible){ current = id; break; } }
+    if(current){
+      Object.values(tocLinks).forEach(a => a.classList.remove("active"));
+      tocLinks[current].classList.add("active");
+    }
+  }, {rootMargin:"-15% 0px -55% 0px"});
+  secIds.forEach(id => { const el = document.getElementById(id); if(el) io.observe(el); });
+}
+</script>
+</body>
+</html>

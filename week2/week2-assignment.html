@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 2 — 자율 실습(선택): 특허 지도 · 계보도 · 내 업무 스킬</title>
+<style>
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
+  --brand:#2e9bdb; --brand-dark:#1b6fa6; --green:#2f765b; --amber:#b8792e; --red:#b0483f;
+  --blue:#375f8f; --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12); --radius:14px; --sidebar-width:250px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15.5px;
+}
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.back-week{font-size:13px;font-weight:700;color:var(--brand-dark);text-decoration:none;white-space:nowrap;}
+.back-week:hover{text-decoration:underline;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+.layout{display:flex;align-items:flex-start;}
+.sidebar{
+  position:sticky;top:63px;flex:0 0 var(--sidebar-width);width:var(--sidebar-width);
+  height:calc(100vh - 63px);overflow-y:auto;padding:22px 14px 40px 22px;border-right:1px solid var(--line);
+}
+.sidebar-title{font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+.toc a{
+  display:block;padding:7px 11px;margin:2px 0;border-radius:8px;border-left:3px solid transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;line-height:1.4;
+}
+.toc a:hover{background:#eef3ec;color:var(--ink);}
+.toc a.active{background:var(--sky-light);border-left-color:var(--brand);color:var(--brand-dark);font-weight:800;}
+.toc a .done-mark{color:var(--green);font-weight:900;margin-left:4px;display:none;}
+.toc a.done .done-mark{display:inline;}
+.content{flex:1;min-width:0;max-width:920px;padding:clamp(20px,4vw,44px) clamp(16px,4vw,44px) 100px;}
+.hero{margin-bottom:16px;}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.07em;color:var(--brand-dark);background:var(--sky-light);padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+.hero h1{font-size:clamp(23px,3.6vw,32px);line-height:1.3;letter-spacing:-.015em;margin-bottom:10px;}
+.hero p{color:var(--muted);max-width:660px;}
+.section{margin-top:44px;padding-top:8px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
+.sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
+.sec-lead{color:var(--muted);margin:4px 0 18px;max-width:700px;}
+h3{font-size:16.5px;margin:26px 0 10px;}
+p{margin:10px 0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:14px 0;box-shadow:0 3px 14px rgba(54,42,31,.05);}
+.callout{border-left:4px solid var(--brand);background:var(--sky-light);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;font-size:14.5px;}
+.callout.caution{border-left-color:var(--red);background:#faeeec;}
+.callout.ok{border-left-color:var(--green);background:#edf4ef;}
+.callout b.cap{display:block;font-size:13px;letter-spacing:.03em;margin-bottom:4px;color:var(--brand-dark);}
+.callout.caution b.cap{color:var(--red);}
+.callout.ok b.cap{color:var(--green);}
+.tip-card{border-left:4px solid var(--brand);background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 17px;margin:14px 0;font-size:14px;color:var(--muted);}
+.tip-card b{color:var(--ink);}
+.copy-block{position:relative;background:#20242a;color:#e8ecf1;border-radius:12px;padding:18px 20px;margin:14px 0;font-size:14px;line-height:1.8;}
+.copy-block .cb-label{position:absolute;top:-10px;left:14px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--brand);padding:3px 10px;border-radius:999px;}
+.copy-block pre{white-space:pre-wrap;word-break:break-word;font-family:inherit;margin-top:4px;}
+.copy-btn{position:absolute;top:12px;right:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 11px;cursor:pointer;}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+.doc-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--surface);}
+.doc-table th{background:#f2f6f0;text-align:left;padding:8px 12px;border:1px solid var(--line);font-size:12.5px;}
+.doc-table td{padding:8px 12px;border:1px solid var(--line);}
+.doc-table td code, p code, li code{background:#eef3ec;border-radius:5px;padding:1px 6px;font-family:ui-monospace,Consolas,monospace;font-size:.9em;}
+.workshop-step{display:flex;gap:14px;margin:14px 0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+.ws-num{flex:0 0 auto;display:grid;place-items:center;width:30px;height:30px;border-radius:999px;background:var(--sky-light);color:var(--brand-dark);font-weight:900;font-size:14px;}
+.ws-body{min-width:0;flex:1;}
+.ws-body b.ws-title{display:block;font-size:14.5px;margin-bottom:4px;}
+.ws-body p{margin:6px 0;font-size:14px;color:var(--muted);}
+.result-box{display:flex;gap:12px;align-items:flex-start;background:#edf4ef;border:1px solid #cfe3d7;border-radius:10px;padding:14px 18px;margin:16px 0;font-size:14px;color:#204935;}
+.result-box b{color:var(--green);}
+.completion-row{margin:22px 0 6px;}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;font-weight:700;cursor:pointer;}
+.check input{width:18px;height:18px;margin-top:3px;accent-color:var(--brand);}
+.celebrate-banner{background:linear-gradient(135deg,#eaf6ee,#e3f1fb);border:1px solid #bfe0cd;border-radius:12px;padding:16px 20px;margin:0 0 18px;font-size:15px;}
+.next-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.next-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.next-card b{display:block;font-size:14.5px;margin-bottom:5px;color:var(--brand-dark);}
+.next-card span{font-size:13.5px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#20242a;color:#fff;font-size:13.5px;font-weight:700;padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:all .25s ease;z-index:60;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media (max-width:900px){ .layout{display:block;} .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);} .next-card-grid{grid-template-columns:1fr;} }
+@media (max-width:640px){ .topbar{flex-wrap:wrap;row-gap:10px;} .topbar-left{flex-wrap:wrap;row-gap:8px;} .progress-wrap{width:100%;} }
+</style>
+</head>
+<body id="top" data-celebrate="🎉 <b>자율 실습 완주!</b> 특허 지도, 계보도, 그리고 나만의 업무 스킬까지 — 판결문 없이도 같은 파이프라인이 돌아간다는 것을 직접 증명했습니다.">
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+    </a>
+    <div class="week-tag"><span class="week-num">WEEK 2</span><span class="week-title">자율 실습 (선택)</span></div>
+    <a class="back-week" href="index.html">← 2주차 목록</a>
+  </div>
+  <div class="progress-wrap" aria-label="진행률">
+    <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="목차">
+    <div class="sidebar-title">자율 실습</div>
+    <div class="toc">
+      <a href="#s1" data-sec="s1">1. 특허 200건의 지도<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. 논문 계보도 (가볍게)<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 내 업무 문서 스킬<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 순서 제안 · 막힐 때<span class="done-mark">✔</span></a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div id="celebrateSlot"></div>
+
+    <div class="hero">
+      <span class="hero-kicker">WEEK 2 · 자율 실습 (선택) — 데이터만 바꿔서, 한 번 더</span>
+      <h1>특허 지도 · 계보도 · 내 업무 스킬</h1>
+      <p>제출도 정답도 없습니다 — <b>해 보고 싶은 분들을 위한 상세 안내</b>입니다. 수업에서는 판결문 347건이었지만, 같은 파이프라인을 <b>다른 데이터로</b> 한 번 더 돌려 보면 "데이터가 바뀌어도 프롬프트와 절차는 그대로"라는 것을 손으로 확인하게 됩니다. 세 가지 모두 강의 자료의 프롬프트를 복사해 몇 단어만 바꾸면 시작됩니다.</p>
+    </div>
+
+    <!-- ============ 실습 1 ============ -->
+    <section class="section" id="s1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>특허 200건을 수집해 기술 지도 그리기</h2></div>
+      <p class="sec-lead">강의 ②③④⑤를 관통하는 메인 코스입니다. 관심 있는 기술 분야 하나를 골라, 특허 데이터로 수집 → 임베딩 → 지도의 전체 파이프라인을 재현합니다.</p>
+
+      <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
+        <b class="ws-title">수집 — 특허 200건을 CSV로</b>
+        <p>특허 검색 사이트(<a href="http://www.kipris.or.kr" target="_blank" rel="noopener">KIPRIS</a> 등)에서 관심 기술 키워드로 검색해 <b>200건</b>을 수집합니다. 항목: 출원번호 · 발명의 명칭 · 출원인 · 출원일 · 초록. ②에서 배운 10초 판별법을 먼저 적용하세요 — URL만 바꿔 목록이 열리면 Cowork로, 스크롤·클릭이 필요하면 크롬 확장으로.</p>
+        <div class="copy-block"><span class="cb-label">💬 수집 프롬프트 (키워드만 바꾸세요)</span><button class="copy-btn" data-copy="a1">복사</button>
+<pre id="a1">특허 검색 결과에서 "이차전지 음극재" 관련 특허 200건을 수집해줘.
+항목: 출원번호, 발명의 명칭, 출원인, 출원일, 초록.
+연동 폴더의 data/patents.csv 로 저장해줘 (엑셀에서 한글이 깨지지 않게 UTF-8 BOM).
+서버에 부담이 없도록 요청 사이에 간격을 두고, 끝나면 수집 건수를 알려줘.</pre></div>
+        <p>특허 공보는 공개가 목적인 공공 데이터라 수집 부담이 적은 편이지만, ②의 기본 수칙(간격·필요한 만큼만)은 그대로 지킵니다.</p>
+      </div></div>
+
+      <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
+        <b class="ws-title">임베딩 — 초록 200건을 벡터로</b>
+        <p>④의 프롬프트를 재사용합니다. 대상만 "판결문"에서 "patents.csv의 초록 열"로 바꾸면 됩니다. 결과는 <code>embeddings/</code> 아래 JSON 200개 — 비용은 1센트 안팎입니다.</p>
+      </div></div>
+
+      <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
+        <b class="ws-title">지도 — 클러스터링과 2D 시각화</b>
+        <p>⑤의 재현용 프롬프트로 클러스터링 + 차원축소 지도를 만들고, <b>군집마다 기술 이름을 붙여</b> 보세요. 마지막으로 "예상과 다른 군집 하나"를 골라 원문(초록)을 확인합니다 — 지도가 보여준 패턴은 가설이고, 확인은 원문으로 한다는 ⑤의 원칙 그대로입니다.</p>
+      </div></div>
+
+      <div class="result-box"><span>🗺️</span><span><b>완성 모습</b> — <code>data/patents.csv</code>(200건) + 클릭해 탐색하는 기술 지도 HTML. "이 분야의 특허는 크게 ~로 나뉜다"고 말할 수 있으면 성공입니다.</span></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>특허 200건 수집 → 임베딩 → 지도까지 완주했다</span></label></div>
+    </section>
+
+    <!-- ============ 실습 2 ============ -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>논문 계보도 만들기 (가볍게)</h2></div>
+      <p class="sec-lead">이건 어렵지 않습니다 — ⑦의 프롬프트를 <b>그대로 복사해 주제만 바꾸면</b> 됩니다. 따라 해 보는 것 자체가 목적입니다.</p>
+
+      <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
+        <b class="ws-title">씨앗 논문 하나 고르기</b>
+        <p>내 관심 주제(연구 주제, 졸업논문 주제, 궁금한 분야 무엇이든)에서 많이 인용되는 논문 1편을 고릅니다. 뭘 골라야 할지 모르겠으면 그것부터 AI에게 물어보세요: "OO 분야에서 가장 많이 인용되는 논문이 뭐야?"</p>
+      </div></div>
+      <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
+        <b class="ws-title">⑦의 프롬프트로 계보도 생성</b>
+        <p>⑦(논문 계보도)의 프롬프트를 복사해 씨앗 논문만 바꿔 실행합니다 — 조상(참고문헌 중 뿌리 논문)과 후예(인용한 논문)를 모아 시간축 네트워크로 그려 줍니다. 여유가 있으면 후속 프롬프트로 <b>읽기 계획</b>까지 뽑아 보세요.</p>
+      </div></div>
+
+      <div class="result-box"><span>🌳</span><span><b>완성 모습</b> — 내 주제의 계보도 HTML 한 장. 그것으로 충분합니다.</span></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>내 주제의 계보도를 만들어 보았다</span></label></div>
+    </section>
+
+    <!-- ============ 실습 3 ============ -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>내 업무 문서를 쓰는 스킬 만들기</h2></div>
+      <p class="sec-lead">⑥에서 본 강사의 컬럼 스킬 사례를 <b>여러분의 문서로</b> 재현합니다. 업무상 반복해서 쓰는 문서가 있다면 — 주간 보고서, 회의록, 제안서, 품의서, 강의계획서, 상담 기록, 무엇이든 — 그 문서를 작성하는 스킬을 만들어 보세요.</p>
+
+      <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
+        <b class="ws-title">과거 문서 모으기</b>
+        <p>같은 종류의 문서를 <b>5~10편</b> 골라 폴더 하나에 넣고 Cowork에 연동합니다. 많을수록 문체·구조 분석이 정확해집니다. 민감한 내용(개인정보·기밀)이 있는 문서는 빼거나 지우고 넣으세요.</p>
+      </div></div>
+      <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
+        <b class="ws-title">한 문장 지시</b>
+        <div class="copy-block"><span class="cb-label">💬 스킬 생성 프롬프트</span><button class="copy-btn" data-copy="a3">복사</button>
+<pre id="a3">이 폴더의 문서들을 전부 분석해서, 같은 종류의 문서를 새로 작성하는
+스킬 파일(SKILL.md)을 만들어 줘. 문체·구조·분량·자주 쓰는 표현을
+실제 수치와 함께 정리하고, 발동 조건(description)에는
+"어떤 요청이 오면 이 스킬을 쓰는지"를 분명하게 적어줘.</pre></div>
+        <p>강사의 컬럼 사례처럼, 문서의 습관("~합니다체", 문단 구조, 항목 순서)이 <b>통계로</b> 추출되는지 관찰해 보세요.</p>
+      </div></div>
+      <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
+        <b class="ws-title">설치하고 발동 시험</b>
+        <p>⑥에서 배운 대로 스킬을 설치하고, 새 대화에서 "다음 주제로 OO 초안을 써 줘"라고 요청해 스킬이 발동되는지, 결과가 내 문서와 닮았는지 확인합니다. 발동이 안 되면 description부터 고치세요(⑥의 원칙).</p>
+      </div></div>
+
+      <div class="tip-card"><b>반복 문서가 없다면</b> — 자기소개서, 이메일, 수업 리포트처럼 몇 번이라도 써 본 글이면 충분합니다. 핵심은 "과거 산출물 → 절차 추출 → 재사용"의 경험입니다.</div>
+      <div class="result-box"><span>📄</span><span><b>완성 모습</b> — SKILL.md 파일과, 스킬이 발동해 작성한 새 문서 초안 1편. "닮았나?"를 스스로 판정해 보세요.</span></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>내 문서의 스킬을 만들어 설치하고 발동까지 확인했다</span></label></div>
+    </section>
+
+    <!-- ============ 마무리 ============ -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>순서 제안 · 막힐 때</h2></div>
+      <p class="sec-lead">셋 다 할 필요는 없습니다 — 끌리는 것 하나면 충분하고, 어느 것부터 해도 됩니다.</p>
+      <table class="doc-table">
+        <thead><tr><th style="width:130px">실습</th><th>이런 분께</th><th style="width:100px">체감 무게</th></tr></thead>
+        <tbody>
+          <tr><td><b>1. 특허 지도</b></td><td>파이프라인 전체를 한 번 더 손에 익히고 싶은 분</td><td>메인 코스</td></tr>
+          <tr><td><b>2. 계보도</b></td><td>일단 가볍게 하나 따라 해 보고 싶은 분</td><td>가볍게</td></tr>
+          <tr><td><b>3. 업무 스킬</b></td><td>당장 내 업무에 써먹을 것을 만들고 싶은 분</td><td>실속</td></tr>
+        </tbody>
+      </table>
+      <div class="next-card-grid">
+        <div class="next-card"><b>막히면</b><span>강의 자료의 프롬프트를 다시 복사하는 것부터. 그래도 막히면 막힌 화면을 AI에게 보여주고 "여기서 왜 안 되는 거야?"라고 물어보세요 — 그 왕복 자체가 이번 주에 배운 작업 방식입니다.</span></div>
+        <div class="next-card"><b>3주차와의 연결</b><span>실습 1에서 만든 특허 임베딩 200건이 있으면, 3주차의 검색엔진·RAG 실습을 판결문 대신 <b>내 특허 데이터</b>로 할 수 있습니다.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>하나 이상 직접 해 보았다</span></label></div>
+    </section>
+
+      <a class="back-week" href="index.html" style="display:inline-block;margin-top:30px;">← 2주차 강의자료 목록으로</a>
+  </main>
+</div>
+
+<div class="toast" id="toast">복사되었습니다</div>
+<script>
+const $ = s => document.querySelector(s);
+function showToast(msg){
+  const t = $("#toast"); if(!t) return;
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){}
+  ta.remove();
+}
+document.querySelectorAll(".copy-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const text = document.getElementById(btn.dataset.copy).textContent;
+    const done = () => showToast("복사되었습니다");
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+    } else fallbackCopy(text, done);
+  });
+});
+const checks = [...document.querySelectorAll("input[data-progress]")];
+if(checks.length){
+  $("#progressTotal").textContent = checks.length;
+  let celebrated = false;
+  const updateProgress = () => {
+    const done = checks.filter(c => c.checked).length;
+    $("#progressCount").textContent = done;
+    $("#progressBar").style.width = (done/checks.length*100)+"%";
+    checks.forEach(c => {
+      const a = document.querySelector(`.toc a[data-sec="${c.dataset.progress}"]`);
+      if(a) a.classList.toggle("done", c.checked);
+    });
+    if(done===checks.length && !celebrated){
+      celebrated = true;
+      const b = document.createElement("div");
+      b.className = "celebrate-banner";
+      b.innerHTML = document.body.dataset.celebrate || "🎉 <b>완료!</b>";
+      $("#celebrateSlot").appendChild(b);
+      b.scrollIntoView({behavior:"smooth", block:"center"});
+    }
+  };
+  checks.forEach(c => c.addEventListener("change", updateProgress));
+  updateProgress();
+}
+const tocLinks = {};
+document.querySelectorAll(".toc a[data-sec]").forEach(a => tocLinks[a.dataset.sec] = a);
+const secIds = Object.keys(tocLinks);
+if(secIds.length){
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { en.target._visible = en.isIntersecting; });
+    let current = null;
+    for(const id of secIds){ const el = document.getElementById(id); if(el && el._visible){ current = id; break; } }
+    if(current){
+      Object.values(tocLinks).forEach(a => a.classList.remove("active"));
+      tocLinks[current].classList.add("active");
+    }
+  }, {rootMargin:"-15% 0px -55% 0px"});
+  secIds.forEach(id => { const el = document.getElementById(id); if(el) io.observe(el); });
+}
+</script>
+</body>
+</html>
