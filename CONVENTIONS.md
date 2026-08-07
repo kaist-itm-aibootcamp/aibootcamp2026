@@ -87,7 +87,7 @@
 | 이전 | 변경 후 |
 |---|---|
 | (옛 3주차) `MCP(커넥터) 소개` | `week4-02-mcp-connectors.html` — WEEK 4 STEP 2. 한때 CLI를 §6으로 흡수했다가(`-cli` 접미사), CLI를 별도 강의로 분리하며 파일명에서 접미사 제거 |
-| (옛 3주차) `CLI 도구 — 레거시 연결` | `week4-03-cli-tools.html` — 별도 강의로 재신설(STEP 3). 기성 CLI 사용 예시 4종(gh·ffmpeg·pandoc·sqlite3)과 레거시 어댑터 3단계 추가 |
+| (옛 3주차) `CLI 도구 — 레거시 연결` | `week4-03-cli-tools.html` — 별도 강의로 재신설(STEP 3). 기성 CLI 사용 예시 4종(Google Cloud CLI·ffmpeg·pandoc·ImageMagick)과 레거시 어댑터(결정적 정리 로직 + AI 요약 분업) 3단계 추가 |
 | (옛 3주차) `구글 시트 읽기/쓰기 — 서비스 계정` | `week4-04-google-sheets-integration.html` — `tmp-sheets-readonly.html`(웹에 게시 읽기 전용)과 `tmp-team-dashboard.html`(팀 현황판 활용사례)을 흡수해 한 편으로 |
 | (옛 3주차) `총정리 — 연동 방식 판단 기준` | `week4-07-integration-decision-guide.html` — 자율 에이전트/루틴 갈래(Q6)와 부트캠프 4주 수료 마무리 추가 |
 | (신규) | `week4-01-autonomous-execution-risks.html` (이론 오프너 — 치명적 3요소·인젝션·샌드박스·HITL) |
