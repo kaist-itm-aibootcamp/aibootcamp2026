@@ -220,7 +220,7 @@ p{margin:10px 0;}
   <nav class="sidebar" aria-label="목차">
     <div class="sidebar-title">이 페이지의 흐름</div>
     <div class="toc">
-      <a href="#s1" data-sec="s1">1. 재료와 요청 — zip 하나, 문장 하나<span class="done-mark">✔</span></a>
+      <a href="#s1" data-sec="s1">1. 분석 요청과 처리 순서<span class="done-mark">✔</span></a>
       <a href="#s2" data-sec="s2">2. 클러스터링 — 비슷한 판결끼리 묶기<span class="done-mark">✔</span></a>
       <a href="#s3" data-sec="s3">3. 차원축소 — 4,096차원을 2차원으로<span class="done-mark">✔</span></a>
       <a href="#s4" data-sec="s4">4. 판결문 지도 — 직접 탐색하기<span class="done-mark">✔</span></a>
@@ -240,11 +240,11 @@ p{margin:10px 0;}
 
     <!-- ============ S1 ============ -->
     <section class="section" id="s1">
-      <div class="sec-head"><span class="sec-num">1</span><h2>재료와 요청 — zip 하나, 문장 하나</h2></div>
-      <p class="sec-lead">재료는 임베딩 JSON 347개(각 파일에 서지 정보 + 4,096차원 본문 벡터 + 요약문)를 담은 zip 파일 하나. 요청은 실제로 이 한 문장이었습니다.</p>
+      <div class="sec-head"><span class="sec-num">1</span><h2>분석 요청과 처리 순서</h2></div>
+      <p class="sec-lead">④번 자료에서 임베딩을 뽑았다면 그 결과가 이미 <b>연동 폴더에 JSON 347개</b>로 저장되어 있습니다(각 파일에 서지 정보 + 4,096차원 본문 벡터 + 요약문). 파일을 따로 올릴 필요 없이, Cowork에 그 폴더의 파일을 쓰라고 지시하면 됩니다. 실제 요청은 이 두 문장이었습니다.</p>
       <div class="copy-block"><span class="cb-label">💬 실제 사용한 요청</span><button class="copy-btn" data-copy="p0">복사</button>
-<pre id="p0">첨부 zip 파일을 이용해서 클러스터링 + 차원축소 + 시각화 작업을 수행하고,
-이 과정을 html로 작성하라.</pre></div>
+<pre id="p0">연동 폴더에 저장된 판결문 임베딩 JSON 파일들을 이용해서
+클러스터링 + 차원축소 + 시각화 작업을 수행하고, 이 과정을 html로 작성하라.</pre></div>
       <div class="flow">
         <div class="step"><b>① 벡터 적재</b><span>JSON 347개 → 347 × 4,096 행렬</span></div>
         <span class="arrow">→</span>
@@ -263,7 +263,12 @@ p{margin:10px 0;}
       <div class="sec-head"><span class="sec-num">2</span><h2>클러스터링 — 비슷한 판결끼리 자동으로 묶기</h2></div>
       <p class="sec-lead">K-means는 "서로 가까운 벡터끼리 k개의 그룹으로 나누라"는 알고리즘입니다. 사람이 정해야 하는 것은 단 하나, <b>몇 개의 그룹(k)으로 나눌 것인가</b>입니다.</p>
       <h3>k 고르기 — 지표와 해석 가능성 사이</h3>
-      <p>k를 3~10으로 바꿔가며 실루엣 점수(군집이 얼마나 또렷한지, 높을수록 좋음)를 쟀습니다.</p>
+      <p>k를 3~10으로 바꿔가며 <b>실루엣 계수</b>를 쟀습니다.</p>
+
+      <div class="callout"><b class="cap">실루엣 계수</b>
+      <b>군집이 얼마나 또렷하게 나뉘었는지를 재는 값</b>입니다. 점 하나마다 두 거리를 비교합니다 — ① 같은 군집 안의 점들과 평균적으로 얼마나 가까운가, ② 가장 가까운 다른 군집의 점들과 얼마나 가까운가. ①이 ②보다 훨씬 가까우면 그 점은 제자리에 잘 들어간 것입니다. 모든 점의 값을 평균한 것이 그 k의 실루엣 계수입니다.
+      <p style="margin-top:10px;"><b>−1에서 1 사이</b>의 값을 가집니다. <b>1에 가까울수록</b> 군집이 뚜렷하게 분리된 것이고, <b>0 근처</b>면 점들이 군집 경계에 걸쳐 있다는 뜻이며, <b>음수</b>면 다른 군집에 들어가는 편이 나았다는 신호입니다. 계산은 AI가 하므로 <b>값을 읽고 판단하는 것</b>만 알면 됩니다.</p></div>
+
       <table class="doc-table">
         <thead><tr><th>k</th><th class="r">3</th><th class="r">4</th><th class="r"><b>5 (선택)</b></th><th class="r">6</th><th class="r">7</th><th class="r">8</th><th class="r">9</th><th class="r">10</th></tr></thead>
         <tbody><tr><td>실루엣</td><td class="r">.124</td><td class="r">.123</td><td class="r"><b>.100</b></td><td class="r">.093</td><td class="r">.102</td><td class="r">.107</td><td class="r">.103</td><td class="r">.102</td></tr></tbody>
@@ -318,7 +323,7 @@ p{margin:10px 0;}
         <div class="sub">막대 색 = 지도의 클러스터 색 · 괄호 안은 사건 수</div>
         <div id="chartWin"></div>
       </div>
-      <div class="insight"><span class="n">1</span><p><b>어느 동네 사건인지가 곧 승률이다.</b> 상급자의 폭언·모욕이라는 전형적 괴롭힘 서사(파랑)는 인용률 96%, 반면 증거가 진술뿐이거나 동료 갈등에 머문 사건(빨강)은 20%. 임베딩은 승패를 배운 적이 없는데도 <b>사실관계의 유형만으로 결과가 갈리는 구조</b>를 드러냈습니다.</p></div>
+      <div class="insight"><span class="n">1</span><p><b>클러스터가 소송 결과와 함께 나뉘었다.</b> 상급자의 폭언·모욕이라는 전형적 괴롭힘 서사(파랑)는 인용률 96%, 반면 증거가 진술뿐이거나 동료 갈등에 머문 사건(빨강)은 20%. 임베딩은 승패를 배운 적이 없는데도 <b>사실관계의 유형만으로 결과가 갈리는 구조</b>를 드러냈습니다.</p></div>
       <div class="insight"><span class="n">2</span><p><b>자살·유족소송(노랑)은 지도 오른쪽 아래의 외딴 섬이다.</b> 피해자 본인이 아닌 유족이 원고이고, 일실수입·인과관계가 쟁점이 되는 근본적으로 다른 사건 구조 — 임베딩이 이 차이를 정확히 분리했습니다.</p></div>
       <div class="insight"><span class="n">3</span><p><b>판결문 임베딩은 "사실 + 판단 논리"를 함께 담는다.</b> 기각형 클러스터가 형성된 것은 사실관계뿐 아니라 "증거만으로는 인정하기 어렵다"는 <b>기각 논리의 문장들</b>이 서로 닮았기 때문이기도 합니다. 무엇을 임베딩했는지(원문 전체 vs 사실관계만)에 따라 지도의 의미가 달라집니다.</p></div>
       <div class="insight"><span class="n">4</span><p><b>경계는 흐릿하다 — 지도는 가설이다.</b> 실루엣 0.1대가 말하듯 클러스터는 경향이지 칸막이가 아닙니다. "객관증거가 인정에 미치는 효과" 같은 패턴을 확정하려면 지도가 가리킨 사건들의 <b>판결문 원문으로 돌아가 직접 확인</b>하는 것이 다음 순서입니다.</p></div>
@@ -330,14 +335,14 @@ p{margin:10px 0;}
       <div class="sec-head"><span class="sec-num">6</span><h2>직접 해보기 + 체크리스트</h2></div>
       <p class="sec-lead">여러분의 임베딩 JSON(리뷰·초록·기사 무엇이든)으로 같은 지도를 만들 수 있습니다.</p>
       <div class="copy-block"><span class="cb-label">💬 재현용 프롬프트</span><button class="copy-btn" data-copy="p6">복사</button>
-<pre id="p6">첨부한 임베딩 JSON들로 다음을 해줘.
-(1) 벡터를 모아 K-means 클러스터링 — k는 3~10을 실루엣 점수로 비교하되,
-    각 군집의 대표 문서 요약을 보여줘서 내가 해석 가능한 k를 고르게 해줘
-(2) UMAP으로 2차원 좌표를 만들고 (난수 시드 고정)
-(3) 클러스터 색 + 마우스 오버 툴팁이 있는 산점도 지도를 HTML로 만들어줘</pre></div>
+<pre id="p6">연동 폴더의 임베딩 JSON 파일들로 클러스터링을 하고,
+결과를 지도처럼 한눈에 볼 수 있게 시각화해줘.
+
+바로 실행하지 말고 계획부터 세워서 보여줘. 기술적으로 결정해야 할 것이
+있으면 선택지와 함께 알려주고, 내가 고르게 해줘.</pre></div>
       <ul class="final-list">
         <li>클러스터링은 원본 고차원 벡터에서, 2D 좌표는 표시용으로만</li>
-        <li>k는 실루엣 점수 + 대표 문서 읽기(해석 가능성)로 결정</li>
+        <li>k는 실루엣 계수 + 대표 문서 읽기(해석 가능성)로 결정</li>
         <li>UMAP 지도에서 믿을 것은 "이웃", 믿지 말 것은 "먼 거리"</li>
         <li>난수 시드를 고정해야 같은 그림이 다시 나온다</li>
         <li>지도가 보여준 패턴은 가설 — 확인은 판결문 원문으로</li>
