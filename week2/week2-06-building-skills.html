@@ -209,12 +209,11 @@ p{margin:10px 0;}
     <div class="toc">
       <a href="#s1" data-sec="s1">1. 스킬이란 — AI에게 주는 업무 매뉴얼<span class="done-mark">✔</span></a>
       <a href="#s2" data-sec="s2">2. SKILL.md 해부<span class="done-mark">✔</span></a>
-      <a href="#s3" data-sec="s3">3. 데이터는 프로젝트에<span class="done-mark">✔</span></a>
-      <a href="#s4" data-sec="s4">4. 실전 — 판례 QA 스킬 만들기<span class="done-mark">✔</span></a>
-      <a href="#s5" data-sec="s5">5. 판단 기준까지 스킬에 담기<span class="done-mark">✔</span></a>
-      <a href="#s6" data-sec="s6">6. 스킬을 쓰는 여러 방법<span class="done-mark">✔</span></a>
-      <a href="#s7" data-sec="s7">7. 실전 사례 — 7년 치 컬럼을 스킬로<span class="done-mark">✔</span></a>
-      <a href="#s8" data-sec="s8">8. 마무리 체크리스트<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 실전 — 판례 QA 스킬 만들기<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 판단 기준까지 스킬에 담기<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 스킬을 쓰는 여러 방법<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. 실전 사례 — 7년 치 컬럼을 스킬로<span class="done-mark">✔</span></a>
+      <a href="#s7" data-sec="s7">7. 마무리 체크리스트<span class="done-mark">✔</span></a>
     </div>
   </nav>
 
@@ -239,7 +238,7 @@ p{margin:10px 0;}
       ③에서 판결문을 마크다운으로 변환하면서 <b>2줄 요약을 함께 만들어 두었습니다.</b> 그 요약을 모은 목록 하나면 347건 전체가 한눈에 들어옵니다. 질문이 들어오면 AI는 <b>이 목록을 훑어 관련 사건을 고르고, 고른 사건만 전문 파일을 열어</b> 읽습니다. 사람이 판례집 목차를 훑고 필요한 쪽만 펴 보는 것과 같은 순서입니다.</div>
 
       <div class="flow">
-        <div class="step"><b>① 질문</b><span>"동료들의 따돌림도 회사 책임인가"</span></div>
+        <div class="step"><b>① 질문</b><span>"직원들이 따돌림 시키면 회사가 손해배상해야 하나"</span></div>
         <span class="arrow">→</span>
         <div class="step"><b>② 요지 목록 훑기</b><span>347건 2줄 요약을 읽고 관련 사건 선별</span></div>
         <span class="arrow">→</span>
@@ -300,77 +299,14 @@ p{margin:10px 0;}
 
     <!-- ============ S3 ============ -->
     <section class="section" id="s3">
-      <div class="sec-head"><span class="sec-num">3</span><h2>데이터는 프로젝트에 — 스킬과 파일의 분업</h2></div>
-      <p class="sec-lead">이 절차가 돌아가려면 AI가 <b>요지 목록과 판결문 전문 파일을 읽을 수 있어야</b> 합니다. 판결문 347건을 스킬 폴더에 욱여넣을 수도 있지만, 그러면 데이터가 바뀔 때마다 스킬을 다시 만들어야 합니다. 자리를 나누는 것이 정답입니다 — <b>절차는 스킬에, 데이터는 프로젝트에.</b></p>
-
-      <p>Claude의 <b>프로젝트(Projects)</b>는 대화 여러 개가 공유하는 자료실입니다. 프로젝트에 파일을 올려 두면, 그 프로젝트 안에서 시작한 대화는 어느 것이든 그 파일을 읽을 수 있습니다. 스킬의 절차가 "프로젝트의 요지 목록을 읽어라"라고 지시하면 연결이 완성됩니다.</p>
-
-      <div class="diagram-card">
-        <h4>절차 실행의 세 자리 — 절차 · 데이터 · 질문</h4>
-        <div class="sub">스킬은 얇게(절차만), 프로젝트는 두껍게(데이터), 대화는 가볍게(질문만)</div>
-        <svg viewBox="0 0 680 330" role="img" aria-label="스킬-프로젝트-대화 구성도">
-          <!-- 스킬 -->
-          <rect x="8" y="14" width="200" height="120" rx="12" fill="#f7efe3" stroke="#e8d9bd"/>
-          <text x="108" y="40" text-anchor="middle" font-size="13" font-weight="900" fill="#8a5a13">스킬 = 절차</text>
-          <rect x="24" y="52" width="168" height="26" rx="6" fill="#fff" stroke="#e8d9bd"/>
-          <text x="108" y="69" text-anchor="middle" font-size="11" font-family="monospace" fill="#52514e">case-qa/SKILL.md</text>
-          <text x="108" y="98" text-anchor="middle" font-size="10.5" fill="#8a6f47">"요지 훑기 → 전문 읽기</text>
-          <text x="108" y="114" text-anchor="middle" font-size="10.5" fill="#8a6f47">→ 사건번호 인용해 답하기"</text>
-          <!-- 프로젝트 -->
-          <rect x="240" y="14" width="200" height="120" rx="12" fill="#eaf3fb" stroke="#9dc4de"/>
-          <text x="340" y="40" text-anchor="middle" font-size="13" font-weight="900" fill="#1b6fa6">프로젝트 = 데이터</text>
-          <rect x="256" y="52" width="168" height="24" rx="6" fill="#fff" stroke="#9dc4de"/>
-          <text x="340" y="68" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#2d4a63">rulings_summary.csv (347건)</text>
-          <rect x="256" y="82" width="168" height="24" rx="6" fill="#fff" stroke="#9dc4de"/>
-          <text x="340" y="98" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#2d4a63">rulings/ 전문 347개</text>
-          <text x="340" y="122" text-anchor="middle" font-size="10" fill="#7d97ab">대화들이 공유하는 자료실</text>
-          <!-- 대화 -->
-          <rect x="472" y="14" width="200" height="120" rx="12" fill="#e7f2ea" stroke="#bfe0c9"/>
-          <text x="572" y="40" text-anchor="middle" font-size="13" font-weight="900" fill="#2f765b">대화 = 질문</text>
-          <rect x="488" y="56" width="168" height="42" rx="6" fill="#fff" stroke="#bfe0c9"/>
-          <text x="572" y="73" text-anchor="middle" font-size="10.5" fill="#2b4a37">"동료들의 따돌림도</text>
-          <text x="572" y="89" text-anchor="middle" font-size="10.5" fill="#2b4a37">배상받을 수 있나?"</text>
-          <text x="572" y="122" text-anchor="middle" font-size="10" fill="#628a72">프로젝트 안에서 시작한 대화</text>
-          <!-- 합류 화살표 -->
-          <path d="M108 134 v34 q0 14 14 14 h190" stroke="#b8792e" stroke-width="2.5" fill="none"/>
-          <path d="M340 134 v48" stroke="#2e9bdb" stroke-width="2.5" fill="none"/>
-          <path d="M572 134 v34 q0 14 -14 14 h-190" stroke="#2f765b" stroke-width="2.5" fill="none"/>
-          <path d="M340 182 l-6 -10 h12 z" fill="#2e9bdb"/>
-          <!-- 실행 박스 -->
-          <rect x="120" y="192" width="440" height="120" rx="12" fill="#1b6fa6"/>
-          <text x="340" y="220" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">절차 실행 (스킬이 지휘)</text>
-          <text x="340" y="245" text-anchor="middle" font-size="11.5" fill="#cde2fb">① 요지 목록 347건을 읽고 관련 사건 선별</text>
-          <text x="340" y="266" text-anchor="middle" font-size="11.5" fill="#cde2fb">② 고른 사건의 전문 파일을 rulings/에서 읽기</text>
-          <text x="340" y="287" text-anchor="middle" font-size="11.5" fill="#cde2fb">③ 전문을 근거로 사건번호·판시 대목을 인용해 답변</text>
-        </svg>
-      </div>
-
-      <h3>준비 순서</h3>
-      <div class="flow">
-        <div class="step"><b>① 프로젝트 만들기</b><span>Claude에서 새 프로젝트 생성 — 예: "판례 코퍼스"</span></div>
-        <span class="arrow">→</span>
-        <div class="step"><b>② 요지 목록 올리기</b><span>rulings_summary.csv (③에서 만든 347건 2줄 요약)</span></div>
-        <span class="arrow">→</span>
-        <div class="step"><b>③ 전문 올리기</b><span>판결문 전문 파일들 (rulings/ 법원_사건번호.md 347개)</span></div>
-        <span class="arrow">→</span>
-        <div class="step"><b>④ 스킬 설치</b><span>case-qa 설치 후, 이 프로젝트 안에서 질문 시작</span></div>
-      </div>
-
-      <div class="tip-card"><b>분업의 보상</b> — 다음 학기에 판례가 500건으로 늘면? <b>프로젝트의 파일만 갈아끼우면 됩니다.</b> 스킬(절차)은 한 글자도 고칠 필요가 없습니다. 반대로 절차를 개선하면(예: "기각 사건도 반드시 1건 이상 대조하라") 스킬만 고치면 모든 대화에 즉시 적용됩니다.</div>
-
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>절차(스킬)와 데이터(프로젝트)를 나누는 이유를 설명할 수 있다</span></label></div>
-    </section>
-
-    <!-- ============ S4 ============ -->
-    <section class="section" id="s4">
-      <div class="sec-head"><span class="sec-num">4</span><h2>실전 — 판례 QA 스킬 만들기</h2></div>
+      <div class="sec-head"><span class="sec-num">3</span><h2>실전 — 판례 QA 스킬 만들기</h2></div>
       <p class="sec-lead">SKILL.md도 손으로 쓸 필요가 없습니다. 지금까지처럼 <b>원하는 것을 서술하면 AI가 파일을 만들어 줍니다.</b> 아래는 실제로 쓸 수 있는 요청과, 그 결과물입니다.</p>
 
       <div class="copy-block"><span class="cb-label">💬 스킬 제작을 맡기는 프롬프트</span><button class="copy-btn" data-copy="k1">복사</button>
 <pre id="k1">판례 질의응답 스킬을 만들어줘.
 
 - 직장 내 괴롭힘 판례(347건)에 대한 질문이 오면 발동
-- 절차: 프로젝트의 rulings_summary.csv를 먼저 훑고 관련 사건을 고른 뒤,
+- 절차: 폴더의 rulings_summary.csv를 먼저 훑고 관련 사건을 고른 뒤,
   고른 사건은 반드시 rulings/ 폴더의 전문 파일을 읽고,
   사건번호와 판시 대목을 인용해서 답할 것. 요지만 보고 답하지 말 것.
 - 관련 사건이 없으면 없다고 답할 것 (지어내지 말 것)
@@ -390,9 +326,9 @@ description: 직장 내 괴롭힘 판례 코퍼스(347건)에 대한 질문에 �
 # 판례 두 단계 질의응답
 
 ## 절차
-1. 프로젝트의 `rulings_summary.csv`(347건 2줄 요약)를 읽고,
+1. 작업 폴더의 `rulings_summary.csv`(347건 2줄 요약)를 읽고,
    질문과 관련된 사건을 고른다.
-2. 고른 사건은 **반드시** 프로젝트의 `rulings/` 폴더에서
+2. 고른 사건은 **반드시** `rulings/` 폴더에서
    판결문 전문 파일을 읽는다. 요지만 보고 답하지 않는다.
 3. 전문을 근거로 답한다. 인정 사건과 기각 사건이 함께 있으면
    갈림길이 된 사정을 대비해서 설명한다.
@@ -407,18 +343,18 @@ description: 직장 내 괴롭힘 판례 코퍼스(347건)에 대한 질문에 �
 
       <h3>설치 후 — 이렇게 발동됩니다</h3>
       <div class="trigger-demo">
-        <div class="bubble user">동료 직원들의 따돌림도 손해배상을 받을 수 있어?</div>
+        <div class="bubble user">직원들이 따돌림 시키면 회사가 손해배상해야 하나?</div>
         <div class="skill-chip">⚙ case-qa 스킬 사용 중 — 요지 훑기 → 전문 3건 읽기</div>
         <div class="bubble ai">코퍼스의 관련 사건을 검토하면, 동료에 의한 따돌림도 손해배상이 인정될 수 있으나 갈림길은 <b>사용자(회사)가 알았거나 알 수 있었는지</b>입니다. [대구지방법원 2024가단138550]은 "…"라고 판시하며 위자료를 인정한 반면, [울산지방법원 2022가단128995]는 회사가 인지 후 즉시 조치한 점을 들어 기각했습니다…<small>참고한 사건: 대구 2024가단138550 · 수원 2022가단546552 · 울산 2022가단128995</small></div>
       </div>
       <div class="tip-card"><b>발동이 안 되면</b> — 질문이 description과 잘 안 맞으면 스킬 없이 답할 때가 있습니다. 그때는 <b>"case-qa 스킬을 써서 답해줘"</b>라고 한 줄만 붙이면 됩니다. 명시적 지시는 기본 동작을 만드는 것이 아니라 <b>보장</b>하는 장치입니다.</div>
 
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>프롬프트로 스킬 파일을 만들 수 있다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>프롬프트로 스킬 파일을 만들 수 있다</span></label></div>
     </section>
 
-    <!-- ============ S5 ============ -->
-    <section class="section" id="s5">
-      <div class="sec-head"><span class="sec-num">5</span><h2>판단 기준까지 스킬에 담기</h2></div>
+    <!-- ============ S4 ============ -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>판단 기준까지 스킬에 담기</h2></div>
       <p class="sec-lead">지금 만든 스킬에는 <b>데이터밖에 없습니다.</b> "요지를 훑고 전문을 읽어라"는 <b>어디서 찾을지</b>를 정한 절차이지, <b>무엇을 기준으로 판단할지</b>는 아무것도 정하지 않았습니다. 인사 담당자가 정작 필요한 것은 후자입니다.</p>
 
       <p>판결문은 개별 사건의 결론과 이유를 담고 있지만, 판단 기준 자체를 정리해 주지는 않습니다. 그런데 <b>그 기준은 이미 문서로 나와 있습니다</b> — 직장 내 괴롭힘 영역만 해도 이런 자료들이 있습니다.</p>
@@ -429,10 +365,10 @@ description: 직장 내 괴롭힘 판례 코퍼스(347건)에 대한 질문에 �
         <div class="concept"><div class="ico">🏢</div><b>사내 규정</b><span>취업규칙·징계 양정 기준·조사 절차 규정 — 우리 조직에서 실제로 적용되는 기준.</span></div>
       </div>
 
-      <p>이 자료들을 <b>프로젝트에 함께 올리고</b>, AI에게 판단 방법을 정리하게 시키면 스킬이 <b>"찾기"에서 "판단하기"로</b> 올라갑니다.</p>
+      <p>이 자료들을 <b>작업 폴더에 함께 넣고</b>, AI에게 판단 방법을 정리하게 시키면 스킬이 <b>"찾기"에서 "판단하기"로</b> 올라갑니다.</p>
 
       <div class="copy-block"><span class="cb-label">💬 판단 기준을 스킬에 반영하는 프롬프트</span><button class="copy-btn" data-copy="pg">복사</button>
-<pre id="pg">프로젝트에 올린 가이드라인과 연구보고서를 읽고, 직장 내 괴롭힘을
+<pre id="pg">폴더에 넣어 둔 가이드라인과 연구보고서를 읽고, 직장 내 괴롭힘을
 판단할 때 확인해야 할 요건과 검토 순서를 정리해줘.
 
 정리한 기준을 case-qa 스킬에 넣어서, 앞으로 질문에 답할 때
@@ -441,32 +377,35 @@ description: 직장 내 괴롭힘 판례 코퍼스(347건)에 대한 질문에 �
 절차를 고쳐줘. 기준의 출처(문서 이름과 항목)도 함께 밝히게 해줘.</pre></div>
 
       <div class="callout ok"><b class="cap">기준이 길면 딸린 파일로</b>
-      §2의 <b>3단계 로딩</b>을 떠올려 보세요. 판단 기준이 길다면 SKILL.md 본문에 다 넣지 말고 스킬 폴더에 <code>판단기준.md</code>로 따로 두고, 본문에서 "판단이 필요하면 <code>판단기준.md</code>를 읽어라"라고 지시하면 됩니다. 그러면 <b>기준이 필요한 질문에서만</b> 그 파일이 읽힙니다.</div>
+      §1의 <b>3단계 로딩</b>을 떠올려 보세요. 판단 기준이 길다면 SKILL.md 본문에 다 넣지 말고 스킬 폴더에 <code>판단기준.md</code>로 따로 두고, 본문에서 "판단이 필요하면 <code>판단기준.md</code>를 읽어라"라고 지시하면 됩니다. 그러면 <b>기준이 필요한 질문에서만</b> 그 파일이 읽힙니다.</div>
 
       <div class="callout caution"><b class="cap">기준을 넣었다고 판단이 끝나는 것은 아니다</b>
       가이드라인은 법이 아니고, 사건은 늘 문서에 없는 사정을 포함합니다. 스킬이 하는 일은 <b>확인해야 할 항목을 빠뜨리지 않게 하고, 판단의 근거를 남기게 하는 것</b>까지입니다. <b>최종 판단은 사람의 몫</b>이며, 그래서 위 프롬프트에 <b>출처를 밝히게 하는 지시</b>를 넣었습니다 — 근거를 확인할 수 있어야 사람이 검토할 수 있습니다.</div>
 
-      <div class="tip-card"><b>여러분의 업무에 적용하면</b> — 반복 판단이 있는 일이라면 같은 구조가 통합니다. 심사·평가·검토 업무에는 대개 <b>기준을 적어 둔 문서</b>(지침·매뉴얼·평가표)와 <b>과거 사례</b>가 함께 있습니다. 기준은 스킬에, 사례는 프로젝트에 두면 §3의 분업이 그대로 확장됩니다.</div>
+      <div class="tip-card"><b>여러분의 업무에 적용하면</b> — 반복 판단이 있는 일이라면 같은 구조가 통합니다. 심사·평가·검토 업무에는 대개 <b>기준을 적어 둔 문서</b>(지침·매뉴얼·평가표)와 <b>과거 사례</b>가 함께 있습니다. 기준은 스킬에, 사례는 폴더에 두면 같은 구조가 그대로 확장됩니다.</div>
 
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>데이터에 더해 판단 기준을 스킬에 담는 방법을 이해했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>데이터에 더해 판단 기준을 스킬에 담는 방법을 이해했다</span></label></div>
     </section>
 
-    <!-- ============ S6 ============ -->
-    <section class="section" id="s6">
-      <div class="sec-head"><span class="sec-num">6</span><h2>스킬을 쓰는 여러 가지 방법</h2></div>
+    <!-- ============ S5 ============ -->
+    <section class="section" id="s5">
+      <div class="sec-head"><span class="sec-num">5</span><h2>스킬을 쓰는 여러 가지 방법</h2></div>
       <p class="sec-lead">스킬은 결국 <b>파일 하나</b>입니다. 그래서 쓰는 방법도 하나가 아닙니다 — <b>작업 폴더에 그냥 넣어 두는 것</b>부터 <b>계정에 설치해 어디서나 쓰는 것</b>까지, 필요한 만큼만 고르면 됩니다.</p>
 
       <h3>방법 ① — 작업 폴더에 파일로 두기 (Cowork에서 가장 간단)</h3>
       <p>Cowork로 작업할 때는 <b>연동한 폴더에 <code>SKILL.md</code>를 저장해 두기만 해도 됩니다.</b> 그 폴더에서 작업하는 동안 AI가 파일을 읽고 절차를 적용합니다. 별도의 설치 과정이 없고, 스킬을 고치고 싶으면 그 파일을 열어 고치면 그만입니다.</p>
       <div class="tip-card"><b>이 방법이 잘 맞는 경우</b> — 이번 주 판례 실습처럼 <b>특정 폴더에서만 하는 작업</b>. 데이터도 절차도 그 폴더 안에 함께 있으니, 폴더째 동료에게 넘기면 그대로 재현됩니다.</div>
 
+      <div class="callout ok"><b class="cap">그래도 자리는 나눠 둡니다 — 절차는 스킬에, 데이터는 파일로</b>
+      같은 폴더에 있더라도 <b>판결문을 SKILL.md 안에 적어 넣지는 마세요.</b> 스킬에는 절차만 두고 데이터는 별도 파일로 두면, 다음 학기에 판례가 500건으로 늘어도 <b>파일만 갈아끼우면 됩니다</b> — 스킬은 한 글자도 고칠 필요가 없습니다. 반대로 절차를 개선하면(예: "기각 사건도 반드시 1건 이상 대조하라") 스킬만 고쳐도 이후 모든 질문에 적용됩니다.</div>
+
       <h3>방법 ② — 계정에 설치해 어디서나 쓰기</h3>
-      <p>같은 스킬을 여러 프로젝트에서 반복해 쓰게 되면, 그때 <b>설치</b>를 고려하면 됩니다. 설치해 두면 <b>폴더와 무관하게</b> 관련 질문이 올 때마다 Claude가 <b>알아서 그 스킬을 골라 씁니다.</b> 스킬을 여러 개 설치해 두면 질문의 성격에 따라 그중 맞는 것을 꺼내 쓰는 식입니다(§1의 3단계 로딩).</p>
+      <p>같은 스킬을 여러 폴더·여러 작업에서 반복해 쓰게 되면, 그때 <b>설치</b>를 고려하면 됩니다. 설치해 두면 <b>폴더와 무관하게</b> 관련 질문이 올 때마다 Claude가 <b>알아서 그 스킬을 골라 씁니다.</b> 스킬을 여러 개 설치해 두면 질문의 성격에 따라 그중 맞는 것을 꺼내 쓰는 식입니다(§1의 3단계 로딩).</p>
 
       <table class="doc-table">
         <thead><tr><th style="width:150px">어디서 쓰나</th><th>두는 자리</th></tr></thead>
         <tbody>
-          <tr><td><b>Cowork</b></td><td><b>연동 폴더에 <code>SKILL.md</code> 저장</b>(방법 ①). §4의 프롬프트로 만들면 완성된 파일을 대화로 건네주므로, 받아서 폴더에 저장하면 끝입니다.</td></tr>
+          <tr><td><b>Cowork</b></td><td><b>연동 폴더에 <code>SKILL.md</code> 저장</b>(방법 ①). §3의 프롬프트로 만들면 완성된 파일을 대화로 건네주므로, 받아서 폴더에 저장하면 끝입니다.</td></tr>
           <tr><td><b>Claude 앱</b><br/><small>(웹·데스크톱)</small></td><td>스킬 폴더를 <b>ZIP으로 압축</b> → 설정의 <b>스킬(Skills)</b> 메뉴에서 업로드. 목록에서 스위치로 켜고 끌 수 있습니다.</td></tr>
           <tr><td><b>Claude Code</b></td><td>폴더째 복사: 계정 전체에 쓰려면 <code>~/.claude/skills/case-qa/</code>, 특정 작업 폴더에서만 쓰려면 그 폴더의 <code>.claude/skills/case-qa/</code></td></tr>
         </tbody>
@@ -483,12 +422,12 @@ description: 직장 내 괴롭힘 판례 코퍼스(347건)에 대한 질문에 �
       </div>
       <div class="tip-card"><b>안 불러오는 것 같으면</b> — <b>"case-qa 스킬을 써서 답해줘"</b>라고 한 줄 붙이면 됩니다. 그래도 어색하면 §2의 <code>description</code>을 손볼 차례입니다.</div>
 
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>폴더에 두는 방법과 설치하는 방법의 차이를 안다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>폴더에 두는 방법과 설치하는 방법의 차이를 안다</span></label></div>
     </section>
 
     <!-- ============ S6 ============ -->
-    <section class="section" id="s7">
-      <div class="sec-head"><span class="sec-num">7</span><h2>실전 사례 — 7년 치 컬럼을 스킬 파일 한 장으로</h2></div>
+    <section class="section" id="s6">
+      <div class="sec-head"><span class="sec-num">6</span><h2>실전 사례 — 7년 치 컬럼을 스킬 파일 한 장으로</h2></div>
       <p class="sec-lead">판례 QA는 수업용 예제였습니다. 이번에는 강사가 <b>실제 업무에서 만든 스킬</b>을 보여드립니다 — 재료는 중앙일보에 7년간 연재한 컬럼 「김병필의 인공지능 개척시대」(2019.01~2026.03, 총 83회) 전체입니다.</p>
 
       <h3>만든 과정 — 지시는 한 문장이었습니다</h3>
@@ -526,17 +465,17 @@ description: 직장 내 괴롭힘 판례 코퍼스(347건)에 대한 질문에 �
 
       <div class="tip-card"><b>여러분에게 적용하면</b> — 반복해 온 글쓰기가 있다면(보고서, 이메일, 리뷰, 논문 초록…) 같은 방법이 통합니다. 과거 산출물을 폴더에 모아 연동하고 "이 스타일로 쓰는 스킬 파일을 만들어 줘" 한 문장이면, 여러분의 축적이 지침이 됩니다.</div>
 
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s7" /><span>내 과거 산출물로 스타일 스킬을 만드는 방법을 이해했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>내 과거 산출물로 스타일 스킬을 만드는 방법을 이해했다</span></label></div>
     </section>
 
     <!-- ================= SECTION 7 ================= -->
-    <section class="section" id="s8">
-      <div class="sec-head"><span class="sec-num">8</span><h2>마무리 체크리스트</h2></div>
+    <section class="section" id="s7">
+      <div class="sec-head"><span class="sec-num">7</span><h2>마무리 체크리스트</h2></div>
       <ul class="final-list">
         <li>스킬 = 반복 프롬프트를 파일로 저장한 업무 매뉴얼 — 관련 질문이 오면 자동 발동</li>
         <li>SKILL.md = 머리말(name + description = 발동 조건) + 본문(절차)</li>
         <li>발동이 이상하면 절차보다 description부터 — "무엇을 + 언제"가 들어 있는가</li>
-        <li>절차는 스킬에, 데이터는 프로젝트에 — 데이터가 바뀌면 프로젝트만, 절차가 바뀌면 스킬만</li>
+        <li>절차는 스킬에, 데이터는 폴더에 — 데이터가 바뀌면 파일만 갈아끼우고 스킬은 그대로</li>
         <li>데이터만으로는 "찾기"까지다 — 가이드라인·연구보고서·사내 규정을 올려 <b>판단 기준</b>까지 스킬에 담으면 "판단하기"가 된다</li>
         <li>기준을 넣어도 최종 판단은 사람의 몫 — 그래서 근거의 출처를 밝히게 한다</li>
         <li>쓰는 방법은 둘 — 작업 폴더에 <code>SKILL.md</code>를 두거나(Cowork에서 가장 간단), 계정에 설치해 어디서나 자동으로 골라 쓰게 하거나</li>
@@ -544,10 +483,10 @@ description: 직장 내 괴롭힘 판례 코퍼스(347건)에 대한 질문에 �
         <li>스킬 파일은 특정 모델 전용이 아니다 — 모델마다 재현도를 비교해 골라 쓴다</li>
       </ul>
       <div class="next-card-grid">
-        <div class="next-card"><b>직접 해보기 — 내 스킬 만들기</b><span>이번 주에 수집한 내 데이터(요지 목록 + 본문 파일)를 프로젝트에 올리고, §4 프롬프트를 변형해 <b>나만의 질의응답 스킬</b>을 만들어 설치해 보세요. 내 업무에 판단 기준을 적어 둔 문서(지침·매뉴얼·평가표)가 있다면 §5처럼 함께 올려 기준까지 반영해 보세요. 여력이 되면 §7처럼 <b>내가 반복해 온 글(보고서·이메일)의 스타일 스킬</b>도 하나 만들어 보세요.</span></div>
+        <div class="next-card"><b>직접 해보기 — 내 스킬 만들기</b><span>이번 주에 수집한 내 데이터(요지 목록 + 본문 파일)가 있는 폴더에서 §3 프롬프트를 변형해 <b>나만의 질의응답 스킬</b>을 만들어 보세요. 내 업무에 판단 기준을 적어 둔 문서(지침·매뉴얼·평가표)가 있다면 §4처럼 함께 넣어 기준까지 반영해 보세요. 여력이 되면 §6처럼 <b>내가 반복해 온 글(보고서·이메일)의 스타일 스킬</b>도 하나 만들어 보세요.</span></div>
         <div class="next-card"><b>다음 강의 — 논문 계보도 (⑦)</b><span>마지막 강의 ⑦(논문 계보도)에서 같은 파이프라인을 논문 데이터에 얹어 <b>네트워크 분석</b>까지 보고, 3주차로 넘어갑니다 — 이번 주에 만든 임베딩으로 <b>검색엔진과 RAG 챗봇</b>을 만들어 세상에 공개합니다. 절차를 파일로 남기는 오늘의 습관은 4주차의 <b>루틴 자동화</b>로도 이어집니다 — 스킬이 "어떻게"라면 루틴은 "언제"입니다.</span></div>
       </div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s8" /><span>스킬 만들기 강의를 마쳤다!</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s7" /><span>스킬 만들기 강의를 마쳤다!</span></label></div>
     </section>
 
       <a class="back-home" href="index.html">
