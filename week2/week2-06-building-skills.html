@@ -222,14 +222,32 @@ p{margin:10px 0;}
 
     <div class="hero">
       <span class="hero-kicker">WEEK 2 · STEP 6 — 나만의 스킬 만들기</span>
-      <h1>매번 긴 프롬프트 대신 —<br/>반복 절차를 스킬 한 장에 담기</h1>
-      <p>이번 주 내내 우리는 좋은 프롬프트를 여럿 만들었습니다 — 수집의 4요소, 두 단계 수집, EDA 지시. 그런데 이런 프롬프트에는 약점이 있습니다: 다음에 또 쓰려면 <b>사람이 기억해서 다시 써야</b> 합니다. 예컨대 판례 코퍼스에 질문할 때마다 "요지 목록을 훑고, 고른 사건은 반드시 전문을 읽고 답하라"는 절차를 반복해 붙여넣는 대신, 그 절차를 <b>SKILL.md 파일 하나</b>로 저장해 두면 관련 질문이 나올 때마다 AI가 <b>알아서 같은 절차로</b> 움직입니다. 오늘은 이 파일을 만들고 설치하는 법을 배웁니다.</p>
+      <h1>수집한 자료에 반복해서 묻기 —<br/>절차를 스킬 한 장에 담기</h1>
+      <p>여러분이 <b>직장 내 괴롭힘 사건을 담당하는 인사 담당자</b>라고 해봅시다. ③에서 수집한 판결문 347건이 폴더에 쌓여 있고, 사건이 생길 때마다 "이런 경우도 회사 책임이 인정됐나"를 확인해야 합니다. <b>같은 방식의 질문을 계속 반복하게 됩니다.</b> 오늘은 그 반복을 <b>SKILL.md 파일 한 장</b>으로 만들어, 관련 질문이 올 때마다 AI가 알아서 같은 절차로 답하게 만듭니다.</p>
     </div>
 
     <!-- ============ S1 ============ -->
     <section class="section" id="s1">
       <div class="sec-head"><span class="sec-num">1</span><h2>스킬이란 — AI에게 주는 업무 매뉴얼</h2></div>
-      <p class="sec-lead">"요지 목록을 훑고, 고른 사건은 전문을 읽고 답하라" — 이 두 단계 질의응답 절차는 잘 작동하지만 약점이 하나 있습니다: <b>사람이 매번 기억해서 다시 써야 한다</b>는 것. 하루 지나 절차의 한 줄("요지만 보고 답하지 마")을 빼먹으면 답변 품질이 조용히 떨어집니다.</p>
+      <p class="sec-lead">인사 담당자가 반복하는 일은 이런 모양입니다 — 새 사건이 들어오면 "비슷한 판결이 있었나, 회사 책임은 어디까지 인정됐나"를 확인하는 것. 수집해 둔 판결문 347건이 답을 갖고 있지만, <b>그대로 물어볼 수는 없습니다.</b></p>
+
+      <div class="callout caution"><b class="cap">347건을 한꺼번에 읽힐 수는 없다</b>
+      판결문 한 건이 평균 8,500자입니다. 347건이면 <b>300만 자에 가깝습니다.</b> 이만한 분량을 질문 한 번에 전부 담을 수는 없고, 담을 수 있다 해도 질문할 때마다 전부 다시 읽히면 느리고 비쌉니다.</div>
+
+      <div class="callout ok"><b class="cap">해법 — 요지 목록만 주고, 나머지는 알아서 찾아 읽게 한다</b>
+      ③에서 판결문을 마크다운으로 변환하면서 <b>2줄 요약을 함께 만들어 두었습니다.</b> 그 요약을 모은 목록 하나면 347건 전체가 한눈에 들어옵니다. 질문이 들어오면 AI는 <b>이 목록을 훑어 관련 사건을 고르고, 고른 사건만 전문 파일을 열어</b> 읽습니다. 사람이 판례집 목차를 훑고 필요한 쪽만 펴 보는 것과 같은 순서입니다.</div>
+
+      <div class="flow">
+        <div class="step"><b>① 질문</b><span>"동료들의 따돌림도 회사 책임인가"</span></div>
+        <span class="arrow">→</span>
+        <div class="step"><b>② 요지 목록 훑기</b><span>347건 2줄 요약을 읽고 관련 사건 선별</span></div>
+        <span class="arrow">→</span>
+        <div class="step"><b>③ 전문 읽기</b><span>고른 사건만 전문 파일을 열어 읽음</span></div>
+        <span class="arrow">→</span>
+        <div class="step"><b>④ 답변</b><span>사건번호와 판시 대목을 인용</span></div>
+      </div>
+
+      <p>이 절차는 잘 작동하지만 약점이 하나 있습니다 — <b>질문할 때마다 사람이 이 지시를 다시 써야 합니다.</b> 하루 지나 한 줄("요지만 보고 답하지 마")을 빼먹으면 답변 품질이 조용히 떨어집니다.</p>
 
       <p><b>스킬(Skill)</b>은 이 절차를 파일로 저장해 AI에게 넘겨주는 장치입니다. 신입 직원에게 건네는 업무 매뉴얼처럼, "이런 질문이 오면 → 이 순서로 일하라"를 적어 둔 <b>마크다운 파일(SKILL.md)</b>이며, 한 번 설치하면 관련 질문이 올 때마다 자동으로 발동됩니다.</p>
 
@@ -249,7 +267,7 @@ p{margin:10px 0;}
           <tr><td><b>③ 딸린 파일</b></td><td>절차가 지시할 때</td><td>스킬 폴더에 같이 넣어 둔 참고 문서·스크립트</td></tr>
         </tbody>
       </table>
-      <div class="tip-card"><b>어디서 본 구조 아닌가요?</b> — "목차는 항상 보고, 본문은 골라 읽는다". 우리의 판례 질의응답 절차(요지 통째 + 전문 골라 읽기)와 같은 원리입니다. 이런 구조는 3주차(RAG와 Long Context)에서 '하이브리드'라는 이름으로 다시 만나게 됩니다.</div>
+      <div class="tip-card"><b>위에서 본 구조와 같습니다</b> — "목차는 항상 보고, 본문은 골라 읽는다". 스킬을 읽어 들이는 방식 자체가 우리가 방금 세운 질의응답 절차(요지 목록 훑기 → 고른 사건만 전문 읽기)와 같은 원리입니다.</div>
 
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>스킬이 무엇이고 언제 발동되는지 이해했다</span></label></div>
     </section>
@@ -301,7 +319,7 @@ p{margin:10px 0;}
           <rect x="240" y="14" width="200" height="120" rx="12" fill="#eaf3fb" stroke="#9dc4de"/>
           <text x="340" y="40" text-anchor="middle" font-size="13" font-weight="900" fill="#1b6fa6">프로젝트 = 데이터</text>
           <rect x="256" y="52" width="168" height="24" rx="6" fill="#fff" stroke="#9dc4de"/>
-          <text x="340" y="68" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#2d4a63">판결요지_목록.md (347건)</text>
+          <text x="340" y="68" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#2d4a63">rulings_summary.csv (347건)</text>
           <rect x="256" y="82" width="168" height="24" rx="6" fill="#fff" stroke="#9dc4de"/>
           <text x="340" y="98" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#2d4a63">rulings/ 전문 347개</text>
           <text x="340" y="122" text-anchor="middle" font-size="10" fill="#7d97ab">대화들이 공유하는 자료실</text>
@@ -330,9 +348,9 @@ p{margin:10px 0;}
       <div class="flow">
         <div class="step"><b>① 프로젝트 만들기</b><span>Claude에서 새 프로젝트 생성 — 예: "판례 코퍼스"</span></div>
         <span class="arrow">→</span>
-        <div class="step"><b>② 요지 목록 올리기</b><span>판결요지_목록.md (사건번호·법원·결과·2줄 요지)</span></div>
+        <div class="step"><b>② 요지 목록 올리기</b><span>rulings_summary.csv (③에서 만든 347건 2줄 요약)</span></div>
         <span class="arrow">→</span>
-        <div class="step"><b>③ 전문 올리기</b><span>판결문 전문 파일들 (rulings/ 347개)</span></div>
+        <div class="step"><b>③ 전문 올리기</b><span>판결문 전문 파일들 (rulings/ 법원_사건번호.md 347개)</span></div>
         <span class="arrow">→</span>
         <div class="step"><b>④ 스킬 설치</b><span>case-qa 설치 후, 이 프로젝트 안에서 질문 시작</span></div>
       </div>
@@ -351,7 +369,7 @@ p{margin:10px 0;}
 <pre id="k1">판례 질의응답 스킬을 만들어줘.
 
 - 직장 내 괴롭힘 판례(347건)에 대한 질문이 오면 발동
-- 절차: 프로젝트의 판결요지_목록.md를 먼저 훑고 관련 사건을 고른 뒤,
+- 절차: 프로젝트의 rulings_summary.csv를 먼저 훑고 관련 사건을 고른 뒤,
   고른 사건은 반드시 rulings/ 폴더의 전문 파일을 읽고,
   사건번호와 판시 대목을 인용해서 답할 것. 요지만 보고 답하지 말 것.
 - 관련 사건이 없으면 없다고 답할 것 (지어내지 말 것)
@@ -371,7 +389,7 @@ description: 직장 내 괴롭힘 판례 코퍼스(347건)에 대한 질문에 �
 # 판례 두 단계 질의응답
 
 ## 절차
-1. 프로젝트의 `판결요지_목록.md`(347건)를 읽고,
+1. 프로젝트의 `rulings_summary.csv`(347건 2줄 요약)를 읽고,
    질문과 관련된 사건을 고른다.
 2. 고른 사건은 **반드시** 프로젝트의 `rulings/` 폴더에서
    판결문 전문 파일을 읽는다. 요지만 보고 답하지 않는다.
@@ -392,7 +410,7 @@ description: 직장 내 괴롭힘 판례 코퍼스(347건)에 대한 질문에 �
         <div class="skill-chip">⚙ case-qa 스킬 사용 중 — 요지 훑기 → 전문 3건 읽기</div>
         <div class="bubble ai">코퍼스의 관련 사건을 검토하면, 동료에 의한 따돌림도 손해배상이 인정될 수 있으나 갈림길은 <b>사용자(회사)가 알았거나 알 수 있었는지</b>입니다. [대구지방법원 2024가단138550]은 "…"라고 판시하며 위자료를 인정한 반면, [울산지방법원 2022가단128995]는 회사가 인지 후 즉시 조치한 점을 들어 기각했습니다…<small>참고한 사건: 대구 2024가단138550 · 수원 2022가단546552 · 울산 2022가단128995</small></div>
       </div>
-      <div class="tip-card"><b>발동이 안 되면</b> — 질문이 description과 잘 안 맞으면 스킬 없이 답할 때가 있습니다. 그때는 <b>"case-qa 스킬을 써서 답해줘"</b>라고 한 줄만 붙이면 됩니다. 3주차 RAG 강의에서와 같은 원리 — 명시적 지시는 기본 동작을 만드는 것이 아니라 <b>보장</b>하는 장치입니다.</div>
+      <div class="tip-card"><b>발동이 안 되면</b> — 질문이 description과 잘 안 맞으면 스킬 없이 답할 때가 있습니다. 그때는 <b>"case-qa 스킬을 써서 답해줘"</b>라고 한 줄만 붙이면 됩니다. 명시적 지시는 기본 동작을 만드는 것이 아니라 <b>보장</b>하는 장치입니다.</div>
 
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>프롬프트로 스킬 파일을 만들 수 있다</span></label></div>
     </section>
