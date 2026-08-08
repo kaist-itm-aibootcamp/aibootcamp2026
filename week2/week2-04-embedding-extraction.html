@@ -267,7 +267,7 @@ p{margin:10px 0;}
       <div class="concept-grid">
         <div class="concept"><div class="ico">🔀</div><b>하나의 키, 수백 개 모델</b><span>OpenAI·Google·Qwen 등 여러 회사 모델을 <b>API 키 하나</b>로 호출. 모델명 문자열만 바꾸면 모델이 바뀝니다.</span></div>
         <div class="concept"><div class="ico">💳</div><b>선불 크레딧</b><span>openrouter.ai 가입 → 소액 충전(몇 달러면 충분) → Keys 메뉴에서 API 키 발급. 쓴 만큼만 차감됩니다.</span></div>
-        <div class="concept"><div class="ico">🧾</div><b>투명한 사용 내역</b><span>대시보드에서 호출 1건 단위로 토큰·비용이 조회됩니다 — 뒤에서 이 내역이 <b>검증 도구</b>로도 쓰입니다(§4).</span></div>
+        <div class="concept"><div class="ico">🧾</div><b>투명한 사용 내역</b><span>사이트의 Activity에서 호출 건수와 비용이 그대로 조회됩니다 — 실습 중 "돈이 얼마나 나가나"를 확인하는 창구입니다(§4).</span></div>
       </div>
 
       <h3>임베딩 모델 고르기 — 컨텍스트 길이가 핵심</h3>
@@ -305,7 +305,6 @@ p{margin:10px 0;}
 
       <div class="copy-block"><span class="cb-label">💬 실제 사용한 요청 (수업용으로 다듬음)</span><button class="copy-btn" data-copy="p1">복사</button>
 <pre id="p1">수집된 판결문 본문의 임베딩을 OpenRouter API로 뽑으려 한다.
-연동 폴더에 openrouterkey.txt 파일을 저장해 두었다. 키를 읽어 API 호출을 하고,
 판결문별로 JSON 파일을 저장해줘. JSON에는 metadata.csv의 기본 서지 정보 +
 본문 전체 임베딩 + 요약문 + 요약문 임베딩을 넣으면 될 것 같다.</pre></div>
 
@@ -323,23 +322,25 @@ p{margin:10px 0;}
       <p class="sec-lead">위의 짧은 요청에 대해 AI가 스스로 수행한 검증과, 사용자가 던진 확인 질문의 기록입니다. <b>AI에게 일을 맡기는 법</b>과 <b>결과를 믿는 법</b>을 동시에 보여줍니다.</p>
 
       <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
-        <b class="ws-title">AI가 모델명부터 바로잡았다</b>
-        <p>사용자는 "chatgpt-oss-embedding 모델로"라고 요청했지만 그런 모델은 실존하지 않았습니다. AI는 그대로 진행하는 대신 OpenRouter의 실제 임베딩 모델 목록과 단가를 조회해 표로 제시하고 선택을 물었습니다. <b>교훈: 이름·수치가 애매하면 AI에게 실존 확인부터 시키세요.</b></p>
-      </div></div>
-      <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
         <b class="ws-title">데이터를 실측한 뒤 모델을 골랐다</b>
         <p>코퍼스 전체 길이를 실측(평균 8,492자, 8천자 초과 다수)해 컨텍스트 8K 모델을 배제하고 32K 모델을 권장했습니다. 최장 판결문(24,250토큰)을 실제로 보내 <b>절단 없이 과금되는지</b>까지 확인했습니다.</p>
       </div></div>
-      <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
+      <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
         <b class="ws-title">시험 5건 → 검증 → 본 배치</b>
         <p>전량을 바로 돌리지 않고 5건으로 시험 실행 후 무결성을 검증했습니다 — 차원 4,096 동일, 벡터 정규화 확인, 본문 벡터가 자기 개요와 가장 가까운지(정합성) 확인. 통과 후 본 배치: <b>347건, 13.8분, 실패 0건, 비용 약 2센트.</b></p>
       </div></div>
-      <div class="workshop-step"><span class="ws-num">4</span><div class="ws-body">
-        <b class="ws-title">사용자는 "과금 내역"으로 교차검증했다</b>
-        <p>사용자가 OpenRouter 대시보드에서 호출 이력이 353건임을 보고 물었습니다 — "본문과 요약을 따로 불렀으면 2배여야 하는 것 아닌가?" AI의 답: 본문+요약을 <b>한 요청에 배열로 담아</b> 판결당 1콜이며, 353 = 소통 확인 1 + 절단 검증 2 + 시험 5 + 본 배치 342 + 검색 스팟체크 3. 토큰 수도 로컬 계산과 1토큰 오차 없이 일치. <b>교훈: AI의 보고를 외부 기록(과금 내역)과 대조하면 가장 확실합니다.</b></p>
+      <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
+        <b class="ws-title">OpenRouter 사이트에서 직접 확인했다</b>
+        <p>AI의 보고를 그대로 믿는 대신 <a href="https://openrouter.ai/activity" target="_blank" rel="noopener"><b>openrouter.ai</b></a>에 로그인해 <b>Activity</b>(사용 내역)를 열어 봤습니다. 호출이 실제로 나갔는지, 몇 건인지, 비용이 얼마나 빠져나갔는지가 그대로 보입니다. <b>교훈: AI의 보고는 외부 기록과 대조하면 가장 확실합니다.</b> 그리고 이 화면은 실습 중 "돈이 얼마나 나가고 있나"를 확인하는 안전장치이기도 합니다.</p>
       </div></div>
 
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>시험 실행·무결성 검증·외부 기록 교차검증의 흐름을 이해했다</span></label></div>
+      <h3>덤 — OpenRouter 랭킹으로 보는 "지금 실제로 쓰이는 모델"</h3>
+      <p>OpenRouter 홈페이지 아래쪽에는 <a href="https://openrouter.ai/rankings" target="_blank" rel="noopener"><b>Rankings</b></a>가 있습니다. OpenRouter를 거쳐 나간 <b>실제 API 호출량(토큰 기준)</b>을 모델별로 집계한 순위표입니다. 벤치마크 점수가 아니라 <b>사람들이 돈을 내고 실제로 쓴 양</b>이라는 점이 다릅니다.</p>
+      <div class="callout"><b class="cap">이 순위표를 왜 보나</b>
+      모델을 고를 때 흔한 고민이 "이름은 많이 들었는데 실제로 쓸 만한가"입니다. 랭킹은 그 질문에 <b>시장의 답</b>을 보여줍니다 — 어떤 모델이 실무에서 실제로 선택되고 있는지, 용도별(프로그래밍·번역·법률 등)로는 무엇이 쓰이는지, 순위가 최근 몇 달 사이 어떻게 뒤집혔는지까지 나옵니다. 신규 모델이 나왔을 때 <b>몇 주 뒤 이 순위를 다시 보면</b> 과대평가인지 실제로 자리를 잡았는지 판단이 섭니다.
+      <p style="margin-top:10px;">다만 <b>순위 = 품질은 아닙니다.</b> 가격이 싸거나 무료 티어가 있으면 호출량이 커지고, 특정 서비스 하나가 순위를 끌어올리기도 합니다. "많이 쓰인다"는 사실 하나로 읽고, 내 용도에는 §2의 기준(컨텍스트 길이·단가)으로 다시 따지세요.</p></div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>시험 실행·무결성 검증·OpenRouter 사이트 확인의 흐름을 이해했다</span></label></div>
     </section>
 
     <!-- ============ S5 ============ -->
@@ -412,7 +413,7 @@ p{margin:10px 0;}
         <li>임베딩 = 시퀀스(비정형 텍스트)의 의미를 요약한 고정 길이 숫자 벡터</li>
         <li>OpenRouter: 키 하나로 여러 모델 — 모델 선택은 컨텍스트 길이와 단가로, 실존 여부는 AI에게 확인시키기</li>
         <li>키는 연동 폴더에 파일로 — 환경변수로만 읽게 하고, 작업 후 평문 키 파일 정리</li>
-        <li>전량 실행 전 시험 실행 → 무결성 검증, 완료 후 과금 내역으로 교차검증</li>
+        <li>전량 실행 전 시험 실행 → 무결성 검증, 완료 후 OpenRouter 사이트에서 호출 건수·비용 확인</li>
         <li>임베딩의 활용: 의미 검색 · 2D 지도 · 클러스터링</li>
       </ul>
       <div class="next-card-grid">
