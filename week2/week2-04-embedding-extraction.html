@@ -212,7 +212,7 @@ p{margin:10px 0;}
     <div class="hero">
       <span class="hero-kicker">WEEK 2 · STEP 4 — 임베딩 추출</span>
       <h1>판결문 347건을 숫자로 —<br/>임베딩 추출 파이프라인</h1>
-      <p>수집한 판결문을 "읽는" 대신 "재는" 방법을 배웁니다. 텍스트를 의미의 좌표(임베딩)로 바꾸면 검색·지도·군집 분석이 가능해집니다. 이 페이지의 수치와 사례는 <b>실제 판결문 코퍼스에 이 파이프라인을 돌린 기록</b>입니다.</p>
+      <p>수집한 판결문을 텍스트 그대로 두지 않고, 의미의 좌표(임베딩)로 바꿉니다. 그러면 검색·지도·군집 분석이 가능해집니다. 이 페이지의 수치와 사례는 <b>실제 판결문 코퍼스에 이 파이프라인을 돌린 기록</b>입니다.</p>
     </div>
 
     <!-- ============ S1 ============ -->
@@ -262,13 +262,58 @@ p{margin:10px 0;}
     <!-- ============ S2 ============ -->
     <section class="section" id="s2">
       <div class="sec-head"><span class="sec-num">2</span><h2>OpenRouter — 임베딩을 뽑는 가장 편한 창구</h2></div>
-      <p class="sec-lead">임베딩 모델을 내 PC에서 직접 돌릴 수도 있지만, 비개발자에게는 <b>API 호출</b>이 압도적으로 편합니다. 그리고 여러 회사의 모델을 한곳에서 쓰게 해주는 중개소가 OpenRouter입니다.</p>
+      <p class="sec-lead">임베딩 모델을 내 PC에서 직접 돌릴 수도 있지만, 비개발자에게는 <b>API로 불러 쓰는 것</b>이 압도적으로 편합니다. 그리고 여러 회사의 모델을 한곳에서 쓰게 해주는 중개소가 OpenRouter입니다. 그 전에 이번 주 내내 나올 두 단어부터 정리하고 갑니다.</p>
+
+      <div class="callout"><b class="cap">잠깐 — API가 뭔가요?</b>
+      지금까지 우리는 <b>화면</b>을 보고 클릭해서 AI를 썼습니다. claude.ai도 Cowork도 <b>사람이 쓰라고 만든 창구</b>입니다. <b>API</b>는 같은 서비스에 <b>프로그램이 직접 요청하는 창구</b>입니다. 사람이 타이핑하는 대신 프로그램이 "이 문장의 임베딩을 줘"라고 보내면 숫자 배열이 답으로 돌아옵니다.
+      <p style="margin-top:10px;">왜 필요하냐면 — <b>판결문 347건의 임베딩을 화면에서 하나씩 복사·붙여넣기 할 수는 없기 때문</b>입니다. 같은 일을 수백 번 반복해야 할 때, 그 일을 사람이 아니라 프로그램에게 시키는 통로가 API입니다.</p></div>
+
+      <table class="doc-table">
+        <thead><tr><th style="width:120px"></th><th>사람용 창구 (웹 화면)</th><th>프로그램용 창구 (API)</th></tr></thead>
+        <tbody>
+          <tr><td><b>누가 쓰나</b></td><td>사람이 클릭하고 타이핑</td><td>프로그램이 자동으로</td></tr>
+          <tr><td><b>한 번에</b></td><td>한 건씩</td><td>수백·수천 건</td></tr>
+          <tr><td><b>신원 확인</b></td><td>아이디·비밀번호 로그인</td><td><b>API 키</b></td></tr>
+          <tr><td><b>이번 주 사례</b></td><td>Cowork 대화창에서 수집 요청</td><td>임베딩 347건 뽑기</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout"><b class="cap">그럼 API 키는?</b>
+      API에는 로그인 화면이 없습니다. 프로그램이 요청할 때마다 <b>"이건 내 요청이다"를 증명</b>해야 하는데, 그 증명서가 <b>API 키</b>입니다. <code>sk-or-v1-3f9a…</code> 같은 길고 무작위한 문자열 하나가 곧 신분증이자 결제수단이며, 하는 일은 두 가지입니다 — <b>누구의 요청인지 식별</b>하고, <b>그 계정의 크레딧에서 사용료를 차감</b>합니다.
+      <p style="margin-top:10px;">그래서 <b>키를 아는 사람은 누구나 내 돈으로 호출할 수 있습니다.</b> 비밀번호가 걸려 있지 않은 신용카드 번호에 가깝다고 보시면 됩니다 — 화면이나 채팅에 붙여넣지 말고, 파일로 보관하고, 남에게 보내지 마세요. 이 원칙을 실제 절차로 옮긴 것이 §3입니다.</p></div>
 
       <div class="concept-grid">
         <div class="concept"><div class="ico">🔀</div><b>하나의 키, 수백 개 모델</b><span>OpenAI·Google·Qwen 등 여러 회사 모델을 <b>API 키 하나</b>로 호출. 모델명 문자열만 바꾸면 모델이 바뀝니다.</span></div>
-        <div class="concept"><div class="ico">💳</div><b>선불 크레딧</b><span>openrouter.ai 가입 → 소액 충전(몇 달러면 충분) → Keys 메뉴에서 API 키 발급. 쓴 만큼만 차감됩니다.</span></div>
-        <div class="concept"><div class="ico">🧾</div><b>투명한 사용 내역</b><span>대시보드에서 호출 1건 단위로 토큰·비용이 조회됩니다 — 뒤에서 이 내역이 <b>검증 도구</b>로도 쓰입니다(§4).</span></div>
+        <div class="concept"><div class="ico">💳</div><b>선불 크레딧</b><span>미리 충전해 둔 금액에서 <b>쓴 만큼만 차감</b>됩니다. 월 구독이 아니라서 안 쓰면 안 나갑니다.</span></div>
+        <div class="concept"><div class="ico">🧾</div><b>투명한 사용 내역</b><span>사이트의 Activity에서 호출 건수와 비용이 그대로 조회됩니다 — 실습 중 "돈이 얼마나 나가나"를 확인하는 창구입니다(§4).</span></div>
       </div>
+
+      <h3>직접 해보기 — 크레딧 충전과 API 키 발급</h3>
+      <p><a href="https://openrouter.ai" target="_blank" rel="noopener"><b>openrouter.ai</b></a>에 가입(구글 계정 등으로 로그인 가능)한 뒤 아래 순서대로 진행합니다. <b>충전을 먼저, 키 발급을 나중에</b> 하는 편이 편합니다 — 키를 만들 때 한도를 함께 정하기 때문입니다.</p>
+
+      <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
+        <b class="ws-title">크레딧 충전 — 최소 금액인 $5면 충분합니다</b>
+        <p>계정 메뉴의 <b>Credits</b>에서 카드로 충전합니다. <b>최소 구매 금액이 $5</b>이며, 이번 주 실습에는 그 이상이 필요 없습니다 — 판결문 347건 전체 임베딩이 <b>약 2센트</b>였으니, $5면 같은 작업을 200번 넘게 돌릴 수 있는 금액입니다. 남은 잔액은 3·4주차 실습에서 계속 씁니다.</p>
+      </div></div>
+
+      <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
+        <b class="ws-title">키 발급 — Keys → Create Key</b>
+        <p><b>Keys</b> 메뉴에서 새 키를 만듭니다. 이름은 나중에 알아볼 수 있게 <code>bootcamp-week2</code>처럼 용도를 적어 두세요. 키가 여러 개가 되면 <b>어느 키가 얼마를 썼는지 따로 볼 수 있고, 문제가 생긴 키만 골라 폐기</b>할 수 있습니다.</p>
+      </div></div>
+
+      <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
+        <b class="ws-title">한도 설정 — 이 단계를 건너뛰지 마세요</b>
+        <p>키를 만들 때 <b>사용 한도(credit limit)</b>를 지정할 수 있습니다. <b>$1~2 정도로 걸어 두세요.</b> 한도를 넘으면 그 키는 더 이상 호출되지 않고 거기서 멈춥니다.</p>
+        <p style="margin-top:8px;">왜 중요하냐면 — 코드가 잘못 돌아 같은 요청을 반복하거나, 키가 유출되면 <b>잔액이 전부 빠져나갈 수 있습니다.</b> 한도는 그 피해를 내가 정한 금액 안으로 묶어 두는 장치입니다. 부족하면 나중에 올리면 되니, 처음에는 작게 거는 편이 낫습니다.</p>
+      </div></div>
+
+      <div class="workshop-step"><span class="ws-num">4</span><div class="ws-body">
+        <b class="ws-title">키 저장 — 생성 직후 한 번만 보여줍니다</b>
+        <p>발급된 키 문자열은 <b>그 화면을 벗어나면 다시 볼 수 없습니다.</b> 바로 복사해서 §3에서 쓸 <code>openrouterkey.txt</code> 파일에 붙여 넣고 저장하세요. 놓쳤다면 그 키는 지우고 새로 만들면 됩니다 — 복구하는 방법은 없습니다.</p>
+      </div></div>
+
+      <div class="callout caution"><b class="cap">키를 다루는 세 가지 습관</b>
+      ① 채팅·메일·과제 제출물에 <b>키를 붙여넣지 않습니다</b>(스크린샷도 포함). ② 키 파일이 든 폴더를 공유하거나 GitHub에 올리기 전에 <b>키 파일부터 빼냅니다.</b> ③ 실수로 노출했다면 당황하지 말고 <b>그 키를 삭제(revoke)</b>하고 새로 발급하세요 — 삭제된 키는 즉시 무효가 되므로, 빨리 지우는 것이 가장 확실한 대처입니다.</div>
 
       <h3>임베딩 모델 고르기 — 컨텍스트 길이가 핵심</h3>
       <p>이번 코퍼스 실측: 347건 평균 <b>8,492자</b>, 최대 41,374자. 8,000자를 넘는 판결문이 절반 가까이라, 컨텍스트가 8K 토큰인 모델은 <b>절반이 잘립니다</b>(한국어는 글자당 토큰 소모가 커서 더 심함). 실제 조회된 선택지:</p>
@@ -305,7 +350,6 @@ p{margin:10px 0;}
 
       <div class="copy-block"><span class="cb-label">💬 실제 사용한 요청 (수업용으로 다듬음)</span><button class="copy-btn" data-copy="p1">복사</button>
 <pre id="p1">수집된 판결문 본문의 임베딩을 OpenRouter API로 뽑으려 한다.
-연동 폴더에 openrouterkey.txt 파일을 저장해 두었다. 키를 읽어 API 호출을 하고,
 판결문별로 JSON 파일을 저장해줘. JSON에는 metadata.csv의 기본 서지 정보 +
 본문 전체 임베딩 + 요약문 + 요약문 임베딩을 넣으면 될 것 같다.</pre></div>
 
@@ -323,23 +367,25 @@ p{margin:10px 0;}
       <p class="sec-lead">위의 짧은 요청에 대해 AI가 스스로 수행한 검증과, 사용자가 던진 확인 질문의 기록입니다. <b>AI에게 일을 맡기는 법</b>과 <b>결과를 믿는 법</b>을 동시에 보여줍니다.</p>
 
       <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
-        <b class="ws-title">AI가 모델명부터 바로잡았다</b>
-        <p>사용자는 "chatgpt-oss-embedding 모델로"라고 요청했지만 그런 모델은 실존하지 않았습니다. AI는 그대로 진행하는 대신 OpenRouter의 실제 임베딩 모델 목록과 단가를 조회해 표로 제시하고 선택을 물었습니다. <b>교훈: 이름·수치가 애매하면 AI에게 실존 확인부터 시키세요.</b></p>
-      </div></div>
-      <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
         <b class="ws-title">데이터를 실측한 뒤 모델을 골랐다</b>
         <p>코퍼스 전체 길이를 실측(평균 8,492자, 8천자 초과 다수)해 컨텍스트 8K 모델을 배제하고 32K 모델을 권장했습니다. 최장 판결문(24,250토큰)을 실제로 보내 <b>절단 없이 과금되는지</b>까지 확인했습니다.</p>
       </div></div>
-      <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
+      <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
         <b class="ws-title">시험 5건 → 검증 → 본 배치</b>
         <p>전량을 바로 돌리지 않고 5건으로 시험 실행 후 무결성을 검증했습니다 — 차원 4,096 동일, 벡터 정규화 확인, 본문 벡터가 자기 개요와 가장 가까운지(정합성) 확인. 통과 후 본 배치: <b>347건, 13.8분, 실패 0건, 비용 약 2센트.</b></p>
       </div></div>
-      <div class="workshop-step"><span class="ws-num">4</span><div class="ws-body">
-        <b class="ws-title">사용자는 "과금 내역"으로 교차검증했다</b>
-        <p>사용자가 OpenRouter 대시보드에서 호출 이력이 353건임을 보고 물었습니다 — "본문과 요약을 따로 불렀으면 2배여야 하는 것 아닌가?" AI의 답: 본문+요약을 <b>한 요청에 배열로 담아</b> 판결당 1콜이며, 353 = 소통 확인 1 + 절단 검증 2 + 시험 5 + 본 배치 342 + 검색 스팟체크 3. 토큰 수도 로컬 계산과 1토큰 오차 없이 일치. <b>교훈: AI의 보고를 외부 기록(과금 내역)과 대조하면 가장 확실합니다.</b></p>
+      <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
+        <b class="ws-title">OpenRouter 사이트에서 직접 확인했다</b>
+        <p>AI의 보고를 그대로 믿는 대신 <a href="https://openrouter.ai/activity" target="_blank" rel="noopener"><b>openrouter.ai</b></a>에 로그인해 <b>Activity</b>(사용 내역)를 열어 봤습니다. 호출이 실제로 나갔는지, 몇 건인지, 비용이 얼마나 빠져나갔는지가 그대로 보입니다. <b>교훈: AI의 보고는 외부 기록과 대조하면 가장 확실합니다.</b> 그리고 이 화면은 실습 중 "돈이 얼마나 나가고 있나"를 확인하는 안전장치이기도 합니다.</p>
       </div></div>
 
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>시험 실행·무결성 검증·외부 기록 교차검증의 흐름을 이해했다</span></label></div>
+      <h3>덤 — OpenRouter 랭킹으로 보는 "지금 실제로 쓰이는 모델"</h3>
+      <p>OpenRouter 홈페이지 아래쪽에는 <a href="https://openrouter.ai/rankings" target="_blank" rel="noopener"><b>Rankings</b></a>가 있습니다. OpenRouter를 거쳐 나간 <b>실제 API 호출량(토큰 기준)</b>을 모델별로 집계한 순위표입니다. 벤치마크 점수가 아니라 <b>사람들이 돈을 내고 실제로 쓴 양</b>이라는 점이 다릅니다.</p>
+      <div class="callout"><b class="cap">이 순위표를 왜 보나</b>
+      모델을 고를 때 흔한 고민이 "이름은 많이 들었는데 실제로 쓸 만한가"입니다. 랭킹은 그 질문에 <b>시장의 답</b>을 보여줍니다 — 어떤 모델이 실무에서 실제로 선택되고 있는지, 용도별(프로그래밍·번역·법률 등)로는 무엇이 쓰이는지, 순위가 최근 몇 달 사이 어떻게 뒤집혔는지까지 나옵니다. 신규 모델이 나왔을 때 <b>몇 주 뒤 이 순위를 다시 보면</b> 과대평가인지 실제로 자리를 잡았는지 판단이 섭니다.
+      <p style="margin-top:10px;">다만 <b>순위 = 품질은 아닙니다.</b> 가격이 싸거나 무료 티어가 있으면 호출량이 커지고, 특정 서비스 하나가 순위를 끌어올리기도 합니다. "많이 쓰인다"는 사실 하나로 읽고, 내 용도에는 §2의 기준(컨텍스트 길이·단가)으로 다시 따지세요.</p></div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>시험 실행·무결성 검증·OpenRouter 사이트 확인의 흐름을 이해했다</span></label></div>
     </section>
 
     <!-- ============ S5 ============ -->
@@ -412,7 +458,7 @@ p{margin:10px 0;}
         <li>임베딩 = 시퀀스(비정형 텍스트)의 의미를 요약한 고정 길이 숫자 벡터</li>
         <li>OpenRouter: 키 하나로 여러 모델 — 모델 선택은 컨텍스트 길이와 단가로, 실존 여부는 AI에게 확인시키기</li>
         <li>키는 연동 폴더에 파일로 — 환경변수로만 읽게 하고, 작업 후 평문 키 파일 정리</li>
-        <li>전량 실행 전 시험 실행 → 무결성 검증, 완료 후 과금 내역으로 교차검증</li>
+        <li>전량 실행 전 시험 실행 → 무결성 검증, 완료 후 OpenRouter 사이트에서 호출 건수·비용 확인</li>
         <li>임베딩의 활용: 의미 검색 · 2D 지도 · 클러스터링</li>
       </ul>
       <div class="next-card-grid">

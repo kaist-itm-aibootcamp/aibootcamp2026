@@ -203,7 +203,8 @@ p{margin:10px 0;}
     <div class="toc" id="toc">
       <a href="#s1" data-sec="s1">1. 실습 — 정적 사이트 소량 수집<span class="done-mark">✔</span></a>
       <a href="#s2" data-sec="s2">2. 수집 후 — 탐색적 분석(EDA)<span class="done-mark">✔</span></a>
-      <a href="#s3" data-sec="s3">3. 마무리 체크리스트<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 연구적용 사례 — 판결문 수집·분석<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 마무리 체크리스트<span class="done-mark">✔</span></a>
     </div>
   </nav>
 
@@ -219,7 +220,12 @@ p{margin:10px 0;}
     <!-- ================= SECTION 1 ================= -->
     <section class="section" id="s1">
       <div class="sec-head"><span class="sec-num">1</span><h2>실습 — 정적 사이트에서 소량 수집하기</h2></div>
-      <p class="sec-lead">②번 자료(크롤링 이론)에서 배웠듯 <b>정적(static) 사이트</b>는 주소(URL)만 요청하면 서버가 내용이 이미 담긴 HTML을 통째로 보내주는 사이트입니다. 이런 사이트는 Cowork에 문장 하나로 요청해도 수집이 잘 됩니다. (스크롤·클릭이 필요한 동적 사이트는 크롬 확장으로 — 판별법은 ②번 자료의 "10초 테스트"를 떠올리세요.)</p>
+      <p class="sec-lead">②번 자료(크롤링 이론)에서 배웠듯 <b>정적(static) 사이트</b>는 주소(URL)만 요청하면 서버가 내용이 이미 담긴 HTML을 통째로 보내주는 사이트입니다. 이런 사이트는 Cowork에 문장 하나로 요청해도 수집이 잘 됩니다. (스크롤·클릭이 필요한 동적 사이트는 크롬 확장으로 — 구분하는 방법은 ②번 자료를 떠올리세요.)</p>
+
+      <h3>먼저 — Cowork를 열고 작업 폴더를 연동합니다</h3>
+      <p>①번 자료에서 만든 <code>C:\claude</code> 아래에 이번 실습용 폴더를 하나 더 만듭니다 — <b><code>C:\claude\bestseller</code></b> (macOS는 <code>~/claude/bestseller</code>).</p>
+      <p>Claude 데스크톱 앱에서 <b>Cowork</b>를 열고 이 폴더를 연동하세요. 연동을 마치면 Cowork가 클라우드에서 만든 파일이 <b>이 폴더로 내려옵니다.</b> 아래 프롬프트에 나오는 "연동한 폴더"는 전부 이 폴더를 가리킵니다.</p>
+      <div class="tip-card"><b>연동을 건너뛰면</b> — 수집은 성공하는데 결과 파일이 클라우드 작업 공간에만 남아 내 PC에서 열 수 없습니다. 수집을 시작하기 전에 폴더가 연동되어 있는지 먼저 확인하세요.</div>
 
       <h3>실습 대상 — YES24 경제·경영 베스트셀러 (성별 × 연령대)</h3>
       <p>YES24 베스트셀러 목록은 URL의 파라미터로 조건이 표현되는, 스크래핑 입문에 좋은 구조입니다:</p>
@@ -234,27 +240,15 @@ https://www.yes24.com/product/category/bestseller?categoryNumber=001001025&pageN
 
 URL의 age(10~60, 60은 60대 이상)와 sex(F/M) 파라미터를 바꿔가며
 성별×연령대 12개 조합 각각의 Top 20 도서를 수집해줘. 각 도서의 순위·제목·저자·출판사·출간월·판매가·평점을 뽑아서
-그룹 정보(성별, 연령대)와 함께 CSV 파일 하나로 만들고, 연동한 폴더의 data/ 아래에
+그룹 정보(성별, 연령대)와 함께 CSV 파일 하나로 만들고, 연동한 폴더에
 bestseller.csv 로 저장해줘. 인코딩은 엑셀에서 한글이 깨지지 않게 UTF-8 BOM으로.
 서버에 부담이 없도록 요청 사이에 간격을 두고, 끝나면 그룹별 수집 건수를 표로 보여줘.</pre></div>
 
       <div class="tip-card"><b>프롬프트의 핵심 4요소</b> — ① 시작 URL과 <b>규칙</b>(무엇을 바꾸면 다른 목록이 나오는지) ② 뽑을 <b>항목</b>(컬럼) ③ 저장 <b>형식</b>(CSV/JSON) ④ 저장할 <b>위치</b>(연동 폴더 안의 경로). ④를 빼먹으면 결과가 클라우드 작업 공간에만 남아 내 PC에서 열 수 없습니다.</div>
 
       <h3>수집 결과는 내 PC에 파일로 남습니다</h3>
-      <p>요청이 끝나면 탐색기(또는 Finder)에서 연동 폴더를 열어 보세요. 대화 기록이 아니라 <b>실제 파일</b>이 들어와 있습니다. 이번 주 내내 이 폴더 하나에 산출물이 층층이 쌓입니다:</p>
-      <div class="card" style="font-size:13.5px;overflow-x:auto;">
-        <pre style="margin:0;font-size:13px;line-height:1.85;">week2/
-├─ data/
-│   ├─ bestseller.csv      ← 이번 §1에서 만든 표 (239행)
-│   └─ rulings.csv         ← §2의 판결문 목록 (사건번호·법원·선고일·링크)
-├─ rulings/                ← 판결문 <b>본문</b> 파일들 (347개)
-│   ├─ 2021가단5012345.txt
-│   └─ …
-└─ embeddings/             ← ④번 자료에서 여기에 JSON 347개가 생깁니다</pre>
-        <p style="color:var(--muted);font-size:13px;margin-top:10px;"><b>표는 CSV, 긴 본문은 개별 파일</b>로 나누는 것이 요령입니다. CSV 한 칸에 판결문 전문을 밀어 넣으면 줄바꿈·쉼표 때문에 파일이 깨지고, 엑셀에서도 열리지 않습니다. 목록(메타데이터)은 CSV로, 본문은 사건번호를 파일명으로 한 텍스트 파일로 저장하세요.</p>
-      </div>
-      <div class="callout ok"><b class="cap">왜 굳이 내 PC에 파일로 두는가</b>
-      3주차에 Claude Code가 켤 검색 서버는 <b>내 컴퓨터의 파일</b>을 읽습니다. 지금 이 폴더에 제대로 저장해 두는 것이 곧 검색엔진의 재료를 준비하는 일입니다. 반대로 클라우드 작업 공간에만 있던 파일은 세션이 끝나면 사라집니다.</div>
+      <p>요청이 끝나면 탐색기(또는 Finder)에서 <code>C:\claude\bestseller</code>를 열어 보세요. 대화 기록이 아니라 <b>실제 파일</b>(<code>bestseller.csv</code>)이 들어와 있습니다. 엑셀로 바로 열립니다.</p>
+      <div class="tip-card"><b>표는 CSV, 긴 본문은 개별 파일</b> — CSV 한 칸에 판결문 전문 같은 긴 글을 밀어 넣으면 줄바꿈·쉼표 때문에 파일이 깨지고 엑셀에서도 열리지 않습니다. 목록(메타데이터)은 CSV로, 본문은 사건번호처럼 알아볼 수 있는 이름을 붙인 <b>개별 텍스트 파일</b>로 나눠 저장하세요. §2에서 이 방식을 씁니다.</div>
 
       <h3>실제 수집 결과 — 239권 (10대 여성은 목록 자체가 19권)</h3>
       <div class="explorer">
@@ -360,22 +354,55 @@ bestseller.csv 로 저장해줘. 인코딩은 엑셀에서 한글이 깨지지 �
       <div class="insight"><span class="n">5</span><p><b>AI 책은 오히려 중장년·고령 목록에 많다.</b> 『박태웅의 AI 강의 2026』 『AI, 신의 탄생 인간의 종말』 등 AI 교양서는 60대 이상 남성 3권·50대 여성 3권으로 최다이고, 10대 남성은 AI를 "주식 자동매매 도구"로 소비하는 실용서가 특징적입니다.</p></div>
       <div class="insight"><span class="n">6</span><p><b>같은 데이터에서 후속 질문이 나온다.</b> "여성 목록에만 있는 『엄마의 두 번째 재테크』류는 어떤 마케팅의 결과일까?", "10대 목록은 누가(본인? 부모?) 구매한 것일까?" — EDA의 끝은 결론이 아니라 <b>더 좋은 질문</b>입니다.</p></div>
 
-      <h3>연구에 적용하면 — 판결문 895건 분석 사례</h3>
-      <p>같은 파이프라인(수집 → 분류 → 반복 패턴 추출)을 판례 데이터에 적용한 실제 사례입니다. "직장 내 괴롭힘"이 언급된 지방법원 판결 <b>895건</b>을 수집해 유형별로 분류하고, 법원이 손해배상을 인정할 때 반복 적용하는 요건을 추출해 보고서로 정리했습니다. 카드를 클릭하면 보고서 전문이 열립니다.</p>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>수집 직후 EDA 프롬프트로 패턴을 탐색하는 흐름을 이해했다</span></label></div>
+    </section>
+
+    <!-- ================= SECTION 3 ================= -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>연구적용 사례 — 판결문 수집·분석</h2></div>
+      <p class="sec-lead">앞의 베스트셀러 실습과 <b>똑같은 파이프라인</b>(수집 → 분류 → 반복 패턴 추출)을 연구용 데이터에 적용한 실제 사례입니다. "직장 내 괴롭힘"이 언급된 지방법원 판결 <b>895건</b>을 수집해 유형별로 분류하고, 법원이 손해배상을 인정할 때 반복 적용하는 요건을 추출해 보고서로 정리했습니다. 데이터가 도서 목록에서 판결문으로 바뀌었을 뿐, 절차는 그대로입니다.</p>
 
       <div class="callout"><b class="cap">대량 텍스트 수집 요령 — 목록 먼저, 본문은 천천히</b>
       판결문처럼 <b>본문이 긴 자료를 수백 건</b> 수집할 때는 한 번에 긁지 마세요. <b>① 먼저 전체 목록(사건번호·법원·선고일·링크 등 메타데이터)만 수집해 CSV로 저장</b>하고, <b>② 본문은 그 목록을 보며 시간 간격을 두고 조금씩</b>(예: 한 번에 수십 건씩) 수집합니다. 서버에 부하를 주지 않기 위한 예의이자(②번 자료의 "서버 배려" 원칙), 중간에 끊겨도 목록 CSV에 진행 상황이 남아 이어서 수집할 수 있는 실전 요령입니다. 위 895건도 이 방식으로 모았습니다.</div>
 
       <div class="copy-block"><span class="cb-label">💬 두 단계 수집 프롬프트</span><button class="copy-btn" data-copy="p5">복사</button>
 <pre id="p5">1단계: 검색 결과의 전체 목록(사건번호, 법원, 선고일, 링크)만 먼저 수집해서
-연동 폴더의 data/rulings.csv로 저장해줘. 본문은 아직 수집하지 마.
+연동 폴더에 rulings.csv로 저장해줘. 본문은 아직 수집하지 마.
 '수집완료' 컬럼을 만들고 전부 비워 둬.
 
-2단계: data/rulings.csv에서 수집완료가 비어 있는 사건 30건만 골라,
+2단계: rulings.csv에서 수집완료가 비어 있는 사건 30건만 골라,
 요청 사이에 간격을 두면서 본문을 수집해줘. 본문은 rulings/ 폴더에
-사건번호.txt 로 한 건씩 저장하고, 저장한 행의 수집완료를 Y로 바꿔줘.
+법원_사건번호.txt 로 한 건씩 저장하고, 저장한 행의 수집완료를 Y로 바꿔줘.
 (이 단계를 시간을 두고 여러 번 반복)</pre></div>
-      <div class="tip-card"><b>이 방식의 진짜 이점</b> — 진행 상황이 <b>내 PC의 CSV 파일에</b> 남습니다. 대화가 끊겨도, 며칠 뒤에 이어서 해도, "수집완료가 비어 있는 것부터"라고만 말하면 정확히 그 지점부터 다시 시작합니다.</div>
+      <div class="tip-card"><b>파일명에 법원을 넣는 이유</b> — 사건번호는 법원이 다르면 겹칠 수 있습니다(같은 <code>2022가단12345</code>가 여러 법원에 존재). <code>서울중앙지방법원_2022가단5252694.txt</code>처럼 <b>법원_사건번호</b>로 저장하면 파일이 덮어써질 일이 없고, 파일 이름만 봐도 어느 법원 사건인지 알 수 있습니다.</div>
+
+      <h3>3단계 — 수집한 본문을 마크다운(.md)으로 변환하기</h3>
+      <p>수집 직후의 <code>.txt</code>는 판결문이 <b>한 덩어리의 글</b>로 들어 있어, 어디까지가 사실관계이고 어디부터가 법원의 판단인지 눈으로 구분되지 않습니다. 이를 <b>마크다운(.md)</b>으로 바꾸면서 <b>중간 제목을 붙여</b> 구조를 드러냅니다. 어차피 AI가 전문을 처음부터 끝까지 읽어야 하는 작업이므로, <b>같은 김에 2줄 요약도 함께 만들어 둡니다</b> — 나중에 목록만 훑어보며 사건을 고를 때 이 요약이 결정적으로 쓰입니다.</p>
+
+      <div class="callout"><b class="cap">잠깐 — 마크다운(.md)이 뭔가요?</b>
+      <b>글의 구조를 기호 몇 개로 표시하는 텍스트 형식</b>입니다. 워드처럼 버튼을 눌러 서식을 넣는 대신, 줄 앞에 기호를 붙여 "이건 제목", "이건 목록"이라고 표시합니다. 실체는 그냥 텍스트 파일이라 메모장으로도 열리고, 용량도 작고, 20년 뒤에도 열립니다.
+      <div style="margin-top:10px;padding:12px 14px;background:#20242a;color:#e8ecf1;border-radius:10px;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;line-height:1.8;white-space:pre-wrap;"># 서울중앙지방법원 2022가단5252694
+## 사건 개요
+기숙학원 야간사감인 원고가 임금체불 진정 후…
+## 법원의 판단
+- 집단 따돌림에 해당한다고 판단
+- 위자료 500만 원 인정</div>
+      <p style="margin-top:10px;"><code>#</code>이 큰 제목, <code>##</code>이 중간 제목, <code>-</code>가 목록입니다. 이 기호들 덕분에 <b>사람도 AI도 "이 문서의 어디에 무엇이 있는지"를 구조로 파악</b>할 수 있습니다. 이번 주 내내 만드는 산출물이 대부분 <code>.md</code>인 이유입니다. (참고: 1주차에 만든 HTML도 같은 발상 — 기호로 구조를 표시하는 형식입니다.)</p></div>
+
+      <div class="copy-block"><span class="cb-label">💬 마크다운 변환 + 요약 프롬프트</span><button class="copy-btn" data-copy="p6">복사</button>
+<pre id="p6">rulings/ 폴더의 txt 파일들을 md 파일로 변환해줘. 한 건씩 다음과 같이:
+
+- 파일명은 그대로, 확장자만 .md 로 (법원_사건번호.md)
+- 판결문 전문을 읽고 사실관계 / 당사자 주장 / 법원의 판단 / 결론처럼
+  내용이 바뀌는 지점마다 ## 중간 제목을 붙여 구조를 드러내줘
+- 원문의 문장은 바꾸지 말고, 제목만 추가하는 방식으로
+- 맨 위에는 사건번호·법원·선고일·소송결과를 적고,
+  그 아래 '요약' 항목에 2줄 요약을 넣어줘
+  (누가 누구를 상대로 무엇을 청구했고, 법원이 어떻게 판단했는지)
+
+변환이 끝나면 전체 요약을 모아 rulings_summary.csv 로도 저장해줘.
+컬럼은 법원, 사건번호, 선고일, 소송결과, 2줄요약.</pre></div>
+      <div class="tip-card"><b>요약을 이때 만드는 이유</b> — 변환 작업에서 AI는 이미 판결문 전문을 읽습니다. 요약을 나중에 따로 시키면 <b>같은 전문을 한 번 더 읽어야 해서</b> 시간도 비용도 두 배가 됩니다. 읽는 김에 만들어 두세요. 이 2줄 요약은 ⑥번 자료(스킬)에서 "요지를 훑고 고른 사건만 전문을 읽는" 방식의 재료가 됩니다.</div>
 
       <div class="example-card" id="reportCard" tabindex="0" role="button" aria-label="판례 분석 보고서 열기">
         <div class="example-thumb"><iframe id="reportThumb" title="판례 분석 보고서 미리보기" loading="lazy"></iframe><span class="zoom">🔍 클릭해서 전문 보기</span></div>
@@ -384,29 +411,32 @@ bestseller.csv 로 저장해줘. 인코딩은 엑셀에서 한글이 깨지지 �
       </div>
 
       <div class="copy-block"><span class="cb-label">💬 이 보고서에 실제로 사용한 지시</span><button class="copy-btn" data-copy="p4">복사</button>
-<pre id="p4">EDA의 목적은 민사 손해배상 소송(직장 내 괴롭힘을 근거로 한 불법행위
-손해배상) 사건에서 직장 내 괴롭힘으로 인정된 요건을 파악하는 것임.
-수집한 사건을 (1) 유형별로 분류하고, (2) 약 2줄로 사건 개요를 요약하라.</pre></div>
-      <div class="tip-card"><b>여기서도 마찬가지</b> — 분석의 <b>목적</b>과 최소한의 산출물(분류·요약)만 지시했고, 인정 요건 ①~⑥의 추출과 긍정/부정 사례 대비 같은 구성은 AI가 목적에 맞춰 스스로 발전시킨 것입니다.</div>
+<pre id="p4">수집한 판결문에 대해 탐색적 분석을 하라.
 
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>수집 → EDA → 보고서로 이어지는 흐름을 이해했다</span></label></div>
+탐색적 분석의 목적은 민사 손해배상 소송(직장 내 괴롭힘을 근거로 한
+불법행위 손해배상) 사건에서 직장 내 괴롭힘으로 인정된 요건을
+파악하는 것임.</pre></div>
+      <div class="tip-card"><b>여기서도 마찬가지</b> — 분석의 <b>목적</b>만 지시했고, 인정 요건 ①~⑥의 추출과 긍정/부정 사례 대비 같은 구성은 AI가 목적에 맞춰 스스로 발전시킨 것입니다. (사건 분류와 2줄 요약은 앞의 수집·변환 단계에서 이미 만들어 둔 상태입니다.)</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>수집 → 변환 → 분석 → 보고서로 이어지는 연구 파이프라인을 이해했다</span></label></div>
     </section>
 
-    <!-- ================= SECTION 3 ================= -->
-    <section class="section" id="s3">
-      <div class="sec-head"><span class="sec-num">3</span><h2>마무리 체크리스트</h2></div>
+    <!-- ================= SECTION 4 ================= -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>마무리 체크리스트</h2></div>
       <ul class="final-list">
         <li>정적 사이트는 "URL 규칙 + 뽑을 항목 + 저장 형식 + 저장 위치"의 4요소 프롬프트로 수집한다</li>
-        <li>결과는 연동 폴더에 파일로 남긴다 — 표는 CSV, 긴 본문은 사건번호를 파일명으로 한 개별 파일</li>
+        <li>결과는 연동 폴더에 파일로 남긴다 — 표는 CSV, 긴 본문은 <code>법원_사건번호</code>를 파일명으로 한 개별 파일</li>
+        <li>수집한 본문은 마크다운(.md)으로 변환하며 중간 제목을 붙이고, 전문을 읽는 김에 2줄 요약도 함께 만들어 둔다</li>
         <li>②번 자료의 경계는 실습에서도 그대로 — 페이월 금지, 비영리·소량·내부 분석, 서버 배려</li>
         <li>대량 수집은 목록 CSV 먼저, 본문은 나눠서 — 진행 상황이 CSV에 남아 언제든 이어서 할 수 있다</li>
         <li>수집 직후 EDA 프롬프트로 유사도·공통항목·키워드 주제·시계열 패턴을 탐색한다</li>
       </ul>
       <div class="next-card-grid">
         <div class="next-card"><b>직접 해보기</b><span>관심 분야의 정적 사이트 하나를 골라 §1 프롬프트를 변형해 100건 이상 수집하고, §2 프롬프트로 패턴 3가지를 찾아보세요. 결과 CSV가 내 폴더에 실제로 저장됐는지 꼭 확인하세요.</span></div>
-        <div class="next-card"><b>다음 강의 — 임베딩 추출</b><span>방금 폴더에 쌓은 판결문 파일을 <b>의미의 좌표(임베딩)</b>로 바꿉니다. 같은 폴더의 <code>embeddings/</code> 아래에 JSON 347개가 생기고, 그것이 지도와 검색의 재료가 됩니다.</span></div>
+        <div class="next-card"><b>다음 강의 — 임베딩 추출</b><span>방금 폴더에 쌓은 판결문 파일을 <b>의미의 좌표(임베딩)</b>로 바꿉니다. 판결문 한 건당 JSON 파일 하나가 만들어지고, 그것이 지도와 검색의 재료가 됩니다.</span></div>
       </div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>Week 2 웹 스크래핑 파트를 마쳤다!</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>Week 2 웹 스크래핑 파트를 마쳤다!</span></label></div>
     </section>
 
       <a class="back-home" href="index.html">
@@ -756,7 +786,7 @@ function updateProgress(){
 checks.forEach(c => c.addEventListener("change", updateProgress));
 
 /* ===== ⑦ 사이드바 scroll-spy ===== */
-const secIds = ["s1","s2","s3"];
+const secIds = ["s1","s2","s3","s4"];
 const tocLinks = {};
 document.querySelectorAll(".toc a").forEach(a => tocLinks[a.dataset.sec] = a);
 const io = new IntersectionObserver(entries => {
