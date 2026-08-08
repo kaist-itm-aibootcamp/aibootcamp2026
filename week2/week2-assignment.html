@@ -147,7 +147,7 @@ p{margin:10px 0;}
     <div class="hero">
       <span class="hero-kicker">WEEK 2 · 자율 실습 (선택) — 데이터만 바꿔서, 한 번 더</span>
       <h1>특허 지도 · 계보도 · 내 업무 스킬</h1>
-      <p>수업에서는 판결문 347건이었지만, 같은 파이프라인을 <b>다른 데이터로</b> 한 번 더 돌려 보면 "데이터가 바뀌어도 프롬프트와 절차는 그대로"라는 것을 손으로 확인하게 됩니다. 세 가지 모두 강의 자료의 프롬프트를 복사해 몇 단어만 바꾸면 시작됩니다.</p>
+      <p>수업에서는 판결문 347건이었지만, 같은 파이프라인을 <b>다른 데이터로</b> 한 번 더 돌려 보면 "데이터가 바뀌어도 프롬프트와 절차는 그대로"라는 것을 손으로 확인하게 됩니다. 아래 프롬프트는 강의에서 쓴 것을 이 실습에 맞게 고쳐 둔 것이라, 그대로 복사해 몇 군데만 채우면 시작됩니다.</p>
     </div>
 
     <!-- ============ 실습 1 ============ -->
@@ -209,12 +209,28 @@ CSV 파일로 저장해줘.
 
       <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
         <b class="ws-title">임베딩 — 초록을 벡터로</b>
-        <p>④의 프롬프트를 재사용합니다. 대상만 "판결문"에서 "patents.csv의 초록 열"로 바꾸면 됩니다. 초록은 판결문보다 훨씬 짧아 비용은 몇 센트 수준입니다.</p>
+        <p>④에서 판결문에 쓴 것과 같은 요청을, 대상만 특허 초록으로 바꿉니다.</p>
+        <div class="copy-block"><span class="cb-label">💬 임베딩 프롬프트</span><button class="copy-btn" data-copy="a2">복사</button>
+<pre id="a2">patents.csv의 초록 열을 임베딩해줘. OpenRouter API를 쓰고,
+키는 폴더의 openrouterkey.txt에서 읽어.
+
+특허 한 건당 JSON 파일 하나로 저장하고, JSON에는 출원번호·발명의 명칭·
+출원인·출원일 같은 서지 정보와 초록, 초록 임베딩을 함께 넣어줘.</pre></div>
+        <p>초록은 판결문보다 훨씬 짧아 비용은 몇 센트 수준입니다.</p>
       </div></div>
 
       <div class="workshop-step"><span class="ws-num">4</span><div class="ws-body">
         <b class="ws-title">지도 — 클러스터링과 2D 시각화</b>
-        <p>⑤의 재현용 프롬프트로 클러스터링 + 차원축소 지도를 만들고, <b>군집마다 기술 이름을 붙여</b> 보세요. 마지막으로 "예상과 다른 군집 하나"를 골라 원문(초록)을 확인합니다 — 지도가 보여준 패턴은 가설이고, 확인은 원문으로 한다는 ⑤의 원칙 그대로입니다.</p>
+        <p>⑤와 같은 방식입니다 — 원하는 결과만 말하고 계획을 먼저 받습니다.</p>
+        <div class="copy-block"><span class="cb-label">💬 지도 프롬프트</span><button class="copy-btn" data-copy="a3">복사</button>
+<pre id="a3">폴더의 특허 임베딩 JSON 파일들로 클러스터링을 하고,
+결과를 지도처럼 한눈에 볼 수 있게 시각화해줘.
+군집마다 어떤 기술인지 이름을 붙여주고, 점에 마우스를 올리면
+발명의 명칭과 출원인이 보이게 해줘.
+
+바로 실행하지 말고 계획부터 세워서 보여줘. 기술적으로 결정해야 할 것이
+있으면 선택지와 함께 알려주고, 내가 고르게 해줘.</pre></div>
+        <p>지도가 나오면 <b>"예상과 다른 군집 하나"</b>를 골라 초록을 직접 읽어 보세요 — 지도가 보여준 패턴은 가설이고 확인은 원문으로 한다는 ⑤의 원칙 그대로입니다.</p>
       </div></div>
 
       <div class="result-box"><span>🗺️</span><span><b>완성 모습</b> — <code>patents.csv</code> + 클릭해 탐색하는 기술 지도 HTML. "이 분야의 특허는 크게 ~로 나뉜다"고 말할 수 있으면 성공입니다.</span></div>
@@ -224,15 +240,27 @@ CSV 파일로 저장해줘.
     <!-- ============ 실습 2 ============ -->
     <section class="section" id="s2">
       <div class="sec-head"><span class="sec-num">2</span><h2>논문 계보도 만들기 (가볍게)</h2></div>
-      <p class="sec-lead">⑦의 프롬프트를 <b>그대로 복사해 주제만 바꾸면</b> 됩니다.</p>
+      <p class="sec-lead">⑦에서 그린 계보도를 <b>내 주제로</b> 다시 그립니다.</p>
 
       <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
         <b class="ws-title">출발점 정하기</b>
         <p>많이 인용되는 논문 1편을 씨앗으로 삼아도 되고, <b>주제만 말해도 됩니다</b> — "OO 분야의 계보도를 그려줘"라고 하면 씨앗 논문을 AI가 찾아 시작합니다.</p>
       </div></div>
       <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
-        <b class="ws-title">⑦의 프롬프트로 계보도 생성</b>
-        <p>⑦(논문 계보도)의 프롬프트를 복사해 씨앗 논문만 바꿔 실행합니다 — 조상(참고문헌 중 뿌리 논문)과 후예(인용한 논문)를 모아 시간축 네트워크로 그려 줍니다. 여유가 있으면 후속 프롬프트로 <b>읽기 계획</b>까지 뽑아 보세요.</p>
+        <b class="ws-title">계보도 만들기</b>
+        <p>⑦에서 쓴 요청을 <b>내 주제로 바꾼 것</b>입니다. 대괄호 두 곳만 채우면 됩니다.</p>
+        <div class="copy-block"><span class="cb-label">💬 계보도 프롬프트 (대괄호만 바꾸세요)</span><button class="copy-btn" data-copy="a4">복사</button>
+<pre id="a4">내 연구 질문은 "[내 주제 한 줄]"이야. [해당 분야] 분야에서 이 질문을
+다룬 주요 연구 30편 내외를, 뿌리가 되는 이전 논문까지 포함해 수집해줘.
+
+- 공개 학술 데이터(OpenAlex, Semantic Scholar 등)에서 제목, 저자,
+  연도, 게재지, 인용 수, 초록, 그리고 "누가 누구를 인용하는지"를 모아
+- 논문 사이의 인용 관계를 시간축 계보도(네트워크)로 시각화해줘
+  · 시간은 위에서 아래로 흐르게
+  · 연구 갈래를 색으로 구분
+  · 논문을 클릭하면 전체 제목·서지 사항·초록이 보이게
+- 수집 출처와 기준일도 함께 기록해줘</pre></div>
+        <p>여유가 있으면 완성된 계보도에 이어서 물어보세요 — <b>"이 계보도를 근거로, 비전공자인 내가 8주 안에 이 분야를 따라잡는 읽기 순서를 짜줘"</b>처럼요. ⑦ §4에서 본 후속 프롬프트입니다.</p>
       </div></div>
 
       <div class="result-box"><span>🌳</span><span><b>완성 모습</b> — 내 주제의 계보도 HTML 한 장.</span></div>
@@ -250,8 +278,8 @@ CSV 파일로 저장해줘.
       </div></div>
       <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
         <b class="ws-title">한 문장 지시</b>
-        <div class="copy-block"><span class="cb-label">💬 스킬 생성 프롬프트</span><button class="copy-btn" data-copy="a3">복사</button>
-<pre id="a3">이 폴더의 문서들을 전부 분석해서, 같은 종류의 문서를 새로 작성하는
+        <div class="copy-block"><span class="cb-label">💬 스킬 생성 프롬프트</span><button class="copy-btn" data-copy="a5">복사</button>
+<pre id="a5">이 폴더의 문서들을 전부 분석해서, 같은 종류의 문서를 새로 작성하는
 스킬 파일(SKILL.md)을 만들어 줘. 문체·구조·분량·자주 쓰는 표현을
 실제 수치와 함께 정리하고, 발동 조건(description)에는
 "어떤 요청이 오면 이 스킬을 쓰는지"를 분명하게 적어줘.</pre></div>
