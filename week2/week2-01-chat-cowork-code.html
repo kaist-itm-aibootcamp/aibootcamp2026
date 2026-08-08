@@ -219,7 +219,7 @@ p{margin:10px 0;}
     <div class="hero">
       <span class="hero-kicker">WEEK 2 · STEP 1 — 도구의 지형</span>
       <h1>같은 Claude, 세 개의 작업대 —<br/>Chat · Cowork · Claude Code</h1>
-      <p>1주차는 브라우저의 <b>claude.ai</b>에서 대화하고 아티팩트를 받는 것으로 충분했습니다. 2주차부터는 다릅니다 — 수백 건의 데이터를 <b>내 PC 폴더에 파일로 쌓습니다</b>. 그래서 작업대를 웹에서 <b>로컬</b>로 내립니다. 세 작업대의 차이를 정리하고, 이번 주(2주차) 전 과정에서 쓸 <b>Claude 데스크톱 앱 · 크롬 확장</b>, 그리고 3주차부터 본격적으로 쓸 <b>Claude Code</b>까지 한 번에 설치합니다.</p>
+      <p>1주차는 브라우저의 <b>claude.ai</b>에서 대화하고 아티팩트를 받는 것으로 충분했습니다. 2주차부터는 다릅니다 — 수백 건의 데이터를 <b>내 PC 폴더에 파일로 쌓습니다</b>. 그래서 작업대를 웹에서 <b>로컬</b>로 내립니다. 세 작업대의 차이를 정리하고, 이번 주(2주차) 전 과정에서 쓸 <b>Claude 데스크톱 앱 · 크롬 확장</b>을 설치한 뒤, 3주차부터 본격적으로 쓸 <b>Claude Code</b>까지 같은 앱 안에서 열어 봅니다.</p>
     </div>
 
     <!-- ============ S1 ============ -->
@@ -252,13 +252,13 @@ p{margin:10px 0;}
         </div>
         <div class="col">
           <span class="tool-badge badge-code">CLAUDE CODE</span>
-          <h4>내 컴퓨터의 터미널 <small style="display:block;font-weight:700;color:var(--muted);font-size:12px;margin-top:3px;">3주차부터의 주력</small></h4>
+          <h4>내 컴퓨터에서 직접 실행 <small style="display:block;font-weight:700;color:var(--muted);font-size:12px;margin-top:3px;">데스크톱 앱에서 실행 · 3주차부터의 주력</small></h4>
           <ul>
-            <li>실행 위치: <b>내 PC</b> — 터미널에서 직접 명령 실행</li>
-            <li>파일: 현재 폴더의 파일을 직접 읽고·쓰고·실행</li>
+            <li>실행 위치: <b>내 PC</b> — 내 컴퓨터에서 직접 명령 실행</li>
+            <li>파일: 열어 둔 폴더의 파일을 직접 읽고·쓰고·실행</li>
             <li>산출물: 실행되는 프로그램 — <b>서버를 켤 수 있음</b></li>
             <li>강점: 로컬 백엔드, 개발 워크플로, 내 환경 제어</li>
-            <li>한계: 터미널이라는 낯선 환경 (오늘 설치하며 익숙해집니다)</li>
+            <li>한계: 내 PC를 직접 건드리는 만큼 사고의 대가도 내 쪽</li>
           </ul>
         </div>
       </div>
@@ -266,7 +266,7 @@ p{margin:10px 0;}
       <table class="doc-table">
         <thead><tr><th style="width:170px"></th><th>Chat</th><th>Cowork</th><th>Claude Code</th></tr></thead>
         <tbody>
-          <tr><td><b>AI가 일하는 곳</b></td><td>대화창</td><td>클라우드 컨테이너</td><td>내 PC 터미널</td></tr>
+          <tr><td><b>AI가 일하는 곳</b></td><td>대화창</td><td>클라우드 컨테이너</td><td>내 PC</td></tr>
           <tr><td><b>내 파일 접근</b></td><td>업로드한 파일만</td><td>연동 폴더 읽기/쓰기</td><td>폴더 직접 읽기/쓰기/실행</td></tr>
           <tr><td><b>프로그램 실행</b></td><td>—</td><td>클라우드에서 실행</td><td><b>내 PC에서 실행</b> (서버 가동)</td></tr>
           <tr><td><b>어울리는 작업 길이</b></td><td>분 단위 왕복</td><td>시간 단위 자율 작업</td><td>세션 단위 개발 작업</td></tr>
@@ -292,7 +292,7 @@ p{margin:10px 0;}
       판결문 수백 건 수집과 임베딩 API 호출은 <b>시간 단위로 도는 자율 작업</b>이고 산출물이 파일 수백 개입니다. Cowork는 클라우드에서 이 일을 돌리면서 결과를 <b>연동해 둔 내 PC 폴더</b>로 내려줍니다 — 그래서 3주차가 시작될 때 그 파일들이 이미 내 컴퓨터에 있습니다.</div>
 
       <div class="callout"><b class="cap">3주차부터 Code인 이유 — 서버는 내 컴퓨터에서 떠 있어야 한다</b>
-      웹앱이 부를 서버는 <b>브라우저와 같은 컴퓨터에서 계속 실행 중</b>이어야 합니다(<code>localhost</code>). Cowork의 클라우드 컨테이너는 세션이 끝나면 사라지고 내 브라우저의 localhost가 아니므로, "터미널에서 서버를 켜고 유지하는" 일은 Claude Code의 영역입니다. API 키를 내 PC에만 두는 보안 구조와도 맞아떨어집니다. 그런데도 Claude Code를 <b>이번 주에 미리 설치</b>하는 이유는 두 가지 — 3주차 첫 실습에서 세팅에 시간을 쓰지 않고 바로 시작하기 위해서, 그리고 이번 주에도 파이썬 버전 확인 같은 가벼운 일에 한 번 써 보며 터미널과 미리 친해지기 위해서입니다.</div>
+      웹앱이 부를 서버는 <b>브라우저와 같은 컴퓨터에서 계속 실행 중</b>이어야 합니다(<code>localhost</code>). Cowork의 클라우드 컨테이너는 세션이 끝나면 사라지고 내 브라우저의 localhost가 아니므로, "내 컴퓨터에서 서버를 켜고 유지하는" 일은 Claude Code의 영역입니다. API 키를 내 PC에만 두는 보안 구조와도 맞아떨어집니다.</div>
 
       <div class="callout caution"><b class="cap">설치 전에 알아둘 것 — 손발을 주는 일에는 위험이 따른다</b>
       지금부터 설치할 도구들은 내 파일을 읽고, 쓰고, 지우고, 인터넷으로 보낼 수 있습니다. 그만큼 <b>파일 파괴·데이터 유출·프롬프트 인젝션</b>(수집한 웹페이지 속에 숨은 지시문을 AI가 명령으로 착각하는 공격) 같은 위험이 따라옵니다. 그래서 이번 주 실습은 두 가지 습관 위에서 진행합니다 — ① 모든 작업은 <b>전용 폴더 하나 안에서만</b> 합니다. 다음 절에서 만들 폴더가 곧 울타리이며, 사고가 나도 피해가 그 폴더를 넘지 않습니다. ② 실행 승인 요청은 <b>반드시 읽고 누릅니다.</b> 습관적으로 Enter를 치는 순간 울타리를 내 손으로 여는 셈입니다. 위험이 발생하는 구조와 이를 OS 수준에서 막는 샌드박스의 원리는 <b>4주차 1강</b>에서 깊게 다룹니다.</div>
@@ -311,13 +311,14 @@ p{margin:10px 0;}
       </div></div>
       <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
         <b class="ws-title">작업 폴더 만들고 Cowork에 연동하기</b>
-        <p>이번 주 산출물이 전부 쌓일 폴더를 하나 만듭니다 (예: <code>바탕화면/week2</code>). 데스크톱 앱에서 <b>Cowork</b>를 열고 이 폴더를 연동하면, Cowork가 클라우드에서 만든 파일이 <b>내 PC의 이 폴더로 내려옵니다.</b></p>
+        <p>이번 주 산출물이 전부 쌓일 폴더를 하나 만듭니다. <b>Windows는 <code>C:\claude</code></b>, macOS는 홈 폴더 아래 <code>~/claude</code>를 권합니다 — 경로가 짧고 한글·공백이 없어서, 3주차에 이 폴더를 다룰 때 훨씬 편합니다. (바탕화면 아래처럼 경로가 길고 한글이 섞인 위치는 나중에 오류의 원인이 됩니다.)</p>
+        <p>데스크톱 앱에서 <b>Cowork</b>를 열고 이 폴더를 연동하면, Cowork가 클라우드에서 만든 파일이 <b>내 PC의 이 폴더로 내려옵니다.</b></p>
         <div class="callout" style="margin-top:10px;"><b class="cap">여기가 웹과 갈리는 지점</b>
         1주차 claude.ai에서는 결과물을 <b>하나씩 내려받아야</b> 했습니다. 폴더를 연동하면 수집한 CSV, 판결문 파일 수백 개, 임베딩 JSON 347개가 <b>알아서 이 폴더에 저장</b>됩니다. 3주차에 Claude Code가 열게 될 폴더도 바로 여기입니다.</div>
       </div></div>
       <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
         <b class="ws-title">Claude in Chrome (브라우저 확장) 설치</b>
-        <p>크롬 웹스토어에서 <b>Claude for Chrome</b> 확장을 설치하고, 툴바 아이콘을 눌러 같은 계정으로 로그인합니다. 이 확장은 <b>내 브라우저가 이미 화면에 그려낸 내용</b>을 읽기 때문에, 자바스크립트로 나중에 채워지는 목록이나 "더보기" 버튼 뒤의 내용까지 수집할 수 있습니다 (왜 필요한지는 ②번 자료(크롤링 이론)에서 다룹니다).</p>
+        <p><a href="https://claude.ai/chrome" target="_blank" rel="noopener"><b>claude.ai/chrome</b></a>의 설치 링크를 따라 <b>Claude for Chrome</b> 확장을 설치하고, 툴바 아이콘을 눌러 같은 계정으로 로그인합니다. (웹스토어에서 직접 검색하면 이름이 비슷한 다른 확장이 함께 나오니, Claude 홈페이지의 링크로 들어가세요.) 이 확장은 <b>내 브라우저가 이미 화면에 그려낸 내용</b>을 읽기 때문에, 자바스크립트로 나중에 채워지는 목록이나 "더보기" 버튼 뒤의 내용까지 수집할 수 있습니다 (왜 필요한지는 ②번 자료(크롤링 이론)에서 다룹니다).</p>
       </div></div>
       <div class="workshop-step"><span class="ws-num">4</span><div class="ws-body">
         <b class="ws-title">연동 확인 — 파일이 정말 내 PC에 떨어지는지</b>
@@ -332,39 +333,29 @@ p{margin:10px 0;}
     <!-- ============ S4 ============ -->
     <section class="section" id="s4">
       <div class="sec-head"><span class="sec-num">4</span><h2>설치 ② — Claude Code (3주차부터 본격 사용)</h2></div>
-      <p class="sec-lead">설치는 터미널에 명령 한 줄입니다. Pro 이상 구독 계정이면 추가 비용 없이 로그인해서 씁니다. 3주차 첫 실습(검색 서버 켜기)에서 바로 쓸 수 있도록 지금 미리 끝내 두고, 이번 주에도 파이썬 확인 같은 가벼운 일에 한 번 써 봅니다.</p>
+      <p class="sec-lead">따로 설치할 것이 없습니다. <b>§3에서 설치한 Claude 데스크톱 앱 안에 Code가 이미 들어 있습니다.</b> 터미널을 열거나 명령어를 외울 필요 없이, 앱에서 작업 폴더를 열고 한국어로 대화하면 됩니다. 3주차 첫 실습(검색 서버 켜기)에서 바로 시작할 수 있도록 지금 한 번 열어 봅니다.</p>
+
+      <div class="callout"><b class="cap">터미널을 쓰지 않습니다</b>
+      Claude Code는 원래 터미널에서 쓰는 도구(CLI)로 알려져 있지만, 이 부트캠프에서는 <b>데스크톱 앱 안의 Code</b>만 씁니다. 하는 일은 똑같습니다 — 내 PC의 폴더를 직접 읽고·쓰고·실행합니다. 다른 점은 검은 화면에 명령을 치는 대신 <b>익숙한 창에서 대화한다</b>는 것뿐입니다. 인터넷에서 <code>npm install</code>이나 <code>curl … | bash</code> 같은 설치 안내를 보시더라도 따라 하지 않으셔도 됩니다.</div>
 
       <div class="workshop-step"><span class="ws-num">1</span><div class="ws-body">
-        <b class="ws-title">터미널 열기</b>
-        <p>Windows: 시작 메뉴에서 <b>PowerShell</b> 검색 → 실행. macOS: Spotlight(⌘+Space)에서 <b>터미널</b> 검색 → 실행.</p>
+        <b class="ws-title">데스크톱 앱에서 Code 열기</b>
+        <p>§3에서 설치한 <b>Claude 데스크톱 앱</b>을 실행하고, Cowork를 골랐던 것과 같은 자리에서 <b>Code</b>를 고릅니다. 이미 로그인되어 있으므로 별도의 로그인 절차는 없습니다 (Pro 이상 구독 계정이면 추가 비용 없이 쓸 수 있습니다).</p>
       </div></div>
       <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
-        <b class="ws-title">설치 명령 실행</b>
-        <div class="copy-block" style="margin-top:8px;"><span class="cb-label">Windows (PowerShell)</span><button class="copy-btn" data-copy="c1">복사</button><pre class="mono" id="c1">irm https://claude.ai/install.ps1 | iex</pre></div>
-        <div class="copy-block"><span class="cb-label">macOS / Linux</span><button class="copy-btn" data-copy="c2">복사</button><pre class="mono" id="c2">curl -fsSL https://claude.ai/install.sh | bash</pre></div>
-        <p>터미널이 낯설면 대안도 있습니다 — 방금 설치한 <b>Claude 데스크톱 앱</b> 안에도 Code가 들어 있어 그래픽 화면으로 같은 일을 할 수 있습니다.</p>
+        <b class="ws-title">작업 폴더 열기</b>
+        <p>§3에서 만들어 Cowork에 연동해 둔 폴더(<code>C:\claude</code> 또는 <code>~/claude</code>)를 작업 폴더로 엽니다. <b>Cowork가 내려준 파일들이 이미 이 안에 있고, 3주차에 Code가 그 파일들을 그대로 이어받습니다</b> — 두 도구가 같은 폴더를 보게 하는 것이 이번 주 세팅의 핵심입니다.</p>
       </div></div>
       <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
-        <b class="ws-title">설치 확인 + 로그인</b>
-        <div class="copy-block" style="margin-top:8px;"><span class="cb-label">확인</span><button class="copy-btn" data-copy="c3">복사</button><pre class="mono" id="c3">claude --version</pre></div>
-        <p>버전 번호가 나오면 성공. <b>§3에서 Cowork에 연동해 둔 그 폴더</b>로 이동해 <code>claude</code>를 입력하면 브라우저가 열리며 로그인(구독 계정)합니다. 문제가 있으면 <code>claude doctor</code>가 진단해 줍니다.</p>
-      </div></div>
-      <div class="workshop-step"><span class="ws-num">4</span><div class="ws-body">
         <b class="ws-title">첫 대화 — 3주차 검색 서버 실습 사전 점검</b>
         <div class="copy-block" style="margin-top:8px;"><span class="cb-label">💬 첫 프롬프트</span><button class="copy-btn" data-copy="c4">복사</button><pre id="c4">파이썬이 설치되어 있는지 버전을 확인해줘. 없다면 설치 방법을 안내해줘.</pre></div>
-        <p>Cowork와 똑같이 한국어로 대화하면 됩니다 — 다른 점은 명령이 <b>내 컴퓨터에서</b> 실행된다는 것뿐입니다. 실행 전에 항상 허락을 구하므로, 무엇을 하려는지 읽고 승인하세요.</p>
-      </div></div>
-
-      <div class="workshop-step"><span class="ws-num">5</span><div class="ws-body">
-        <b class="ws-title">샌드박스 켜기 — 4주차 1강에서 원리를 배울 울타리 미리 두르기</b>
-        <div class="copy-block" style="margin-top:8px;"><span class="cb-label">Claude Code 안에서 입력</span><button class="copy-btn" data-copy="c5">복사</button><pre class="mono" id="c5">/sandbox</pre></div>
-        <p>패널이 열리면 <b>Mode</b> 탭에서 자동 승인 또는 일반 권한 모드를 고릅니다. macOS는 바로 켜지고, Linux·WSL2는 <code>bubblewrap</code>·<code>socat</code>이 필요하다는 안내가 뜨면 패널이 알려주는 대로 설치한 뒤 다시 실행하세요. <b>Windows는 WSL2 안에서 Claude Code를 실행</b>해야 샌드박스가 적용됩니다 — 네이티브 Windows에서는 지원되지 않고, 이 경우 권한 승인 프롬프트가 유일한 방어선이 되니 승인을 더 신중히 읽어야 합니다.</p>
+        <p>Cowork와 똑같이 한국어로 대화하면 됩니다 — 다른 점은 명령이 <b>내 컴퓨터에서</b> 실행된다는 것뿐입니다. 실행 전에 항상 허락을 구하므로, 무엇을 하려는지 읽고 승인하세요. 파이썬이 없다고 나오면 안내해 주는 대로 설치까지 맡기시면 됩니다.</p>
       </div></div>
 
       <div class="callout caution"><b class="cap">내 PC에서 실행된다 = 책임도 내 PC</b>
-      샌드박스는 사고의 <b>범위</b>를 좁혀 줄 뿐입니다. Claude Code는 울타리 밖으로 나가야 하는 명령·파일 삭제·새 도메인 접속에 확인을 요청하는데, 이때 승인 버튼을 습관적으로 누르면 울타리를 내가 여는 셈이 됩니다. 내용을 읽고 승인하세요. 중요한 폴더는 백업 후 실습하시고요.</div>
+      Claude Code는 파일을 지우거나 새 프로그램을 설치하는 것처럼 되돌리기 어려운 일 앞에서 확인을 요청합니다. 이때 승인 버튼을 습관적으로 누르면 §2에서 말한 울타리를 내 손으로 여는 셈입니다 — 내용을 읽고 승인하세요. 그리고 작업은 <b>§3에서 만든 전용 폴더 안에서만</b> 하세요. 사고가 나도 피해가 그 폴더를 넘지 않습니다. 중요한 폴더는 백업 후 실습하시고요. (이런 위험을 OS 수준에서 막는 <b>샌드박스</b>는 4주차 1강에서 원리부터 다룹니다.)</div>
 
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>Claude Code를 설치하고 파이썬 버전 확인까지 마쳤다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>데스크톱 앱에서 Code를 열고 파이썬 버전 확인까지 마쳤다</span></label></div>
     </section>
 
     <!-- ============ S5 ============ -->
