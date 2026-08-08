@@ -211,7 +211,7 @@ p{margin:10px 0;}
       <a href="#s2" data-sec="s2">2. SKILL.md 해부<span class="done-mark">✔</span></a>
       <a href="#s3" data-sec="s3">3. 실전 — 판례 QA 스킬 만들기<span class="done-mark">✔</span></a>
       <a href="#s4" data-sec="s4">4. 판단 기준까지 스킬에 담기<span class="done-mark">✔</span></a>
-      <a href="#s5" data-sec="s5">5. 스킬을 쓰는 여러 방법<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 스킬 쓰기 — 폴더에 넣어 두면 끝<span class="done-mark">✔</span></a>
       <a href="#s6" data-sec="s6">6. 실전 사례 — 7년 치 컬럼을 스킬로<span class="done-mark">✔</span></a>
       <a href="#s7" data-sec="s7">7. 마무리 체크리스트<span class="done-mark">✔</span></a>
     </div>
@@ -389,28 +389,13 @@ description: 직장 내 괴롭힘 판례 코퍼스(347건)에 대한 질문에 �
 
     <!-- ============ S5 ============ -->
     <section class="section" id="s5">
-      <div class="sec-head"><span class="sec-num">5</span><h2>스킬을 쓰는 여러 가지 방법</h2></div>
-      <p class="sec-lead">스킬은 결국 <b>파일 하나</b>입니다. 그래서 쓰는 방법도 하나가 아닙니다 — <b>작업 폴더에 그냥 넣어 두는 것</b>부터 <b>계정에 설치해 어디서나 쓰는 것</b>까지, 필요한 만큼만 고르면 됩니다.</p>
+      <div class="sec-head"><span class="sec-num">5</span><h2>스킬 쓰기 — 폴더에 넣어 두면 끝</h2></div>
+      <p class="sec-lead">Cowork로 작업할 때는 <b>연동한 폴더에 <code>SKILL.md</code>를 저장해 두기만 하면 됩니다.</b> 그 폴더에서 작업하는 동안 AI가 파일을 읽고 절차를 적용합니다. 설치 과정도, 설정 메뉴도 없습니다. §3의 프롬프트로 만들면 완성된 파일을 대화로 건네주므로, <b>받아서 폴더에 저장하면 그것으로 끝</b>입니다.</p>
 
-      <h3>방법 ① — 작업 폴더에 파일로 두기 (Cowork에서 가장 간단)</h3>
-      <p>Cowork로 작업할 때는 <b>연동한 폴더에 <code>SKILL.md</code>를 저장해 두기만 해도 됩니다.</b> 그 폴더에서 작업하는 동안 AI가 파일을 읽고 절차를 적용합니다. 별도의 설치 과정이 없고, 스킬을 고치고 싶으면 그 파일을 열어 고치면 그만입니다.</p>
-      <div class="tip-card"><b>이 방법이 잘 맞는 경우</b> — 이번 주 판례 실습처럼 <b>특정 폴더에서만 하는 작업</b>. 데이터도 절차도 그 폴더 안에 함께 있으니, 폴더째 동료에게 넘기면 그대로 재현됩니다.</div>
+      <div class="tip-card"><b>고치고 싶으면 파일을 열어 고치면 됩니다</b> — 데이터도 절차도 한 폴더 안에 있으니, 폴더째 동료에게 넘기면 그대로 재현됩니다.</div>
 
       <div class="callout ok"><b class="cap">그래도 자리는 나눠 둡니다 — 절차는 스킬에, 데이터는 파일로</b>
-      같은 폴더에 있더라도 <b>판결문을 SKILL.md 안에 적어 넣지는 마세요.</b> 스킬에는 절차만 두고 데이터는 별도 파일로 두면, 다음 학기에 판례가 500건으로 늘어도 <b>파일만 갈아끼우면 됩니다</b> — 스킬은 한 글자도 고칠 필요가 없습니다. 반대로 절차를 개선하면(예: "기각 사건도 반드시 1건 이상 대조하라") 스킬만 고쳐도 이후 모든 질문에 적용됩니다.</div>
-
-      <h3>방법 ② — 계정에 설치해 어디서나 쓰기</h3>
-      <p>같은 스킬을 여러 폴더·여러 작업에서 반복해 쓰게 되면, 그때 <b>설치</b>를 고려하면 됩니다. 설치해 두면 <b>폴더와 무관하게</b> 관련 질문이 올 때마다 Claude가 <b>알아서 그 스킬을 골라 씁니다.</b> 스킬을 여러 개 설치해 두면 질문의 성격에 따라 그중 맞는 것을 꺼내 쓰는 식입니다(§1의 3단계 로딩).</p>
-
-      <table class="doc-table">
-        <thead><tr><th style="width:150px">어디서 쓰나</th><th>두는 자리</th></tr></thead>
-        <tbody>
-          <tr><td><b>Cowork</b></td><td><b>연동 폴더에 <code>SKILL.md</code> 저장</b>(방법 ①). §3의 프롬프트로 만들면 완성된 파일을 대화로 건네주므로, 받아서 폴더에 저장하면 끝입니다.</td></tr>
-          <tr><td><b>Claude 앱</b><br/><small>(웹·데스크톱)</small></td><td>스킬 폴더를 <b>ZIP으로 압축</b> → 설정의 <b>스킬(Skills)</b> 메뉴에서 업로드. 목록에서 스위치로 켜고 끌 수 있습니다.</td></tr>
-          <tr><td><b>Claude Code</b></td><td>폴더째 복사: 계정 전체에 쓰려면 <code>~/.claude/skills/case-qa/</code>, 특정 작업 폴더에서만 쓰려면 그 폴더의 <code>.claude/skills/case-qa/</code></td></tr>
-        </tbody>
-      </table>
-      <div class="tip-card"><b>한 곳에 두었다고 다른 곳에 생기지는 않습니다</b> — 앱에 업로드한 스킬이 Claude Code에 자동으로 나타나지는 않습니다. 여러 환경에서 쓰려면 각각에 두어야 하는데, <b>파일 하나를 복사하는 일</b>이라 어렵지 않습니다.</div>
+      같은 폴더에 있더라도 <b>판결문을 SKILL.md 안에 적어 넣지는 마세요.</b> 스킬에는 절차만 두고 데이터는 별도 파일로 두면, 판례가 500건으로 늘어도 <b>파일만 갈아끼우면 됩니다</b> — 스킬은 한 글자도 고칠 필요가 없습니다. 반대로 절차를 개선하면(예: "기각 사건도 반드시 1건 이상 대조하라") 스킬만 고쳐도 이후 모든 질문에 적용됩니다.</div>
 
       <h3>잘 되고 있는지 확인하기</h3>
       <div class="flow">
@@ -421,8 +406,9 @@ description: 직장 내 괴롭힘 판례 코퍼스(347건)에 대한 질문에 �
         <div class="step"><b>③ 답변 형태</b><span>사건번호 인용이 붙어 있으면 절차대로 동작한 것</span></div>
       </div>
       <div class="tip-card"><b>안 불러오는 것 같으면</b> — <b>"case-qa 스킬을 써서 답해줘"</b>라고 한 줄 붙이면 됩니다. 그래도 어색하면 §2의 <code>description</code>을 손볼 차례입니다.</div>
+      <div class="tip-card"><b>폴더와 무관하게 쓰고 싶다면</b> — Claude 앱이나 Claude Code에 <b>설치</b>해 두는 방법도 있습니다. 필요해지면 <b>Claude에게 "이 스킬을 설치하려면 어떻게 하냐"고 물어보면</b> 환경에 맞게 알려줍니다.</div>
 
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>폴더에 두는 방법과 설치하는 방법의 차이를 안다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>연동 폴더에 SKILL.md를 두어 스킬을 적용하는 방법을 안다</span></label></div>
     </section>
 
     <!-- ============ S6 ============ -->
@@ -478,7 +464,7 @@ description: 직장 내 괴롭힘 판례 코퍼스(347건)에 대한 질문에 �
         <li>절차는 스킬에, 데이터는 폴더에 — 데이터가 바뀌면 파일만 갈아끼우고 스킬은 그대로</li>
         <li>데이터만으로는 "찾기"까지다 — 가이드라인·연구보고서·사내 규정을 올려 <b>판단 기준</b>까지 스킬에 담으면 "판단하기"가 된다</li>
         <li>기준을 넣어도 최종 판단은 사람의 몫 — 그래서 근거의 출처를 밝히게 한다</li>
-        <li>쓰는 방법은 둘 — 작업 폴더에 <code>SKILL.md</code>를 두거나(Cowork에서 가장 간단), 계정에 설치해 어디서나 자동으로 골라 쓰게 하거나</li>
+        <li>Cowork에서는 연동 폴더에 <code>SKILL.md</code>를 저장해 두면 그대로 적용된다 — 설치가 필요하면 Claude에게 물어보면 된다</li>
         <li>과거 산출물 폴더 + "이 스타일로 쓰는 스킬을 만들어 줘" 한 문장 = 나의 스타일 스킬 (7년 치 컬럼 사례)</li>
         <li>스킬 파일은 특정 모델 전용이 아니다 — 모델마다 재현도를 비교해 골라 쓴다</li>
       </ul>
