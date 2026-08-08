@@ -33,6 +33,12 @@ body{
 .week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
 .back-week{font-size:13px;font-weight:700;color:var(--brand-dark);text-decoration:none;white-space:nowrap;}
 .back-week:hover{text-decoration:underline;}
+.back-home{display:flex;align-items:center;gap:15px;max-width:840px;margin:34px 0 10px;padding:20px 24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s ease,border-color .18s ease;}
+.back-home:hover{transform:translateY(-2px);border-color:var(--brand);}
+.back-home .bh-ic{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;border-radius:11px;background:var(--sky-light);color:var(--brand-dark);font-size:19px;font-weight:900;}
+.back-home strong{display:block;font-size:15.5px;font-weight:800;}
+.back-home small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;font-weight:600;}
+@media (max-width:640px){.back-home{padding:18px;gap:12px;}}
 .progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
 .progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
 .progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
@@ -136,13 +142,13 @@ p{margin:10px 0;}
     <div class="hero">
       <span class="hero-kicker">WEEK 4 · 자율 실습 (선택) — 4주의 기술을 한 화면에</span>
       <h1>내 포트폴리오 수익률 앱 만들기</h1>
-      <p>제출도 정답도 없습니다 — <b>해 보고 싶은 분들을 위한 상세 안내</b>입니다. 내 투자 포트폴리오(가상이어도 됩니다)를 <b>구글 드라이브의 시트</b>에 올리고, 앱이 <b>주기적으로 현재가를 수집해 DB에 쌓은 뒤</b>, 그 기록으로 <b>수익률과 자산 추이 그래프</b>를 보여주는 앱을 만듭니다. 마지막으로 <b>비밀번호를 입력해야 들어올 수 있는</b> 잠금까지 — 시트 연동(④), 루틴 수집(⑥의 원리), 배포(3주차 ⑤), 비밀번호 해시(3주차 ⑥ §6)를 한 번에 복습하게 됩니다.</p>
+      <p>내 투자 포트폴리오(가상이어도 됩니다)를 <b>구글 드라이브의 시트</b>에 올리고, 앱이 <b>주기적으로 현재가를 수집해 DB에 쌓은 뒤</b>, 그 기록으로 <b>수익률과 자산 추이 그래프</b>를 보여주는 앱을 만듭니다. 마지막으로 <b>비밀번호를 입력해야 들어올 수 있는</b> 잠금까지 — 시트 연동(④), 루틴 수집(⑥의 원리), 배포(3주차 ⑤), 비밀번호 해시(3주차 ⑥ §6)를 한 번에 복습하게 됩니다.</p>
     </div>
 
     <!-- ============ S1 ============ -->
     <section class="section" id="s1">
       <div class="sec-head"><span class="sec-num">1</span><h2>구글 시트에 포트폴리오 원장 만들기</h2></div>
-      <p class="sec-lead">구글 드라이브에서 새 스프레드시트를 만들어 <b>보유 내역(원장)</b>을 적습니다. 실제 계좌가 부담스러우면 <b>가상 포트폴리오</b>로 하세요 — 목적은 연동과 자동화이지 투자가 아닙니다.</p>
+      <p class="sec-lead">구글 드라이브에서 새 스프레드시트를 만들어 <b>보유 내역(원장)</b>을 적습니다.</p>
       <p><b>탭 1 — <code>portfolio</code></b> (내가 적는 원장):</p>
       <table class="doc-table">
         <thead><tr><th>종목명</th><th>티커</th><th>수량</th><th>매수단가</th></tr></thead>
@@ -204,7 +210,7 @@ p{margin:10px 0;}
 
       <div class="callout"><b class="cap">"DB가 왜 구글 시트야?"</b>
       맞습니다, 여기서 시트의 <code>prices</code> 탭이 <b>DB 역할</b>을 합니다. 이미 배운 서비스 계정 쓰기로 충분하고, 쌓이는 기록을 눈으로 열어 볼 수 있어 학습용으로 최적입니다. 기록이 수만 행으로 커지면 그때 진짜 DB(Postgres 등)로 옮기면 됩니다 — 3주차 검색엔진에서 "소규모는 전수 계산, 대규모는 전용 DB"라고 했던 것과 같은 판단입니다.</div>
-      <div class="tip-card"><b>그래프가 하루 만에 안 예뻐도 정상</b> — 추이 그래프는 기록이 쌓여야 선이 됩니다. 첫날은 점 하나입니다. 수집이 매일 도는 것을 확인했다면 완성이고, 일주일 뒤에 다시 열어 보세요.</div>
+      <div class="tip-card">추이 그래프는 <b>기록이 쌓여야 선이 됩니다.</b> 첫날은 점 하나입니다. 수집이 매일 도는 것을 확인했다면 완성이고, 일주일 뒤에 다시 열어 보세요.</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>수집 함수가 prices 탭에 기록을 쌓고, 화면에 수익률과 추이 그래프가 나온다</span></label></div>
     </section>
 
@@ -237,7 +243,10 @@ p{margin:10px 0;}
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>다음 날에도 기록이 스스로 쌓이는 것을 확인했다</span></label></div>
     </section>
 
-      <a class="back-week" href="index.html" style="display:inline-block;margin-top:30px;">← 4주차 강의자료 목록으로</a>
+      <a class="back-home" href="index.html">
+        <span class="bh-ic">←</span>
+        <span><strong>4주차 강의자료 목록으로 돌아가기</strong><small>강의 자료를 다시 보려면 목록에서 골라보세요</small></span>
+      </a>
   </main>
 </div>
 

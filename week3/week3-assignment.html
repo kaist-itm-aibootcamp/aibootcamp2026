@@ -33,6 +33,12 @@ body{
 .week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
 .back-week{font-size:13px;font-weight:700;color:var(--brand-dark);text-decoration:none;white-space:nowrap;}
 .back-week:hover{text-decoration:underline;}
+.back-home{display:flex;align-items:center;gap:15px;max-width:840px;margin:34px 0 10px;padding:20px 24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s ease,border-color .18s ease;}
+.back-home:hover{transform:translateY(-2px);border-color:var(--brand);}
+.back-home .bh-ic{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;border-radius:11px;background:var(--sky-light);color:var(--brand-dark);font-size:19px;font-weight:900;}
+.back-home strong{display:block;font-size:15.5px;font-weight:800;}
+.back-home small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;font-weight:600;}
+@media (max-width:640px){.back-home{padding:18px;gap:12px;}}
 .progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
 .progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
 .progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
@@ -136,13 +142,13 @@ p{margin:10px 0;}
     <div class="hero">
       <span class="hero-kicker">WEEK 3 · 자율 실습 (선택) — 내가 만들고 싶은 것을, 세상에</span>
       <h1>내 웹앱 하나를 만들어 Vercel로 배포하기</h1>
-      <p>제출도 정답도 없습니다 — <b>해 보고 싶은 분들을 위한 상세 안내</b>입니다. 내가 배포해 보고 싶은 웹앱을 만들어 Vercel에 올려 보세요. 강의에서 다룬 검색엔진이나 RAG 방식 문서 작성기여도 좋고, <b>전혀 다른 어떤 방식이어도 좋습니다.</b> 성공의 기준은 화려함이 아니라 "실제 URL로 동작하는가" 하나입니다.</p>
+      <p>내가 배포해 보고 싶은 웹앱을 만들어 Vercel에 올려 보세요. 강의에서 다룬 검색엔진이나 RAG 방식 문서 작성기여도 좋고, <b>전혀 다른 어떤 방식이어도 좋습니다.</b> 성공의 기준은 화려함이 아니라 "실제 URL로 동작하는가" 하나입니다.</p>
     </div>
 
     <!-- ============ S1 ============ -->
     <section class="section" id="s1">
       <div class="sec-head"><span class="sec-num">1</span><h2>아이디어 정하기 — 무엇이든, 단 내 것으로</h2></div>
-      <p class="sec-lead">막막하면 아래에서 골라 변형하세요. 전부 이번 주 강의의 프롬프트를 재사용할 수 있는 방향들입니다.</p>
+      <p class="sec-lead">아래는 이번 주 강의의 프롬프트를 재사용할 수 있는 방향들입니다.</p>
       <table class="doc-table">
         <thead><tr><th style="width:210px">방향</th><th>예시</th><th style="width:150px">재사용할 강의</th></tr></thead>
         <tbody>
@@ -209,7 +215,10 @@ API(백엔드 함수), 데이터·파일 구조, 만들 순서. 내가 검토한
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>내 앱이 실제 URL로 동작한다</span></label></div>
     </section>
 
-      <a class="back-week" href="index.html" style="display:inline-block;margin-top:30px;">← 3주차 강의자료 목록으로</a>
+      <a class="back-home" href="index.html">
+        <span class="bh-ic">←</span>
+        <span><strong>3주차 강의자료 목록으로 돌아가기</strong><small>강의 자료를 다시 보려면 목록에서 골라보세요</small></span>
+      </a>
   </main>
 </div>
 
