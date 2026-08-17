@@ -63,6 +63,18 @@ body{
 .hero p{color:var(--muted);max-width:640px;}
 /* ---------- sections ---------- */
 .section{margin-top:44px;padding-top:8px;}
+.envm{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:20px 22px;margin:14px 0;font-size:13px;color:#111;max-width:640px;}
+.envm .em-h{display:flex;justify-content:space-between;align-items:center;font-size:16px;font-weight:900;margin-bottom:4px;}
+.envm .em-h span{color:#888;font-weight:400;}
+.envm .em-label{font-size:12px;color:#555;margin:12px 0 5px;}
+.envm .em-row{display:flex;gap:10px;align-items:center;}
+.envm .em-input{flex:1;border:1px solid #e4e4e4;border-radius:8px;padding:9px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;color:#111;}
+.envm .em-key{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;}
+.envm .em-dots{letter-spacing:2px;color:#333;overflow:hidden;white-space:nowrap;}
+.envm .em-ph{color:#aaa;}
+.envm .em-ico{color:#777;}
+.envm .em-btn{display:inline-block;border:1px solid #e4e4e4;border-radius:8px;padding:7px 14px;font-weight:600;margin-top:14px;}
+.envm .em-group{padding-bottom:6px;margin-bottom:8px;}
 .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
 .sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
 .sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
@@ -334,18 +346,46 @@ Vercel에 배포되어 있는 프로젝트야.
 흐름:
 1. 첫 화면은 이메일 입력 폼. 인증 전에는 챗봇 화면도, 검색·챗봇 API도
    절대 동작하면 안 돼.
-2. /api/send-code : 입력된 이메일이 허용 명단(환경변수 ALLOWED_EMAILS,
-   쉼표 구분)에 있으면 6자리 코드를 생성해 nodemailer로 Gmail SMTP를 통해 발송.
+2. /api/send-code : 입력된 이메일이 허용 명단(환경변수 ALLOWED_USERS,
+   쉼표 구분)에 있으면 6자리 코드를 생성해 Gmail SMTP로 발송.
    명단에 없으면 "발송되지 않았습니다"라고만 답하고 이유는 알려주지 마.
 3. 코드는 서버 측에 5분간만 유효하게 보관하고, 검증 3회 실패 시 폐기해줘.
 4. /api/verify-code : 코드가 맞으면 세션(서명된 쿠키)을 발급.
    이후 /api/chat과 /api/search는 유효한 세션이 있을 때만 동작하게 해줘.
 5. SMTP 설정은 환경변수로: SMTP_USER(내 지메일 주소), SMTP_APP_PASSWORD(앱
    비밀번호). smtp.gmail.com 587 포트 사용. 자격증명을 코드에 넣지 마.
-6. 메일 제목은 "[판결문 챗봇] 인증코드 안내", 본문에 코드와 유효시간을 담아줘.
-7. 파일 변경까지만 하고 git commit/push는 하지 마.</pre>
+6. 메일 제목은 "[판결문 챗봇] 인증코드 안내", 본문에 코드와 유효시간을 담아줘.</pre>
       </div>
-      <p>Vercel 환경변수에 <code>SMTP_USER</code>, <code>SMTP_APP_PASSWORD</code>, <code>ALLOWED_EMAILS</code> 세 개를 추가하고 재배포하면 완성입니다. 프롬프트의 2번 마지막 문장(이유를 알려주지 않기)과 3번(시간 제한·시도 제한)은 사소해 보이지만 실제 보안 관행입니다 — 공격자에게 명단 탐색과 무차별 대입의 실마리를 주지 않는 장치입니다. 1번의 "API도 동작하면 안 돼"도 중요합니다: 화면만 가리고 API를 열어 두면, 화면을 우회해 직접 API를 부르는 사람에게는 문이 없는 것과 같습니다.</p>
+      <p>Vercel 환경변수에 <code>SMTP_APP_PASSWORD</code>, <code>SMTP_USER</code>, <code>ALLOWED_USERS</code> 세 개를 추가하고 재배포하면 완성입니다. 실제로 추가한 화면입니다 (프로젝트 Settings → Environment Variables → Add — 값은 가려져 저장됩니다):</p>
+      <div class="envm">
+        <div class="em-h">Add Environment Variable <span>&#10005;</span></div>
+        <div class="em-group">
+          <div class="em-label">Key</div>
+          <div class="em-row"><div class="em-input em-key">SMTP_APP_PASSWORD</div><span class="em-ico">&#128465;</span></div>
+          <div class="em-label">Value</div>
+          <div class="em-input"><span class="em-dots">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span><span class="em-ico">&#128065;</span></div>
+          <div class="em-label">Note (Optional)</div>
+          <div class="em-input em-ph">Where to rotate, or who to contact</div>
+        </div>
+        <div class="em-group">
+          <div class="em-label">Key</div>
+          <div class="em-row"><div class="em-input em-key">SMTP_USER</div><span class="em-ico">&#128465;</span></div>
+          <div class="em-label">Value</div>
+          <div class="em-input"><span class="em-dots">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span><span class="em-ico">&#128065;</span></div>
+          <div class="em-label">Note (Optional)</div>
+          <div class="em-input em-ph">Where to rotate, or who to contact</div>
+        </div>
+        <div class="em-group">
+          <div class="em-label">Key</div>
+          <div class="em-row"><div class="em-input em-key">ALLOWED_USERS</div><span class="em-ico">&#128465;</span></div>
+          <div class="em-label">Value</div>
+          <div class="em-input"><span class="em-dots">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span><span class="em-ico">&#128065;</span></div>
+          <div class="em-label">Note (Optional)</div>
+          <div class="em-input em-ph">Where to rotate, or who to contact</div>
+        </div>
+        <div class="em-btn">+ Add Another</div>
+      </div>
+      <p> 프롬프트의 2번 마지막 문장(이유를 알려주지 않기)과 3번(시간 제한·시도 제한)은 사소해 보이지만 실제 보안 관행입니다 — 공격자에게 명단 탐색과 무차별 대입의 실마리를 주지 않는 장치입니다. 1번의 "API도 동작하면 안 돼"도 중요합니다: 화면만 가리고 API를 열어 두면, 화면을 우회해 직접 API를 부르는 사람에게는 문이 없는 것과 같습니다.</p>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>인증 추가 프롬프트와 필요한 환경변수 3개를 파악했다</span></label></div>
     </section>
 
