@@ -342,7 +342,7 @@ p{margin:10px 0;}
           <line x1="571" y1="470" x2="349" y2="470" stroke="#2f765b" stroke-width="2.5"/>
           <path d="M349 470 l10 -6 v12 z" fill="#2f765b"/>
           <text x="456" y="462" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f765b">⑧ 답변 텍스트 반환</text>
-          <text x="456" y="487" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">"…인정된 사례가 있습니다 [대구지법 …]"</text>
+          <text x="456" y="487" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">"…인정된 사례가 있습니다 [1]"</text>
           <!-- 9 -->
           <line x1="331" y1="530" x2="109" y2="530" stroke="#2f765b" stroke-width="2.5"/>
           <path d="M109 530 l10 -6 v12 z" fill="#2f765b"/>
@@ -388,9 +388,9 @@ p{margin:10px 0;}
 &nbsp;&nbsp;<span class="k">"model"</span>: <span class="v">"(계획서에서 정한 챗 모델)"</span>,<br/>
 &nbsp;&nbsp;<span class="k">"messages"</span>: [<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;{ <span class="k">"role"</span>: <span class="v">"system"</span>,<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"content"</span>: <span class="hl-sys">"아래 제공된 판결문 정보만을 근거로 답하라. 근거가 된 판결의<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;법원·사건번호를 반드시 인용하라. 제공된 판결로 답할 수 없으면<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'제공된 판례 범위에서는 답하기 어렵다'고 말하라."</span> },<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"content"</span>: <span class="hl-sys">"아래 제공된 판결문 정보만을 근거로 답하라. 근거로 쓴 판결에는<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1] [7]처럼 번호를 붙여 인용하라. 제공된 판결로 답할 수 없으면<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'제가 가진 347건의 판결문으로는 답변드릴 수 없습니다'라고 말하라."</span> },<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;{ <span class="k">"role"</span>: <span class="v">"user"</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"content"</span>: <span class="hl-doc">"[문서 1 | 유사도 0.86] 대구지방법원 2024가단138550 (원고일부승)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;무용단 단원인 원고 2명이 동료 단원 8명을 상대로 공연 출연자 명단변경,<br/>
@@ -454,6 +454,17 @@ p{margin:10px 0;}
       </div></div>
 
       <div class="workshop-step"><span class="ws-num">4</span><div class="ws-body">
+        <b class="ws-title">AI가 실측으로 답하고 계획을 확정한다 — 실제 돌아온 답변</b>
+        <div class="card" style="margin-top:8px;font-size:13.5px;line-height:1.75;">
+          <p style="margin:0 0 10px;"><b>만들 것</b> — 상단에 [검색] [챗봇] 탭이 생기고, 챗봇에 질문하면 판결 347건 중 가까운 20건을 찾아 그 요약을 근거로 답합니다. 답변에는 [1] [7] 같은 근거 번호가 붙고, 답변 아래 근거 판결이 카드로 나오며 클릭하면 오른쪽 패널에 전문이 열립니다. 근거가 없으면 "제가 가진 347건의 판결문으로는 답변드릴 수 없습니다"라고 답합니다.</p>
+          <p style="margin:0 0 10px;"><b>모델 선택을 맡기셔서 실제로 시험해 봤습니다.</b> 후보 6개에 진짜 챗봇과 똑같은 프롬프트를 넣고, 판례에 답이 있는 질문과 무관한 질문("이혼 재산분할 비율") 두 가지를 던졌습니다. 결과가 뚜렷했습니다. GLM 4.7 Flash는 두 질문 모두 빈 응답을 내놔 탈락했고, 나머지 다섯은 모두 무관한 질문을 정확히 거절했습니다. 요청하신 "아는 척하지 않기"는 다섯 모두 통과한 셈입니다.</p>
+          <p style="margin:0 0 10px;"><b>DeepSeek V3.2를 추천드립니다.</b> 질문당 약 2원인데, Claude(약 40원)와 함께 유일하게 "회사가 징계·전보를 다한 경우에는 책임이 부정되기도 한다"는 반대 사례를 스스로 짚었습니다. 법률 자료에서 예외를 함께 말해주는 건 중요한 차이라고 봤습니다. 20배 싼 값에 그 수준을 낸 게 결정적이었습니다. 단점은 응답이 16초로 느린 것이라, 답변을 한 글자씩 흘려보내는 스트리밍 출력을 함께 만들어 체감 대기를 줄이겠습니다. 그래도 답답하면 모델 이름 한 줄만 바꾸면 됩니다.</p>
+          <p style="margin:0;"><b>미리 아셔야 할 한계가 하나 있습니다.</b> 요약만 근거로 쓰기로 하셨는데, 요약은 한 건에 190자라 법원이 왜 그렇게 판단했는지는 담겨 있지 않습니다. "왜 그렇게 판단했나요?"류 질문에는 답이 얕아집니다. 확인 지점 1에서 실제 답변을 보시고 아쉬우면 상위 3~5건의 전문을 추가하는 쪽으로 바꿀 수 있습니다(질문당 2원 → 10원). 그리고 챗봇은 매번 20건만 보므로 "347건 중 승소율은?" 같은 전체 통계 질문은 답하지 못합니다. 그건 검색 탭의 요약 차트가 담당합니다.</p>
+        </div>
+        <p style="margin-top:8px;">위임한 결정 하나에 <b>후보 6개 실측 → 추천과 이유 → 비용 숫자 → 단점과 보완책</b>이 돌아왔습니다 — 3단계의 "추천해서 이유와 함께 적어줘" 한 줄이 만든 결과입니다. 묻지 않은 한계(요약 근거의 얕음, 전체 통계 불가)를 먼저 고지하고 나중에 바꿀 경로까지 열어둔 것도 눈여겨보세요 — 사람 전문가에게 기대하는 바로 그 보고 형태입니다.</p>
+      </div></div>
+
+      <div class="workshop-step"><span class="ws-num">5</span><div class="ws-body">
         <b class="ws-title">확정된 계획서대로 구현시킨다</b>
         <div class="copy-block" style="margin-top:8px;"><span class="cb-label">💬 4단계 — 구현 지시</span><button class="copy-btn" data-copy="r3">복사</button>
 <pre id="r3">계획서 v2대로 구현해줘. 계획에 없는 것은 먼저 물어봐.
@@ -471,12 +482,12 @@ p{margin:10px 0;}
           <div class="mock-title">💬 판례 AI에게 물어보기 <span style="font-size:11px;font-weight:700;color:#898781">— 347건 근거 · RAG</span></div>
           <div class="chat-q"><div class="bub">동료 직원들의 따돌림만으로도 손해배상을 받을 수 있어?</div></div>
           <div class="chat-a"><div class="bub">
-            제공된 판례 범위에서는 <b>가능합니다 — 다만 상대와 입증에 따라 갈립니다.</b> 상급자가 아닌 <b>동료를 상대로 직접</b> 위자료가 인정된 사례가 있습니다: 동료 단원 8명의 따돌림·폭언에 대해 일부 인용된 사건 <span class="cite">[대구지방법원 2024가단138550]</span>, 동료 검사원 3명의 따돌림·배제에 대해 일부 인용된 사건 <span class="cite">[수원지방법원 2022가단546552]</span>. 반면 집단 따돌림을 주장했지만 <b>증거 부족으로 기각</b>된 사례도 있습니다 <span class="cite">[울산지방법원 2022가단128995]</span>. 회사에까지 책임을 물으려면 회사가 따돌림을 알았거나 알 수 있었다는 점이 추가로 입증되어야 합니다.
+            제공된 판례 범위에서는 <b>가능합니다 — 다만 상대와 입증에 따라 갈립니다.</b> 상급자가 아닌 <b>동료를 상대로 직접</b> 위자료가 인정된 사례가 있습니다: 동료 단원 8명의 따돌림·폭언에 대해 일부 인용된 사건 <span class="cite">[1]</span>, 동료 검사원 3명의 따돌림·배제에 대해 일부 인용된 사건 <span class="cite">[2]</span>. 반면 집단 따돌림을 주장했지만 <b>증거 부족으로 기각</b>된 사례도 있습니다 <span class="cite">[3]</span>. 회사에까지 책임을 물으려면 회사가 따돌림을 알았거나 알 수 있었다는 점이 추가로 입증되어야 합니다.
           </div></div>
           <div class="chat-srcs">
-            <span class="chat-src">📎 대구지법 2024가단138550 · 원고일부승</span>
-            <span class="chat-src">📎 수원지법 2022가단546552 · 원고일부승</span>
-            <span class="chat-src">📎 울산지법 2022가단128995 · 원고패</span>
+            <span class="chat-src">📎 [1] 대구지법 2024가단138550 · 원고일부승</span>
+            <span class="chat-src">📎 [2] 수원지법 2022가단546552 · 원고일부승</span>
+            <span class="chat-src">📎 [3] 울산지법 2022가단128995 · 원고패</span>
           </div>
           <div class="chat-input"><div class="inp">추가 질문을 입력하세요…</div><div class="btn">질문</div></div>
         </div>
