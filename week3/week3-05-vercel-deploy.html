@@ -265,12 +265,12 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <!-- ================= SECTION 1 (Part A) ================= -->
     <section class="section" id="s1">
       <div class="sec-head"><span class="sec-num">1</span><h2>Part A · 지금까지의 한계 — 왜 나만 쓸 수 있었나</h2></div>
-      <p class="sec-lead">③에서 만든 검색기의 구조를 다시 봅시다. 브라우저(프런트엔드)는 판결문을 검색할 때마다 <b>내 PC에서 도는 로컬 서버(FastAPI)</b>에 물어봤습니다.</p>
+      <p class="sec-lead">③에서 만든 검색기의 구조를 다시 봅시다. 브라우저(프런트엔드)는 판결문을 검색할 때마다 <b>내 PC에서 도는 파이썬 로컬 서버</b>에 물어봤습니다.</p>
 
       <div class="flowline">
         <span class="fnode">브라우저<small>검색어 입력</small></span>
         <span class="farrow">→</span>
-        <span class="fnode dark">내 PC의 FastAPI<small>OpenRouter 키 보관 · 임베딩 계산</small></span>
+        <span class="fnode dark">내 PC의 로컬 서버<small>OpenRouter 키 보관 · 임베딩 계산</small></span>
         <span class="farrow">→</span>
         <span class="fnode">OpenRouter API<small>임베딩 모델</small></span>
         <span class="farrow">→</span>
@@ -308,10 +308,10 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <p>중요한 것은 <b>작업 흐름이 1주차와 똑같다</b>는 점입니다. 코드를 GitHub에 push하면 Vercel이 알아서 감지하고 새 버전을 배포합니다. "서버 관리"라는 일이 통째로 사라진 것 — 이것이 요즘 배포 방식(서버리스)의 핵심입니다.</p>
       <div class="tip-card"><b>이름에 속지 마세요.</b> "서버리스(serverless)"는 서버가 없다는 뜻이 아니라, <b>서버를 내가 관리하지 않는다</b>는 뜻입니다. 서버는 Vercel의 데이터센터에 있고, 나는 코드만 올립니다.</div>
 
-      <h3>서버리스 함수 — 로컬 FastAPI의 클라우드 버전</h3>
+      <h3>서버리스 함수 — 로컬 서버의 클라우드 버전</h3>
       <p>Vercel에서 백엔드는 <b>서버리스 함수(serverless function)</b>라는 형태로 돕니다. 저장소의 <code>api/</code> 폴더에 파일을 넣으면, 그 파일 하나하나가 <code>주소/api/파일명</code>으로 호출되는 백엔드가 됩니다.</p>
       <div class="compare">
-        <div class="col static-col"><h4>③ — 로컬 FastAPI</h4>
+        <div class="col static-col"><h4>③ — 내 PC의 로컬 서버</h4>
           <ul>
             <li>터미널에서 <code>uvicorn main:app</code>으로 직접 실행</li>
             <li>내가 실행해 둔 동안만 살아 있음</li>
@@ -330,7 +330,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       </div>
       <p>"요청이 올 때만 깨어난다"는 점이 무료로 운영 가능한 이유입니다. 24시간 컴퓨터를 빌리는 게 아니라, <b>실행된 순간만큼만</b> 자원을 쓰기 때문입니다. 개인 프로젝트나 MVP 수준의 트래픽이면 무료 한도를 넘기 어렵습니다.</p>
       <div class="callout"><b class="cap">우리가 할 일은 "요청"뿐</b>
-      FastAPI 코드를 서버리스 함수 형식으로 고치는 일은 AI에게 맡깁니다. 우리가 알아야 할 것은 구조 — "로컬 서버가 하던 일을 <code>api/</code> 폴더의 함수가 대신한다" — 입니다. §3의 프롬프트가 이 변환을 요청합니다.</div>
+      로컬 서버 코드를 서버리스 함수 형식으로 고치는 일은 AI에게 맡깁니다. 우리가 알아야 할 것은 구조 — "로컬 서버가 하던 일을 <code>api/</code> 폴더의 함수가 대신한다" — 입니다. §3의 프롬프트가 이 변환을 요청합니다.</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>Vercel·서버리스 함수가 무엇이고 왜 무료로 가능한지 이해했다</span></label></div>
     </section>
 
