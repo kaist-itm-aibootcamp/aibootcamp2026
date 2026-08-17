@@ -259,7 +259,8 @@ p{margin:10px 0;}
       <a href="#s2" data-sec="s2">2. 아키텍처와 데이터 플로우<span class="done-mark">✔</span></a>
       <a href="#s3" data-sec="s3">3. 컨텍스트에 실제로 담기는 것<span class="done-mark">✔</span></a>
       <a href="#s4" data-sec="s4">4. 실습 — 판례 챗봇, 계획부터<span class="done-mark">✔</span></a>
-      <a href="#s5" data-sec="s5">5. 마무리 체크리스트<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 실제 기록 — API 왕복과 로그<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. 마무리 체크리스트<span class="done-mark">✔</span></a>
     </div>
   </nav>
 
@@ -353,7 +354,7 @@ p{margin:10px 0;}
           <text x="100" y="596" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f765b">⑩ 답변 + 근거 카드 표시</text>
           <text x="100" y="613" text-anchor="middle" font-size="11" fill="#628a72">아래 "완성 화면 예시" 참고</text>
         </svg>
-        <p class="chart-note">앞 강의와 마찬가지로 — 🔑 키는 서버만 갖고, 판결문 347건 원본은 내 PC를 떠나지 않습니다(⑥에서 검색된 20건의 요약만 전송). 소요 시간은 몇 초로 늘어나는데, 대부분 ⑦의 답변 생성입니다.</p>
+        <p class="chart-note">앞 강의와 마찬가지로 — 🔑 키는 서버만 갖고, 판결문 347건 원본은 내 PC를 떠나지 않습니다(⑥에서 검색된 20건의 요약만 전송). 소요 시간은 십수 초로 늘어나는데, 대부분 ⑦의 답변 생성입니다 (실측: 임베딩 1초 + 생성 12초 — §5의 실제 기록 참조).</p>
       </div>
 
       <h3>왜 Chat·Cowork가 아니라 외부 유료 API인가</h3>
@@ -380,12 +381,12 @@ p{margin:10px 0;}
     <!-- ============ S3 ============ -->
     <section class="section" id="s3">
       <div class="sec-head"><span class="sec-num">3</span><h2>컨텍스트에 실제로 담기는 것 — 증강의 실물</h2></div>
-      <p class="sec-lead">⑥단계에서 서버가 실제로 보내는 LLM 호출을 열어보면 이렇게 생겼습니다. <b>사용자 질문 앞에 검색된 판례 요약 20건이 끼워 넣어진, 하나의 긴 컨텍스트</b> — 이것이 "증강(Augmented)"의 전부입니다.</p>
+      <p class="sec-lead">⑥단계에서 서버가 보내는 LLM 호출을 열어보면 이렇게 생겼습니다 (구조가 보이게 줄인 축약본 — 한 질문의 전체 실물 기록은 §5에 있습니다). <b>사용자 질문 앞에 검색된 판례 요약 20건이 끼워 넣어진, 하나의 긴 컨텍스트</b> — 이것이 "증강(Augmented)"의 전부입니다.</p>
       <div class="api-code">
 <span class="c">// ⑥ 서버가 보내는 실제 LLM 호출 — 컨텍스트 전체가 한 번에 들어갑니다</span><br/>
 <span class="k">POST</span> https://openrouter.ai/api/v1/chat/completions<br/>
 {<br/>
-&nbsp;&nbsp;<span class="k">"model"</span>: <span class="v">"(계획서에서 정한 챗 모델)"</span>,<br/>
+&nbsp;&nbsp;<span class="k">"model"</span>: <span class="v">"deepseek/deepseek-v4-flash"</span>,<br/>
 &nbsp;&nbsp;<span class="k">"messages"</span>: [<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;{ <span class="k">"role"</span>: <span class="v">"system"</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"content"</span>: <span class="hl-sys">"아래 제공된 판결문 정보만을 근거로 답하라. 근거로 쓴 판결에는<br/>
@@ -521,18 +522,133 @@ p{margin:10px 0;}
 
     <!-- ============ S5 ============ -->
     <section class="section" id="s5">
-      <div class="sec-head"><span class="sec-num">5</span><h2>마무리 체크리스트</h2></div>
+      <div class="sec-head"><span class="sec-num">5</span><h2>실제 기록 — 질문 한 번의 API 왕복 전부</h2></div>
+      <p class="sec-lead">완성된 챗봇에 §4 화면의 그 질문을 한 번 던지고, 프로그램이 OpenRouter와 <b>실제로 주고받은 내용을 그대로 캡처</b>했습니다 — 손으로 다듬지 않았고, API 키만 가렸습니다. API 호출은 <b>두 번뿐</b>입니다. 판결문을 고르는 일은 내 컴퓨터에서 계산으로 처리하고, AI에게는 고른 결과만 넘깁니다.</p>
+      <div class="api-code"><span class="c">// 전체 흐름 — 실측 시간</span><br/>
+[사용자 질문]<br/>
+&nbsp;&nbsp;→ (1) 임베딩 API&nbsp;&nbsp;— 질문을 4,096개의 숫자로 변환&nbsp;&nbsp;&nbsp;&nbsp;<span class="n">1.0초</span><br/>
+&nbsp;&nbsp;→ [내 컴퓨터]&nbsp;&nbsp;&nbsp;&nbsp;— 347건과 비교해 가까운 20건 선택&nbsp;&nbsp;&nbsp;<span class="c">(API 호출 없음)</span><br/>
+&nbsp;&nbsp;→ (2) 챗 API&nbsp;&nbsp;&nbsp;&nbsp;— 요약 20건을 근거로 주고 답변 요청&nbsp;&nbsp;<span class="n">12.0초</span><br/>
+&nbsp;&nbsp;→ [답변 + 인용 번호]</div>
+
+      <h3>첫 왕복 — 임베딩: 질문을 숫자로</h3>
+      <div class="api-code">
+<span class="k">POST</span> https://openrouter.ai/api/v1/embeddings<br/>
+<span class="c">Authorization: Bearer sk-or-v1-•••(비밀키)</span><br/>
+{ <span class="k">"model"</span>: <span class="v">"qwen/qwen3-embedding-8b"</span>,<br/>
+&nbsp;&nbsp;<span class="k">"input"</span>: <span class="v">"직장 내 괴롭힘으로 우울증이 생겼을 때 회사에도 책임을 물을 수 있나요?"</span> }<br/>
+<span class="c">── 받은 것 ──</span><br/>
+{ <span class="k">"data"</span>: [ { <span class="k">"embedding"</span>: [ <span class="n">-0.0036022…, -0.0106367…, 0.0236234…</span> <span class="c">(총 4,096개)</span> ] } ],<br/>
+&nbsp;&nbsp;<span class="k">"usage"</span>: { <span class="k">"prompt_tokens"</span>: <span class="n">30</span>, <span class="k">"cost"</span>: <span class="n">0.0000003</span> },<br/>
+&nbsp;&nbsp;<span class="k">"provider"</span>: <span class="v">"Nebius"</span> }</div>
+      <p class="chart-note">질문 한 문장이 <b>4,096개의 소수</b>(의미 좌표)로 바뀌었습니다. 토큰 30개, 비용 0.0000003달러(약 0.00044원) — 사실상 공짜입니다. 응답 끝의 <code>"provider": "Nebius"</code>는 아래 로그 이야기에서 다시 만납니다.</p>
+
+      <h3>API 없이, 내 컴퓨터에서 — 20건 고르기</h3>
+      <p>이 4,096개 숫자를 미리 만들어 둔 판결 347건의 임베딩과 비교합니다. 판결마다 본문·요약 임베딩이 하나씩 있어 총 694번 비교하고, 높은 쪽을 그 판결의 점수로 삼아 상위 20건을 고릅니다. 실제로 뽑힌 상위 5건입니다:</p>
+      <table class="doc-table">
+        <thead><tr><th style="width:52px">순위</th><th>법원 · 사건번호</th><th style="width:86px">소송결과</th><th style="width:70px" class="r">유사도</th><th style="width:70px">맞은 쪽</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>수원지방법원 안산지원 2022가단87835</td><td>원고일부승</td><td class="r">0.732</td><td>요약</td></tr>
+          <tr><td>2</td><td>수원지방법원 2024가단603107</td><td>원고일부승</td><td class="r">0.707</td><td>요약</td></tr>
+          <tr><td>3</td><td>서울중앙지방법원 2022가단5334343</td><td>원고패</td><td class="r">0.702</td><td>본문</td></tr>
+          <tr><td>4</td><td>수원지방법원 2021가단531133</td><td>원고일부승</td><td class="r">0.691</td><td>요약</td></tr>
+          <tr><td>5</td><td>대구지방법원 경주지원 2019가단15840</td><td>원고일부승</td><td class="r">0.685</td><td>요약</td></tr>
+        </tbody>
+      </table>
+
+      <h3>두 번째 왕복 — 챗: 근거를 주고 답변을 받는다</h3>
+      <div class="api-code">{ <span class="k">"model"</span>: <span class="v">"deepseek/deepseek-v4-flash"</span>, <span class="k">"max_tokens"</span>: <span class="n">3000</span>, <span class="k">"temperature"</span>: <span class="n">0.2</span>, <span class="k">"stream"</span>: <span class="n">true</span> }</div>
+      <p><code>stream: true</code>는 답변을 다 쓴 뒤 한 번에 주지 말고 쓰는 대로 조금씩 보내달라는 뜻이고(§4 완성 보고의 스트리밍 출력이 이것입니다), <code>temperature: 0.2</code>는 답변을 되도록 일관되게 하라는 뜻입니다(0에 가까울수록 매번 비슷해집니다).</p>
+      <p style="margin-top:14px;"><b>system 메시지 — AI에게 주는 규칙 (671자, 보낸 그대로)</b></p>
+      <div class="card" style="font-family:ui-monospace,Consolas,monospace;font-size:12.3px;line-height:1.8;white-space:pre-wrap;">너는 한국의 '직장 내 괴롭힘' 관련 민사판결 347건만을 근거로 답하는 조수다.
+사용자는 법률 전문가가 아니다.
+
+반드시 지킬 규칙:
+
+1. 아래 &lt;판례&gt;에 적힌 내용만 근거로 삼는다. 네가 따로 아는 법률지식이나 일반론으로
+   보충하지 마라. &lt;판례&gt;에 없는 법조문·판례번호·금액을 지어내지 마라.
+2. 답변의 각 주장 끝에 근거가 된 판례의 번호를 [1], [7]처럼 붙인다.
+   반드시 &lt;판례&gt;에 실제로 있는 번호만 쓴다.
+3. &lt;판례&gt;만으로 질문에 답할 수 없으면, 추측하지 말고 정확히 이렇게 답한다:
+   "제가 가진 347건의 판결문으로는 답변드릴 수 없습니다" 그리고 왜 그런지 한 줄로 설명한다.
+   일부만 답할 수 있으면 답할 수 있는 부분만 답하고, 나머지는 근거가 없다고 밝힌다.
+4. 결론이 갈리는 쟁점이면 **반대 방향의 사례도 함께** 제시한다.
+   (예: 회사 책임이 인정된 사례와 부정된 사례)
+5. 한국어로, 법률용어는 풀어서 설명한다. 길게 늘어놓지 말고 핵심부터 말한다.
+   사례를 그냥 나열하지 말고, 갈래를 잡아 정리한다.
+   답변에 "&lt;판례&gt;"라는 표시를 그대로 쓰지 마라. 필요하면 "판결문"이라고 쓴다.
+6. 너는 변호사가 아니며 이 답변은 법률 자문이 아니다. 다만 매 답변마다
+   그 사실을 반복해 적지는 마라 (화면에 이미 표시된다).</div>
+      <p style="margin-top:14px;"><b>user 메시지 — 근거 자료 + 질문 (5,252자)</b></p>
+      <div class="api-code"><span class="hl-doc">&lt;판례&gt;<br/>
+[1] 수원지방법원 안산지원 2022가단87835 · 2025. 1. 15. · 1심 · 원고일부승 · 333,751,696원<br/>
+팀장의 지속적인 공개 질책·모욕 등 직장 내 괴롭힘으로 우울증을 겪다 자살한 근로자의 유족이 가해<br/>
+팀장과 회사를 상대로 손해배상을 청구하였다. 법원은 괴롭힘과 사망 사이의 상당인과관계 및 회사의<br/>
+사용자책임을 인정하되 책임을 60%로 제한하여 합계 약 3억 3,000만 원의 배상을 명하였다.<br/>
+<span class="c">&nbsp;&nbsp;&nbsp;… [2]번부터 [20]번까지 같은 형식으로 이어짐 (4,900여 자) …</span><br/>
+&lt;/판례&gt;</span><br/>
+<br/>
+<span class="hl-q">질문: 직장 내 괴롭힘으로 우울증이 생겼을 때 회사에도 책임을 물을 수 있나요?</span></div>
+      <p class="chart-note">질문은 맨 마지막 한 줄(40자)뿐이고 <b>나머지 99%가 근거 자료</b>입니다. 규칙(system)은 매번 같고, 자료(user)는 질문마다 새로 담깁니다.</p>
+      <p>12초에 걸쳐 답변(1,162자 — §4 완성 화면의 그 답변입니다)이 스트리밍으로 돌아오고, 마지막에 사용량과 비용이 함께 옵니다:</p>
+      <div class="api-code">{ <span class="k">"usage"</span>: { <span class="k">"prompt_tokens"</span>: <span class="n">4332</span>, <span class="k">"completion_tokens"</span>: <span class="n">761</span>, <span class="k">"cost"</span>: <span class="n">0.00081956</span> },<br/>
+&nbsp;&nbsp;<span class="k">"provider"</span>: <span class="v">"CoreWeave"</span>, <span class="k">"finish_reason"</span>: <span class="v">"stop"</span> }</div>
+      <div class="callout caution"><b class="cap">실제로 겪은 문제 — 답이 잘리는 경우</b>
+      처음에는 <code>max_tokens</code>를 1500으로 두었는데, 이 모델이 답변을 길게 쓰는 편이라 <code>finish_reason</code>이 <code>"length"</code>로 돌아오면서 답변이 문장 중간("노동청이")에서 뚝 끊겼습니다. 3000으로 올려 해결했습니다. <b><code>finish_reason</code>이 <code>"length"</code>면 답이 잘린 것</b>입니다 — 화면에는 그럴듯하게 보여도 문장이 중간에 끊겨 있으니, 모델을 바꿀 때마다 확인해야 합니다.</div>
+
+      <h3>받은 뒤 — 인용 번호를 검증한다</h3>
+      <p>프로그램은 답변에서 <code>[1]</code> <code>[10]</code> 같은 번호를 찾아, 20건 목록에 <b>실제로 있는 번호만</b> 근거 카드로 만듭니다 — 이 답변에서는 13건([1] [2] [7] [19] [10] [5] [3] [6] [9] [15] [17] [12] [13])이 인용되었습니다. <code>[25]</code>처럼 목록에 없는 번호를 쓰면 카드로 만들지 않습니다. AI가 붙인 번호를 그대로 믿지 않고 프로그램이 확인하는 것입니다.</p>
+
+      <h3>이 질문 한 번의 비용</h3>
+      <table class="doc-table">
+        <thead><tr><th>단계</th><th>토큰</th><th class="r" style="text-align:right">비용(달러)</th><th class="r" style="text-align:right">비용(원)</th></tr></thead>
+        <tbody>
+          <tr><td>임베딩</td><td>30</td><td class="r">0.00000030</td><td class="r">0.00044원</td></tr>
+          <tr><td>답변 생성</td><td>입력 4,332 + 출력 761</td><td class="r">0.00081956</td><td class="r">1.19원</td></tr>
+          <tr><td><b>합계</b></td><td><b>5,123</b></td><td class="r"><b>0.00081986</b></td><td class="r"><b>약 1.19원</b></td></tr>
+        </tbody>
+      </table>
+      <p class="chart-note">입력 토큰 4,332개의 대부분이 판례 요약 20건입니다 — 질문 자체는 30토큰. (1달러 = 1,450원 기준)</p>
+
+      <h3>OpenRouter 활동 로그 — 같은 모델, 서버는 그때그때</h3>
+      <p>openrouter.ai의 Activity 페이지(2주차 ④에서 과금을 확인하던 그 화면)에는 호출 한 건 한 건이 이렇게 남습니다. 위 왕복들을 실험하는 동안 실제로 찍힌 기록입니다:</p>
+      <table class="doc-table" style="font-size:12.5px;">
+        <thead><tr><th style="width:74px">시각</th><th>모델</th><th>Provider (호스팅 서버)</th><th class="r" style="text-align:right">입력</th><th class="r" style="text-align:right">출력</th><th class="r" style="text-align:right">비용</th><th class="r" style="text-align:right">속도</th></tr></thead>
+        <tbody>
+          <tr><td>02:15</td><td>DeepSeek V4 Flash</td><td>Azure</td><td class="r">4,332</td><td class="r">729</td><td class="r">$0.00132</td><td class="r">66.4 tok/s</td></tr>
+          <tr><td>02:15</td><td>Qwen3 Embedding 8B</td><td>DeepInfra</td><td class="r">30</td><td class="r">–</td><td class="r">$0.0000003</td><td class="r">–</td></tr>
+          <tr><td>02:15</td><td>DeepSeek V4 Flash</td><td>StreamLake</td><td class="r">4,332</td><td class="r">1,348</td><td class="r">$0.000581</td><td class="r">46.1 tok/s</td></tr>
+          <tr><td>02:13</td><td>DeepSeek V4 Flash</td><td>CoreWeave</td><td class="r">4,332</td><td class="r">761</td><td class="r">$0.00082</td><td class="r">64.8 tok/s</td></tr>
+          <tr><td>02:13</td><td>Qwen3 Embedding 8B</td><td>Nebius Token Factory</td><td class="r">30</td><td class="r">–</td><td class="r">$0.0000003</td><td class="r">–</td></tr>
+          <tr><td>02:12</td><td>DeepSeek V4 Flash</td><td>GMICloud</td><td class="r">4,411</td><td class="r">1,499</td><td class="r">$0.000622</td><td class="r">90.4 tok/s</td></tr>
+        </tbody>
+      </table>
+      <p>눈여겨볼 것은 <b>Provider 열</b>입니다. 우리는 모델 이름(<code>deepseek/deepseek-v4-flash</code>)만 지정했는데, 그 모델을 <b>어느 회사 서버에서 돌릴지는 OpenRouter가 가격·속도·혼잡도를 보고 그때그때 골라 분산</b>합니다 — 같은 질문이 어떤 때는 Azure로, 어떤 때는 CoreWeave·StreamLake·GMICloud로 갔습니다. 임베딩(Qwen3 Embedding 8B)도 DeepInfra와 Nebius로 나뉘어 갔습니다. 위 왕복 기록의 <code>"provider": "Nebius"</code>·<code>"CoreWeave"</code>가 바로 그 흔적입니다. 서버가 다르니 속도(46~90 tok/s)와 비용도 호출마다 조금씩 다릅니다.</p>
+
+      <h3>짚어줄 점</h3>
+      <div class="insight"><span class="n">1</span><p><b>AI는 판결문 347건을 갖고 있지 않습니다.</b> 매번 질문에 맞는 20건을 골라 그때그때 메시지에 담아 보내고, AI는 그 20건만 보고 답합니다.</p></div>
+      <div class="insight"><span class="n">2</span><p><b>보내는 메시지의 대부분이 근거 자료입니다.</b> 질문은 40자인데 근거는 5,252자입니다.</p></div>
+      <div class="insight"><span class="n">3</span><p><b>규칙(system)과 자료(user)를 나눠서 보냅니다.</b> 규칙은 매번 같고, 자료는 매번 다릅니다.</p></div>
+      <div class="insight"><span class="n">4</span><p><b>"근거가 없으면 모른다고 하라"를 규칙에 적어둡니다.</b> 이 문장이 없으면 AI는 자기가 아는 일반 법률지식으로 그럴듯하게 지어냅니다.</p></div>
+      <div class="insight"><span class="n">5</span><p><b>인용 번호는 검증합니다.</b> AI가 붙인 번호를 그대로 믿지 않고, 실제 목록에 있는 번호인지 프로그램이 확인합니다.</p></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>질문 한 번의 API 왕복 두 번과 비용·로그를 실물로 확인했다</span></label></div>
+    </section>
+
+    <!-- ============ S6 ============ -->
+    <section class="section" id="s6">
+      <div class="sec-head"><span class="sec-num">6</span><h2>마무리 체크리스트</h2></div>
       <ul class="final-list">
         <li>RAG = 검색(기존 검색엔진 재사용) → 증강(질문 앞에 문서 끼워 넣기) → 생성(인용 강제)</li>
         <li>답변 생성은 Chat·Cowork가 아니라 외부 API — 서비스는 프로그램이 호출할 수 있어야 확장된다</li>
         <li>증강의 실물 = 지시 + 검색 문서 + 질문이 담긴 하나의 컨텍스트</li>
         <li>답이 이상하면 생성보다 검색 결과부터 디버깅</li>
+        <li>질문 한 번 = API 두 번(임베딩 + 챗) · 비용 약 1원대 — 어느 서버에서 돌릴지는 OpenRouter가 골라 분산</li>
       </ul>
       <div class="next-card-grid">
         <div class="next-card"><b>다음 강의 — Vercel 배포: 검색기에서 챗봇까지 (⑤)</b><span>③의 검색엔진과 오늘 만든 RAG 챗봇은 아직 <b>내 PC에서만</b> 돕니다. 다음 강의에서 클라우드(Vercel)에 올려 <b>URL 하나로 누구나 쓰는 서비스</b>로 만듭니다.</span></div>
         <div class="next-card"><b>다른 갈래 — Long Context와 하이브리드 (⑥)</b><span>검색으로 고르는 대신 <b>자료를 통째로 읽히면</b> 안 되나? 컨텍스트 창이 백만 토큰으로 커진 지금의 답과, 요지는 통째·전문은 골라 읽는 하이브리드를 ⑥에서 다룹니다.</span></div>
       </div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>RAG 강의를 마쳤다!</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>RAG 강의를 마쳤다!</span></label></div>
     </section>
       <a class="back-home" href="index.html">
         <span class="bh-ic">←</span>
