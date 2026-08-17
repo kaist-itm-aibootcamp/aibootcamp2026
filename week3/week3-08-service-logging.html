@@ -159,6 +159,29 @@ p{margin:10px 0;}
 .doc-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--surface);}
 .doc-table th{background:#f2f6f0;text-align:left;padding:8px 12px;border:1px solid var(--line);font-size:12.5px;}
 .doc-table td{padding:8px 12px;border:1px solid var(--line);}
+.sbf{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin:12px 0;font-size:13px;color:#111;overflow:hidden;}
+.sbf .sb-head{padding:16px 20px;border-bottom:1px solid #eee;}
+.sbf .sb-head b{font-size:15.5px;display:block;margin-bottom:4px;}
+.sbf .sb-head span{color:#666;font-size:12.5px;line-height:1.6;display:block;}
+.sbf .sb-row{display:grid;grid-template-columns:170px 1fr;gap:14px;padding:14px 20px;border-bottom:1px solid #f0f0f0;align-items:start;}
+.sbf .sb-row>b{font-size:13px;padding-top:8px;}
+.sbf .sb-input{border:1px solid #e4e4e4;background:#f9f9f9;border-radius:8px;padding:9px 13px;display:flex;align-items:center;gap:8px;color:#111;}
+.sbf .sb-input .cv{margin-left:auto;color:#888;}
+.sbf .sb-chip{background:#ececec;border-radius:999px;padding:1px 9px;font-size:10.5px;font-weight:700;color:#444;letter-spacing:.04em;}
+.sbf .sb-sub{font-size:12px;color:#777;margin-top:7px;line-height:1.6;}
+.sbf .sb-sub u{text-underline-offset:2px;}
+.sbf .sb-bar{height:4px;border-radius:999px;background:#2fbf71;margin-top:8px;}
+.sbf .sb-copy{border:1px solid #e4e4e4;background:#fff;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;margin-left:8px;white-space:nowrap;}
+.sbf .sb-check{display:flex;gap:10px;margin:0 0 14px;}
+.sbf .sb-check:last-child{margin-bottom:0;}
+.sbf .sb-check i{flex:0 0 auto;width:17px;height:17px;border-radius:4px;border:1px solid #ccc;display:grid;place-items:center;font-style:normal;font-size:11px;margin-top:2px;}
+.sbf .sb-check i.on{background:#111;border-color:#111;color:#fff;}
+.sbf .sb-check b{display:block;font-size:13px;}
+.sbf .sb-check span{display:block;font-size:12px;color:#777;line-height:1.55;}
+.sbf .sb-adv{padding:12px 20px;font-family:ui-monospace,Consolas,monospace;font-size:11.5px;letter-spacing:.12em;color:#666;border-bottom:1px solid #f0f0f0;}
+.sbf .sb-foot{padding:13px 20px;display:flex;justify-content:flex-end;gap:10px;}
+.sbf .sb-btn{border:1px solid #e4e4e4;border-radius:8px;padding:8px 16px;font-weight:600;}
+.sbf .sb-btn.go{background:#3ecf8e;border-color:#3ecf8e;color:#0b3d25;font-weight:800;}
 .final-list{list-style:none;margin:14px 0;}
 .final-list li > span{flex:1;}
 .final-list li{display:flex;gap:10px;margin:9px 0;font-size:14.5px;}
@@ -335,11 +358,35 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <div class="ws-steps">
         <div class="workshop-step"><span class="ws-num">1</span>
           <b class="ws-t">Supabase 가입과 프로젝트 만들기</b>
-          <p><a href="https://supabase.com" target="_blank" rel="noopener">supabase.com</a> → GitHub 계정으로 가입 → <b>New project</b>. 이름은 자유, 지역(Region)은 가까운 곳, 데이터베이스 비밀번호는 만들어 보관하세요. 프로젝트가 열리면 설정에서 <b>Project URL</b>과 <b>API Key</b>를 복사해 둡니다 — 어디 있는지 못 찾겠으면 Claude Code에 물어보면 됩니다.</p>
+          <p><a href="https://supabase.com" target="_blank" rel="noopener">supabase.com</a> → GitHub 계정으로 가입 → <b>New project</b>. 실제 만들 때의 화면입니다:</p>
+          <div class="sbf">
+            <div class="sb-head"><b>Create a new project</b><span>Your project will have its own dedicated instance and full Postgres database.<br/>An API will be set up so you can easily interact with your new database.</span></div>
+            <div class="sb-row"><b>Organization</b><div><div class="sb-input">KAIST ITM <span class="sb-chip">FREE</span><span class="cv">&#8964;</span></div></div></div>
+            <div class="sb-row"><b>GitHub (optional)</b><div><div class="sb-input">&#9679; kaist-itm-aibootcamp/no-bullying<span class="cv">&#8964;</span></div><div class="sb-sub">Ideal for agent-first workflows. Update your schema in code and push it to GitHub. Supabase deploys the changes.</div></div></div>
+            <div class="sb-row"><b>Project name</b><div><div class="sb-input">no-bullying</div></div></div>
+            <div class="sb-row"><b>Database password</b><div><div style="display:flex;align-items:center;"><div class="sb-input" style="flex:1;letter-spacing:2px;">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div><span class="sb-copy">&#10697; Copy</span></div><div class="sb-bar"></div><div class="sb-sub">This password is strong. <u>Generate a password</u>.</div></div></div>
+            <div class="sb-row"><b>Region</b><div><div class="sb-input">&#127758; Asia-Pacific<span class="cv">&#8964;</span></div><div class="sb-sub">Select the region closest to your users for the best performance.</div></div></div>
+            <div class="sb-row"><b>Security</b><div>
+              <div class="sb-check"><i class="on">&#10003;</i><div><b>Enable Data API</b><span>Autogenerate a RESTful API for your public schema. Recommended if using a client library like supabase-js.</span></div></div>
+              <div class="sb-check"><i class="on">&#10003;</i><div><b>Automatically expose new tables</b><span>Grants privileges to Data API roles by default, exposing new tables.</span></div></div>
+              <div class="sb-check"><i></i><div><b>Enable automatic RLS</b><span>Create an event trigger that automatically enables Row Level Security on all new tables in the public schema.</span></div></div>
+            </div></div>
+            <div class="sb-adv">ADVANCED CONFIGURATION &#8250;</div>
+            <div class="sb-foot"><span class="sb-btn">Cancel</span><span class="sb-btn go">Create new project</span></div>
+          </div>
+          <ul>
+            <li><b>Organization · Project name</b> — 조직은 기본값, 이름은 자유입니다 (여기서는 챗봇 저장소와 같은 no-bullying).</li>
+            <li><b>GitHub (optional)</b> — 챗봇 저장소를 연결할 수 있습니다. 이번 실습에 필수는 아니지만, 연결해 두면 나중에 코드로 DB 구조를 관리할 때 좋습니다.</li>
+            <li><b>Database password</b> — <b>Generate a password</b>로 만들고 <b>Copy</b>로 보관하세요. DB에 직접 접속할 때 쓰는 값이라 이번 실습 코드에는 등장하지 않지만, 잃어버리면 곤란합니다.</li>
+            <li><b>Region</b> — 가까운 곳(Asia-Pacific)으로.</li>
+            <li><b>Security</b> — 기본값 그대로 두면 됩니다. <b>Create new project</b>를 누르면 1~2분 뒤 프로젝트가 열립니다.</li>
+          </ul>
+          <div class="callout"><b class="cap">어떤 키를 복사하나 — Publishable이 아니라 Secret</b>
+          프로젝트가 열리면 <b>Settings → API Keys</b>에 키가 두 종류 보입니다. <b>Publishable key</b>(<code>sb_publishable_…</code>)는 브라우저에 노출해도 되는 키로, 화면이 DB를 직접 부르는 구조에서 행 단위 보안 규칙(RLS)과 함께 쓰는 것입니다. <b>Secret key</b>(<code>sb_secret_…</code>)는 서버 전용 만능 키라 브라우저에서 쓰면 아예 거부됩니다. 우리 구조는 <b>서버리스 함수만</b> Supabase에 접근하므로 — <b>Project URL과 Secret key</b>를 복사해 둡니다. 이름대로 비밀이니 환경변수로만 다룹니다.</div>
         </div>
         <div class="workshop-step"><span class="ws-num">2</span>
           <b class="ws-t">Vercel에 환경변수 추가</b>
-          <p>Vercel 프로젝트 → <b>Settings → Environment Variables</b>(⑤에서 키를 넣던 그 화면)에 세 개를 추가합니다: <code>SUPABASE_URL</code>, <code>SUPABASE_KEY</code>, 그리고 관리자 비밀번호의 해시값 <code>ADMIN_PASSWORD_HASH</code>(⑦ §5의 프롬프트로 만든 그 값). 환경변수는 다음 배포부터 반영됩니다 — 3단계의 push가 그 배포입니다.</p>
+          <p>Vercel 프로젝트 → <b>Settings → Environment Variables</b>(⑤에서 키를 넣던 그 화면)에 세 개를 추가합니다: <code>SUPABASE_URL</code>(Project URL), <code>SUPABASE_KEY</code>(Secret key), 그리고 관리자 비밀번호의 해시값 <code>ADMIN_PASSWORD_HASH</code>(⑦ §5의 프롬프트로 만든 그 값). 환경변수는 다음 배포부터 반영됩니다 — 3단계의 push가 그 배포입니다.</p>
         </div>
         <div class="workshop-step"><span class="ws-num">3</span>
           <b class="ws-t">Claude Code에 지시</b>
