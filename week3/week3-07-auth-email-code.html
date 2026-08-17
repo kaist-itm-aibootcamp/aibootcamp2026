@@ -75,6 +75,23 @@ body{
 .envm .em-ico{color:#777;}
 .envm .em-btn{display:inline-block;border:1px solid #e4e4e4;border-radius:8px;padding:7px 14px;font-weight:600;margin-top:14px;}
 .envm .em-group{padding-bottom:6px;margin-bottom:8px;}
+.vmenu{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:16px 18px;margin:12px 0;max-width:380px;font-size:13px;color:#111;}
+.vmenu .vm-card b{display:block;font-size:14px;}
+.vmenu .vm-card span{color:#777;font-size:12.5px;}
+.vmenu .vm-dots{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:999px;background:#f0f0f0;margin-right:10px;font-weight:900;color:#555;}
+.vmenu .vm-list{border:1px solid #eee;border-radius:10px;margin-top:12px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.06);}
+.vmenu .vm-list div{padding:9px 14px;border-bottom:1px solid #f4f4f4;color:#333;}
+.vmenu .vm-list div:last-child{border-bottom:none;}
+.vmenu .vm-list div.on{background:#f2f6f0;font-weight:800;color:#111;}
+.vlist{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:16px 20px;margin:12px 0;font-size:13px;color:#111;}
+.vlist .vl-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.vlist .vl-h b{font-size:15px;}
+.vlist .vl-btn{background:#000;color:#fff;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;}
+.vlist .vl-row{display:flex;align-items:center;gap:10px;padding:11px 4px;border-top:1px solid #f0f0f0;flex-wrap:wrap;}
+.vlist .vl-name{font-family:ui-monospace,Consolas,monospace;font-weight:700;font-size:12.5px;}
+.vlist .vl-chip{background:#ececec;border-radius:999px;padding:2px 9px;font-size:11px;color:#555;}
+.vlist .vl-env{color:#888;font-size:12px;}
+.vlist .vl-ago{margin-left:auto;color:#888;font-size:12px;white-space:nowrap;}
 .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
 .sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
 .sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
@@ -356,7 +373,29 @@ Vercel에 배포되어 있는 프로젝트야.
    비밀번호). smtp.gmail.com 587 포트 사용. 자격증명을 코드에 넣지 마.
 6. 메일 제목은 "[판결문 챗봇] 인증코드 안내", 본문에 코드와 유효시간을 담아줘.</pre>
       </div>
-      <p>Vercel 환경변수에 <code>SMTP_APP_PASSWORD</code>, <code>SMTP_USER</code>, <code>ALLOWED_EMAILS</code> 세 개를 추가하고 재배포하면 완성입니다. 실제로 추가한 화면입니다 (프로젝트 Settings → Environment Variables → Add — 값은 가려져 저장됩니다):</p>
+      <p>Vercel 환경변수에 <code>SMTP_APP_PASSWORD</code>, <code>SMTP_USER</code>, <code>ALLOWED_EMAILS</code> 세 개를 추가하고 재배포하면 완성입니다. 추가하는 길이 처음에는 헷갈립니다 — 순서대로: ① Vercel의 <b>Projects</b> 화면에서 프로젝트 카드의 <b>⋯ 아이콘</b>을 누르고 <b>Settings</b>를 고릅니다 ② 설정 메뉴의 <b>Environments</b>에서 <b>Production</b> 행을 누릅니다 ③ 환경변수 목록이 나옵니다 — 여기서 추가·수정·삭제를 모두 합니다.</p>
+      <div class="vmenu">
+        <div class="vm-card"><span class="vm-dots">⋯</span><b style="display:inline;">no-bullying</b><br/><span>no-bullying-gamma.vercel.app</span></div>
+        <div class="vm-list">
+          <div>Add Favorite</div>
+          <div>Visit with Toolbar</div>
+          <div>View Logs</div>
+          <div>Manage Domains</div>
+          <div>Transfer Project</div>
+          <div class="on">Settings</div>
+          <div>Import Directory</div>
+          <div>View Git Repository</div>
+        </div>
+      </div>
+      <p>Production 환경의 변수 목록입니다 — 실제로 등록을 마친 상태입니다 (인증용 세 개, 그리고 ⑧에서 쓸 관리자 해시 <code>PASSWORD_HASH</code>까지. "Sensitive"는 값이 가려져 저장된다는 표시입니다):</p>
+      <div class="vlist">
+        <div class="vl-h"><b>Environment Variables</b><span class="vl-btn">Add Environment Variable</span></div>
+        <div class="vl-row"><span>🔒</span><span class="vl-name">PASSWORD_HASH</span><span class="vl-chip">Sensitive</span><span class="vl-env">Production</span><span class="vl-ago">Added 17m ago</span></div>
+        <div class="vl-row"><span>🔒</span><span class="vl-name">ALLOWED_EMAILS</span><span class="vl-chip">Sensitive</span><span class="vl-env">Production</span><span class="vl-ago">Added 40m ago</span></div>
+        <div class="vl-row"><span>🔒</span><span class="vl-name">SMTP_APP_PASSWORD</span><span class="vl-chip">Sensitive</span><span class="vl-env">Production</span><span class="vl-ago">Added 49m ago</span></div>
+        <div class="vl-row"><span>🔒</span><span class="vl-name">SMTP_USER</span><span class="vl-chip">Sensitive</span><span class="vl-env">Production</span><span class="vl-ago">Added 49m ago</span></div>
+      </div>
+      <p><b>Add Environment Variable</b>을 누르면 이 화면이 뜹니다:</p>
       <div class="envm">
         <div class="em-h">Add Environment Variable <span>&#10005;</span></div>
         <div class="em-group">

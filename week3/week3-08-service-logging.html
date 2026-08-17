@@ -406,7 +406,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
         </div>
         <div class="workshop-step"><span class="ws-num">2</span>
           <b class="ws-t">Vercel에 환경변수 추가</b>
-          <p>Vercel 프로젝트 → <b>Settings → Environment Variables</b>(⑤에서 키를 넣던 그 화면)에 세 개를 추가합니다: <code>SUPABASE_URL</code>(Project URL), <code>SUPABASE_KEY</code>(Secret key), 그리고 관리자 비밀번호의 해시값 <code>ADMIN_PASSWORD_HASH</code>(⑦ §5의 프롬프트로 만든 그 값). 환경변수는 다음 배포부터 반영됩니다 — 3단계의 push가 그 배포입니다.</p>
+          <p>Projects 화면에서 프로젝트 카드의 <b>⋯ → Settings → Environments → Production</b>(⑦ §4에서 간 그 길)으로 들어가 세 개를 추가합니다: <code>SUPABASE_URL</code>(Project URL), <code>SUPABASE_KEY</code>(Secret key), 그리고 관리자 비밀번호의 해시값 <code>PASSWORD_HASH</code>(⑦ §5의 프롬프트로 만든 그 값). 환경변수는 다음 배포부터 반영됩니다 — 3단계의 push가 그 배포입니다.</p>
         </div>
         <div class="workshop-step"><span class="ws-num">3</span>
           <b class="ws-t">Claude Code에 지시</b>
@@ -419,7 +419,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
   있어. Supabase 쪽에 만들어 둘 표가 있으면 만드는 방법을 알려줘.
 - 화면 우측 상단에 작은 톱니바퀴 아이콘을 추가해줘. 누르면 관리자
   화면이 열리고, 비밀번호를 맞게 넣어야 기록을 볼 수 있어.
-- 관리자 비밀번호는 입력값을 해시해서 환경변수 ADMIN_PASSWORD_HASH와
+- 관리자 비밀번호는 입력값을 해시해서 환경변수 PASSWORD_HASH와
   비교해줘. 비밀번호 원문은 어디에도 저장하지 마.
 - 기록 화면은 최근 순서로 시각·질문·답변·비용·소요 시간을 표로 보여줘.</pre>
           </div>
@@ -436,7 +436,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <section class="section" id="s4">
       <div class="sec-head"><span class="sec-num">4</span><h2>관리자 비밀번호 — ⑦의 해시 방식 그대로</h2></div>
       <p class="sec-lead">새로 배울 것은 없습니다 — ⑦ §5의 비밀번호 잠금 지름길을 그대로 씁니다.</p>
-      <p>⑦ §5의 프롬프트로 내 비밀번호의 <b>해시값</b>을 만들고, Vercel 환경변수 <code>ADMIN_PASSWORD_HASH</code>로 추가합니다(실습 2단계). 서버는 입력된 비밀번호를 해시해 이 값과 비교할 뿐, 원문은 어디에도 저장되지 않습니다. 원리와 한계(비밀번호는 길고 흔하지 않게)는 ⑦ §5에 정리되어 있습니다.</p>
+      <p>⑦ §5의 프롬프트로 내 비밀번호의 <b>해시값</b>을 만들고, Vercel 환경변수 <code>PASSWORD_HASH</code>로 추가합니다(실습 2단계). 서버는 입력된 비밀번호를 해시해 이 값과 비교할 뿐, 원문은 어디에도 저장되지 않습니다. 원리와 한계(비밀번호는 길고 흔하지 않게)는 ⑦ §5에 정리되어 있습니다.</p>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>관리자 비밀번호 해시를 만들어 환경변수로 추가했다</span></label></div>
     </section>
 
