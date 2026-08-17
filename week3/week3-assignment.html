@@ -199,6 +199,10 @@ API(백엔드 함수), 데이터·파일 구조, 만들 순서. 내가 검토한
         <b class="ws-title">(선택) 문 달기</b>
         <p>나만 쓸 앱이면 ⑦ §5의 <b>비밀번호 잠금</b>(해시 + 환경변수)으로 충분합니다. 여럿을 명단으로 들이려면 ⑦의 이메일 인증코드를 붙여 보세요.</p>
       </div></div>
+      <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
+        <b class="ws-title">(선택) DB 연동하기 — Supabase 연결</b>
+        <p>⑧의 방법 그대로 내 앱에도 기록을 남길 수 있습니다 — Supabase 프로젝트를 만들고(표는 SQL Editor에서 한 번), Project URL과 Secret key를 Vercel 환경변수로 넣은 뒤, "이용자가 쓸 때마다 ○○를 표에 기록해줘"라고 지시하면 됩니다. 무엇을 기록할지는 앱 성격에 맞게 — ⑧의 원칙대로 <b>필요한 것만</b> 남기세요.</p>
+      </div></div>
       <div class="callout caution"><b class="cap">배포 전 3초 점검</b>
       ① 코드·GitHub에 API 키가 없는가 ② 수집한 데이터에 개인정보가 없는가 ③ 공개해도 되는 데이터인가.</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>Vercel URL로 접속되는 것을 다른 기기에서 확인했다</span></label></div>
@@ -210,7 +214,7 @@ API(백엔드 함수), 데이터·파일 구조, 만들 순서. 내가 검토한
       <p class="sec-lead">배포된 URL을 다른 기기(폰)에서 열어 보는 순간이 이 실습의 결승선입니다.</p>
       <div class="next-card-grid">
         <div class="next-card"><b>막히면</b><span>막힌 화면을 AI에게 보여주고 "여기서 왜 안 되는 거야?"라고 물어보세요. 계획서 단계로 돌아가 범위를 줄이는 것도 좋은 선택입니다 — 기능 하나를 끝까지.</span></div>
-        <div class="next-card"><b>4주차와의 연결</b><span>배포한 앱에 4주차의 구글 시트 연동(기록·대시보드)과 루틴 자동화를 얹으면 완전한 서비스가 됩니다. 만든 앱은 다음 수업에서 자랑해 주셔도 좋습니다.</span></div>
+        <div class="next-card"><b>4주차와의 연결</b><span>배포한 앱에 4주차의 구글 시트 연동(대시보드·공유)과 루틴 자동화를 얹으면 완전한 서비스가 됩니다. 만든 앱은 다음 수업에서 자랑해 주셔도 좋습니다.</span></div>
       </div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>내 앱이 실제 URL로 동작한다</span></label></div>
     </section>
