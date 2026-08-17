@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 3 — Long Context와 하이브리드: 검색 없이 통째로 읽히기</title>
+<style>
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
+  --brand:#2e9bdb; --brand-dark:#1b6fa6; --green:#2f765b; --amber:#b8792e; --red:#b0483f;
+  --blue:#375f8f; --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12); --radius:14px; --sidebar-width:250px;
+  --series-1:#2a78d6; --series-2:#eb6834; --series-3:#1baf7a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15.5px;
+}
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+.layout{display:flex;align-items:flex-start;}
+.sidebar{
+  position:sticky;top:63px;flex:0 0 var(--sidebar-width);width:var(--sidebar-width);
+  height:calc(100vh - 63px);overflow-y:auto;padding:22px 14px 40px 22px;border-right:1px solid var(--line);
+}
+.sidebar-title{font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+.toc a{
+  display:block;padding:7px 11px;margin:2px 0;border-radius:8px;border-left:3px solid transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;line-height:1.4;
+}
+.toc a:hover{background:#eef3ec;color:var(--ink);}
+.toc a.active{background:var(--sky-light);border-left-color:var(--brand);color:var(--brand-dark);font-weight:800;}
+.toc a .done-mark{color:var(--green);font-weight:900;margin-left:4px;display:none;}
+.toc a.done .done-mark{display:inline;}
+.content{flex:1;min-width:0;max-width:920px;padding:clamp(20px,4vw,44px) clamp(16px,4vw,44px) 100px;}
+.hero{margin-bottom:16px;}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.07em;color:var(--brand-dark);background:var(--sky-light);padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+.hero h1{font-size:clamp(23px,3.6vw,32px);line-height:1.3;letter-spacing:-.015em;margin-bottom:10px;}
+.hero p{color:var(--muted);max-width:660px;}
+.section{margin-top:44px;padding-top:8px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
+.sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
+.sec-lead{color:var(--muted);margin:4px 0 18px;max-width:700px;}
+h3{font-size:16.5px;margin:26px 0 10px;}
+h4{font-size:15px;margin:16px 0 8px;}
+p{margin:10px 0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:14px 0;box-shadow:0 3px 14px rgba(54,42,31,.05);}
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+.concept-grid.two{grid-template-columns:repeat(2,1fr);}
+.concept{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.concept .ico{font-size:21px;}
+.concept b{display:block;margin:7px 0 4px;font-size:14.5px;}
+.concept span{display:block;color:var(--muted);font-size:13px;line-height:1.55;}
+.concept .use{display:inline-block;margin-top:9px;font-size:12px;font-weight:800;color:var(--brand-dark);background:var(--sky-light);border-radius:999px;padding:2px 10px;}
+.callout{border-left:4px solid var(--brand);background:var(--sky-light);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;font-size:14.5px;}
+.callout.caution{border-left-color:var(--red);background:#faeeec;}
+.callout.ok{border-left-color:var(--green);background:#edf4ef;}
+.callout b.cap{display:block;font-size:13px;letter-spacing:.03em;margin-bottom:4px;color:var(--brand-dark);}
+.callout.caution b.cap{color:var(--red);}
+.callout.ok b.cap{color:var(--green);}
+.tip-card{border-left:4px solid var(--brand);background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 17px;margin:14px 0;font-size:14px;color:var(--muted);}
+.tip-card b{color:var(--ink);}
+.copy-block{position:relative;background:#20242a;color:#e8ecf1;border-radius:12px;padding:18px 20px;margin:14px 0;font-size:14px;line-height:1.8;}
+.copy-block .cb-label{position:absolute;top:-10px;left:14px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--brand);padding:3px 10px;border-radius:999px;}
+.copy-block pre{white-space:pre-wrap;word-break:break-word;font-family:inherit;margin-top:4px;}
+.copy-block pre.mono{font-family:ui-monospace,Consolas,monospace;font-size:13px;}
+.copy-btn{position:absolute;top:12px;right:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 11px;cursor:pointer;}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+.doc-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;background:var(--surface);}
+.doc-table th{background:#f2f6f0;text-align:left;padding:8px 12px;border:1px solid var(--line);font-size:12.5px;}
+.doc-table td{padding:8px 12px;border:1px solid var(--line);}
+.doc-table td.r{text-align:right;font-variant-numeric:tabular-nums;}
+.doc-table td code, p code, li code{background:#eef3ec;border-radius:5px;padding:1px 6px;font-family:ui-monospace,Consolas,monospace;font-size:.9em;}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+.compare.three{grid-template-columns:1fr 1fr 1fr;}
+.compare .col{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.compare .col h4{font-size:14.5px;margin:0 0 8px;}
+.compare ul{margin:0 0 0 18px;font-size:13.5px;color:var(--muted);}
+.compare li{margin:5px 0;}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+.stat-row.three{grid-template-columns:repeat(3,1fr);}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 15px;}
+.stat .v{font-size:26px;font-weight:900;letter-spacing:-.02em;color:var(--brand-dark);line-height:1.15;}
+.stat .k{margin-top:5px;font-size:12.5px;color:var(--muted);line-height:1.5;}
+.insight{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0;}
+.insight .n{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;border-radius:999px;background:var(--sky-light);color:var(--brand-dark);font-weight:900;font-size:13px;transform:translateY(2px);}
+.insight p{margin:0;font-size:14.5px;}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin:16px 0;}
+.flow .step{flex:1 1 150px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;position:relative;}
+.flow .step b{display:block;font-size:13.5px;margin-bottom:3px;color:var(--brand-dark);}
+.flow .step span{font-size:12.5px;color:var(--muted);line-height:1.5;display:block;}
+.flow .arrow{align-self:center;color:var(--brand);font-weight:900;font-size:16px;}
+.workshop-step{display:flex;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0;}
+.ws-num{flex:0 0 auto;display:grid;place-items:center;width:30px;height:30px;border-radius:999px;background:var(--brand);color:#fff;font-weight:900;font-size:14px;transform:translateY(2px);}
+.ws-body{min-width:0;flex:1;}
+.ws-body b.ws-title{display:block;font-size:14.5px;margin-bottom:4px;}
+.ws-body p{margin:5px 0;font-size:14px;color:var(--muted);}
+.example-card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;margin:16px 0;box-shadow:var(--shadow);max-width:560px;}
+.example-card:focus-visible{outline:3px solid var(--brand);}
+.example-thumb{position:relative;height:210px;overflow:hidden;background:#eef1ec;}
+.example-thumb iframe{position:absolute;top:0;left:0;width:400%;height:400%;transform:scale(.25);transform-origin:top left;border:none;pointer-events:none;}
+.example-thumb .zoom{position:absolute;right:12px;bottom:12px;background:rgba(32,36,42,.85);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:5px 12px;}
+.example-body{padding:14px 18px;}
+.example-body b{font-size:14.5px;}
+.example-body p{margin:4px 0 0;font-size:13px;color:var(--muted);}
+.example-lightbox{position:fixed;inset:0;z-index:80;background:rgba(20,24,20,.62);display:flex;align-items:center;justify-content:center;padding:3vh 3vw;}
+.example-lightbox[hidden]{display:none;}
+.lightbox-inner{position:relative;width:min(980px,96vw);height:92vh;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);}
+.lightbox-inner iframe{width:100%;height:100%;border:none;}
+.lightbox-close{position:absolute;top:10px;right:10px;z-index:2;border:none;background:#20242a;color:#fff;width:34px;height:34px;border-radius:999px;font-size:16px;font-weight:900;cursor:pointer;}
+.placeholder-box{border:2px dashed var(--line);border-radius:var(--radius);background:#fafcf9;padding:26px 22px;margin:14px 0;text-align:center;color:var(--muted);}
+.placeholder-box b{display:block;color:var(--ink);font-size:15px;margin-bottom:6px;}
+.placeholder-box .soon{display:inline-block;margin-top:10px;font-size:12px;font-weight:900;letter-spacing:.05em;color:var(--amber);background:#f7efe3;border-radius:999px;padding:4px 12px;}
+.completion-row{margin:22px 0 6px;}
+.check{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 18px;cursor:pointer;font-size:14px;font-weight:700;color:var(--muted);}
+.check input{width:17px;height:17px;accent-color:var(--green);}
+.check:has(input:checked){border-color:var(--green);color:var(--green);background:#edf4ef;}
+.celebrate-banner{border:1px solid #bfe0c9;background:linear-gradient(120deg,#edf7ef,#e3f1fb);border-radius:var(--radius);padding:18px 22px;margin:0 0 22px;font-size:15px;box-shadow:var(--shadow);}
+.celebrate-banner b{color:var(--green);}
+.final-list{list-style:none;margin:14px 0;}
+.final-list li{display:flex;gap:10px;margin:9px 0;font-size:14.5px;}
+.final-list li::before{content:"✔";color:var(--green);font-weight:900;}
+.next-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.next-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.next-card b{display:block;font-size:14.5px;margin-bottom:5px;color:var(--brand-dark);}
+.next-card span{font-size:13.5px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#20242a;color:#fff;font-size:13.5px;font-weight:700;border-radius:999px;padding:10px 20px;opacity:0;transition:all .25s;z-index:90;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.diagram-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:16px 0;}
+.diagram-card h4{margin:0 0 4px;}
+.diagram-card .sub{font-size:12.5px;color:var(--muted);margin-bottom:10px;}
+.diagram-card svg{width:100%;height:auto;display:block;}
+@media (max-width:900px){
+  .layout{display:block;}
+  .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  .concept-grid,.concept-grid.two{grid-template-columns:1fr 1fr;}
+  .stat-row,.stat-row.three{grid-template-columns:1fr 1fr;}
+  .compare,.compare.three{grid-template-columns:1fr;}
+  .next-card-grid{grid-template-columns:1fr;}
+}
+@media (max-width:640px){
+  .topbar{flex-wrap:wrap;row-gap:10px;}
+  .topbar-left{flex-wrap:wrap;row-gap:8px;}
+  .progress-wrap{width:100%;}
+  .concept-grid,.concept-grid.two{grid-template-columns:1fr;}
+}
+
+.rag-demo{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:14px 0;}
+.rag-demo .q{background:#20242a;color:#fff;padding:13px 18px;font-size:14px;}
+.rag-demo .q b{color:#9ec5f4;}
+.rag-demo .a{padding:15px 18px;font-size:14px;line-height:1.8;}
+.rag-demo .src{border-top:1px dashed var(--line);padding:11px 18px;background:#fafcf9;font-size:12.5px;color:var(--muted);}
+.rag-demo .src b{color:var(--ink);}
+/* 개발자 스타일 API 호출 박스 */
+.api-code{background:#20242a;color:#e8ecf1;border-radius:12px;padding:16px 18px;margin:12px 0;font-family:ui-monospace,Consolas,monospace;font-size:12.3px;line-height:1.75;overflow-x:auto;}
+.api-code .k{color:#9ec5f4;}
+.api-code .v{color:#c5e3b5;}
+.api-code .n{color:#f0c987;}
+.api-code .c{color:#8b93a1;}
+.api-code .hl-sys{color:#f0c987;}
+.api-code .hl-doc{color:#a8cdf0;}
+.api-code .hl-q{color:#9fe0b5;font-weight:700;}
+/* 컨텍스트 구조 시각화 */
+.ctx-stack{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:12px 0;font-size:13px;line-height:1.65;}
+.ctx-block{padding:11px 16px;}
+.ctx-block .lb{display:block;font-size:11px;font-weight:900;letter-spacing:.05em;margin-bottom:4px;}
+.ctx-sys{background:#20242a;color:#e8ecf1;}
+.ctx-sys .lb{color:#9ec5f4;}
+.ctx-doc{background:#eaf3fb;border-top:2px solid #fff;color:#2d4a63;}
+.ctx-doc .lb{color:#1b6fa6;}
+.ctx-doc.dim{background:#f0f6fb;color:#7d97ab;}
+.ctx-q{background:#e7f2ea;border-top:2px solid #fff;color:#2b4a37;}
+.ctx-q .lb{color:#2f765b;}
+.ctx-note{font-size:12px;color:var(--muted);margin:6px 2px 0;}
+.ctx-compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;}
+.ctx-compare h5{font-size:13.5px;margin:0 0 8px;text-align:center;}
+.ctx-token{display:block;text-align:center;font-size:12px;color:var(--muted);margin-top:6px;}
+@media (max-width:760px){ .ctx-compare{grid-template-columns:1fr;} }
+/* 목업 (챗) */
+.mock-browser{border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);margin:14px 0;background:#fff;}
+.mock-bar{display:flex;align-items:center;gap:8px;background:#eceff0;padding:9px 14px;border-bottom:1px solid var(--line);}
+.mock-bar .dot{width:11px;height:11px;border-radius:999px;}
+.mock-bar .url{flex:1;background:#fff;border:1px solid #dce0e2;border-radius:999px;padding:4px 14px;font-size:12px;color:#52514e;font-family:ui-monospace,Consolas,monospace;}
+.mock-body{padding:20px 22px;}
+.shot-body{background:#faf9f7;padding:22px 26px 24px;}
+.shot-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.shot-head b{font-size:16px;color:#2b2723;}
+.shot-head span{font-size:12px;color:#8a857e;}
+.shot-tabs{display:flex;gap:26px;margin:14px 0 0;border-bottom:1px solid #e8e4de;}
+.shot-tabs span{font-size:13.5px;font-weight:700;color:#8a857e;padding:6px 2px 9px;}
+.shot-tabs .on{color:#b5522a;border-bottom:3px solid #b5522a;font-weight:900;}
+.chatq{background:#fdf0e7;border:1px solid #f5ddc9;border-radius:12px;padding:13px 16px;font-size:13.5px;color:#3a352f;margin:18px 0 14px;}
+.chata{font-size:13px;color:#3a352f;line-height:1.8;}
+.chata p{margin:0 0 10px;}
+.chata h6{font-size:13.5px;font-weight:900;color:#2b2723;margin:14px 0 8px;}
+.chata ul{margin:0 0 10px 18px;padding:0;}
+.chata li{margin:6px 0;}
+.cchip{display:inline-block;min-width:20px;text-align:center;font-size:10.5px;font-weight:800;color:#b5522a;background:#fae8dc;border:1px solid #f0d5c2;border-radius:6px;padding:1px 5px;margin:0 1px;vertical-align:1px;}
+/* 논문 카드 */
+.paper{display:flex;gap:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin:9px 0;}
+.paper .tag{flex:0 0 auto;font-size:10.5px;font-weight:900;color:#fff;background:var(--blue);border-radius:7px;padding:3px 9px;height:fit-content;transform:translateY(3px);white-space:nowrap;}
+.paper .bd{font-size:13.5px;}
+.paper .bd b{display:block;margin-bottom:2px;}
+.paper .bd span{color:var(--muted);font-size:12.5px;line-height:1.6;}
+.paper .bd .ref{display:block;margin-top:3px;font-size:11.5px;color:#898781;font-family:ui-monospace,Consolas,monospace;}
+
+/* ---- 목록으로 돌아가기 (week1과 동일 패턴) ---- */
+.back-week{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:color .15s ease,border-color .15s ease,background .15s ease;}
+.back-week:hover{color:var(--brand-dark);border-color:var(--brand);background:var(--sky-light);}
+.back-home{display:flex;align-items:center;gap:15px;max-width:840px;margin:34px 0 10px;padding:20px 24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s ease,border-color .18s ease;}
+.back-home:hover{transform:translateY(-2px);border-color:var(--brand);}
+.back-home .bh-ic{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;border-radius:11px;background:var(--sky-light);color:var(--brand-dark);font-size:19px;font-weight:900;}
+.back-home strong{display:block;font-size:15.5px;font-weight:800;}
+.back-home small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;font-weight:600;}
+@media (max-width:640px){.back-home{padding:18px;gap:12px;}}
+</style>
+</head>
+<body id="top" data-celebrate="🎉 <b>세 구조를 모두 손에 넣었습니다!</b> RAG는 골라서, Long Context는 통째로, 하이브리드는 그 사이 — 자료의 크기와 질문의 성격에 맞춰 구조를 고를 수 있게 되었습니다.">
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+    </a>
+    <div class="week-tag"><span class="week-num">WEEK 3</span><span class="week-title">Long Context와 하이브리드</span></div>
+    <a class="back-week" href="index.html">← 3주차 목록</a>
+  </div>
+  <div class="progress-wrap" aria-label="진행률">
+    <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="목차">
+    <div class="sidebar-title">이 페이지의 흐름</div>
+    <div class="toc">
+      <a href="#s1" data-sec="s1">1. Long Context — 통째로 싣기<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. 얼마나 담을 수 있나 — 모델 비교<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 하이브리드 — 요지는 통째, 전문은 골라서<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 마무리 체크리스트<span class="done-mark">✔</span></a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div id="celebrateSlot"></div>
+
+    <div class="hero">
+      <span class="hero-kicker">WEEK 3 · STEP 6 — Long Context와 하이브리드</span>
+      <h1>Long Context — 검색 없이<br/>통째로 읽히면 안 되나?</h1>
+      <p>④의 RAG는 검색으로 고른 문서만 컨텍스트에 실었습니다. 이 강의는 다른 갈래의 쟁점입니다 — 컨텍스트 창이 수십만~백만 토큰으로 커진 지금, <b>자료를 통째로 실어 버리는 Long Context 방식</b>이 언제 성립하는지 점검하고, 요지는 통째로·전문은 골라 읽는 <b>하이브리드</b>까지 세 구조의 자리를 정리합니다.</p>
+    </div>
+
+    <!-- ============ S1 ============ -->
+    <section class="section" id="s1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>Long Context — 그냥 전부 읽히면 안 되나?</h2></div>
+      <p class="sec-lead">됩니다 — 코퍼스가 충분히 작다면. ④에서 만든 챗봇과의 차이는 <b>컨텍스트에 무엇을 싣는가</b>로 보면 한눈에 들어옵니다.</p>
+
+      <div class="ctx-compare">
+        <div>
+          <h5 style="color:var(--brand-dark)">RAG의 컨텍스트 — 골라서 싣기</h5>
+          <div class="ctx-stack">
+            <div class="ctx-block ctx-sys" style="padding:8px 14px;"><span class="lb">지시</span>제공 문서만 근거로 답하라…</div>
+            <div class="ctx-block ctx-doc" style="padding:8px 14px;">검색된 판례 요약 20건 (관련도 순)</div>
+            <div class="ctx-block ctx-q" style="padding:8px 14px;"><span class="lb">질문</span>동료들의 따돌림도…?</div>
+          </div>
+          <span class="ctx-token">총 <b>약 3천 토큰</b> — 질문마다 검색으로 새로 고름</span>
+        </div>
+        <div>
+          <h5 style="color:var(--green)">Long Context — 통째로 싣기</h5>
+          <div class="ctx-stack">
+            <div class="ctx-block ctx-sys" style="padding:8px 14px;"><span class="lb">지시</span>첨부 자료 전체를 읽고 답하라…</div>
+            <div class="ctx-block ctx-doc" style="padding:26px 14px 8px;">판결 요지 <b>347건 전부</b><br/><span style="font-size:11px;color:#7d97ab">1번부터 347번까지, 검색 없이 통째로</span></div>
+            <div class="ctx-block ctx-doc" style="padding:20px 14px;">　</div>
+            <div class="ctx-block ctx-doc dim" style="padding:20px 14px;">　</div>
+            <div class="ctx-block ctx-q" style="padding:8px 14px;"><span class="lb">질문</span>동료들의 따돌림도…?</div>
+          </div>
+          <span class="ctx-token">총 <b>약 4~5만 토큰</b> — 질문마다 전체를 다시 실음 (비용도 그만큼)</span>
+        </div>
+      </div>
+      <div class="callout ok"><b class="cap">Long Context 방식의 매력</b>
+      검색 단계가 없으므로 <b>백엔드도, 임베딩도 필요 없습니다.</b> 판결 요지 CSV를 Chat·Cowork에 첨부하고 "전부 읽고 답해줘"라고 하면 끝 — 실제로 이 부트캠프의 판례 분석 보고서(895건 유형 분류)도 이 계열의 방식으로 만들어졌습니다. <b>혼자 쓰는 연구라면 가장 단순하고 강력한 선택지</b>입니다. (서비스로 만들 때는 ④에서 본 이유 — 프로그램이 호출할 수 있어야 한다 — 로 다시 API·비용 문제가 돌아옵니다.)</div>
+      <table class="doc-table">
+        <thead><tr><th style="width:130px"></th><th>RAG (검색 후 로딩)</th><th>Long Context (통째로 로딩)</th></tr></thead>
+        <tbody>
+          <tr><td><b>코퍼스 규모</b></td><td>수만~수백만 건도 가능 (검색이 골라줌)</td><td>컨텍스트 창에 들어가는 만큼</td></tr>
+          <tr><td><b>구현 난이도</b></td><td>임베딩 + 벡터 DB + 백엔드 필요</td><td><b>매우 낮음</b> — 파일 첨부 + 프롬프트</td></tr>
+          <tr><td><b>1회 비용</b></td><td>낮음 (관련 요약 20건만 로딩)</td><td>높음 (매 질문마다 전체 토큰 과금)</td></tr>
+          <tr><td><b>실패 모드</b></td><td>검색이 놓치면 답도 틀림</td><td>자료가 컨텍스트 창을 넘거나(§2), 긴 문맥 중간의 정보를 놓칠 수 있음</td></tr>
+          <tr><td><b>강점</b></td><td>반복 질문·서비스화·대규모</td><td>전체 조망이 필요한 질문("전반적 경향은?")</td></tr>
+        </tbody>
+      </table>
+      <div class="copy-block"><span class="cb-label">💬 Long Context 방식 프롬프트 예시 (Chat·Cowork에서)</span><button class="copy-btn" data-copy="r4">복사</button>
+<pre id="r4">첨부한 CSV는 직장 내 괴롭힘 판결 347건의 요지야. 전부 읽고 답해줘:
+동료 직원에 의한 따돌림 사건들에서 손해배상이 인정된 경우와
+기각된 경우를 나눠서, 갈림길이 된 요소를 사건번호와 함께 정리해줘.</pre></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>두 방식의 컨텍스트 구조 차이를 그림으로 설명할 수 있다</span></label></div>
+    </section>
+
+    <!-- ============ S2 ============ -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>Long Context 사용 전 점검 — 얼마나 담을 수 있는 모델인가</h2></div>
+      <p class="sec-lead">Long Context 방식을 쓰기로 했다면 첫 질문은 하나입니다 — <b>"내 자료가 이 모델의 컨텍스트 창에 들어가는가?"</b> 컨텍스트 길이는 모델마다 크게 다릅니다.</p>
+
+      <h3>주요 모델 컨텍스트 길이 비교 (2026년 기준 공개 정보)</h3>
+      <table class="doc-table">
+        <thead><tr><th style="width:110px">구분</th><th>모델</th><th style="text-align:right;width:110px">컨텍스트 창</th><th style="width:170px">판결 요지 347건<br/>(약 4~5만 토큰) 수용?</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="3"><b>해외 상용</b></td><td>Google Gemini 3.1 Pro</td><td class="r">100만 토큰</td><td>✅ 여유 (약 1/20 사용)</td></tr>
+          <tr><td>OpenAI GPT-5.5</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
+          <tr><td>Anthropic Claude Opus 4.8 / Sonnet 4.6</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
+          <tr><td rowspan="3"><b>중국 오픈소스</b></td><td>DeepSeek V4</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
+          <tr><td>Qwen3.5-Plus (알리바바)</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
+          <tr><td>Kimi K2.5 (문샷)</td><td class="r">26만 토큰</td><td>✅ 가능</td></tr>
+          <tr><td rowspan="2"><b>국내</b></td><td>LG K-EXAONE (236B)</td><td class="r">26만 토큰</td><td>✅ 가능</td></tr>
+          <tr><td>네이버 HyperCLOVA X SEED Think</td><td class="r">3.2만 토큰</td><td>⚠️ <b>들어가지 않음</b> — 요약·분할 필요</td></tr>
+        </tbody>
+      </table>
+      <p class="ctx-note">공개 자료 기준이며 버전에 따라 달라집니다 — 사용 전 그 모델의 공식 문서에서 확인하는 습관이 중요합니다. 참고로 오픈소스 진영에는 1,000만 토큰을 내건 모델(Llama 4 Scout)도 있습니다.</p>
+
+      <div class="callout"><b class="cap">표가 말해주는 것</b>
+      같은 자료(판결 요지 347건 ≈ 4~5만 토큰)라도 <b>어떤 모델을 고르느냐에 따라 Long Context 방식이 되기도, 안 되기도</b> 합니다. 프런티어 상용 모델과 중국 오픈소스 상위 모델은 100만 토큰 시대에 들어섰고, 국내 모델은 LG K-EXAONE이 26만 토큰으로 수용 가능한 반면 네이버 공개 모델(3.2만)에는 이 자료가 통째로 들어가지 않습니다 — 이 경우 요약본을 쓰거나, 나눠 묻거나, RAG로 전환해야 합니다.</div>
+
+      <h3>사용 전 점검 3가지</h3>
+      <div class="insight"><span class="n">1</span><p><b>내 자료의 토큰 수를 추정한다.</b> 한국어는 대략 글자 수 × 0.7~1이 토큰 수입니다. 판결 요지 347건(약 6.5만 자) ≈ 4~5만 토큰. AI에게 "이 파일 토큰 수 세줘"라고 시켜도 됩니다.</p></div>
+      <div class="insight"><span class="n">2</span><p><b>모델의 컨텍스트 창과 비교한다.</b> 자료가 창의 절반을 넘으면 여유가 없는 것입니다 — 대화가 오갈수록 컨텍스트는 계속 쌓이기 때문입니다.</p></div>
+      <div class="insight"><span class="n">3</span><p><b>명목 길이 ≠ 실제 독해력.</b> 창이 크다고 그 끝까지 꼼꼼히 읽는 것은 아닙니다 — 아주 긴 입력에서는 중간의 정보를 놓치는 경향이 보고되어 있으니, 중요한 지시·자료는 앞이나 뒤에 배치하고 여유를 두세요.</p></div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>자료 토큰 수 추정 → 모델 컨텍스트 확인의 점검 순서를 안다</span></label></div>
+    </section>
+
+    <!-- ============ S3 ============ -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>하이브리드 — 요지는 통째로 싣고, 전문은 골라 읽힌다</h2></div>
+      <p class="sec-lead">RAG와 Long Context는 섞어 쓸 수 있습니다. 아이디어: <b>컨텍스트에는 판결 요지 347건만 통째로 싣고</b>(목차 역할), 모델이 요지를 훑어 관련 사건을 고르면 <b>그 판결문 전문만 저장된 파일에서 도구로 읽어와</b> 컨텍스트에 추가하는 구조입니다.</p>
+
+      <div class="diagram-card">
+        <h4>하이브리드 구조 — Long Context(요지) + 도구 호출(전문)</h4>
+        <div class="sub">임베딩도 벡터 DB도 없이, "요지 훑기"가 검색을 대신합니다</div>
+        <svg viewBox="0 0 680 470" role="img" aria-label="하이브리드 구조도">
+          <!-- A: 초기 컨텍스트 -->
+          <rect x="8" y="10" width="300" height="150" rx="12" fill="#f4f9fd" stroke="#bcdcf3"/>
+          <text x="24" y="34" font-size="12.5" font-weight="900" fill="#1b6fa6">① 초기 컨텍스트 (Long Context)</text>
+          <rect x="24" y="46" width="268" height="26" rx="6" fill="#20242a"/>
+          <text x="158" y="63" text-anchor="middle" font-size="11" fill="#f0c987">지시: 요지를 훑고, 필요한 전문은 파일로 읽어라</text>
+          <rect x="24" y="78" width="268" height="46" rx="6" fill="#eaf3fb" stroke="#9dc4de"/>
+          <text x="158" y="97" text-anchor="middle" font-size="11.5" font-weight="800" fill="#2d4a63">판결 요지 347건 전부 (~4.5만 토큰)</text>
+          <text x="158" y="113" text-anchor="middle" font-size="10" fill="#7d97ab">코퍼스 전체의 "목차" 역할</text>
+          <rect x="24" y="130" width="268" height="22" rx="6" fill="#e7f2ea" stroke="#bfe0c9"/>
+          <text x="158" y="145" text-anchor="middle" font-size="11" fill="#2b4a37">질문: 동료들의 따돌림도 배상되나?</text>
+          <!-- arrow A->B -->
+          <text x="340" y="90" text-anchor="middle" font-size="15" font-weight="900" fill="#2e9bdb">→</text>
+          <!-- B: 모델이 선별 -->
+          <rect x="372" y="34" width="300" height="100" rx="12" fill="#1b6fa6"/>
+          <text x="522" y="60" text-anchor="middle" font-size="12.5" font-weight="900" fill="#fff">② 모델이 요지 전체를 훑고 선별</text>
+          <text x="522" y="82" text-anchor="middle" font-size="11" fill="#cde2fb">"관련 사건은 대구 2024가단138550,</text>
+          <text x="522" y="98" text-anchor="middle" font-size="11" fill="#cde2fb">수원 2022가단546552, 울산 2022가단128995 —</text>
+          <text x="522" y="114" text-anchor="middle" font-size="11" fill="#cde2fb">이 3건은 전문을 읽어야겠다"</text>
+          <!-- arrow B->C -->
+          <path d="M522 134 v34" stroke="#b8792e" stroke-width="2.5" fill="none"/>
+          <path d="M522 168 l-6 -10 h12 z" fill="#b8792e"/>
+          <text x="600" y="156" text-anchor="middle" font-size="11.5" font-weight="800" fill="#8a5a13">③ 도구 호출</text>
+          <!-- C: 도구 -->
+          <rect x="372" y="176" width="300" height="88" rx="12" fill="#fdf8ef" stroke="#e8d9bd"/>
+          <text x="522" y="199" text-anchor="middle" font-size="12" font-weight="900" fill="#8a5a13">파일 읽기 도구 (저장된 판결문 폴더)</text>
+          <text x="522" y="219" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#52514e">read_file("대구지방법원_2024가단138550.md")</text>
+          <text x="522" y="235" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#52514e">read_file("수원지방법원_2022가단546552.md")</text>
+          <text x="522" y="251" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#52514e">read_file("울산지방법원_2022가단128995.md")</text>
+          <!-- arrow C->D -->
+          <path d="M372 220 H340 V300 H316" stroke="#2f765b" stroke-width="2.5" fill="none"/>
+          <path d="M316 300 l10 -6 v12 z" fill="#2f765b"/>
+          <!-- D: 확장된 컨텍스트 -->
+          <rect x="8" y="230" width="300" height="140" rx="12" fill="#f4f9fd" stroke="#bcdcf3"/>
+          <text x="24" y="254" font-size="12.5" font-weight="900" fill="#1b6fa6">④ 확장된 컨텍스트</text>
+          <rect x="24" y="266" width="268" height="26" rx="6" fill="#eaf3fb" stroke="#9dc4de"/>
+          <text x="158" y="283" text-anchor="middle" font-size="10.5" fill="#7d97ab">(요지 347건 + 질문 — 그대로 유지)</text>
+          <rect x="24" y="298" width="268" height="60" rx="6" fill="#e3f1fb" stroke="#2e9bdb"/>
+          <text x="158" y="318" text-anchor="middle" font-size="11.5" font-weight="800" fill="#1b6fa6">+ 선별된 3건의 판결문 전문</text>
+          <text x="158" y="335" text-anchor="middle" font-size="10" fill="#5c7fa3">도구가 읽어온 원문이 컨텍스트에 추가됨</text>
+          <text x="158" y="350" text-anchor="middle" font-size="10" fill="#5c7fa3">(전문이 필요한 사건만, 필요한 만큼)</text>
+          <!-- arrow D->E -->
+          <path d="M158 370 v28" stroke="#2f765b" stroke-width="2.5" fill="none"/>
+          <path d="M158 398 l-6 -10 h12 z" fill="#2f765b"/>
+          <!-- E: 답변 -->
+          <rect x="8" y="406" width="664" height="52" rx="12" fill="#edf4ef" stroke="#bfe0c9"/>
+          <text x="340" y="428" text-anchor="middle" font-size="12.5" font-weight="900" fill="#2f765b">⑤ 전문을 근거로 한 정밀 답변 — 요지에는 없는 판시 이유·인용액 산정까지 인용 가능</text>
+          <text x="340" y="447" text-anchor="middle" font-size="10.5" fill="#628a72">"대구 사건에서 법원은 … 라고 판시하며 위자료를 인정하였고 [대구지방법원 2024가단138550, 판결 이유 2.가.] …"</text>
+        </svg>
+      </div>
+
+      <div class="compare">
+        <div class="col"><h4 style="color:var(--green)">이 구조의 장점</h4>
+          <ul>
+            <li>임베딩·벡터 DB·검색 서버가 <b>전혀 필요 없음</b> — "요지 훑기"가 검색을 대신</li>
+            <li>답변 근거가 요약이 아니라 <b>판결문 전문</b> — 판시 이유까지 정밀 인용</li>
+            <li>사실 Cowork·Claude Code가 일하는 방식이 바로 이것 — 목록을 훑고 필요한 파일만 읽기. 이 부트캠프의 판례 보고서도 이렇게 만들어졌습니다</li>
+          </ul></div>
+        <div class="col"><h4 style="color:var(--amber)">치르는 비용</h4>
+          <ul>
+            <li>요지 4~5만 토큰이 <b>매 질문마다</b> 컨텍스트에 상주 (Long Context의 비용 그대로)</li>
+            <li>도구 왕복만큼 응답이 느려짐</li>
+            <li>파일 읽기 도구를 붙일 수 있는 환경이 필요 — Chat 웹화면으로는 안 되고, Cowork·Claude Code 또는 도구 호출을 지원하는 API로 구현</li>
+          </ul></div>
+      </div>
+      <h3>하이브리드로 질문하기 — 프롬프트 예시</h3>
+      <div class="copy-block"><span class="cb-label">💬 Cowork에서 (요지 CSV + 전문 폴더가 연동된 상태)</span><button class="copy-btn" data-copy="r5">복사</button>
+<pre id="r5">연동 폴더에 판결 요지 CSV(347건)와 판결문 전문 파일들(rulings_md/)이 있어.
+질문: 동료 직원들의 따돌림에 대해 손해배상이 인정된 사건과 기각된 사건의
+갈림길은 무엇이었나?
+
+먼저 요지 전체를 훑어서 관련 사건을 고르고, 고른 사건은 반드시
+전문 파일을 읽은 다음, 전문을 근거로 사건번호와 판시 대목을
+인용해서 답해줘. 요지만 보고 답하지 마.</pre></div>
+      <div class="tip-card"><b>사실 이렇게 지시하지 않아도 됩니다 (대체로)</b> — Cowork·Claude Code는 <b>과제의 성질에 따라 기본적으로 이렇게 동작</b>합니다: 질문이 코퍼스 전반에 걸치면 목록·요지부터 훑고, 정밀한 근거가 필요해지면 해당 파일을 스스로 열어 읽습니다. 다만 가끔 요지만 보고 요약 수준으로 답하고 마는 경우가 있는데, 답변에 전문 인용이 없다면 그때 위 프롬프트처럼 <b>"고른 사건은 반드시 전문을 읽고 답하라"고 명시적으로 지시</b>하면 됩니다. 지시는 기본 동작을 만드는 것이 아니라 <b>보장</b>하는 장치입니다.</div>
+
+      <div class="tip-card"><b>세 구조의 자리</b> — <b>RAG</b>는 대규모·서비스용, <b>Long Context</b>는 소규모·전체 조망용, <b>하이브리드</b>는 그 사이 — "요지는 다 보되 전문은 골라 읽어야 하는" 연구 작업에 특히 잘 맞습니다. 코퍼스가 커져 요지조차 컨텍스트에 안 들어가게 되면, 그때 요지 훑기를 임베딩 검색으로 바꾸는 것이 자연스러운 진로입니다. 그리고 이 하이브리드 절차를 매번 프롬프트로 다시 쓰지 않도록 <b>파일(스킬)로 저장하는 방법</b>은 4주차에서 다룹니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>하이브리드(요지 통째 + 전문 도구 읽기) 구조를 설명할 수 있다</span></label></div>
+    </section>
+
+    <!-- ============ S4 ============ -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>마무리 체크리스트</h2></div>
+      <ul class="final-list">
+        <li>Long Context는 "통째로 싣기" — 수만 토큰 이내 혼자 쓰는 분석이면 최선의 단순함</li>
+        <li>Long Context 사용 전: 자료 토큰 수 추정 → 모델 컨텍스트 창 확인 (모델마다 3.2만~100만 토큰으로 천차만별)</li>
+        <li>하이브리드: 요지는 통째로(목차), 전문은 도구로 골라 읽기 — Cowork·Claude Code가 일하는 방식</li>
+      </ul>
+      <div class="next-card-grid">
+        <div class="next-card"><b>직접 해보기 — 내 데이터로 구현하기</b><span>여러분이 스크래핑했거나 보관하고 있는 데이터(리뷰·기사·논문 초록·업무 문서 등)로 셋 중 하나를 구현해 보세요: ① <b>임베딩 검색엔진</b> ② <b>RAG 답변 시스템</b> ③ <b>하이브리드 질의응답</b>(요지 통째 + 전문 골라 읽기). 판결문은 예시였을 뿐 — 데이터가 바뀌어도 파이프라인과 프롬프트는 동일합니다. §3의 하이브리드 절차는 2주차 ⑥에서 배운 방법 그대로 <b>스킬(SKILL.md)로 저장</b>해 두면 좋습니다.</span></div>
+        <div class="next-card"><b>이어지는 실습 — 이메일 인증으로 문 달기 (⑦)</b><span>⑤에서 배포한 챗봇은 아직 <b>URL만 알면 누구나</b> 들어옵니다. ⑦에서 이메일 인증코드로 문을 달아, 허용된 사람만 들어오게 만듭니다.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>Long Context와 하이브리드 강의를 마쳤다!</span></label></div>
+    </section>
+      <a class="back-home" href="index.html">
+        <span class="bh-ic">←</span>
+        <span><strong>3주차 강의자료 목록으로 돌아가기</strong><small>다음 자료로 이어가려면 목록에서 골라보세요</small></span>
+      </a>
+
+  </main>
+</div>
+
+<div class="toast" id="toast">복사되었습니다</div>
+<script>
+/* 공통: 프롬프트 복사 / 진행률 / scroll-spy / 라이트박스 (요소 없으면 자동 생략) */
+const $ = s => document.querySelector(s);
+function showToast(msg){
+  const t = $("#toast"); if(!t) return;
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){}
+  ta.remove();
+}
+document.querySelectorAll(".copy-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const text = document.getElementById(btn.dataset.copy).textContent;
+    const done = () => showToast("복사되었습니다");
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+    } else fallbackCopy(text, done);
+  });
+});
+/* 진행률 + 축하 배너 (상태는 메모리에만) */
+const checks = [...document.querySelectorAll("input[data-progress]")];
+if(checks.length){
+  $("#progressTotal").textContent = checks.length;
+  let celebrated = false;
+  const updateProgress = () => {
+    const done = checks.filter(c => c.checked).length;
+    $("#progressCount").textContent = done;
+    $("#progressBar").style.width = (done/checks.length*100)+"%";
+    checks.forEach(c => {
+      const a = document.querySelector(`.toc a[data-sec="${c.dataset.progress}"]`);
+      if(a) a.classList.toggle("done", c.checked);
+    });
+    if(done===checks.length && !celebrated){
+      celebrated = true;
+      const b = document.createElement("div");
+      b.className = "celebrate-banner";
+      b.innerHTML = document.body.dataset.celebrate || "🎉 <b>완료!</b> 수고하셨습니다.";
+      $("#celebrateSlot").appendChild(b);
+      b.scrollIntoView({behavior:"smooth", block:"center"});
+    }
+  };
+  checks.forEach(c => c.addEventListener("change", updateProgress));
+  updateProgress();
+}
+/* scroll-spy */
+const tocLinks = {};
+document.querySelectorAll(".toc a[data-sec]").forEach(a => tocLinks[a.dataset.sec] = a);
+const secIds = Object.keys(tocLinks);
+if(secIds.length){
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { en.target._visible = en.isIntersecting; });
+    let current = null;
+    for(const id of secIds){ const el = document.getElementById(id); if(el && el._visible){ current = id; break; } }
+    if(current){
+      Object.values(tocLinks).forEach(a => a.classList.remove("active"));
+      tocLinks[current].classList.add("active");
+    }
+  }, {rootMargin:"-15% 0px -55% 0px"});
+  secIds.forEach(id => { const el = document.getElementById(id); if(el) io.observe(el); });
+}
+/* 라이트박스 — data-doc 카드 여러 개 지원 */
+const lb = $("#exampleLightbox");
+if(lb){
+  const lbFrame = $("#exampleLightboxFrame");
+  const closeLb = () => { lb.hidden = true; lbFrame.src = "about:blank"; document.body.style.overflow=""; };
+  document.querySelectorAll(".example-card[data-doc]").forEach(card => {
+    const docURL = "data:text/html;base64," + window[card.dataset.doc];
+    const thumb = card.querySelector("iframe");
+    if(thumb) thumb.src = docURL;
+    const openLb = () => { lbFrame.src = docURL; lb.hidden = false; document.body.style.overflow="hidden"; };
+    card.addEventListener("click", openLb);
+    card.addEventListener("keydown", e => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openLb(); } });
+  });
+  $("#lightboxClose").addEventListener("click", closeLb);
+  lb.addEventListener("click", e => { if(e.target===lb) closeLb(); });
+  document.addEventListener("keydown", e => { if(e.key==="Escape" && !lb.hidden) closeLb(); });
+}
+
+</script>
+</body>
+</html>

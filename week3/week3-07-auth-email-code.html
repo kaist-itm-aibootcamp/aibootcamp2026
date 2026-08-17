@@ -255,7 +255,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <div id="celebrateSlot"></div>
 
     <div class="hero">
-      <span class="hero-kicker">WEEK 3 · STEP 6 — 인증 실습: 문 달기</span>
+      <span class="hero-kicker">WEEK 3 · STEP 7 — 인증 실습: 문 달기</span>
       <h1>허용된 사람만 들어오게 —<br/>배포한 챗봇에 이메일 인증으로 문 달기</h1>
       <p>⑤에서 배포한 판결문 챗봇은 <b>URL만 알면 누구나</b> 들어옵니다. 오늘 그 챗봇에 <b>문</b>을 달아 <b>인증된 사람만</b> 들어오게 만듭니다. 방식은 여러분이 매일 겪는 그것 — <b>이메일로 6자리 인증코드를 받아 입력</b>하는 흐름입니다. 발송은 별도 유료 서비스 없이 <b>Gmail SMTP + 앱 비밀번호</b>로 합니다.</p>
     </div>
@@ -435,9 +435,9 @@ Vercel에 배포되어 있는 프로젝트야.
         <thead><tr><th>비밀</th><th>등장</th><th>유출되면</th><th>보관 위치</th></tr></thead>
         <tbody>
           <tr><td><b>OpenRouter API 키</b></td><td>③⑤</td><td>내 계정으로 요금 폭탄</td><td rowspan="4" style="vertical-align:middle;text-align:center;background:var(--sky-light);"><b>서버의<br/>환경변수</b><br/><span style="font-size:12px;color:var(--muted);">브라우저·코드·<br/>GitHub 어디에도 없음</span></td></tr>
-          <tr><td><b>Gmail 앱 비밀번호</b></td><td>⑥</td><td>내 이름으로 스팸 발송</td></tr>
-          <tr><td><b>허용 이메일 명단·인증코드</b></td><td>⑥</td><td>인증 우회, 명단(개인정보) 노출</td></tr>
-          <tr><td><b>비밀번호 해시 (지름길)</b></td><td>⑥ §6</td><td>원문 복원은 불가하나 무차별 대입의 표적 — 그래서 비밀번호는 길게</td></tr>
+          <tr><td><b>Gmail 앱 비밀번호</b></td><td>⑦</td><td>내 이름으로 스팸 발송</td></tr>
+          <tr><td><b>허용 이메일 명단·인증코드</b></td><td>⑦</td><td>인증 우회, 명단(개인정보) 노출</td></tr>
+          <tr><td><b>비밀번호 해시 (지름길)</b></td><td>⑦ §6</td><td>원문 복원은 불가하나 무차별 대입의 표적 — 그래서 비밀번호는 길게</td></tr>
         </tbody>
       </table>
       <div class="callout caution"><b class="cap">허용 명단도 개인정보다</b>
@@ -471,7 +471,7 @@ Vercel에 배포되어 있는 프로젝트야.
 
 <script>
 
-const CELEBRATE_HTML = "🎉 <b>문을 달았습니다!</b> 이론(①) → 검색 비교(②) → 검색엔진(③) → RAG(④) → 배포(⑤) → 인증(⑥) — 서비스 한 사이클을 완주했습니다. 4주차에는 이 서비스에 연동과 자율성을 더합니다.";
+const CELEBRATE_HTML = "🎉 <b>문을 달았습니다!</b> 온보딩(①) → 검색 비교(②) → 검색엔진(③) → RAG(④) → 배포(⑤) → 인증(⑦) — 서비스 한 사이클을 완주했습니다. 4주차에는 이 서비스에 연동과 자율성을 더합니다.";
 
 const $ = s => document.querySelector(s);
 /* 프롬프트 복사 */

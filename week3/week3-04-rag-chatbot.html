@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Week 3 — RAG: 검색해서 읽고 답하는 AI, 그리고 Long Context라는 대안</title>
+<title>Week 3 — RAG: 검색해서 읽고, 근거를 달아 답하는 판례 챗봇</title>
 <style>
 :root{
   --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
@@ -234,7 +234,7 @@ p{margin:10px 0;}
 @media (max-width:640px){.back-home{padding:18px;gap:12px;}}
 </style>
 </head>
-<body id="top" data-celebrate="🎉 <b>RAG 강의 완주!</b> 검색으로 근거를 모아 답하게 하는 법과, 통째로 읽혀 답하게 하는 법 — 두 도구의 구조와 한계까지 알고 상황에 맞게 고를 수 있게 되었습니다.">
+<body id="top" data-celebrate="🎉 <b>RAG 강의 완주!</b> 검색으로 근거를 모아, 그 근거만으로 답하게 만드는 법 — 계획 문답부터 완성 화면까지 실제 기록으로 익혔습니다. 대안 갈래(Long Context)는 ⑥에서 이어집니다.">
 
 <header class="topbar">
   <div class="topbar-left">
@@ -242,7 +242,7 @@ p{margin:10px 0;}
       <span class="brand-mark">AI</span>
       <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
     </a>
-    <div class="week-tag"><span class="week-num">WEEK 3</span><span class="week-title">RAG와 Long Context</span></div>
+    <div class="week-tag"><span class="week-num">WEEK 3</span><span class="week-title">RAG — 판례 챗봇</span></div>
     <a class="back-week" href="index.html">← 3주차 목록</a>
   </div>
   <div class="progress-wrap" aria-label="진행률">
@@ -259,10 +259,7 @@ p{margin:10px 0;}
       <a href="#s2" data-sec="s2">2. 아키텍처와 데이터 플로우<span class="done-mark">✔</span></a>
       <a href="#s3" data-sec="s3">3. 컨텍스트에 실제로 담기는 것<span class="done-mark">✔</span></a>
       <a href="#s4" data-sec="s4">4. 실습 — 판례 챗봇, 계획부터<span class="done-mark">✔</span></a>
-      <a href="#s5" data-sec="s5">5. 대안 — Long Context 방식<span class="done-mark">✔</span></a>
-      <a href="#s6" data-sec="s6">6. 얼마나 담을 수 있나 — 모델 비교<span class="done-mark">✔</span></a>
-      <a href="#s7" data-sec="s7">7. 하이브리드 — 요지는 통째, 전문은 골라서<span class="done-mark">✔</span></a>
-      <a href="#s8" data-sec="s8">8. 마무리 체크리스트<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 마무리 체크리스트<span class="done-mark">✔</span></a>
     </div>
   </nav>
 
@@ -270,9 +267,9 @@ p{margin:10px 0;}
     <div id="celebrateSlot"></div>
 
     <div class="hero">
-      <span class="hero-kicker">WEEK 3 · STEP 4 — RAG와 Long Context</span>
+      <span class="hero-kicker">WEEK 3 · STEP 4 — RAG: 판례 챗봇</span>
       <h1>RAG — 질문하면 관련 문서를 찾아<br/>읽히고, 근거를 달아 답하게 하기</h1>
-      <p>앞 강의의 검색엔진은 "문서 목록"을 사람에게 돌려줬습니다. RAG는 다른 목적의 기법입니다 — <b>질문과 관련된 문서를 찾아 AI의 컨텍스트에 로딩하고, 그 문서만 근거로 답변을 쓰게</b> 합니다. 마지막에는 유력한 대안인 <b>Long Context</b> 방식의 현재 수준까지 살펴봅니다.</p>
+      <p>앞 강의의 검색엔진은 "문서 목록"을 사람에게 돌려줬습니다. RAG는 다른 목적의 기법입니다 — <b>질문과 관련된 문서를 찾아 AI의 컨텍스트에 로딩하고, 그 문서만 근거로 답변을 쓰게</b> 합니다. 유력한 대안인 <b>Long Context</b> 방식과의 비교는 ⑥ 강의에서 따로 다룹니다.</p>
     </div>
 
     <!-- ============ S1 ============ -->
@@ -365,7 +362,7 @@ p{margin:10px 0;}
         <div class="col"><h4 style="color:var(--amber)">Chat·Cowork — 사람의 도구</h4>
           <ul>
             <li>사람이 로그인해 <b>화면에서 직접</b> 실행하는 개인용 서비스</li>
-            <li>내 연구를 내가 할 때는 이걸로 충분 (Long Context 방식 §5 포함)</li>
+            <li>내 연구를 내가 할 때는 이걸로 충분 (⑥의 Long Context 방식 포함)</li>
             <li>그러나 <b>내 프로그램(서버)이 대신 호출할 수 없고</b>, 내 계정 1인분 — 이용자 100명을 받을 수 없음</li>
           </ul></div>
         <div class="col"><h4 style="color:var(--brand-dark)">외부 API — 프로그램의 부품</h4>
@@ -524,188 +521,18 @@ p{margin:10px 0;}
 
     <!-- ============ S5 ============ -->
     <section class="section" id="s5">
-      <div class="sec-head"><span class="sec-num">5</span><h2>대안 — Long Context: 그냥 전부 읽히면 안 되나?</h2></div>
-      <p class="sec-lead">됩니다 — 코퍼스가 충분히 작다면. 최신 LLM의 컨텍스트 창은 수십만~백만 토큰까지 커졌습니다. 두 방식의 차이는 <b>컨텍스트에 무엇을 싣는가</b>로 보면 한눈에 들어옵니다.</p>
-
-      <div class="ctx-compare">
-        <div>
-          <h5 style="color:var(--brand-dark)">RAG의 컨텍스트 — 골라서 싣기</h5>
-          <div class="ctx-stack">
-            <div class="ctx-block ctx-sys" style="padding:8px 14px;"><span class="lb">지시</span>제공 문서만 근거로 답하라…</div>
-            <div class="ctx-block ctx-doc" style="padding:8px 14px;">검색된 판례 요약 20건 (관련도 순)</div>
-            <div class="ctx-block ctx-q" style="padding:8px 14px;"><span class="lb">질문</span>동료들의 따돌림도…?</div>
-          </div>
-          <span class="ctx-token">총 <b>약 3천 토큰</b> — 질문마다 검색으로 새로 고름</span>
-        </div>
-        <div>
-          <h5 style="color:var(--green)">Long Context — 통째로 싣기</h5>
-          <div class="ctx-stack">
-            <div class="ctx-block ctx-sys" style="padding:8px 14px;"><span class="lb">지시</span>첨부 자료 전체를 읽고 답하라…</div>
-            <div class="ctx-block ctx-doc" style="padding:26px 14px 8px;">판결 요지 <b>347건 전부</b><br/><span style="font-size:11px;color:#7d97ab">1번부터 347번까지, 검색 없이 통째로</span></div>
-            <div class="ctx-block ctx-doc" style="padding:20px 14px;">　</div>
-            <div class="ctx-block ctx-doc dim" style="padding:20px 14px;">　</div>
-            <div class="ctx-block ctx-q" style="padding:8px 14px;"><span class="lb">질문</span>동료들의 따돌림도…?</div>
-          </div>
-          <span class="ctx-token">총 <b>약 4~5만 토큰</b> — 질문마다 전체를 다시 실음 (비용도 그만큼)</span>
-        </div>
-      </div>
-      <div class="callout ok"><b class="cap">Long Context 방식의 매력</b>
-      검색 단계가 없으므로 <b>백엔드도, 임베딩도 필요 없습니다.</b> 판결 요지 CSV를 Chat·Cowork에 첨부하고 "전부 읽고 답해줘"라고 하면 끝 — 실제로 이 부트캠프의 판례 분석 보고서(895건 유형 분류)도 이 계열의 방식으로 만들어졌습니다. <b>혼자 쓰는 연구라면 가장 단순하고 강력한 선택지</b>입니다. (서비스로 만들 때는 §2의 이유로 다시 API·비용 문제가 돌아옵니다.)</div>
-      <table class="doc-table">
-        <thead><tr><th style="width:130px"></th><th>RAG (검색 후 로딩)</th><th>Long Context (통째로 로딩)</th></tr></thead>
-        <tbody>
-          <tr><td><b>코퍼스 규모</b></td><td>수만~수백만 건도 가능 (검색이 골라줌)</td><td>컨텍스트 창에 들어가는 만큼</td></tr>
-          <tr><td><b>구현 난이도</b></td><td>임베딩 + 벡터 DB + 백엔드 필요</td><td><b>매우 낮음</b> — 파일 첨부 + 프롬프트</td></tr>
-          <tr><td><b>1회 비용</b></td><td>낮음 (관련 요약 20건만 로딩)</td><td>높음 (매 질문마다 전체 토큰 과금)</td></tr>
-          <tr><td><b>실패 모드</b></td><td>검색이 놓치면 답도 틀림</td><td>자료가 컨텍스트 창을 넘거나(§6), 긴 문맥 중간의 정보를 놓칠 수 있음</td></tr>
-          <tr><td><b>강점</b></td><td>반복 질문·서비스화·대규모</td><td>전체 조망이 필요한 질문("전반적 경향은?")</td></tr>
-        </tbody>
-      </table>
-      <div class="copy-block"><span class="cb-label">💬 Long Context 방식 프롬프트 예시 (Chat·Cowork에서)</span><button class="copy-btn" data-copy="r4">복사</button>
-<pre id="r4">첨부한 CSV는 직장 내 괴롭힘 판결 347건의 요지야. 전부 읽고 답해줘:
-동료 직원에 의한 따돌림 사건들에서 손해배상이 인정된 경우와
-기각된 경우를 나눠서, 갈림길이 된 요소를 사건번호와 함께 정리해줘.</pre></div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>두 방식의 컨텍스트 구조 차이를 그림으로 설명할 수 있다</span></label></div>
-    </section>
-
-    <!-- ============ S6 ============ -->
-    <section class="section" id="s6">
-      <div class="sec-head"><span class="sec-num">6</span><h2>Long Context 사용 전 점검 — 얼마나 담을 수 있는 모델인가</h2></div>
-      <p class="sec-lead">Long Context 방식을 쓰기로 했다면 첫 질문은 하나입니다 — <b>"내 자료가 이 모델의 컨텍스트 창에 들어가는가?"</b> 컨텍스트 길이는 모델마다 크게 다릅니다.</p>
-
-      <h3>주요 모델 컨텍스트 길이 비교 (2026년 기준 공개 정보)</h3>
-      <table class="doc-table">
-        <thead><tr><th style="width:110px">구분</th><th>모델</th><th style="text-align:right;width:110px">컨텍스트 창</th><th style="width:170px">판결 요지 347건<br/>(약 4~5만 토큰) 수용?</th></tr></thead>
-        <tbody>
-          <tr><td rowspan="3"><b>해외 상용</b></td><td>Google Gemini 3.1 Pro</td><td class="r">100만 토큰</td><td>✅ 여유 (약 1/20 사용)</td></tr>
-          <tr><td>OpenAI GPT-5.5</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
-          <tr><td>Anthropic Claude Opus 4.8 / Sonnet 4.6</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
-          <tr><td rowspan="3"><b>중국 오픈소스</b></td><td>DeepSeek V4</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
-          <tr><td>Qwen3.5-Plus (알리바바)</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
-          <tr><td>Kimi K2.5 (문샷)</td><td class="r">26만 토큰</td><td>✅ 가능</td></tr>
-          <tr><td rowspan="2"><b>국내</b></td><td>LG K-EXAONE (236B)</td><td class="r">26만 토큰</td><td>✅ 가능</td></tr>
-          <tr><td>네이버 HyperCLOVA X SEED Think</td><td class="r">3.2만 토큰</td><td>⚠️ <b>들어가지 않음</b> — 요약·분할 필요</td></tr>
-        </tbody>
-      </table>
-      <p class="ctx-note">공개 자료 기준이며 버전에 따라 달라집니다 — 사용 전 그 모델의 공식 문서에서 확인하는 습관이 중요합니다. 참고로 오픈소스 진영에는 1,000만 토큰을 내건 모델(Llama 4 Scout)도 있습니다.</p>
-
-      <div class="callout"><b class="cap">표가 말해주는 것</b>
-      같은 자료(판결 요지 347건 ≈ 4~5만 토큰)라도 <b>어떤 모델을 고르느냐에 따라 Long Context 방식이 되기도, 안 되기도</b> 합니다. 프런티어 상용 모델과 중국 오픈소스 상위 모델은 100만 토큰 시대에 들어섰고, 국내 모델은 LG K-EXAONE이 26만 토큰으로 수용 가능한 반면 네이버 공개 모델(3.2만)에는 이 자료가 통째로 들어가지 않습니다 — 이 경우 요약본을 쓰거나, 나눠 묻거나, RAG로 전환해야 합니다.</div>
-
-      <h3>사용 전 점검 3가지</h3>
-      <div class="insight"><span class="n">1</span><p><b>내 자료의 토큰 수를 추정한다.</b> 한국어는 대략 글자 수 × 0.7~1이 토큰 수입니다. 판결 요지 347건(약 6.5만 자) ≈ 4~5만 토큰. AI에게 "이 파일 토큰 수 세줘"라고 시켜도 됩니다.</p></div>
-      <div class="insight"><span class="n">2</span><p><b>모델의 컨텍스트 창과 비교한다.</b> 자료가 창의 절반을 넘으면 여유가 없는 것입니다 — 대화가 오갈수록 컨텍스트는 계속 쌓이기 때문입니다.</p></div>
-      <div class="insight"><span class="n">3</span><p><b>명목 길이 ≠ 실제 독해력.</b> 창이 크다고 그 끝까지 꼼꼼히 읽는 것은 아닙니다 — 아주 긴 입력에서는 중간의 정보를 놓치는 경향이 보고되어 있으니, 중요한 지시·자료는 앞이나 뒤에 배치하고 여유를 두세요.</p></div>
-
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>자료 토큰 수 추정 → 모델 컨텍스트 확인의 점검 순서를 안다</span></label></div>
-    </section>
-
-    <!-- ============ S7 (하이브리드) ============ -->
-    <section class="section" id="s7">
-      <div class="sec-head"><span class="sec-num">7</span><h2>하이브리드 — 요지는 통째로 싣고, 전문은 골라 읽힌다</h2></div>
-      <p class="sec-lead">RAG와 Long Context는 섞어 쓸 수 있습니다. 아이디어: <b>컨텍스트에는 판결 요지 347건만 통째로 싣고</b>(목차 역할), 모델이 요지를 훑어 관련 사건을 고르면 <b>그 판결문 전문만 저장된 파일에서 도구로 읽어와</b> 컨텍스트에 추가하는 구조입니다.</p>
-
-      <div class="diagram-card">
-        <h4>하이브리드 구조 — Long Context(요지) + 도구 호출(전문)</h4>
-        <div class="sub">임베딩도 벡터 DB도 없이, "요지 훑기"가 검색을 대신합니다</div>
-        <svg viewBox="0 0 680 470" role="img" aria-label="하이브리드 구조도">
-          <!-- A: 초기 컨텍스트 -->
-          <rect x="8" y="10" width="300" height="150" rx="12" fill="#f4f9fd" stroke="#bcdcf3"/>
-          <text x="24" y="34" font-size="12.5" font-weight="900" fill="#1b6fa6">① 초기 컨텍스트 (Long Context)</text>
-          <rect x="24" y="46" width="268" height="26" rx="6" fill="#20242a"/>
-          <text x="158" y="63" text-anchor="middle" font-size="11" fill="#f0c987">지시: 요지를 훑고, 필요한 전문은 파일로 읽어라</text>
-          <rect x="24" y="78" width="268" height="46" rx="6" fill="#eaf3fb" stroke="#9dc4de"/>
-          <text x="158" y="97" text-anchor="middle" font-size="11.5" font-weight="800" fill="#2d4a63">판결 요지 347건 전부 (~4.5만 토큰)</text>
-          <text x="158" y="113" text-anchor="middle" font-size="10" fill="#7d97ab">코퍼스 전체의 "목차" 역할</text>
-          <rect x="24" y="130" width="268" height="22" rx="6" fill="#e7f2ea" stroke="#bfe0c9"/>
-          <text x="158" y="145" text-anchor="middle" font-size="11" fill="#2b4a37">질문: 동료들의 따돌림도 배상되나?</text>
-          <!-- arrow A->B -->
-          <text x="340" y="90" text-anchor="middle" font-size="15" font-weight="900" fill="#2e9bdb">→</text>
-          <!-- B: 모델이 선별 -->
-          <rect x="372" y="34" width="300" height="100" rx="12" fill="#1b6fa6"/>
-          <text x="522" y="60" text-anchor="middle" font-size="12.5" font-weight="900" fill="#fff">② 모델이 요지 전체를 훑고 선별</text>
-          <text x="522" y="82" text-anchor="middle" font-size="11" fill="#cde2fb">"관련 사건은 대구 2024가단138550,</text>
-          <text x="522" y="98" text-anchor="middle" font-size="11" fill="#cde2fb">수원 2022가단546552, 울산 2022가단128995 —</text>
-          <text x="522" y="114" text-anchor="middle" font-size="11" fill="#cde2fb">이 3건은 전문을 읽어야겠다"</text>
-          <!-- arrow B->C -->
-          <path d="M522 134 v34" stroke="#b8792e" stroke-width="2.5" fill="none"/>
-          <path d="M522 168 l-6 -10 h12 z" fill="#b8792e"/>
-          <text x="600" y="156" text-anchor="middle" font-size="11.5" font-weight="800" fill="#8a5a13">③ 도구 호출</text>
-          <!-- C: 도구 -->
-          <rect x="372" y="176" width="300" height="88" rx="12" fill="#fdf8ef" stroke="#e8d9bd"/>
-          <text x="522" y="199" text-anchor="middle" font-size="12" font-weight="900" fill="#8a5a13">파일 읽기 도구 (저장된 판결문 폴더)</text>
-          <text x="522" y="219" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#52514e">read_file("대구지방법원_2024가단138550.md")</text>
-          <text x="522" y="235" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#52514e">read_file("수원지방법원_2022가단546552.md")</text>
-          <text x="522" y="251" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#52514e">read_file("울산지방법원_2022가단128995.md")</text>
-          <!-- arrow C->D -->
-          <path d="M372 220 H340 V300 H316" stroke="#2f765b" stroke-width="2.5" fill="none"/>
-          <path d="M316 300 l10 -6 v12 z" fill="#2f765b"/>
-          <!-- D: 확장된 컨텍스트 -->
-          <rect x="8" y="230" width="300" height="140" rx="12" fill="#f4f9fd" stroke="#bcdcf3"/>
-          <text x="24" y="254" font-size="12.5" font-weight="900" fill="#1b6fa6">④ 확장된 컨텍스트</text>
-          <rect x="24" y="266" width="268" height="26" rx="6" fill="#eaf3fb" stroke="#9dc4de"/>
-          <text x="158" y="283" text-anchor="middle" font-size="10.5" fill="#7d97ab">(요지 347건 + 질문 — 그대로 유지)</text>
-          <rect x="24" y="298" width="268" height="60" rx="6" fill="#e3f1fb" stroke="#2e9bdb"/>
-          <text x="158" y="318" text-anchor="middle" font-size="11.5" font-weight="800" fill="#1b6fa6">+ 선별된 3건의 판결문 전문</text>
-          <text x="158" y="335" text-anchor="middle" font-size="10" fill="#5c7fa3">도구가 읽어온 원문이 컨텍스트에 추가됨</text>
-          <text x="158" y="350" text-anchor="middle" font-size="10" fill="#5c7fa3">(전문이 필요한 사건만, 필요한 만큼)</text>
-          <!-- arrow D->E -->
-          <path d="M158 370 v28" stroke="#2f765b" stroke-width="2.5" fill="none"/>
-          <path d="M158 398 l-6 -10 h12 z" fill="#2f765b"/>
-          <!-- E: 답변 -->
-          <rect x="8" y="406" width="664" height="52" rx="12" fill="#edf4ef" stroke="#bfe0c9"/>
-          <text x="340" y="428" text-anchor="middle" font-size="12.5" font-weight="900" fill="#2f765b">⑤ 전문을 근거로 한 정밀 답변 — 요지에는 없는 판시 이유·인용액 산정까지 인용 가능</text>
-          <text x="340" y="447" text-anchor="middle" font-size="10.5" fill="#628a72">"대구 사건에서 법원은 … 라고 판시하며 위자료를 인정하였고 [대구지방법원 2024가단138550, 판결 이유 2.가.] …"</text>
-        </svg>
-      </div>
-
-      <div class="compare">
-        <div class="col"><h4 style="color:var(--green)">이 구조의 장점</h4>
-          <ul>
-            <li>임베딩·벡터 DB·검색 서버가 <b>전혀 필요 없음</b> — "요지 훑기"가 검색을 대신</li>
-            <li>답변 근거가 요약이 아니라 <b>판결문 전문</b> — 판시 이유까지 정밀 인용</li>
-            <li>사실 Cowork·Claude Code가 일하는 방식이 바로 이것 — 목록을 훑고 필요한 파일만 읽기. 이 부트캠프의 판례 보고서도 이렇게 만들어졌습니다</li>
-          </ul></div>
-        <div class="col"><h4 style="color:var(--amber)">치르는 비용</h4>
-          <ul>
-            <li>요지 4~5만 토큰이 <b>매 질문마다</b> 컨텍스트에 상주 (Long Context의 비용 그대로)</li>
-            <li>도구 왕복만큼 응답이 느려짐</li>
-            <li>파일 읽기 도구를 붙일 수 있는 환경이 필요 — Chat 웹화면으로는 안 되고, Cowork·Claude Code 또는 도구 호출을 지원하는 API로 구현</li>
-          </ul></div>
-      </div>
-      <h3>하이브리드로 질문하기 — 프롬프트 예시</h3>
-      <div class="copy-block"><span class="cb-label">💬 Cowork에서 (요지 CSV + 전문 폴더가 연동된 상태)</span><button class="copy-btn" data-copy="r5">복사</button>
-<pre id="r5">연동 폴더에 판결 요지 CSV(347건)와 판결문 전문 파일들(rulings_md/)이 있어.
-질문: 동료 직원들의 따돌림에 대해 손해배상이 인정된 사건과 기각된 사건의
-갈림길은 무엇이었나?
-
-먼저 요지 전체를 훑어서 관련 사건을 고르고, 고른 사건은 반드시
-전문 파일을 읽은 다음, 전문을 근거로 사건번호와 판시 대목을
-인용해서 답해줘. 요지만 보고 답하지 마.</pre></div>
-      <div class="tip-card"><b>사실 이렇게 지시하지 않아도 됩니다 (대체로)</b> — Cowork·Claude Code는 <b>과제의 성질에 따라 기본적으로 이렇게 동작</b>합니다: 질문이 코퍼스 전반에 걸치면 목록·요지부터 훑고, 정밀한 근거가 필요해지면 해당 파일을 스스로 열어 읽습니다. 다만 가끔 요지만 보고 요약 수준으로 답하고 마는 경우가 있는데, 답변에 전문 인용이 없다면 그때 위 프롬프트처럼 <b>"고른 사건은 반드시 전문을 읽고 답하라"고 명시적으로 지시</b>하면 됩니다. 지시는 기본 동작을 만드는 것이 아니라 <b>보장</b>하는 장치입니다.</div>
-
-      <div class="tip-card"><b>세 구조의 자리</b> — <b>RAG</b>는 대규모·서비스용, <b>Long Context</b>는 소규모·전체 조망용, <b>하이브리드</b>는 그 사이 — "요지는 다 보되 전문은 골라 읽어야 하는" 연구 작업에 특히 잘 맞습니다. 코퍼스가 커져 요지조차 컨텍스트에 안 들어가게 되면, 그때 요지 훑기를 임베딩 검색으로 바꾸는 것이 자연스러운 진로입니다. 그리고 이 하이브리드 절차를 매번 프롬프트로 다시 쓰지 않도록 <b>파일(스킬)로 저장하는 방법</b>은 4주차에서 다룹니다.</div>
-
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s7" /><span>하이브리드(요지 통째 + 전문 도구 읽기) 구조를 설명할 수 있다</span></label></div>
-    </section>
-
-    <!-- ============ S8 ============ -->
-    <section class="section" id="s8">
-      <div class="sec-head"><span class="sec-num">8</span><h2>마무리 체크리스트</h2></div>
+      <div class="sec-head"><span class="sec-num">5</span><h2>마무리 체크리스트</h2></div>
       <ul class="final-list">
         <li>RAG = 검색(기존 검색엔진 재사용) → 증강(질문 앞에 문서 끼워 넣기) → 생성(인용 강제)</li>
         <li>답변 생성은 Chat·Cowork가 아니라 외부 API — 서비스는 프로그램이 호출할 수 있어야 확장된다</li>
         <li>증강의 실물 = 지시 + 검색 문서 + 질문이 담긴 하나의 컨텍스트</li>
         <li>답이 이상하면 생성보다 검색 결과부터 디버깅</li>
-        <li>Long Context는 "통째로 싣기" — 수만 토큰 이내 혼자 쓰는 분석이면 최선의 단순함</li>
-        <li>Long Context 사용 전: 자료 토큰 수 추정 → 모델 컨텍스트 창 확인 (모델마다 3.2만~100만 토큰으로 천차만별)</li>
-        <li>하이브리드: 요지는 통째로(목차), 전문은 도구로 골라 읽기 — Cowork·Claude Code가 일하는 방식</li>
       </ul>
       <div class="next-card-grid">
-        <div class="next-card"><b>직접 해보기 — 내 데이터로 구현하기</b><span>여러분이 스크래핑했거나 보관하고 있는 데이터(리뷰·기사·논문 초록·업무 문서 등)로 셋 중 하나를 구현해 보세요: ① <b>임베딩 검색엔진</b> ② <b>RAG 답변 시스템</b> ③ <b>하이브리드 질의응답</b>(요지 통째 + 전문 골라 읽기). 판결문은 예시였을 뿐 — 데이터가 바뀌어도 파이프라인과 프롬프트는 동일합니다.</span></div>
-        <div class="next-card"><b>다음 강의 — Vercel 배포: 검색기에서 챗봇까지 (⑤)</b><span>③의 검색엔진과 오늘 배운 RAG는 아직 <b>내 PC에서만</b> 돕니다. 다음 강의에서 이것을 클라우드(Vercel)에 올려 <b>URL 하나로 누구나 쓰는 서비스</b>로 만듭니다. §7의 하이브리드 절차는 2주차 ⑥에서 배운 방법 그대로 <b>스킬(SKILL.md)로 저장</b>해 두면 좋습니다.</span></div>
+        <div class="next-card"><b>다음 강의 — Vercel 배포: 검색기에서 챗봇까지 (⑤)</b><span>③의 검색엔진과 오늘 만든 RAG 챗봇은 아직 <b>내 PC에서만</b> 돕니다. 다음 강의에서 클라우드(Vercel)에 올려 <b>URL 하나로 누구나 쓰는 서비스</b>로 만듭니다.</span></div>
+        <div class="next-card"><b>다른 갈래 — Long Context와 하이브리드 (⑥)</b><span>검색으로 고르는 대신 <b>자료를 통째로 읽히면</b> 안 되나? 컨텍스트 창이 백만 토큰으로 커진 지금의 답과, 요지는 통째·전문은 골라 읽는 하이브리드를 ⑥에서 다룹니다.</span></div>
       </div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s8" /><span>RAG 강의를 마쳤다!</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>RAG 강의를 마쳤다!</span></label></div>
     </section>
       <a class="back-home" href="index.html">
         <span class="bh-ic">←</span>

@@ -78,10 +78,12 @@
 | (2주차에서 이관) `week2-06-embedding-search-engine.html` | `week3-03-embedding-search-engine.html` |
 | (2주차에서 이관) `week2-07-rag-long-context.html` | `week3-04-rag-long-context.html` |
 | (옛 초안) `판례 검색기 Vercel 배포` + `판결문 챗봇을 Vercel로` | `week3-05-vercel-deploy.html` (두 편 통합 — 구글시트 기록부는 4주차 예고로 조정) |
-| (옛 초안) `인증·접근 통제·데이터 보안` 실습부 | `week3-06-auth-email-code.html` (대상을 ⑤의 배포 챗봇으로 재서술, §6에 비밀번호 해시 지름길 추가) |
+| (옛 초안) `인증·접근 통제·데이터 보안` 실습부 | `week3-06-auth-email-code.html` (대상을 ⑤의 배포 챗봇으로 재서술, §6에 비밀번호 해시 지름길 추가) → 2026-08-17 ⑥ 신설로 `week3-07-auth-email-code.html`로 한 칸 이동 |
+| (분리 — 2026-08-17) `week3-04-rag-long-context.html`의 §5~§7 | `week3-06-long-context-hybrid.html` — Long Context·모델 비교·하이브리드는 쟁점이 달라 별도 강의(⑥)로 분리 |
+| `week3-04-rag-long-context.html` | `week3-04-rag-chatbot.html` (Long Context 분리 후 RAG 챗봇 실습 중심으로 개명) |
 | (옛 초안) `MCP 커넥터` · `포트폴리오 시트 읽기 전용` · `구글 시트 읽기/쓰기` · `팀 현황판` · `CLI 도구` · `총정리` | 4주차로 이관 (Week 4 표 참조) |
 
-> 2026-08 주차 재편성: 새 Week 3 = "검색엔진과 RAG — 서비스로 만들어 세상에 내놓기" (Claude Code 주간, 자료 6개, STEP 1~6). 스킬 만들기는 4주차→3주차를 거쳐 최종적으로 **2주차 ⑥**에 안착했다(주차별 분량 균형). ③(검색엔진 구축)에 문서화 절(PLAN·DECISIONS·README·CLAUDE.md)을 추가했다.
+> 2026-08 주차 재편성: 새 Week 3 = "검색엔진과 RAG — 서비스로 만들어 세상에 내놓기" (Claude Code 주간, 자료 7개, STEP 1~7). 스킬 만들기는 4주차→3주차를 거쳐 최종적으로 **2주차 ⑥**에 안착했다(주차별 분량 균형). ③(검색엔진 구축)에 문서화 절(PLAN·DECISIONS·README·CLAUDE.md)을 추가했다.
 
 ## Week 4 적용 결과 (이름 변경 이력)
 
