@@ -182,6 +182,14 @@ p{margin:10px 0;}
 .sbf .sb-foot{padding:13px 20px;display:flex;justify-content:flex-end;gap:10px;}
 .sbf .sb-btn{border:1px solid #e4e4e4;border-radius:8px;padding:8px 16px;font-weight:600;}
 .sbf .sb-btn.go{background:#3ecf8e;border-color:#3ecf8e;color:#0b3d25;font-weight:800;}
+.gc{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin:12px 0;padding:16px 20px;color:#111;}
+.gc .gc-t{font-size:14px;font-weight:900;margin-bottom:12px;}
+.gc .gc-row{display:grid;grid-template-columns:repeat(6,1fr);border:1px solid #eee;border-radius:10px;overflow:hidden;}
+.gc .gc-cell{padding:14px 6px;text-align:center;border-right:1px solid #f0f0f0;font-size:11px;color:#777;}
+.gc .gc-cell:last-child{border-right:none;}
+.gc .gc-cell b{display:block;font-size:12.5px;color:#111;margin:4px 0 2px;}
+.gc .gc-cell.hl{background:#eafaf1;outline:2px solid #3ecf8e;outline-offset:-2px;}
+@media (max-width:700px){.gc .gc-row{grid-template-columns:repeat(3,1fr);}.gc .gc-cell{border-bottom:1px solid #f0f0f0;}}
 .final-list{list-style:none;margin:14px 0;}
 .final-list li > span{flex:1;}
 .final-list li{display:flex;gap:10px;margin:9px 0;font-size:14.5px;}
@@ -381,8 +389,20 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
             <li><b>Region</b> — 가까운 곳(Asia-Pacific)으로.</li>
             <li><b>Security</b> — 기본값 그대로 두면 됩니다. <b>Create new project</b>를 누르면 1~2분 뒤 프로젝트가 열립니다.</li>
           </ul>
+          <p style="margin-top:12px;">프로젝트가 만들어지면 첫 화면(프로젝트 홈)에서 두 값을 복사합니다. <b>Project URL</b>은 화면 맨 위 프로젝트 이름 바로 아래 주소입니다(옆의 <b>Copy</b> 버튼). 키는 같은 화면을 아래로 내리면 나오는 <b>Get connected</b> 줄의 <b>맨 오른쪽 "API Keys" 타일</b>을 누르면 보입니다:</p>
+          <div class="gc">
+            <div class="gc-t">Get connected</div>
+            <div class="gc-row">
+              <div class="gc-cell"><b>Framework</b>Use a client library</div>
+              <div class="gc-cell"><b>Server</b>Build APIs</div>
+              <div class="gc-cell"><b>Direct</b>Connection string</div>
+              <div class="gc-cell"><b>ORM</b>Third-party library</div>
+              <div class="gc-cell"><b>MCP</b>Connect your agent</div>
+              <div class="gc-cell hl">🔑<b>API Keys</b>Manage project keys</div>
+            </div>
+          </div>
           <div class="callout"><b class="cap">어떤 키를 복사하나 — Publishable이 아니라 Secret</b>
-          프로젝트가 열리면 <b>Settings → API Keys</b>에 키가 두 종류 보입니다. <b>Publishable key</b>(<code>sb_publishable_…</code>)는 브라우저에 노출해도 되는 키로, 화면이 DB를 직접 부르는 구조에서 행 단위 보안 규칙(RLS)과 함께 쓰는 것입니다. <b>Secret key</b>(<code>sb_secret_…</code>)는 서버 전용 만능 키라 브라우저에서 쓰면 아예 거부됩니다. 우리 구조는 <b>서버리스 함수만</b> Supabase에 접근하므로 — <b>Project URL과 Secret key</b>를 복사해 둡니다. 이름대로 비밀이니 환경변수로만 다룹니다.</div>
+          API Keys를 열면 키가 두 종류 보입니다. <b>Publishable key</b>(<code>sb_publishable_…</code>)는 브라우저에 노출해도 되는 키로, 화면이 DB를 직접 부르는 구조에서 행 단위 보안 규칙(RLS)과 함께 쓰는 것입니다. 우리가 쓸 것은 그 아래 <b>Secret keys</b> — 서버 전용 만능 키라 브라우저에서 쓰면 아예 거부됩니다(<code>sb_secret_…</code>). 우리 구조는 <b>서버리스 함수만</b> Supabase에 접근하므로 <b>Secret keys의 키를 복사</b>합니다. 이름대로 비밀이니 환경변수로만 다룹니다.</div>
         </div>
         <div class="workshop-step"><span class="ws-num">2</span>
           <b class="ws-t">Vercel에 환경변수 추가</b>
