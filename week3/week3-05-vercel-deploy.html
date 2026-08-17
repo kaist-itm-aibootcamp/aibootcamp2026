@@ -206,6 +206,26 @@ p{margin:10px 0;}
 .workshop-step b.ws-t{display:block;font-size:14.5px;margin-bottom:4px;}
 .workshop-step p{font-size:14px;color:var(--muted);margin:4px 0;}
 .workshop-step code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.5px;}
+.workshop-step ul{margin:8px 0 4px 18px;padding:0;}
+.workshop-step ul li{font-size:13.5px;color:var(--muted);margin:6px 0;line-height:1.7;}
+.workshop-step ul li b{color:var(--ink);}
+.vform{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:20px 22px;margin:12px 0;font-size:13px;color:#111;}
+.vform .vf-h{font-size:18px;font-weight:900;margin-bottom:14px;}
+.vf-banner{background:#f2f2f2;border-radius:8px;padding:11px 14px;margin-bottom:14px;font-size:12.5px;color:#555;}
+.vf-banner b{display:block;color:#111;font-size:13px;margin-top:3px;}
+.vf-banner .br{color:#666;font-family:ui-monospace,Consolas,monospace;font-weight:400;font-size:12px;}
+.vf-label{font-size:12px;color:#555;margin:12px 0 5px;}
+.vf-row{display:flex;gap:12px;flex-wrap:wrap;}
+.vf-row>div{flex:1;min-width:200px;}
+.vf-input{border:1px solid #e4e4e4;border-radius:8px;padding:9px 13px;font-size:13px;color:#111;display:flex;align-items:center;gap:8px;background:#fff;}
+.vf-input .chip{background:#ececec;border-radius:999px;padding:2px 10px;font-size:11px;font-weight:700;color:#444;}
+.vf-input .cv{margin-left:auto;color:#888;}
+.vf-input.dim{background:#f6f6f6;color:#999;}
+.vf-collapse{border:1px solid #e4e4e4;border-radius:8px;padding:11px 13px;font-size:13px;font-weight:600;color:#111;margin:12px 0;}
+.vf-env{border:1px solid #e4e4e4;border-radius:8px;padding:13px;margin:12px 0;}
+.vf-env .vf-label:first-child{margin-top:0;}
+.vf-btn{display:inline-block;border:1px solid #e4e4e4;border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:600;color:#111;}
+.vf-deploy{background:#000;color:#fff;border-radius:8px;text-align:center;padding:11px;font-weight:700;font-size:14px;margin-top:14px;}
 code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.88em;font-family:ui-monospace,'SF Mono',Consolas,monospace;}
 .copy-block code{background:transparent;border:none;padding:0;color:#9fd0f5;font-size:inherit;}
 .quad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
@@ -369,11 +389,42 @@ openrouter credit 부담할 것이야. 나중에 인증 기능 추가할 예정�
         </div>
         <div class="workshop-step"><span class="ws-num">3</span>
           <b class="ws-t">GitHub에 push → Vercel에서 Import</b>
-          <p>변경 사항을 확인하고 commit·push합니다. Vercel 대시보드 → <b>Add New… → Project</b> → 검색기 저장소 옆 <b>Import</b>. 설정은 기본값 그대로 두고 아직 <b>Deploy를 누르지 않습니다</b> — 키부터 넣어야 합니다.</p>
+          <p>변경 사항을 확인하고 commit·push합니다. Vercel 대시보드 → <b>Add New… → Project</b> → 검색기 저장소 옆 <b>Import</b>를 누르면 4단계의 New Project 화면으로 넘어갑니다.</p>
         </div>
         <div class="workshop-step"><span class="ws-num">4</span>
-          <b class="ws-t">환경변수 등록 → Deploy</b>
-          <p>Import 화면의 <b>Environment Variables</b> 항목에 이름 <code>OPENROUTER_API_KEY</code>, 값에 내 키(2주차에 발급한 그 키)를 붙여넣고 <b>Deploy</b>. 1~2분 뒤 <code>프로젝트명.vercel.app</code> 주소가 나옵니다. 열어서 검색이 되는지 확인하세요.</p>
+          <b class="ws-t">New Project 화면 — 두 가지만 챙기면 됩니다</b>
+          <p>Import를 누르면 이 화면이 나옵니다 (실제 배포 때의 화면 그대로입니다):</p>
+          <div class="vform">
+            <div class="vf-h">New Project</div>
+            <div class="vf-banner">Importing from GitHub<b>&#9679; kaist-itm-aibootcamp/no-bullying &nbsp;<span class="br">&#8618; master</span></b></div>
+            <div style="font-size:13px;color:#333;">Choose where you want to create the project and give it a name.</div>
+            <div class="vf-row">
+              <div><div class="vf-label">Vercel Team</div><div class="vf-input"><span style="color:#2f9e44">&#9679;</span> KAIST-ITM <span class="chip">Hobby</span><span class="cv">&#8964;</span></div></div>
+              <div><div class="vf-label">Project Name</div><div class="vf-input">no-bullying</div></div>
+            </div>
+            <div class="vf-label">Application Preset</div>
+            <div class="vf-input">Flask<span class="cv">&#8964;</span></div>
+            <div class="vf-label">Root Directory</div>
+            <div class="vf-row"><div><div class="vf-input dim">./</div></div><div style="flex:0 0 auto;min-width:0;"><span class="vf-btn">Edit</span></div></div>
+            <div class="vf-collapse">&#8250; &nbsp;Build and Output Settings</div>
+            <div class="vf-env">
+              <div style="font-size:13px;font-weight:700;margin-bottom:8px;">&#8964; &nbsp;Environment Variables</div>
+              <div class="vf-label">Key</div>
+              <div class="vf-input" style="font-family:ui-monospace,Consolas,monospace;">OPENROUTER_API_KEY<span class="cv">&#8722;</span></div>
+              <div class="vf-label">Value</div>
+              <div class="vf-input"><span style="color:#aaa;">(2주차에 발급한 내 키 붙여넣기)</span><span class="cv">&#128065; &#128274;</span></div>
+              <div class="vf-label">Environments</div>
+              <div class="vf-input">Production and Preview<span class="cv">&#8964;</span></div>
+              <div style="margin-top:10px;"><span class="vf-btn">Import .env</span> <span style="font-size:12px;color:#888;">or paste the .env contents</span> &nbsp;<span class="vf-btn">+ Add More</span></div>
+            </div>
+            <div class="vf-deploy">Deploy</div>
+          </div>
+          <ul>
+            <li><b>Vercel Team · Project Name</b> — 기본값(계정 이름과 저장소 이름) 그대로 둡니다.</li>
+            <li><b>Application Preset</b> — 이 프로젝트가 쓰는 프레임워크를 고릅니다. 이 빌드에서는 <b>Flask</b>였습니다. 무엇을 골라야 할지 모르면 Claude Code에 "Vercel의 Application Preset에서 뭘 골라야 해?"라고 물어보면 됩니다 — 자기가 만든 코드이니 바로 답합니다.</li>
+            <li><b>Environment Variables</b> — <b>반드시</b> 펼쳐서 Key에 <code>OPENROUTER_API_KEY</code>, Value에 내 키(2주차에 발급한 그 키)를 붙여넣습니다. 이걸 빠뜨리면 배포는 되지만 검색할 때 서버가 키를 찾지 못해 실패합니다.</li>
+            <li>나머지(Root Directory, Build and Output Settings)는 그대로 두고 <b>Deploy</b>. 1~2분 뒤 <code>프로젝트명.vercel.app</code> 주소가 나옵니다. 열어서 검색이 되는지 확인하세요.</li>
+          </ul>
         </div>
       </div>
 
