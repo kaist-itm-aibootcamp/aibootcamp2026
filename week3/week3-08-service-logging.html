@@ -444,7 +444,7 @@ alter table public.chat_logs enable row level security;</pre>
         </div>
         <div class="workshop-step"><span class="ws-num">3</span>
           <b class="ws-t">Vercel에 환경변수 추가</b>
-          <p>Projects 화면에서 프로젝트 카드의 <b>⋯ → Settings → Environments → Production</b>(⑦ §4에서 간 그 길)으로 들어가 세 개를 추가합니다: <code>SUPABASE_URL</code>(Project URL), <code>SUPABASE_KEY</code>(Secret key), 그리고 관리자 비밀번호의 해시값 <code>ADMIN_PASSWORD_HASH</code>(⑦ §5의 방법으로 새로 만든 값 — 사이트 접속용 <code>PASSWORD_HASH</code>와는 <b>다른 값</b>을 쓰세요). 환경변수는 다음 배포부터 반영됩니다 — 3단계의 push가 그 배포입니다.</p>
+          <p>Vercel 첫 화면에서 프로젝트를 클릭해 들어가 <b>왼쪽 사이드 메뉴의 Environment Variables</b>(⑦ §4에서 간 그 길)에서 세 개를 추가합니다: <code>SUPABASE_URL</code>(Project URL), <code>SUPABASE_KEY</code>(Secret key), 그리고 관리자 비밀번호의 해시값 <code>ADMIN_PASSWORD_HASH</code>(⑦ §5의 방법으로 새로 만든 값 — 사이트 접속용 <code>PASSWORD_HASH</code>와는 <b>다른 값</b>을 쓰세요). 환경변수는 다음 배포부터 반영됩니다 — 3단계의 push가 그 배포입니다.</p>
         </div>
         <div class="workshop-step"><span class="ws-num">4</span>
           <b class="ws-t">Claude Code에 지시</b>
