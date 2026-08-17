@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Week 3 — Long Context와 하이브리드: 검색 없이 통째로 읽히기</title>
+<title>Week 3 — RAG vs Long Context: 검색 없이 통째로 읽히면 안 되나?</title>
 <style>
 :root{
   --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
@@ -242,7 +242,7 @@ p{margin:10px 0;}
       <span class="brand-mark">AI</span>
       <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
     </a>
-    <div class="week-tag"><span class="week-num">WEEK 3</span><span class="week-title">Long Context와 하이브리드</span></div>
+    <div class="week-tag"><span class="week-num">WEEK 3</span><span class="week-title">RAG vs Long Context</span></div>
     <a class="back-week" href="index.html">← 3주차 목록</a>
   </div>
   <div class="progress-wrap" aria-label="진행률">
@@ -266,8 +266,8 @@ p{margin:10px 0;}
     <div id="celebrateSlot"></div>
 
     <div class="hero">
-      <span class="hero-kicker">WEEK 3 · STEP 6 — Long Context와 하이브리드</span>
-      <h1>Long Context — 검색 없이<br/>통째로 읽히면 안 되나?</h1>
+      <span class="hero-kicker">WEEK 3 · STEP 6 — RAG vs Long Context</span>
+      <h1>RAG vs Long Context —<br/>검색 없이 통째로 읽히면 안 되나?</h1>
       <p>④의 RAG는 검색으로 고른 문서만 컨텍스트에 실었습니다. 이 강의는 다른 갈래의 쟁점입니다 — 컨텍스트 창이 수십만~백만 토큰으로 커진 지금, <b>자료를 통째로 실어 버리는 Long Context 방식</b>이 언제 성립하는지 점검하고, 요지는 통째로·전문은 골라 읽는 <b>하이브리드</b>까지 세 구조의 자리를 정리합니다.</p>
     </div>
 
@@ -446,10 +446,6 @@ p{margin:10px 0;}
         <li>Long Context 사용 전: 자료 토큰 수 추정 → 모델 컨텍스트 창 확인 (모델마다 3.2만~100만 토큰으로 천차만별)</li>
         <li>하이브리드: 요지는 통째로(목차), 전문은 도구로 골라 읽기 — Cowork·Claude Code가 일하는 방식</li>
       </ul>
-      <div class="next-card-grid">
-        <div class="next-card"><b>직접 해보기 — 내 데이터로 구현하기</b><span>여러분이 스크래핑했거나 보관하고 있는 데이터(리뷰·기사·논문 초록·업무 문서 등)로 셋 중 하나를 구현해 보세요: ① <b>임베딩 검색엔진</b> ② <b>RAG 답변 시스템</b> ③ <b>하이브리드 질의응답</b>(요지 통째 + 전문 골라 읽기). 판결문은 예시였을 뿐 — 데이터가 바뀌어도 파이프라인과 프롬프트는 동일합니다. §3의 하이브리드 절차는 2주차 ⑥에서 배운 방법 그대로 <b>스킬(SKILL.md)로 저장</b>해 두면 좋습니다.</span></div>
-        <div class="next-card"><b>이어지는 실습 — 이메일 인증으로 문 달기 (⑦)</b><span>⑤에서 배포한 챗봇은 아직 <b>URL만 알면 누구나</b> 들어옵니다. ⑦에서 이메일 인증코드로 문을 달아, 허용된 사람만 들어오게 만듭니다.</span></div>
-      </div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>Long Context와 하이브리드 강의를 마쳤다!</span></label></div>
     </section>
       <a class="back-home" href="index.html">
