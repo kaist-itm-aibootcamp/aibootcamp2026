@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Week 3 — RAG: 검색해서 읽고 답하는 AI, 그리고 Long Context라는 대안</title>
+<title>Week 3 — RAG: 검색해서 읽고, 근거를 달아 답하는 판례 챗봇</title>
 <style>
 :root{
   --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
@@ -201,17 +201,20 @@ p{margin:10px 0;}
 .mock-bar .dot{width:11px;height:11px;border-radius:999px;}
 .mock-bar .url{flex:1;background:#fff;border:1px solid #dce0e2;border-radius:999px;padding:4px 14px;font-size:12px;color:#52514e;font-family:ui-monospace,Consolas,monospace;}
 .mock-body{padding:20px 22px;}
-.mock-title{font-size:16px;font-weight:900;margin-bottom:12px;}
-.chat-q{display:flex;justify-content:flex-end;margin:10px 0;}
-.chat-q .bub{max-width:78%;background:var(--brand-dark);color:#fff;border-radius:14px 14px 3px 14px;padding:10px 15px;font-size:13.5px;line-height:1.65;}
-.chat-a{display:flex;margin:10px 0;}
-.chat-a .bub{max-width:88%;background:#f4f7f3;border:1px solid var(--line);border-radius:14px 14px 14px 3px;padding:12px 16px;font-size:13.5px;line-height:1.75;}
-.chat-a .cite{color:var(--brand-dark);font-weight:700;}
-.chat-srcs{margin:8px 0 0 6px;display:flex;flex-wrap:wrap;gap:6px;}
-.chat-src{font-size:11.5px;font-weight:700;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 11px;}
-.chat-input{display:flex;gap:8px;margin-top:14px;border-top:1px solid var(--line);padding-top:14px;}
-.chat-input .inp{flex:1;border:2px solid var(--line);border-radius:10px;padding:10px 14px;font-size:13.5px;color:#898781;}
-.chat-input .btn{background:var(--brand-dark);color:#fff;font-weight:800;font-size:13.5px;border-radius:10px;padding:0 18px;display:grid;place-items:center;}
+.shot-body{background:#faf9f7;padding:22px 26px 24px;}
+.shot-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.shot-head b{font-size:16px;color:#2b2723;}
+.shot-head span{font-size:12px;color:#8a857e;}
+.shot-tabs{display:flex;gap:26px;margin:14px 0 0;border-bottom:1px solid #e8e4de;}
+.shot-tabs span{font-size:13.5px;font-weight:700;color:#8a857e;padding:6px 2px 9px;}
+.shot-tabs .on{color:#b5522a;border-bottom:3px solid #b5522a;font-weight:900;}
+.chatq{background:#fdf0e7;border:1px solid #f5ddc9;border-radius:12px;padding:13px 16px;font-size:13.5px;color:#3a352f;margin:18px 0 14px;}
+.chata{font-size:13px;color:#3a352f;line-height:1.8;}
+.chata p{margin:0 0 10px;}
+.chata h6{font-size:13.5px;font-weight:900;color:#2b2723;margin:14px 0 8px;}
+.chata ul{margin:0 0 10px 18px;padding:0;}
+.chata li{margin:6px 0;}
+.cchip{display:inline-block;min-width:20px;text-align:center;font-size:10.5px;font-weight:800;color:#b5522a;background:#fae8dc;border:1px solid #f0d5c2;border-radius:6px;padding:1px 5px;margin:0 1px;vertical-align:1px;}
 /* 논문 카드 */
 .paper{display:flex;gap:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin:9px 0;}
 .paper .tag{flex:0 0 auto;font-size:10.5px;font-weight:900;color:#fff;background:var(--blue);border-radius:7px;padding:3px 9px;height:fit-content;transform:translateY(3px);white-space:nowrap;}
@@ -231,7 +234,7 @@ p{margin:10px 0;}
 @media (max-width:640px){.back-home{padding:18px;gap:12px;}}
 </style>
 </head>
-<body id="top" data-celebrate="🎉 <b>RAG 강의 완주!</b> 검색으로 근거를 모아 답하게 하는 법과, 통째로 읽혀 답하게 하는 법 — 두 도구의 구조와 한계까지 알고 상황에 맞게 고를 수 있게 되었습니다.">
+<body id="top" data-celebrate="🎉 <b>RAG 강의 완주!</b> 검색으로 근거를 모아, 그 근거만으로 답하게 만드는 법 — 계획 문답부터 완성 화면까지 실제 기록으로 익혔습니다. 대안 갈래(Long Context)는 ⑥에서 이어집니다.">
 
 <header class="topbar">
   <div class="topbar-left">
@@ -239,7 +242,7 @@ p{margin:10px 0;}
       <span class="brand-mark">AI</span>
       <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
     </a>
-    <div class="week-tag"><span class="week-num">WEEK 3</span><span class="week-title">RAG와 Long Context</span></div>
+    <div class="week-tag"><span class="week-num">WEEK 3</span><span class="week-title">RAG — 판례 챗봇</span></div>
     <a class="back-week" href="index.html">← 3주차 목록</a>
   </div>
   <div class="progress-wrap" aria-label="진행률">
@@ -256,10 +259,8 @@ p{margin:10px 0;}
       <a href="#s2" data-sec="s2">2. 아키텍처와 데이터 플로우<span class="done-mark">✔</span></a>
       <a href="#s3" data-sec="s3">3. 컨텍스트에 실제로 담기는 것<span class="done-mark">✔</span></a>
       <a href="#s4" data-sec="s4">4. 실습 — 판례 챗봇, 계획부터<span class="done-mark">✔</span></a>
-      <a href="#s5" data-sec="s5">5. 대안 — Long Context 방식<span class="done-mark">✔</span></a>
-      <a href="#s6" data-sec="s6">6. 얼마나 담을 수 있나 — 모델 비교<span class="done-mark">✔</span></a>
-      <a href="#s7" data-sec="s7">7. 하이브리드 — 요지는 통째, 전문은 골라서<span class="done-mark">✔</span></a>
-      <a href="#s8" data-sec="s8">8. 마무리 체크리스트<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 실제 기록 — API 왕복과 로그<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. 마무리 체크리스트<span class="done-mark">✔</span></a>
     </div>
   </nav>
 
@@ -267,9 +268,9 @@ p{margin:10px 0;}
     <div id="celebrateSlot"></div>
 
     <div class="hero">
-      <span class="hero-kicker">WEEK 3 · STEP 4 — RAG와 Long Context</span>
+      <span class="hero-kicker">WEEK 3 · STEP 4 — RAG: 판례 챗봇</span>
       <h1>RAG — 질문하면 관련 문서를 찾아<br/>읽히고, 근거를 달아 답하게 하기</h1>
-      <p>앞 강의의 검색엔진은 "문서 목록"을 사람에게 돌려줬습니다. RAG는 다른 목적의 기법입니다 — <b>질문과 관련된 문서를 찾아 AI의 컨텍스트에 로딩하고, 그 문서만 근거로 답변을 쓰게</b> 합니다. 마지막에는 유력한 대안인 <b>Long Context</b> 방식의 현재 수준까지 살펴봅니다.</p>
+      <p>앞 강의의 검색엔진은 "문서 목록"을 사람에게 돌려줬습니다. RAG는 다른 목적의 기법입니다 — <b>질문과 관련된 문서를 찾아 AI의 컨텍스트에 로딩하고, 그 문서만 근거로 답변을 쓰게</b> 합니다. 유력한 대안인 <b>Long Context</b> 방식과의 비교는 ⑥ 강의에서 따로 다룹니다.</p>
     </div>
 
     <!-- ============ S1 ============ -->
@@ -327,12 +328,12 @@ p{margin:10px 0;}
           <!-- 5 -->
           <rect x="240" y="262" width="200" height="58" rx="8" fill="#e3f1fb" stroke="#2e9bdb"/>
           <text x="340" y="283" text-anchor="middle" font-size="12.5" font-weight="900" fill="#1b6fa6">⑤ 검색 (서버 내부)</text>
-          <text x="340" y="301" text-anchor="middle" font-size="11" fill="#375f8f">347건과 코사인 → 관련 판결 Top-5</text>
+          <text x="340" y="301" text-anchor="middle" font-size="11" fill="#375f8f">347건과 코사인 → 관련 판결 Top-20</text>
           <!-- 6 -->
           <line x1="340" y1="352" x2="571" y2="352" stroke="#b8792e" stroke-width="2.5"/>
           <path d="M571 352 l-10 -6 v12 z" fill="#b8792e"/>
           <text x="456" y="344" text-anchor="middle" font-size="12.5" font-weight="800" fill="#8a5a13">⑥ 챗 모델 요청 (🔑) — 두 번째 방문</text>
-          <text x="456" y="369" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">{지시 + 검색된 판결 5건 + 질문}</text>
+          <text x="456" y="369" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">{지시 + 판결 요약 20건 + 질문}</text>
           <text x="456" y="384" text-anchor="middle" font-size="10.5" fill="#898781">← §3에서 이 꾸러미의 실물을 봅니다</text>
           <!-- 7 -->
           <rect x="492" y="398" width="176" height="42" rx="8" fill="#fff" stroke="#d5ddd3"/>
@@ -342,18 +343,18 @@ p{margin:10px 0;}
           <line x1="571" y1="470" x2="349" y2="470" stroke="#2f765b" stroke-width="2.5"/>
           <path d="M349 470 l10 -6 v12 z" fill="#2f765b"/>
           <text x="456" y="462" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f765b">⑧ 답변 텍스트 반환</text>
-          <text x="456" y="487" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">"…인정된 사례가 있습니다 [대구지법 …]"</text>
+          <text x="456" y="487" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">"…인정된 사례가 있습니다 [1]"</text>
           <!-- 9 -->
           <line x1="331" y1="530" x2="109" y2="530" stroke="#2f765b" stroke-width="2.5"/>
           <path d="M109 530 l10 -6 v12 z" fill="#2f765b"/>
           <text x="216" y="522" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f765b">⑨ 답변 + 근거 목록 반환</text>
-          <text x="216" y="547" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">{answer:"…", sources:[5건 서지]}</text>
+          <text x="216" y="547" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">{answer:"…", sources:[근거 서지]}</text>
           <!-- 10 -->
           <rect x="12" y="576" width="176" height="46" rx="8" fill="#edf4ef" stroke="#bfe0c9"/>
           <text x="100" y="596" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f765b">⑩ 답변 + 근거 카드 표시</text>
           <text x="100" y="613" text-anchor="middle" font-size="11" fill="#628a72">아래 "완성 화면 예시" 참고</text>
         </svg>
-        <p class="chart-note">앞 강의와 마찬가지로 — 🔑 키는 서버만 갖고, 판결문 347건 원본은 내 PC를 떠나지 않습니다(⑥에서 검색된 5건의 요약만 전송). 소요 시간은 몇 초로 늘어나는데, 대부분 ⑦의 답변 생성입니다.</p>
+        <p class="chart-note">앞 강의와 마찬가지로 — 🔑 키는 서버만 갖고, 판결문 347건 원본은 내 PC를 떠나지 않습니다(⑥에서 검색된 20건의 요약만 전송). 소요 시간은 십수 초로 늘어나는데, 대부분 ⑦의 답변 생성입니다 (실측: 임베딩 1초 + 생성 12초 — §5의 실제 기록 참조).</p>
       </div>
 
       <h3>왜 Chat·Cowork가 아니라 외부 유료 API인가</h3>
@@ -362,7 +363,7 @@ p{margin:10px 0;}
         <div class="col"><h4 style="color:var(--amber)">Chat·Cowork — 사람의 도구</h4>
           <ul>
             <li>사람이 로그인해 <b>화면에서 직접</b> 실행하는 개인용 서비스</li>
-            <li>내 연구를 내가 할 때는 이걸로 충분 (Long Context 방식 §5 포함)</li>
+            <li>내 연구를 내가 할 때는 이걸로 충분 (⑥의 Long Context 방식 포함)</li>
             <li>그러나 <b>내 프로그램(서버)이 대신 호출할 수 없고</b>, 내 계정 1인분 — 이용자 100명을 받을 수 없음</li>
           </ul></div>
         <div class="col"><h4 style="color:var(--brand-dark)">외부 API — 프로그램의 부품</h4>
@@ -380,17 +381,17 @@ p{margin:10px 0;}
     <!-- ============ S3 ============ -->
     <section class="section" id="s3">
       <div class="sec-head"><span class="sec-num">3</span><h2>컨텍스트에 실제로 담기는 것 — 증강의 실물</h2></div>
-      <p class="sec-lead">⑥단계에서 서버가 실제로 보내는 LLM 호출을 열어보면 이렇게 생겼습니다. <b>사용자 질문 앞에 검색된 문서 5건이 끼워 넣어진, 하나의 긴 컨텍스트</b> — 이것이 "증강(Augmented)"의 전부입니다.</p>
+      <p class="sec-lead">⑥단계에서 서버가 보내는 LLM 호출을 열어보면 이렇게 생겼습니다 (구조가 보이게 줄인 축약본 — 한 질문의 전체 실물 기록은 §5에 있습니다). <b>사용자 질문 앞에 검색된 판례 요약 20건이 끼워 넣어진, 하나의 긴 컨텍스트</b> — 이것이 "증강(Augmented)"의 전부입니다.</p>
       <div class="api-code">
 <span class="c">// ⑥ 서버가 보내는 실제 LLM 호출 — 컨텍스트 전체가 한 번에 들어갑니다</span><br/>
 <span class="k">POST</span> https://openrouter.ai/api/v1/chat/completions<br/>
 {<br/>
-&nbsp;&nbsp;<span class="k">"model"</span>: <span class="v">"(계획서에서 정한 챗 모델)"</span>,<br/>
+&nbsp;&nbsp;<span class="k">"model"</span>: <span class="v">"deepseek/deepseek-v4-flash"</span>,<br/>
 &nbsp;&nbsp;<span class="k">"messages"</span>: [<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;{ <span class="k">"role"</span>: <span class="v">"system"</span>,<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"content"</span>: <span class="hl-sys">"아래 제공된 판결문 정보만을 근거로 답하라. 근거가 된 판결의<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;법원·사건번호를 반드시 인용하라. 제공된 판결로 답할 수 없으면<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'제공된 판례 범위에서는 답하기 어렵다'고 말하라."</span> },<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"content"</span>: <span class="hl-sys">"아래 제공된 판결문 정보만을 근거로 답하라. 근거로 쓴 판결에는<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1] [7]처럼 번호를 붙여 인용하라. 제공된 판결로 답할 수 없으면<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'제가 가진 347건의 판결문으로는 답변드릴 수 없습니다'라고 말하라."</span> },<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;{ <span class="k">"role"</span>: <span class="v">"user"</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"content"</span>: <span class="hl-doc">"[문서 1 | 유사도 0.86] 대구지방법원 2024가단138550 (원고일부승)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;무용단 단원인 원고 2명이 동료 단원 8명을 상대로 공연 출연자 명단변경,<br/>
@@ -401,12 +402,12 @@ p{margin:10px 0;}
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;검사원 3명을 상대로 약 3,185만 원의 손해배상을 청구…<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[문서 3 | 유사도 0.83] 서울중앙지방법원 2022가단5252694 (원고일부승)<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;단체채팅방 배제 등 집단 따돌림…&nbsp;&nbsp;<span class="c">…[문서 4], [문서 5] 생략…</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;단체채팅방 배제 등 집단 따돌림…&nbsp;&nbsp;<span class="c">…[문서 4] ~ [문서 20] 생략…</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="hl-q">질문: 동료 직원들의 따돌림만으로도 손해배상을 받을 수 있어?</span><span class="hl-doc">"</span> }<br/>
 &nbsp;&nbsp;]<br/>
 }</div>
-      <p class="ctx-note">노란 글씨 = 개발자가 고정한 지시, 파란 글씨 = 방금 검색된 문서 5건, 초록 글씨 = 사용자 질문. 이 전체(약 1천 토큰)가 <b>한 번의 호출에 담긴 하나의 컨텍스트</b>이고, 모델은 "이 자료를 읽고 마지막 질문에 답하라"는 오픈북 문제지를 받은 셈입니다. 검색이 문서를 잘못 고르면 문제지 자체가 엉뚱해집니다 — RAG 품질의 절반은 검색 품질입니다.</p>
+      <p class="ctx-note">노란 글씨 = 개발자가 고정한 지시, 파란 글씨 = 방금 검색된 판례 요약 20건, 초록 글씨 = 사용자 질문. 이 전체(약 3천 토큰)가 <b>한 번의 호출에 담긴 하나의 컨텍스트</b>이고, 모델은 "이 자료를 읽고 마지막 질문에 답하라"는 오픈북 문제지를 받은 셈입니다. 검색이 문서를 잘못 고르면 문제지 자체가 엉뚱해집니다 — RAG 품질의 절반은 검색 품질입니다.</p>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>증강 = "질문 앞에 검색 문서를 끼워 넣는 것"임을 실물로 확인했다</span></label></div>
     </section>
 
@@ -432,33 +433,39 @@ p{margin:10px 0;}
       </div></div>
 
       <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
-        <b class="ws-title">AI가 계획서를 만든다 (예시)</b>
+        <b class="ws-title">AI가 계획서 초안과 질문 4가지를 돌려준다 — 실제 돌아온 질문</b>
         <div class="card" style="margin-top:8px;font-size:13.5px;line-height:1.7;">
-          <b>📋 계획서 v1 (요약)</b><br/>
-          <b>만들 것</b> — 기존 서버에 질문 응답 기능(/ask) 추가 + 화면에 "AI에게 물어보기" 탭. 흐름: 질문 → 기존 검색 재사용(Top-5) → 5건을 근거로 챗 모델이 답변 생성<br/>
-          <b>진행 순서</b> — /ask 추가 → 시험 질문(확인 요청) → 화면 탭 연결<br/>
-          <b>질문 3가지</b> — (a) 답변 생성용 챗 모델은 무엇으로 할까요? (추천 가능) (b) 근거 표시는 어떤 형태로? (본문 인용 / 하단 목록 / 둘 다) (c) 검색은 몇 건을 근거로 넣을까요?
+          <b>📋 계획서 v1 (요약)</b> — 기존 서버에 질문 응답 기능 추가 + 챗봇 화면. 흐름: 질문 → 기존 검색 재사용 → 찾은 판례를 근거로 챗 모델이 답변 생성. 이어서 결정이 필요한 질문 네 개가 왔고, 각 질문에는 선택지와 AI의 추천안이 붙어 있었습니다:<br/><br/>
+          <b>(a)</b> 챗봇이 답변할 때 <b>무엇을 근거로 읽게</b> 할까요? 답변의 깊이와 비용을 가장 크게 좌우하는 선택입니다.<br/>
+          <b>(b)</b> 답변을 만드는 <b>AI 모델</b>은 어느 쪽으로 할까요? 네 가지 모두 연결 테스트를 통과했습니다.<br/>
+          <b>(c)</b> <b>대화를 이어가는 방식</b>은 어떻게 할까요?<br/>
+          <b>(d)</b> 챗봇을 <b>화면 어디에</b> 둘까요? 지금은 왼쪽에 검색·결과, 오른쪽에 판결문 전문이 들어가 있습니다.
         </div>
       </div></div>
 
       <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
-        <b class="ws-title">피드백을 주고받는다</b>
-        <div class="copy-block" style="margin-top:8px;"><span class="cb-label">💬 3단계 — 피드백 예시</span><button class="copy-btn" data-copy="r2">복사</button>
-<pre id="r2">질문에 답할게.
-(a) 챗 모델은 네가 가성비 좋은 걸로 추천해서 계획서에 이유와 함께 적어줘
-(b) 둘 다 — 답변 문장 안에 [법원 사건번호]로 인용하고,
-    답변 아래에 근거 판례 카드도 보여줘
-(c) 5건이면 충분해
-
-추가 요구:
-- 챗 모델에게 주는 지시에 "제공된 판결로 답할 수 없으면
-  '제공된 판례 범위에서는 답하기 어렵다'고 말하라"를 꼭 넣어줘
-- 키는 지금처럼 openrouterkey.txt에서만 읽어
-
-이 내용 반영해서 계획서 v2로 확정해줘.</pre></div>
+        <b class="ws-title">질문에 답한다 — 실제 답한 그대로</b>
+        <div class="card" style="margin-top:8px;font-size:13.5px;line-height:1.7;">
+          <b>(a)</b> 근거 → <b>요약만 20건</b><br/>
+          <b>(b)</b> 모델 → <b>"네가 가성비 좋은 걸로 추천해서 계획서에 이유와 함께 적어줘. 딥시크 등 OpenRouter에서 널리 활용되는 추론 모델 고려"</b><br/>
+          <b>(c)</b> 대화 방식 → <b>이어지는 대화</b> (AI 추천안 수락)<br/>
+          <b>(d)</b> 화면 위치 → <b>상단 탭으로 전환</b> (AI 추천안 수락)
+        </div>
+        <p style="margin-top:8px;">결정 네 개의 답이 세 갈래입니다 — 둘은 추천안 그대로 수락하고, (a)는 비용을 아끼면서 근거 폭을 넓히는 쪽(전문 몇 건 대신 <b>요약 20건</b>)을 직접 골랐고, (b)는 <b>판단 자체를 AI에게 위임하되 "추천 이유를 계획서에 적어라"</b>고 요구했습니다. 모르는 결정은 이렇게 되넘기면 됩니다 — 근거가 문서로 남아 나중에 검토할 수 있습니다.</p>
       </div></div>
 
       <div class="workshop-step"><span class="ws-num">4</span><div class="ws-body">
+        <b class="ws-title">AI가 실측으로 답하고 계획을 확정한다 — 실제 돌아온 답변</b>
+        <div class="card" style="margin-top:8px;font-size:13.5px;line-height:1.75;">
+          <p style="margin:0 0 10px;"><b>만들 것</b> — 상단에 [검색] [챗봇] 탭이 생기고, 챗봇에 질문하면 판결 347건 중 가까운 20건을 찾아 그 요약을 근거로 답합니다. 답변에는 [1] [7] 같은 근거 번호가 붙고, 답변 아래 근거 판결이 카드로 나오며 클릭하면 오른쪽 패널에 전문이 열립니다. 근거가 없으면 "제가 가진 347건의 판결문으로는 답변드릴 수 없습니다"라고 답합니다.</p>
+          <p style="margin:0 0 10px;"><b>모델 선택을 맡기셔서 실제로 시험해 봤습니다.</b> 후보 6개에 진짜 챗봇과 똑같은 프롬프트를 넣고, 판례에 답이 있는 질문과 무관한 질문("이혼 재산분할 비율") 두 가지를 던졌습니다. 결과가 뚜렷했습니다. GLM 4.7 Flash는 두 질문 모두 빈 응답을 내놔 탈락했고, 나머지 다섯은 모두 무관한 질문을 정확히 거절했습니다. 요청하신 "아는 척하지 않기"는 다섯 모두 통과한 셈입니다.</p>
+          <p style="margin:0 0 10px;"><b>DeepSeek V4 Flash를 추천드립니다.</b> 질문당 약 2원인데, Claude(약 40원)와 함께 유일하게 "회사가 징계·전보를 다한 경우에는 책임이 부정되기도 한다"는 반대 사례를 스스로 짚었습니다. 법률 자료에서 예외를 함께 말해주는 건 중요한 차이라고 봤습니다. 20배 싼 값에 그 수준을 낸 게 결정적이었습니다. 단점은 응답이 16초로 느린 것이라, 답변을 한 글자씩 흘려보내는 스트리밍 출력을 함께 만들어 체감 대기를 줄이겠습니다. 그래도 답답하면 모델 이름 한 줄만 바꾸면 됩니다.</p>
+          <p style="margin:0;"><b>미리 아셔야 할 한계가 하나 있습니다.</b> 요약만 근거로 쓰기로 하셨는데, 요약은 한 건에 190자라 법원이 왜 그렇게 판단했는지는 담겨 있지 않습니다. "왜 그렇게 판단했나요?"류 질문에는 답이 얕아집니다. 확인 지점 1에서 실제 답변을 보시고 아쉬우면 상위 3~5건의 전문을 추가하는 쪽으로 바꿀 수 있습니다(질문당 2원 → 10원). 그리고 챗봇은 매번 20건만 보므로 "347건 중 승소율은?" 같은 전체 통계 질문은 답하지 못합니다. 그건 검색 탭의 요약 차트가 담당합니다.</p>
+        </div>
+        <p style="margin-top:8px;">위임한 결정 하나에 <b>후보 6개 실측 → 추천과 이유 → 비용 숫자 → 단점과 보완책</b>이 돌아왔습니다 — 3단계의 "추천해서 이유와 함께 적어줘" 한 줄이 만든 결과입니다. 묻지 않은 한계(요약 근거의 얕음, 전체 통계 불가)를 먼저 고지하고 나중에 바꿀 경로까지 열어둔 것도 눈여겨보세요 — 사람 전문가에게 기대하는 바로 그 보고 형태입니다.</p>
+      </div></div>
+
+      <div class="workshop-step"><span class="ws-num">5</span><div class="ws-body">
         <b class="ws-title">확정된 계획서대로 구현시킨다</b>
         <div class="copy-block" style="margin-top:8px;"><span class="cb-label">💬 4단계 — 구현 지시</span><button class="copy-btn" data-copy="r3">복사</button>
 <pre id="r3">계획서 v2대로 구현해줘. 계획에 없는 것은 먼저 물어봐.
@@ -466,27 +473,47 @@ p{margin:10px 0;}
 시험 질문을 해서 답변과 근거를 보여줘.</pre></div>
       </div></div>
 
-      <h3>완성되면 이런 화면이 나옵니다 (예시)</h3>
+      <h3>구현 완료 보고 — 실제 돌아온 그대로</h3>
+      <div class="card" style="font-size:13.5px;line-height:1.75;">
+        <p style="margin:0 0 10px;">판례에 답이 있는 질문("회사에도 책임을 물을 수 있나요")에는 회사 책임이 <b>인정된 경우와 부정된 경우를 갈래로 나눠</b> 답했습니다. 계획서에서 이 모델을 고른 결정적 이유였던 "반대 사례를 함께 짚는" 동작이 실제로 나왔습니다. 범위 밖 질문("이혼 재산분할")에는 정확히 거절했고, 이때는 근거 카드도 표시되지 않습니다. 애매한 질문("녹음 파일이 몇 개나 필요한가요")에는 "구체적인 숫자 기준은 답할 수 없다"고 먼저 밝힌 뒤 판례에서 읽히는 경향만 설명했습니다. 금액을 지어낼 위험이 있는 질문에도 판례에 있는 금액만 인용했습니다.</p>
+        <p style="margin:0 0 10px;"><b>구현 중 버그 두 개를 잡았습니다.</b> 하나는 스트리밍 응답의 한글이 전부 깨지는 문제였습니다. OpenRouter의 스트리밍 응답에는 문자 인코딩 정보가 없어서 라이브러리가 서유럽 문자로 잘못 읽고 있었습니다. 다른 하나는 모델이 [6, 13, 17]처럼 한 괄호에 여러 번호를 묶어 쓰는데 제 코드가 [6] 형태만 인식해서, 근거 카드가 실제보다 적게 나오던 문제입니다. 둘 다 고쳤고 재검증했습니다.</p>
+        <p style="margin:0 0 10px;"><b>실제 동작 확인</b> — 답변은 2~4초 만에 첫 글자가 나오기 시작해 20~30초에 완성됩니다. "회사에도 책임을 물을 수 있나요" 질문에는 근거 카드 13건과 본문 인용 칩 25개가 붙었고, 칩이든 카드든 클릭하면 오른쪽 패널에 그 판결문 전문이 열립니다. 이어지는 대화도 작동합니다. "그중에 회사 책임이 부정된 사례만 알려줘"라고 하면 내부적으로 "회사 책임이 부정된 직장 내 괴롭힘으로 인한 우울증 판례"로 다시 써서 검색합니다. 이 다시 쓴 문장은 답변 위에 작게 표시되니 챗봇이 무엇을 찾았는지 확인하실 수 있습니다.</p>
+        <p style="margin:0 0 10px;"><b>한 가지 눈여겨보실 점이 있습니다.</b> 위자료 금액을 묻는 질문에서 챗봇은 요약문에 적힌 위자료 금액을 인용하는데, 근거 카드에 표시되는 금액은 주문에서 뽑은 전체 인용액(치료비·일실수입 포함)입니다. 그래서 같은 판결인데 본문의 금액과 카드의 금액이 다르게 보일 수 있습니다. 둘 다 맞는 값이지만 성격이 다른 숫자입니다.</p>
+        <p style="margin:0;">계획서에 적었던 대로 요약만 근거로 쓰는 한계도 그대로 남아 있습니다. "법원이 왜 그렇게 판단했는지"를 깊이 파고들면 답이 얕아집니다. 몇 가지 질문을 직접 해보시고 아쉬우면 상위 3~5건의 전문을 근거에 추가하는 쪽으로 바꿀 수 있습니다(질문당 3원 → 10원 정도).</p>
+      </div>
+      <p style="margin-top:8px;">확인 지점을 계획서에 박아 둔 덕에, 완료 보고가 "됩니다" 한 줄이 아니라 <b>검증 시나리오 4종(답 있는·범위 밖·애매한·금액 질문) → 고친 버그 → 실측 성능 → 숫자 해석 주의 → 남은 한계</b>의 순서로 돌아왔습니다.</p>
+
+      <h3>완성된 챗봇 화면입니다</h3>
       <div class="mock-browser">
         <div class="mock-bar">
           <span class="dot" style="background:#ee6a5f"></span><span class="dot" style="background:#f5bd4f"></span><span class="dot" style="background:#61c454"></span>
-          <span class="url">http://localhost:8000/ask</span>
+          <span class="url">http://localhost:8000</span>
         </div>
-        <div class="mock-body">
-          <div class="mock-title">💬 판례 AI에게 물어보기 <span style="font-size:11px;font-weight:700;color:#898781">— 347건 근거 · RAG</span></div>
-          <div class="chat-q"><div class="bub">동료 직원들의 따돌림만으로도 손해배상을 받을 수 있어?</div></div>
-          <div class="chat-a"><div class="bub">
-            제공된 판례 범위에서는 <b>가능합니다 — 다만 상대와 입증에 따라 갈립니다.</b> 상급자가 아닌 <b>동료를 상대로 직접</b> 위자료가 인정된 사례가 있습니다: 동료 단원 8명의 따돌림·폭언에 대해 일부 인용된 사건 <span class="cite">[대구지방법원 2024가단138550]</span>, 동료 검사원 3명의 따돌림·배제에 대해 일부 인용된 사건 <span class="cite">[수원지방법원 2022가단546552]</span>. 반면 집단 따돌림을 주장했지만 <b>증거 부족으로 기각</b>된 사례도 있습니다 <span class="cite">[울산지방법원 2022가단128995]</span>. 회사에까지 책임을 물으려면 회사가 따돌림을 알았거나 알 수 있었다는 점이 추가로 입증되어야 합니다.
-          </div></div>
-          <div class="chat-srcs">
-            <span class="chat-src">📎 대구지법 2024가단138550 · 원고일부승</span>
-            <span class="chat-src">📎 수원지법 2022가단546552 · 원고일부승</span>
-            <span class="chat-src">📎 울산지법 2022가단128995 · 원고패</span>
+        <div class="shot-body">
+          <div class="shot-head"><b>직장 내 괴롭힘 판결문</b><span>판결 347건에서 의미로 찾고, 근거를 들어 답합니다</span></div>
+          <div class="shot-tabs"><span>검색</span><span class="on">챗봇</span></div>
+          <div class="chatq">직장 내 괴롭힘으로 우울증이 생겼을 때 회사에도 책임을 물을 수 있나요?</div>
+          <div class="chata">
+            <p>네, 직장 내 괴롭힘으로 인한 우울증 발생 시 회사(사용자)에게도 책임을 물을 수 있는 경우가 있습니다. 다만, 모든 경우에 인정되는 것은 아니며, 구체적인 상황과 회사의 대응에 따라 법원의 판단이 갈립니다.</p>
+            <p>판결문을 근거로 정리하면 다음과 같습니다.</p>
+            <h6>1. 회사의 책임이 인정된 사례 (사용자책임 또는 보호의무 위반)</h6>
+            <p>회사가 가해자를 적절히 관리·감독하지 않았거나, 괴롭힘 발생 시 필요한 예방 또는 시정 조치를 하지 않은 경우 책임을 집니다.</p>
+            <ul>
+              <li><b>직접적 가해 행위에 대한 사용자책임</b>: 상사(팀장, 이사 등)의 괴롭힘 행위가 업무 수행과 관련되어 있다고 보아 회사가 책임을 진 경우 <span class="cchip">1</span>.</li>
+              <li><b>보호의무 위반</b>: 괴롭힘 발생 후 회사가 피해 근로자와 가해자를 분리하는 등 적절한 보호조치를 취하지 않은 경우 <span class="cchip">10</span>. 또는 괴롭힘을 알고도 방치한 경우 <span class="cchip">7</span>.</li>
+              <li><b>공동불법행위 책임</b>: 회사의 운영진(상무, 이사 등)이 직접 가해 행위에 가담하거나 공동으로 괴롭힘을 한 경우 <span class="cchip">2</span>.</li>
+            </ul>
+            <h6>2. 회사의 책임이 부정된 사례</h6>
+            <p>다음과 같은 경우에는 회사에 대한 청구가 기각되기도 합니다.</p>
+            <ul>
+              <li><b>가해 행위가 업무와 무관하다고 판단된 경우</b>: 가해자가 동료이고, 그 행위가 회사의 업무 수행과 관련이 없다고 보는 경우 <span class="cchip">11</span> (단, 이 사건은 가해 개인에 대한 책임은 인정됨).</li>
+              <li><b>회사가 적절한 조치를 취한 경우</b>: 괴롭힘 신고 후 회사가 내부 조사를 실시하고, 가해자에게 징계 또는 전보 등의 조치를 취했다고 인정되는 경우 <span class="cchip">12</span>.</li>
+              <li><b>괴롭힘 사실 자체가 증명되지 않은 경우</b>: 원고가 주장하는 괴롭힘 행위가 증거 부족으로 인정되지 않아, 회사의 책임 논의 자체가 이루어지지 않은 경우 <span class="cchip">3</span>, <span class="cchip">8</span>, <span class="cchip">15</span>, <span class="cchip">18</span>.</li>
+            </ul>
           </div>
-          <div class="chat-input"><div class="inp">추가 질문을 입력하세요…</div><div class="btn">질문</div></div>
         </div>
       </div>
-      <p class="chart-note" style="margin-top:-6px;">예시 화면입니다 — 인용된 세 사건 모두 코퍼스에 실재하며, 답변 문구는 예시입니다. 인정 사례와 기각 사례가 함께 인용된 점(§3의 문서 5건이 그대로 근거가 됨)을 눈여겨보세요.</p>
+      <p class="chart-note" style="margin-top:-6px;">실제 화면입니다 — 이 답변 아래로 근거 판결 카드 13건이 이어지고, 본문의 번호 칩이든 카드든 클릭하면 오른쪽 패널에 해당 판결문 전문이 열립니다. 인정 갈래와 부정 갈래를 나눠 답한 것, 즉 계획서에서 이 모델을 고른 결정적 이유였던 동작이 첫 질문에서 그대로 나왔습니다.</p>
 
       <div class="callout caution"><b class="cap">RAG의 실패 모드도 알아두기</b>
       RAG의 품질은 <b>①검색이 좋은 문서를 찾았는가</b>에 달려 있습니다. 답이 이상하면 생성보다 먼저 <b>검색 결과부터 확인</b>하는 것이 디버깅 순서입니다.</div>
@@ -495,188 +522,133 @@ p{margin:10px 0;}
 
     <!-- ============ S5 ============ -->
     <section class="section" id="s5">
-      <div class="sec-head"><span class="sec-num">5</span><h2>대안 — Long Context: 그냥 전부 읽히면 안 되나?</h2></div>
-      <p class="sec-lead">됩니다 — 코퍼스가 충분히 작다면. 최신 LLM의 컨텍스트 창은 수십만~백만 토큰까지 커졌습니다. 두 방식의 차이는 <b>컨텍스트에 무엇을 싣는가</b>로 보면 한눈에 들어옵니다.</p>
+      <div class="sec-head"><span class="sec-num">5</span><h2>실제 기록 — 질문 한 번의 API 왕복 전부</h2></div>
+      <p class="sec-lead">완성된 챗봇에 §4 화면의 그 질문을 한 번 던지고, 프로그램이 OpenRouter와 <b>실제로 주고받은 내용을 그대로 캡처</b>했습니다 — 손으로 다듬지 않았고, API 키만 가렸습니다. API 호출은 <b>두 번뿐</b>입니다. 판결문을 고르는 일은 내 컴퓨터에서 계산으로 처리하고, AI에게는 고른 결과만 넘깁니다.</p>
+      <div class="api-code"><span class="c">// 전체 흐름 — 실측 시간</span><br/>
+[사용자 질문]<br/>
+&nbsp;&nbsp;→ (1) 임베딩 API&nbsp;&nbsp;— 질문을 4,096개의 숫자로 변환&nbsp;&nbsp;&nbsp;&nbsp;<span class="n">1.0초</span><br/>
+&nbsp;&nbsp;→ [내 컴퓨터]&nbsp;&nbsp;&nbsp;&nbsp;— 347건과 비교해 가까운 20건 선택&nbsp;&nbsp;&nbsp;<span class="c">(API 호출 없음)</span><br/>
+&nbsp;&nbsp;→ (2) 챗 API&nbsp;&nbsp;&nbsp;&nbsp;— 요약 20건을 근거로 주고 답변 요청&nbsp;&nbsp;<span class="n">12.0초</span><br/>
+&nbsp;&nbsp;→ [답변 + 인용 번호]</div>
 
-      <div class="ctx-compare">
-        <div>
-          <h5 style="color:var(--brand-dark)">RAG의 컨텍스트 — 골라서 싣기</h5>
-          <div class="ctx-stack">
-            <div class="ctx-block ctx-sys" style="padding:8px 14px;"><span class="lb">지시</span>제공 문서만 근거로 답하라…</div>
-            <div class="ctx-block ctx-doc" style="padding:8px 14px;">검색된 판결 5건 (관련도 순)</div>
-            <div class="ctx-block ctx-q" style="padding:8px 14px;"><span class="lb">질문</span>동료들의 따돌림도…?</div>
-          </div>
-          <span class="ctx-token">총 <b>약 1천 토큰</b> — 질문마다 검색으로 새로 고름</span>
-        </div>
-        <div>
-          <h5 style="color:var(--green)">Long Context — 통째로 싣기</h5>
-          <div class="ctx-stack">
-            <div class="ctx-block ctx-sys" style="padding:8px 14px;"><span class="lb">지시</span>첨부 자료 전체를 읽고 답하라…</div>
-            <div class="ctx-block ctx-doc" style="padding:26px 14px 8px;">판결 요지 <b>347건 전부</b><br/><span style="font-size:11px;color:#7d97ab">1번부터 347번까지, 검색 없이 통째로</span></div>
-            <div class="ctx-block ctx-doc" style="padding:20px 14px;">　</div>
-            <div class="ctx-block ctx-doc dim" style="padding:20px 14px;">　</div>
-            <div class="ctx-block ctx-q" style="padding:8px 14px;"><span class="lb">질문</span>동료들의 따돌림도…?</div>
-          </div>
-          <span class="ctx-token">총 <b>약 4~5만 토큰</b> — 질문마다 전체를 다시 실음 (비용도 그만큼)</span>
-        </div>
-      </div>
-      <div class="callout ok"><b class="cap">Long Context 방식의 매력</b>
-      검색 단계가 없으므로 <b>백엔드도, 임베딩도 필요 없습니다.</b> 판결 요지 CSV를 Chat·Cowork에 첨부하고 "전부 읽고 답해줘"라고 하면 끝 — 실제로 이 부트캠프의 판례 분석 보고서(895건 유형 분류)도 이 계열의 방식으로 만들어졌습니다. <b>혼자 쓰는 연구라면 가장 단순하고 강력한 선택지</b>입니다. (서비스로 만들 때는 §2의 이유로 다시 API·비용 문제가 돌아옵니다.)</div>
+      <h3>첫 왕복 — 임베딩: 질문을 숫자로</h3>
+      <div class="api-code">
+<span class="k">POST</span> https://openrouter.ai/api/v1/embeddings<br/>
+<span class="c">Authorization: Bearer sk-or-v1-•••(비밀키)</span><br/>
+{ <span class="k">"model"</span>: <span class="v">"qwen/qwen3-embedding-8b"</span>,<br/>
+&nbsp;&nbsp;<span class="k">"input"</span>: <span class="v">"직장 내 괴롭힘으로 우울증이 생겼을 때 회사에도 책임을 물을 수 있나요?"</span> }<br/>
+<span class="c">── 받은 것 ──</span><br/>
+{ <span class="k">"data"</span>: [ { <span class="k">"embedding"</span>: [ <span class="n">-0.0036022…, -0.0106367…, 0.0236234…</span> <span class="c">(총 4,096개)</span> ] } ],<br/>
+&nbsp;&nbsp;<span class="k">"usage"</span>: { <span class="k">"prompt_tokens"</span>: <span class="n">30</span>, <span class="k">"cost"</span>: <span class="n">0.0000003</span> },<br/>
+&nbsp;&nbsp;<span class="k">"provider"</span>: <span class="v">"Nebius"</span> }</div>
+      <p class="chart-note">질문 한 문장이 <b>4,096개의 소수</b>(의미 좌표)로 바뀌었습니다. 토큰 30개, 비용 0.0000003달러(약 0.00044원) — 사실상 공짜입니다. 응답 끝의 <code>"provider": "Nebius"</code>는 아래 로그 이야기에서 다시 만납니다.</p>
+
+      <h3>API 없이, 내 컴퓨터에서 — 20건 고르기</h3>
+      <p>이 4,096개 숫자를 미리 만들어 둔 판결 347건의 임베딩과 비교합니다. 판결마다 본문·요약 임베딩이 하나씩 있어 총 694번 비교하고, 높은 쪽을 그 판결의 점수로 삼아 상위 20건을 고릅니다. 실제로 뽑힌 상위 5건입니다:</p>
       <table class="doc-table">
-        <thead><tr><th style="width:130px"></th><th>RAG (검색 후 로딩)</th><th>Long Context (통째로 로딩)</th></tr></thead>
+        <thead><tr><th style="width:52px">순위</th><th>법원 · 사건번호</th><th style="width:86px">소송결과</th><th style="width:70px" class="r">유사도</th><th style="width:70px">맞은 쪽</th></tr></thead>
         <tbody>
-          <tr><td><b>코퍼스 규모</b></td><td>수만~수백만 건도 가능 (검색이 골라줌)</td><td>컨텍스트 창에 들어가는 만큼</td></tr>
-          <tr><td><b>구현 난이도</b></td><td>임베딩 + 벡터 DB + 백엔드 필요</td><td><b>매우 낮음</b> — 파일 첨부 + 프롬프트</td></tr>
-          <tr><td><b>1회 비용</b></td><td>낮음 (관련 5건만 로딩)</td><td>높음 (매 질문마다 전체 토큰 과금)</td></tr>
-          <tr><td><b>실패 모드</b></td><td>검색이 놓치면 답도 틀림</td><td>자료가 컨텍스트 창을 넘거나(§6), 긴 문맥 중간의 정보를 놓칠 수 있음</td></tr>
-          <tr><td><b>강점</b></td><td>반복 질문·서비스화·대규모</td><td>전체 조망이 필요한 질문("전반적 경향은?")</td></tr>
+          <tr><td>1</td><td>수원지방법원 안산지원 2022가단87835</td><td>원고일부승</td><td class="r">0.732</td><td>요약</td></tr>
+          <tr><td>2</td><td>수원지방법원 2024가단603107</td><td>원고일부승</td><td class="r">0.707</td><td>요약</td></tr>
+          <tr><td>3</td><td>서울중앙지방법원 2022가단5334343</td><td>원고패</td><td class="r">0.702</td><td>본문</td></tr>
+          <tr><td>4</td><td>수원지방법원 2021가단531133</td><td>원고일부승</td><td class="r">0.691</td><td>요약</td></tr>
+          <tr><td>5</td><td>대구지방법원 경주지원 2019가단15840</td><td>원고일부승</td><td class="r">0.685</td><td>요약</td></tr>
         </tbody>
       </table>
-      <div class="copy-block"><span class="cb-label">💬 Long Context 방식 프롬프트 예시 (Chat·Cowork에서)</span><button class="copy-btn" data-copy="r4">복사</button>
-<pre id="r4">첨부한 CSV는 직장 내 괴롭힘 판결 347건의 요지야. 전부 읽고 답해줘:
-동료 직원에 의한 따돌림 사건들에서 손해배상이 인정된 경우와
-기각된 경우를 나눠서, 갈림길이 된 요소를 사건번호와 함께 정리해줘.</pre></div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>두 방식의 컨텍스트 구조 차이를 그림으로 설명할 수 있다</span></label></div>
+
+      <h3>두 번째 왕복 — 챗: 근거를 주고 답변을 받는다</h3>
+      <div class="api-code">{ <span class="k">"model"</span>: <span class="v">"deepseek/deepseek-v4-flash"</span>, <span class="k">"max_tokens"</span>: <span class="n">3000</span>, <span class="k">"temperature"</span>: <span class="n">0.2</span>, <span class="k">"stream"</span>: <span class="n">true</span> }</div>
+      <p><code>stream: true</code>는 답변을 다 쓴 뒤 한 번에 주지 말고 쓰는 대로 조금씩 보내달라는 뜻이고(§4 완성 보고의 스트리밍 출력이 이것입니다), <code>temperature: 0.2</code>는 답변을 되도록 일관되게 하라는 뜻입니다(0에 가까울수록 매번 비슷해집니다).</p>
+      <p style="margin-top:14px;"><b>system 메시지 — AI에게 주는 규칙 (671자, 보낸 그대로)</b></p>
+      <div class="card" style="font-family:ui-monospace,Consolas,monospace;font-size:12.3px;line-height:1.8;white-space:pre-wrap;">너는 한국의 '직장 내 괴롭힘' 관련 민사판결 347건만을 근거로 답하는 조수다.
+사용자는 법률 전문가가 아니다.
+
+반드시 지킬 규칙:
+
+1. 아래 &lt;판례&gt;에 적힌 내용만 근거로 삼는다. 네가 따로 아는 법률지식이나 일반론으로
+   보충하지 마라. &lt;판례&gt;에 없는 법조문·판례번호·금액을 지어내지 마라.
+2. 답변의 각 주장 끝에 근거가 된 판례의 번호를 [1], [7]처럼 붙인다.
+   반드시 &lt;판례&gt;에 실제로 있는 번호만 쓴다.
+3. &lt;판례&gt;만으로 질문에 답할 수 없으면, 추측하지 말고 정확히 이렇게 답한다:
+   "제가 가진 347건의 판결문으로는 답변드릴 수 없습니다" 그리고 왜 그런지 한 줄로 설명한다.
+   일부만 답할 수 있으면 답할 수 있는 부분만 답하고, 나머지는 근거가 없다고 밝힌다.
+4. 결론이 갈리는 쟁점이면 **반대 방향의 사례도 함께** 제시한다.
+   (예: 회사 책임이 인정된 사례와 부정된 사례)
+5. 한국어로, 법률용어는 풀어서 설명한다. 길게 늘어놓지 말고 핵심부터 말한다.
+   사례를 그냥 나열하지 말고, 갈래를 잡아 정리한다.
+   답변에 "&lt;판례&gt;"라는 표시를 그대로 쓰지 마라. 필요하면 "판결문"이라고 쓴다.
+6. 너는 변호사가 아니며 이 답변은 법률 자문이 아니다. 다만 매 답변마다
+   그 사실을 반복해 적지는 마라 (화면에 이미 표시된다).</div>
+      <p style="margin-top:14px;"><b>user 메시지 — 근거 자료 + 질문 (5,252자)</b></p>
+      <div class="api-code"><span class="hl-doc">&lt;판례&gt;<br/>
+[1] 수원지방법원 안산지원 2022가단87835 · 2025. 1. 15. · 1심 · 원고일부승 · 333,751,696원<br/>
+팀장의 지속적인 공개 질책·모욕 등 직장 내 괴롭힘으로 우울증을 겪다 자살한 근로자의 유족이 가해<br/>
+팀장과 회사를 상대로 손해배상을 청구하였다. 법원은 괴롭힘과 사망 사이의 상당인과관계 및 회사의<br/>
+사용자책임을 인정하되 책임을 60%로 제한하여 합계 약 3억 3,000만 원의 배상을 명하였다.<br/>
+<span class="c">&nbsp;&nbsp;&nbsp;… [2]번부터 [20]번까지 같은 형식으로 이어짐 (4,900여 자) …</span><br/>
+&lt;/판례&gt;</span><br/>
+<br/>
+<span class="hl-q">질문: 직장 내 괴롭힘으로 우울증이 생겼을 때 회사에도 책임을 물을 수 있나요?</span></div>
+      <p class="chart-note">질문은 맨 마지막 한 줄(40자)뿐이고 <b>나머지 99%가 근거 자료</b>입니다. 규칙(system)은 매번 같고, 자료(user)는 질문마다 새로 담깁니다.</p>
+      <p>12초에 걸쳐 답변(1,162자 — §4 완성 화면의 그 답변입니다)이 스트리밍으로 돌아오고, 마지막에 사용량과 비용이 함께 옵니다:</p>
+      <div class="api-code">{ <span class="k">"usage"</span>: { <span class="k">"prompt_tokens"</span>: <span class="n">4332</span>, <span class="k">"completion_tokens"</span>: <span class="n">761</span>, <span class="k">"cost"</span>: <span class="n">0.00081956</span> },<br/>
+&nbsp;&nbsp;<span class="k">"provider"</span>: <span class="v">"CoreWeave"</span>, <span class="k">"finish_reason"</span>: <span class="v">"stop"</span> }</div>
+      <div class="callout caution"><b class="cap">실제로 겪은 문제 — 답이 잘리는 경우</b>
+      처음에는 <code>max_tokens</code>를 1500으로 두었는데, 이 모델이 답변을 길게 쓰는 편이라 <code>finish_reason</code>이 <code>"length"</code>로 돌아오면서 답변이 문장 중간("노동청이")에서 뚝 끊겼습니다. 3000으로 올려 해결했습니다. <b><code>finish_reason</code>이 <code>"length"</code>면 답이 잘린 것</b>입니다 — 화면에는 그럴듯하게 보여도 문장이 중간에 끊겨 있으니, 모델을 바꿀 때마다 확인해야 합니다.</div>
+
+      <h3>받은 뒤 — 인용 번호를 검증한다</h3>
+      <p>프로그램은 답변에서 <code>[1]</code> <code>[10]</code> 같은 번호를 찾아, 20건 목록에 <b>실제로 있는 번호만</b> 근거 카드로 만듭니다 — 이 답변에서는 13건([1] [2] [7] [19] [10] [5] [3] [6] [9] [15] [17] [12] [13])이 인용되었습니다. <code>[25]</code>처럼 목록에 없는 번호를 쓰면 카드로 만들지 않습니다. AI가 붙인 번호를 그대로 믿지 않고 프로그램이 확인하는 것입니다.</p>
+
+      <h3>이 질문 한 번의 비용</h3>
+      <table class="doc-table">
+        <thead><tr><th>단계</th><th>토큰</th><th class="r" style="text-align:right">비용(달러)</th><th class="r" style="text-align:right">비용(원)</th></tr></thead>
+        <tbody>
+          <tr><td>임베딩</td><td>30</td><td class="r">0.00000030</td><td class="r">0.00044원</td></tr>
+          <tr><td>답변 생성</td><td>입력 4,332 + 출력 761</td><td class="r">0.00081956</td><td class="r">1.19원</td></tr>
+          <tr><td><b>합계</b></td><td><b>5,123</b></td><td class="r"><b>0.00081986</b></td><td class="r"><b>약 1.19원</b></td></tr>
+        </tbody>
+      </table>
+      <p class="chart-note">입력 토큰 4,332개의 대부분이 판례 요약 20건입니다 — 질문 자체는 30토큰. (1달러 = 1,450원 기준)</p>
+
+      <h3>OpenRouter 활동 로그 — 같은 모델, 서버는 그때그때</h3>
+      <p>openrouter.ai의 Activity 페이지(2주차 ④에서 과금을 확인하던 그 화면)에는 호출 한 건 한 건이 이렇게 남습니다. 위 왕복들을 실험하는 동안 실제로 찍힌 기록입니다:</p>
+      <table class="doc-table" style="font-size:12.5px;">
+        <thead><tr><th style="width:74px">시각</th><th>모델</th><th>Provider (호스팅 서버)</th><th class="r" style="text-align:right">입력</th><th class="r" style="text-align:right">출력</th><th class="r" style="text-align:right">비용</th><th class="r" style="text-align:right">속도</th></tr></thead>
+        <tbody>
+          <tr><td>02:15</td><td>DeepSeek V4 Flash</td><td>Azure</td><td class="r">4,332</td><td class="r">729</td><td class="r">$0.00132</td><td class="r">66.4 tok/s</td></tr>
+          <tr><td>02:15</td><td>Qwen3 Embedding 8B</td><td>DeepInfra</td><td class="r">30</td><td class="r">–</td><td class="r">$0.0000003</td><td class="r">–</td></tr>
+          <tr><td>02:15</td><td>DeepSeek V4 Flash</td><td>StreamLake</td><td class="r">4,332</td><td class="r">1,348</td><td class="r">$0.000581</td><td class="r">46.1 tok/s</td></tr>
+          <tr><td>02:13</td><td>DeepSeek V4 Flash</td><td>CoreWeave</td><td class="r">4,332</td><td class="r">761</td><td class="r">$0.00082</td><td class="r">64.8 tok/s</td></tr>
+          <tr><td>02:13</td><td>Qwen3 Embedding 8B</td><td>Nebius Token Factory</td><td class="r">30</td><td class="r">–</td><td class="r">$0.0000003</td><td class="r">–</td></tr>
+          <tr><td>02:12</td><td>DeepSeek V4 Flash</td><td>GMICloud</td><td class="r">4,411</td><td class="r">1,499</td><td class="r">$0.000622</td><td class="r">90.4 tok/s</td></tr>
+        </tbody>
+      </table>
+      <p>눈여겨볼 것은 <b>Provider 열</b>입니다. 우리는 모델 이름(<code>deepseek/deepseek-v4-flash</code>)만 지정했는데, 그 모델을 <b>어느 회사 서버에서 돌릴지는 OpenRouter가 가격·속도·혼잡도를 보고 그때그때 골라 분산</b>합니다 — 같은 질문이 어떤 때는 Azure로, 어떤 때는 CoreWeave·StreamLake·GMICloud로 갔습니다. 임베딩(Qwen3 Embedding 8B)도 DeepInfra와 Nebius로 나뉘어 갔습니다. 위 왕복 기록의 <code>"provider": "Nebius"</code>·<code>"CoreWeave"</code>가 바로 그 흔적입니다. 서버가 다르니 속도(46~90 tok/s)와 비용도 호출마다 조금씩 다릅니다.</p>
+
+      <h3>짚어줄 점</h3>
+      <div class="insight"><span class="n">1</span><p><b>AI는 판결문 347건을 갖고 있지 않습니다.</b> 매번 질문에 맞는 20건을 골라 그때그때 메시지에 담아 보내고, AI는 그 20건만 보고 답합니다.</p></div>
+      <div class="insight"><span class="n">2</span><p><b>보내는 메시지의 대부분이 근거 자료입니다.</b> 질문은 40자인데 근거는 5,252자입니다.</p></div>
+      <div class="insight"><span class="n">3</span><p><b>규칙(system)과 자료(user)를 나눠서 보냅니다.</b> 규칙은 매번 같고, 자료는 매번 다릅니다.</p></div>
+      <div class="insight"><span class="n">4</span><p><b>"근거가 없으면 모른다고 하라"를 규칙에 적어둡니다.</b> 이 문장이 없으면 AI는 자기가 아는 일반 법률지식으로 그럴듯하게 지어냅니다.</p></div>
+      <div class="insight"><span class="n">5</span><p><b>인용 번호는 검증합니다.</b> AI가 붙인 번호를 그대로 믿지 않고, 실제 목록에 있는 번호인지 프로그램이 확인합니다.</p></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>질문 한 번의 API 왕복 두 번과 비용·로그를 실물로 확인했다</span></label></div>
     </section>
 
     <!-- ============ S6 ============ -->
     <section class="section" id="s6">
-      <div class="sec-head"><span class="sec-num">6</span><h2>Long Context 사용 전 점검 — 얼마나 담을 수 있는 모델인가</h2></div>
-      <p class="sec-lead">Long Context 방식을 쓰기로 했다면 첫 질문은 하나입니다 — <b>"내 자료가 이 모델의 컨텍스트 창에 들어가는가?"</b> 컨텍스트 길이는 모델마다 크게 다릅니다.</p>
-
-      <h3>주요 모델 컨텍스트 길이 비교 (2026년 기준 공개 정보)</h3>
-      <table class="doc-table">
-        <thead><tr><th style="width:110px">구분</th><th>모델</th><th style="text-align:right;width:110px">컨텍스트 창</th><th style="width:170px">판결 요지 347건<br/>(약 4~5만 토큰) 수용?</th></tr></thead>
-        <tbody>
-          <tr><td rowspan="3"><b>해외 상용</b></td><td>Google Gemini 3.1 Pro</td><td class="r">100만 토큰</td><td>✅ 여유 (약 1/20 사용)</td></tr>
-          <tr><td>OpenAI GPT-5.5</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
-          <tr><td>Anthropic Claude Opus 4.8 / Sonnet 4.6</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
-          <tr><td rowspan="3"><b>중국 오픈소스</b></td><td>DeepSeek V4</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
-          <tr><td>Qwen3.5-Plus (알리바바)</td><td class="r">100만 토큰</td><td>✅ 여유</td></tr>
-          <tr><td>Kimi K2.5 (문샷)</td><td class="r">26만 토큰</td><td>✅ 가능</td></tr>
-          <tr><td rowspan="2"><b>국내</b></td><td>LG K-EXAONE (236B)</td><td class="r">26만 토큰</td><td>✅ 가능</td></tr>
-          <tr><td>네이버 HyperCLOVA X SEED Think</td><td class="r">3.2만 토큰</td><td>⚠️ <b>들어가지 않음</b> — 요약·분할 필요</td></tr>
-        </tbody>
-      </table>
-      <p class="ctx-note">공개 자료 기준이며 버전에 따라 달라집니다 — 사용 전 그 모델의 공식 문서에서 확인하는 습관이 중요합니다. 참고로 오픈소스 진영에는 1,000만 토큰을 내건 모델(Llama 4 Scout)도 있습니다.</p>
-
-      <div class="callout"><b class="cap">표가 말해주는 것</b>
-      같은 자료(판결 요지 347건 ≈ 4~5만 토큰)라도 <b>어떤 모델을 고르느냐에 따라 Long Context 방식이 되기도, 안 되기도</b> 합니다. 프런티어 상용 모델과 중국 오픈소스 상위 모델은 100만 토큰 시대에 들어섰고, 국내 모델은 LG K-EXAONE이 26만 토큰으로 수용 가능한 반면 네이버 공개 모델(3.2만)에는 이 자료가 통째로 들어가지 않습니다 — 이 경우 요약본을 쓰거나, 나눠 묻거나, RAG로 전환해야 합니다.</div>
-
-      <h3>사용 전 점검 3가지</h3>
-      <div class="insight"><span class="n">1</span><p><b>내 자료의 토큰 수를 추정한다.</b> 한국어는 대략 글자 수 × 0.7~1이 토큰 수입니다. 판결 요지 347건(약 6.5만 자) ≈ 4~5만 토큰. AI에게 "이 파일 토큰 수 세줘"라고 시켜도 됩니다.</p></div>
-      <div class="insight"><span class="n">2</span><p><b>모델의 컨텍스트 창과 비교한다.</b> 자료가 창의 절반을 넘으면 여유가 없는 것입니다 — 대화가 오갈수록 컨텍스트는 계속 쌓이기 때문입니다.</p></div>
-      <div class="insight"><span class="n">3</span><p><b>명목 길이 ≠ 실제 독해력.</b> 창이 크다고 그 끝까지 꼼꼼히 읽는 것은 아닙니다 — 아주 긴 입력에서는 중간의 정보를 놓치는 경향이 보고되어 있으니, 중요한 지시·자료는 앞이나 뒤에 배치하고 여유를 두세요.</p></div>
-
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>자료 토큰 수 추정 → 모델 컨텍스트 확인의 점검 순서를 안다</span></label></div>
-    </section>
-
-    <!-- ============ S7 (하이브리드) ============ -->
-    <section class="section" id="s7">
-      <div class="sec-head"><span class="sec-num">7</span><h2>하이브리드 — 요지는 통째로 싣고, 전문은 골라 읽힌다</h2></div>
-      <p class="sec-lead">RAG와 Long Context는 섞어 쓸 수 있습니다. 아이디어: <b>컨텍스트에는 판결 요지 347건만 통째로 싣고</b>(목차 역할), 모델이 요지를 훑어 관련 사건을 고르면 <b>그 판결문 전문만 저장된 파일에서 도구로 읽어와</b> 컨텍스트에 추가하는 구조입니다.</p>
-
-      <div class="diagram-card">
-        <h4>하이브리드 구조 — Long Context(요지) + 도구 호출(전문)</h4>
-        <div class="sub">임베딩도 벡터 DB도 없이, "요지 훑기"가 검색을 대신합니다</div>
-        <svg viewBox="0 0 680 470" role="img" aria-label="하이브리드 구조도">
-          <!-- A: 초기 컨텍스트 -->
-          <rect x="8" y="10" width="300" height="150" rx="12" fill="#f4f9fd" stroke="#bcdcf3"/>
-          <text x="24" y="34" font-size="12.5" font-weight="900" fill="#1b6fa6">① 초기 컨텍스트 (Long Context)</text>
-          <rect x="24" y="46" width="268" height="26" rx="6" fill="#20242a"/>
-          <text x="158" y="63" text-anchor="middle" font-size="11" fill="#f0c987">지시: 요지를 훑고, 필요한 전문은 파일로 읽어라</text>
-          <rect x="24" y="78" width="268" height="46" rx="6" fill="#eaf3fb" stroke="#9dc4de"/>
-          <text x="158" y="97" text-anchor="middle" font-size="11.5" font-weight="800" fill="#2d4a63">판결 요지 347건 전부 (~4.5만 토큰)</text>
-          <text x="158" y="113" text-anchor="middle" font-size="10" fill="#7d97ab">코퍼스 전체의 "목차" 역할</text>
-          <rect x="24" y="130" width="268" height="22" rx="6" fill="#e7f2ea" stroke="#bfe0c9"/>
-          <text x="158" y="145" text-anchor="middle" font-size="11" fill="#2b4a37">질문: 동료들의 따돌림도 배상되나?</text>
-          <!-- arrow A->B -->
-          <text x="340" y="90" text-anchor="middle" font-size="15" font-weight="900" fill="#2e9bdb">→</text>
-          <!-- B: 모델이 선별 -->
-          <rect x="372" y="34" width="300" height="100" rx="12" fill="#1b6fa6"/>
-          <text x="522" y="60" text-anchor="middle" font-size="12.5" font-weight="900" fill="#fff">② 모델이 요지 전체를 훑고 선별</text>
-          <text x="522" y="82" text-anchor="middle" font-size="11" fill="#cde2fb">"관련 사건은 대구 2024가단138550,</text>
-          <text x="522" y="98" text-anchor="middle" font-size="11" fill="#cde2fb">수원 2022가단546552, 울산 2022가단128995 —</text>
-          <text x="522" y="114" text-anchor="middle" font-size="11" fill="#cde2fb">이 3건은 전문을 읽어야겠다"</text>
-          <!-- arrow B->C -->
-          <path d="M522 134 v34" stroke="#b8792e" stroke-width="2.5" fill="none"/>
-          <path d="M522 168 l-6 -10 h12 z" fill="#b8792e"/>
-          <text x="600" y="156" text-anchor="middle" font-size="11.5" font-weight="800" fill="#8a5a13">③ 도구 호출</text>
-          <!-- C: 도구 -->
-          <rect x="372" y="176" width="300" height="88" rx="12" fill="#fdf8ef" stroke="#e8d9bd"/>
-          <text x="522" y="199" text-anchor="middle" font-size="12" font-weight="900" fill="#8a5a13">파일 읽기 도구 (저장된 판결문 폴더)</text>
-          <text x="522" y="219" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#52514e">read_file("대구지방법원_2024가단138550.md")</text>
-          <text x="522" y="235" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#52514e">read_file("수원지방법원_2022가단546552.md")</text>
-          <text x="522" y="251" text-anchor="middle" font-size="10.5" font-family="monospace" fill="#52514e">read_file("울산지방법원_2022가단128995.md")</text>
-          <!-- arrow C->D -->
-          <path d="M372 220 H340 V300 H316" stroke="#2f765b" stroke-width="2.5" fill="none"/>
-          <path d="M316 300 l10 -6 v12 z" fill="#2f765b"/>
-          <!-- D: 확장된 컨텍스트 -->
-          <rect x="8" y="230" width="300" height="140" rx="12" fill="#f4f9fd" stroke="#bcdcf3"/>
-          <text x="24" y="254" font-size="12.5" font-weight="900" fill="#1b6fa6">④ 확장된 컨텍스트</text>
-          <rect x="24" y="266" width="268" height="26" rx="6" fill="#eaf3fb" stroke="#9dc4de"/>
-          <text x="158" y="283" text-anchor="middle" font-size="10.5" fill="#7d97ab">(요지 347건 + 질문 — 그대로 유지)</text>
-          <rect x="24" y="298" width="268" height="60" rx="6" fill="#e3f1fb" stroke="#2e9bdb"/>
-          <text x="158" y="318" text-anchor="middle" font-size="11.5" font-weight="800" fill="#1b6fa6">+ 선별된 3건의 판결문 전문</text>
-          <text x="158" y="335" text-anchor="middle" font-size="10" fill="#5c7fa3">도구가 읽어온 원문이 컨텍스트에 추가됨</text>
-          <text x="158" y="350" text-anchor="middle" font-size="10" fill="#5c7fa3">(전문이 필요한 사건만, 필요한 만큼)</text>
-          <!-- arrow D->E -->
-          <path d="M158 370 v28" stroke="#2f765b" stroke-width="2.5" fill="none"/>
-          <path d="M158 398 l-6 -10 h12 z" fill="#2f765b"/>
-          <!-- E: 답변 -->
-          <rect x="8" y="406" width="664" height="52" rx="12" fill="#edf4ef" stroke="#bfe0c9"/>
-          <text x="340" y="428" text-anchor="middle" font-size="12.5" font-weight="900" fill="#2f765b">⑤ 전문을 근거로 한 정밀 답변 — 요지에는 없는 판시 이유·인용액 산정까지 인용 가능</text>
-          <text x="340" y="447" text-anchor="middle" font-size="10.5" fill="#628a72">"대구 사건에서 법원은 … 라고 판시하며 위자료를 인정하였고 [대구지방법원 2024가단138550, 판결 이유 2.가.] …"</text>
-        </svg>
-      </div>
-
-      <div class="compare">
-        <div class="col"><h4 style="color:var(--green)">이 구조의 장점</h4>
-          <ul>
-            <li>임베딩·벡터 DB·검색 서버가 <b>전혀 필요 없음</b> — "요지 훑기"가 검색을 대신</li>
-            <li>답변 근거가 요약이 아니라 <b>판결문 전문</b> — 판시 이유까지 정밀 인용</li>
-            <li>사실 Cowork·Claude Code가 일하는 방식이 바로 이것 — 목록을 훑고 필요한 파일만 읽기. 이 부트캠프의 판례 보고서도 이렇게 만들어졌습니다</li>
-          </ul></div>
-        <div class="col"><h4 style="color:var(--amber)">치르는 비용</h4>
-          <ul>
-            <li>요지 4~5만 토큰이 <b>매 질문마다</b> 컨텍스트에 상주 (Long Context의 비용 그대로)</li>
-            <li>도구 왕복만큼 응답이 느려짐</li>
-            <li>파일 읽기 도구를 붙일 수 있는 환경이 필요 — Chat 웹화면으로는 안 되고, Cowork·Claude Code 또는 도구 호출을 지원하는 API로 구현</li>
-          </ul></div>
-      </div>
-      <h3>하이브리드로 질문하기 — 프롬프트 예시</h3>
-      <div class="copy-block"><span class="cb-label">💬 Cowork에서 (요지 CSV + 전문 폴더가 연동된 상태)</span><button class="copy-btn" data-copy="r5">복사</button>
-<pre id="r5">연동 폴더에 판결 요지 CSV(347건)와 판결문 전문 파일들(rulings_md/)이 있어.
-질문: 동료 직원들의 따돌림에 대해 손해배상이 인정된 사건과 기각된 사건의
-갈림길은 무엇이었나?
-
-먼저 요지 전체를 훑어서 관련 사건을 고르고, 고른 사건은 반드시
-전문 파일을 읽은 다음, 전문을 근거로 사건번호와 판시 대목을
-인용해서 답해줘. 요지만 보고 답하지 마.</pre></div>
-      <div class="tip-card"><b>사실 이렇게 지시하지 않아도 됩니다 (대체로)</b> — Cowork·Claude Code는 <b>과제의 성질에 따라 기본적으로 이렇게 동작</b>합니다: 질문이 코퍼스 전반에 걸치면 목록·요지부터 훑고, 정밀한 근거가 필요해지면 해당 파일을 스스로 열어 읽습니다. 다만 가끔 요지만 보고 요약 수준으로 답하고 마는 경우가 있는데, 답변에 전문 인용이 없다면 그때 위 프롬프트처럼 <b>"고른 사건은 반드시 전문을 읽고 답하라"고 명시적으로 지시</b>하면 됩니다. 지시는 기본 동작을 만드는 것이 아니라 <b>보장</b>하는 장치입니다.</div>
-
-      <div class="tip-card"><b>세 구조의 자리</b> — <b>RAG</b>는 대규모·서비스용, <b>Long Context</b>는 소규모·전체 조망용, <b>하이브리드</b>는 그 사이 — "요지는 다 보되 전문은 골라 읽어야 하는" 연구 작업에 특히 잘 맞습니다. 코퍼스가 커져 요지조차 컨텍스트에 안 들어가게 되면, 그때 요지 훑기를 임베딩 검색으로 바꾸는 것이 자연스러운 진로입니다. 그리고 이 하이브리드 절차를 매번 프롬프트로 다시 쓰지 않도록 <b>파일(스킬)로 저장하는 방법</b>은 4주차에서 다룹니다.</div>
-
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s7" /><span>하이브리드(요지 통째 + 전문 도구 읽기) 구조를 설명할 수 있다</span></label></div>
-    </section>
-
-    <!-- ============ S8 ============ -->
-    <section class="section" id="s8">
-      <div class="sec-head"><span class="sec-num">8</span><h2>마무리 체크리스트</h2></div>
+      <div class="sec-head"><span class="sec-num">6</span><h2>마무리 체크리스트</h2></div>
       <ul class="final-list">
         <li>RAG = 검색(기존 검색엔진 재사용) → 증강(질문 앞에 문서 끼워 넣기) → 생성(인용 강제)</li>
         <li>답변 생성은 Chat·Cowork가 아니라 외부 API — 서비스는 프로그램이 호출할 수 있어야 확장된다</li>
         <li>증강의 실물 = 지시 + 검색 문서 + 질문이 담긴 하나의 컨텍스트</li>
         <li>답이 이상하면 생성보다 검색 결과부터 디버깅</li>
-        <li>Long Context는 "통째로 싣기" — 수만 토큰 이내 혼자 쓰는 분석이면 최선의 단순함</li>
-        <li>Long Context 사용 전: 자료 토큰 수 추정 → 모델 컨텍스트 창 확인 (모델마다 3.2만~100만 토큰으로 천차만별)</li>
-        <li>하이브리드: 요지는 통째로(목차), 전문은 도구로 골라 읽기 — Cowork·Claude Code가 일하는 방식</li>
+        <li>질문 한 번 = API 두 번(임베딩 + 챗) · 비용 약 1원대 — 어느 서버에서 돌릴지는 OpenRouter가 골라 분산</li>
       </ul>
       <div class="next-card-grid">
-        <div class="next-card"><b>직접 해보기 — 내 데이터로 구현하기</b><span>여러분이 스크래핑했거나 보관하고 있는 데이터(리뷰·기사·논문 초록·업무 문서 등)로 셋 중 하나를 구현해 보세요: ① <b>임베딩 검색엔진</b> ② <b>RAG 답변 시스템</b> ③ <b>하이브리드 질의응답</b>(요지 통째 + 전문 골라 읽기). 판결문은 예시였을 뿐 — 데이터가 바뀌어도 파이프라인과 프롬프트는 동일합니다.</span></div>
-        <div class="next-card"><b>다음 강의 — Vercel 배포: 검색기에서 챗봇까지 (⑤)</b><span>③의 검색엔진과 오늘 배운 RAG는 아직 <b>내 PC에서만</b> 돕니다. 다음 강의에서 이것을 클라우드(Vercel)에 올려 <b>URL 하나로 누구나 쓰는 서비스</b>로 만듭니다. §7의 하이브리드 절차는 2주차 ⑥에서 배운 방법 그대로 <b>스킬(SKILL.md)로 저장</b>해 두면 좋습니다.</span></div>
+        <div class="next-card"><b>다음 강의 — Vercel 배포: 검색기에서 챗봇까지 (⑤)</b><span>③의 검색엔진과 오늘 만든 RAG 챗봇은 아직 <b>내 PC에서만</b> 돕니다. 다음 강의에서 클라우드(Vercel)에 올려 <b>URL 하나로 누구나 쓰는 서비스</b>로 만듭니다.</span></div>
+        <div class="next-card"><b>다른 갈래 — Long Context와 하이브리드 (⑥)</b><span>검색으로 고르는 대신 <b>자료를 통째로 읽히면</b> 안 되나? 컨텍스트 창이 백만 토큰으로 커진 지금의 답과, 요지는 통째·전문은 골라 읽는 하이브리드를 ⑥에서 다룹니다.</span></div>
       </div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s8" /><span>RAG 강의를 마쳤다!</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>RAG 강의를 마쳤다!</span></label></div>
     </section>
       <a class="back-home" href="index.html">
         <span class="bh-ic">←</span>
