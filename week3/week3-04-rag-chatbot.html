@@ -557,44 +557,47 @@ p{margin:10px 0;}
       </table>
 
       <h3>두 번째 왕복 — 챗: 근거를 주고 답변을 받는다</h3>
-      <div class="api-code">{ <span class="k">"model"</span>: <span class="v">"deepseek/deepseek-v4-flash"</span>, <span class="k">"max_tokens"</span>: <span class="n">3000</span>, <span class="k">"temperature"</span>: <span class="n">0.2</span>, <span class="k">"stream"</span>: <span class="n">true</span> }</div>
-      <p><code>stream: true</code>는 답변을 다 쓴 뒤 한 번에 주지 말고 쓰는 대로 조금씩 보내달라는 뜻이고(§4 완성 보고의 스트리밍 출력이 이것입니다), <code>temperature: 0.2</code>는 답변을 되도록 일관되게 하라는 뜻입니다(0에 가까울수록 매번 비슷해집니다).</p>
-      <p style="margin-top:14px;"><b>system 메시지 — AI에게 주는 규칙 (671자, 보낸 그대로)</b></p>
-      <div class="card" style="font-family:ui-monospace,Consolas,monospace;font-size:12.3px;line-height:1.8;white-space:pre-wrap;">너는 한국의 '직장 내 괴롭힘' 관련 민사판결 347건만을 근거로 답하는 조수다.
-사용자는 법률 전문가가 아니다.
-
-반드시 지킬 규칙:
-
-1. 아래 &lt;판례&gt;에 적힌 내용만 근거로 삼는다. 네가 따로 아는 법률지식이나 일반론으로
-   보충하지 마라. &lt;판례&gt;에 없는 법조문·판례번호·금액을 지어내지 마라.
-2. 답변의 각 주장 끝에 근거가 된 판례의 번호를 [1], [7]처럼 붙인다.
-   반드시 &lt;판례&gt;에 실제로 있는 번호만 쓴다.
-3. &lt;판례&gt;만으로 질문에 답할 수 없으면, 추측하지 말고 정확히 이렇게 답한다:
-   "제가 가진 347건의 판결문으로는 답변드릴 수 없습니다" 그리고 왜 그런지 한 줄로 설명한다.
-   일부만 답할 수 있으면 답할 수 있는 부분만 답하고, 나머지는 근거가 없다고 밝힌다.
-4. 결론이 갈리는 쟁점이면 **반대 방향의 사례도 함께** 제시한다.
-   (예: 회사 책임이 인정된 사례와 부정된 사례)
-5. 한국어로, 법률용어는 풀어서 설명한다. 길게 늘어놓지 말고 핵심부터 말한다.
-   사례를 그냥 나열하지 말고, 갈래를 잡아 정리한다.
-   답변에 "&lt;판례&gt;"라는 표시를 그대로 쓰지 마라. 필요하면 "판결문"이라고 쓴다.
-6. 너는 변호사가 아니며 이 답변은 법률 자문이 아니다. 다만 매 답변마다
-   그 사실을 반복해 적지는 마라 (화면에 이미 표시된다).</div>
-      <p style="margin-top:14px;"><b>user 메시지 — 근거 자료 + 질문 (5,252자)</b></p>
-      <div class="api-code"><span class="hl-doc">&lt;판례&gt;<br/>
-[1] 수원지방법원 안산지원 2022가단87835 · 2025. 1. 15. · 1심 · 원고일부승 · 333,751,696원<br/>
-팀장의 지속적인 공개 질책·모욕 등 직장 내 괴롭힘으로 우울증을 겪다 자살한 근로자의 유족이 가해<br/>
-팀장과 회사를 상대로 손해배상을 청구하였다. 법원은 괴롭힘과 사망 사이의 상당인과관계 및 회사의<br/>
-사용자책임을 인정하되 책임을 60%로 제한하여 합계 약 3억 3,000만 원의 배상을 명하였다.<br/>
-<span class="c">&nbsp;&nbsp;&nbsp;… [2]번부터 [20]번까지 같은 형식으로 이어짐 (4,900여 자) …</span><br/>
-&lt;/판례&gt;</span><br/>
+      <p>보낸 것은 요청 하나입니다 — 설정값과 함께, <code>messages</code> 안에 <b>규칙(system)</b>과 <b>근거+질문(user)</b>이 나란히 담깁니다.</p>
+      <div class="api-code">
+<span class="k">POST</span> https://openrouter.ai/api/v1/chat/completions<br/>
+{ <span class="k">"model"</span>: <span class="v">"deepseek/deepseek-v4-flash"</span>, <span class="k">"max_tokens"</span>: <span class="n">3000</span>, <span class="k">"temperature"</span>: <span class="n">0.2</span>, <span class="k">"stream"</span>: <span class="n">true</span>,<br/>
+&nbsp;&nbsp;<span class="k">"messages"</span>: [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="k">"role"</span>: <span class="v">"system"</span>,&nbsp;&nbsp;<span class="c">// AI에게 주는 규칙 — 671자, 매번 동일</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"content"</span>: <span class="hl-sys">"너는 한국의 '직장 내 괴롭힘' 관련 민사판결 347건만을 근거로 답하는 조수다.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;사용자는 법률 전문가가 아니다.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;반드시 지킬 규칙:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. 아래 &lt;판례&gt;에 적힌 내용만 근거로 삼는다. 네가 따로 아는 법률지식이나<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;일반론으로 보충하지 마라. &lt;판례&gt;에 없는 법조문·판례번호·금액을 지어내지 마라.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. 답변의 각 주장 끝에 근거가 된 판례의 번호를 [1], [7]처럼 붙인다.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;반드시 &lt;판례&gt;에 실제로 있는 번호만 쓴다.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. &lt;판례&gt;만으로 질문에 답할 수 없으면, 추측하지 말고 정확히 이렇게 답한다:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"제가 가진 347건의 판결문으로는 답변드릴 수 없습니다" 그리고 왜 그런지 한 줄로<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;설명한다. 일부만 답할 수 있으면 답할 수 있는 부분만 답하고, 나머지는 근거가<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;없다고 밝힌다.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. 결론이 갈리는 쟁점이면 반대 방향의 사례도 함께 제시한다.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(예: 회사 책임이 인정된 사례와 부정된 사례)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5. 한국어로, 법률용어는 풀어서 설명한다. 길게 늘어놓지 말고 핵심부터 말한다.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;사례를 그냥 나열하지 말고, 갈래를 잡아 정리한다. 답변에 "&lt;판례&gt;"라는 표시를<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;그대로 쓰지 마라. 필요하면 "판결문"이라고 쓴다.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6. 너는 변호사가 아니며 이 답변은 법률 자문이 아니다. 다만 매 답변마다 그 사실을<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;반복해 적지는 마라 (화면에 이미 표시된다)."</span> },<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="k">"role"</span>: <span class="v">"user"</span>,&nbsp;&nbsp;<span class="c">// 근거 자료 + 질문 — 5,252자, 질문마다 새로</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">"content"</span>: <span class="hl-doc">"&lt;판례&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1] 수원지방법원 안산지원 2022가단87835 · 2025. 1. 15. · 1심 · 원고일부승 · 333,751,696원<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;팀장의 지속적인 공개 질책·모욕 등 직장 내 괴롭힘으로 우울증을 겪다 자살한 근로자의<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;유족이 가해 팀장과 회사를 상대로 손해배상을 청구하였다. 법원은 괴롭힘과 사망 사이의<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;상당인과관계 및 회사의 사용자책임을 인정하되 책임을 60%로 제한하여 합계 약<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3억 3,000만 원의 배상을 명하였다.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c">… [2]번부터 [20]번까지 같은 형식으로 이어짐 (4,900여 자) …</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/판례&gt;<br/>
 <br/>
-<span class="hl-q">질문: 직장 내 괴롭힘으로 우울증이 생겼을 때 회사에도 책임을 물을 수 있나요?</span></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="hl-q">질문: 직장 내 괴롭힘으로 우울증이 생겼을 때 회사에도 책임을 물을 수 있나요?</span><span class="hl-doc">"</span> }<br/>
+&nbsp;&nbsp;] }</div>
+      <p><code>stream: true</code>는 답변을 다 쓴 뒤 한 번에 주지 말고 쓰는 대로 조금씩 보내달라는 뜻이고(§4 완성 보고의 스트리밍 출력이 이것입니다), <code>temperature: 0.2</code>는 답변을 되도록 일관되게 하라는 뜻입니다(0에 가까울수록 매번 비슷해집니다).</p>
       <p class="chart-note">질문은 맨 마지막 한 줄(40자)뿐이고 <b>나머지 99%가 근거 자료</b>입니다. 규칙(system)은 매번 같고, 자료(user)는 질문마다 새로 담깁니다.</p>
       <p>12초에 걸쳐 답변(1,162자 — §4 완성 화면의 그 답변입니다)이 스트리밍으로 돌아오고, 마지막에 사용량과 비용이 함께 옵니다:</p>
       <div class="api-code">{ <span class="k">"usage"</span>: { <span class="k">"prompt_tokens"</span>: <span class="n">4332</span>, <span class="k">"completion_tokens"</span>: <span class="n">761</span>, <span class="k">"cost"</span>: <span class="n">0.00081956</span> },<br/>
 &nbsp;&nbsp;<span class="k">"provider"</span>: <span class="v">"CoreWeave"</span>, <span class="k">"finish_reason"</span>: <span class="v">"stop"</span> }</div>
-      <div class="callout caution"><b class="cap">실제로 겪은 문제 — 답이 잘리는 경우</b>
-      처음에는 <code>max_tokens</code>를 1500으로 두었는데, 이 모델이 답변을 길게 쓰는 편이라 <code>finish_reason</code>이 <code>"length"</code>로 돌아오면서 답변이 문장 중간("노동청이")에서 뚝 끊겼습니다. 3000으로 올려 해결했습니다. <b><code>finish_reason</code>이 <code>"length"</code>면 답이 잘린 것</b>입니다 — 화면에는 그럴듯하게 보여도 문장이 중간에 끊겨 있으니, 모델을 바꿀 때마다 확인해야 합니다.</div>
 
       <h3>받은 뒤 — 인용 번호를 검증한다</h3>
       <p>프로그램은 답변에서 <code>[1]</code> <code>[10]</code> 같은 번호를 찾아, 20건 목록에 <b>실제로 있는 번호만</b> 근거 카드로 만듭니다 — 이 답변에서는 13건([1] [2] [7] [19] [10] [5] [3] [6] [9] [15] [17] [12] [13])이 인용되었습니다. <code>[25]</code>처럼 목록에 없는 번호를 쓰면 카드로 만들지 않습니다. AI가 붙인 번호를 그대로 믿지 않고 프로그램이 확인하는 것입니다.</p>
