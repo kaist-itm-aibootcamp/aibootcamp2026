@@ -243,11 +243,10 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <div class="toc" id="toc">
       <a href="#s1" data-sec="s1">1. 목표 — 배포한 챗봇에 문 달기<span class="done-mark">✔</span></a>
       <a href="#s2" data-sec="s2">2. 설계 — 이메일 인증코드의 전체 흐름<span class="done-mark">✔</span></a>
-      <a href="#s3" data-sec="s3">3. 체험 — 인증 흐름 시뮬레이터<span class="done-mark">✔</span></a>
-      <a href="#s4" data-sec="s4">4. 발송 수단 — Gmail SMTP + 앱 비밀번호<span class="done-mark">✔</span></a>
-      <a href="#s5" data-sec="s5">5. 구현 프롬프트 (강사 데모 · 자율 실습)<span class="done-mark">✔</span></a>
-      <a href="#s6" data-sec="s6">6. 지름길 — 나만 쓴다면: 비밀번호 잠금<span class="done-mark">✔</span></a>
-      <a href="#s7" data-sec="s7">7. 마무리 — 비밀 총정리와 기성품이라는 선택지<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 발송 수단 — Gmail SMTP + 앱 비밀번호<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 구현 프롬프트 (강사 데모 · 자율 실습)<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 지름길 — 나만 쓴다면: 비밀번호 잠금<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. 마무리 — 비밀 총정리와 기성품이라는 선택지<span class="done-mark">✔</span></a>
     </div>
   </nav>
 
@@ -299,7 +298,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <ul class="final-list">
         <li><b>허용 이메일 명단</b> — 누구를 들여보낼지는 서버만 압니다. 명단에 없으면 코드 발송 자체를 안 합니다</li>
         <li><b>발송된 코드</b> — 서버가 잠시(예: 5분) 기억하고 대조 후 폐기합니다</li>
-        <li><b>Gmail 발송 자격증명</b> — §4의 앱 비밀번호. 환경변수에 있습니다</li>
+        <li><b>Gmail 발송 자격증명</b> — §3의 앱 비밀번호. 환경변수에 있습니다</li>
       </ul>
       <p>이 흐름이 "이메일 주인만 통과"를 보장하는 이유: 코드는 <b>그 메일함으로만</b> 갑니다. 메일함을 열 수 있는 사람 = 그 이메일의 주인이라는 사실을 구글의 로그인 보안에 얹혀 확인하는 셈입니다.</p>
       <p>인증을 통과하면 서버가 <b>세션</b>(서명된 쿠키 — "인증됨" 표식)을 발급합니다. 이후 브라우저의 모든 요청에 이 표식이 함께 가고, 챗봇 API는 <b>유효한 세션이 있을 때만</b> 동작합니다. 매 질문마다 인증코드를 다시 받지 않아도 되는 이유입니다.</p>
@@ -308,40 +307,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
 
     <!-- ================= SECTION 3 ================= -->
     <section class="section" id="s3">
-      <div class="sec-head"><span class="sec-num">3</span><h2>체험 — 인증 흐름 시뮬레이터</h2></div>
-      <p class="sec-lead">§2의 흐름을 이 페이지 안에서 직접 밟아 봅니다. 실제 메일은 나가지 않고, 서버와 메일함이 화면에 시뮬레이션됩니다. 허용 명단에는 <code>kim@itm.kaist.ac.kr</code>, <code>park@itm.kaist.ac.kr</code>, <code>lee@itm.kaist.ac.kr</code> 세 주소가 있습니다. <b>명단에 없는 주소도 넣어 보세요</b> — 거부되는 경험이 핵심입니다.</p>
-
-      <div class="explorer">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;" class="sim-grid">
-          <div>
-            <div style="font-size:12.5px;font-weight:800;color:var(--muted);margin-bottom:6px;">🖥️ 챗봇 로그인 화면 (브라우저)</div>
-            <div style="display:flex;gap:8px;margin-bottom:10px;">
-              <input id="simEmail" type="text" placeholder="이메일 입력 (예: kim@itm.kaist.ac.kr)" style="flex:1;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:13.5px;"/>
-              <button id="simSend" class="dl-btn" style="white-space:nowrap;">코드 받기</button>
-            </div>
-            <div id="simMailbox" hidden style="border:1px dashed var(--amber);background:#fbf1de;border-radius:10px;padding:11px 14px;font-size:13px;margin-bottom:10px;">
-              📬 <b>메일함</b> — 받는 사람: <span id="simMailTo"></span><br/>
-              제목: [판결문 챗봇] 인증코드 안내<br/>
-              인증코드: <b style="font-size:17px;letter-spacing:.12em;" id="simMailCode"></b> (5분간 유효)
-            </div>
-            <div id="simCodeArea" style="display:none;gap:8px;margin-bottom:10px;">
-              <input id="simCode" type="text" placeholder="6자리 코드 입력" maxlength="6" style="flex:1;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:13.5px;letter-spacing:.15em;"/>
-              <button id="simVerify" class="dl-btn" style="white-space:nowrap;">인증하기</button>
-            </div>
-            <div id="simResult" style="font-size:13.5px;font-weight:700;min-height:22px;"></div>
-          </div>
-          <div>
-            <div style="font-size:12.5px;font-weight:800;color:var(--muted);margin-bottom:6px;">⚙️ 서버 로그 (방문자에게는 안 보이는 영역)</div>
-            <div id="simServerLog" style="background:#20242a;color:#a8e0b2;border-radius:10px;padding:12px 14px;font-size:12px;line-height:1.7;height:190px;overflow:auto;font-family:ui-monospace,Consolas,monospace;"><div>› 대기 중…</div></div>
-          </div>
-        </div>
-      </div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>허용/비허용 주소 모두 시도해 서버의 판단을 확인했다</span></label></div>
-    </section>
-
-    <!-- ================= SECTION 4 ================= -->
-    <section class="section" id="s4">
-      <div class="sec-head"><span class="sec-num">4</span><h2>발송 수단 — Gmail SMTP + 앱 비밀번호</h2></div>
+      <div class="sec-head"><span class="sec-num">3</span><h2>발송 수단 — Gmail SMTP + 앱 비밀번호</h2></div>
       <p class="sec-lead">서버가 메일을 보내려면 발신 우체국(SMTP 서버)이 필요합니다. 우리는 <b>Gmail의 SMTP 서버를 빌려 씁니다</b> — 별도 가입도, 비용도, 도메인 설정도 없습니다.</p>
 
       <div class="term-list">
@@ -352,13 +318,13 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       </div>
 
       <div class="callout"><b class="cap">왜 직접 메일 서버를 세우지 않나</b>
-      SMTP 서버 자체는 누구나 세울 수 있습니다. 문제는 <b>평판</b>입니다. 수신 측(Gmail·네이버)은 낯선 발신 서버의 메일을 스팸으로 분류하거나 거부합니다. SPF·DKIM 같은 인증 설정을 다 갖춰도 신규 서버는 평판이 없어 배달이 불안정합니다. Gmail을 빌리면 <b>구글의 평판으로 발송</b>되므로 이 문제가 사라집니다. 규모가 커지면 전문 발송 서비스로 옮깁니다(§6).</div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>앱 비밀번호가 무엇이고 왜 본 비밀번호 대신 쓰는지 이해했다</span></label></div>
+      SMTP 서버 자체는 누구나 세울 수 있습니다. 문제는 <b>평판</b>입니다. 수신 측(Gmail·네이버)은 낯선 발신 서버의 메일을 스팸으로 분류하거나 거부합니다. SPF·DKIM 같은 인증 설정을 다 갖춰도 신규 서버는 평판이 없어 배달이 불안정합니다. Gmail을 빌리면 <b>구글의 평판으로 발송</b>되므로 이 문제가 사라집니다. 규모가 커지면 전문 발송 서비스로 옮깁니다(§5).</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>앱 비밀번호가 무엇이고 왜 본 비밀번호 대신 쓰는지 이해했다</span></label></div>
     </section>
 
-    <!-- ================= SECTION 5 ================= -->
-    <section class="section" id="s5">
-      <div class="sec-head"><span class="sec-num">5</span><h2>구현 프롬프트 (강사 데모 · 자율 실습)</h2></div>
+    <!-- ================= SECTION 4 ================= -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>구현 프롬프트 (강사 데모 · 자율 실습)</h2></div>
       <p class="sec-lead">수업에서는 강사가 ⑤의 챗봇에 이 인증을 붙여 실제 메일이 도착하는 것까지 시연합니다. 각자 구현은 자율 과제 — 아래 프롬프트를 ⑤의 챗봇 프로젝트 폴더에서 실행하면 됩니다.</p>
       <div class="copy-block"><span class="cb-label">💬 완성 프롬프트 — 이메일 인증 추가</span>
         <button class="copy-btn" data-copy="p51">복사</button>
@@ -380,13 +346,13 @@ Vercel에 배포되어 있는 프로젝트야.
 7. 파일 변경까지만 하고 git commit/push는 하지 마.</pre>
       </div>
       <p>Vercel 환경변수에 <code>SMTP_USER</code>, <code>SMTP_APP_PASSWORD</code>, <code>ALLOWED_EMAILS</code> 세 개를 추가하고 재배포하면 완성입니다. 프롬프트의 2번 마지막 문장(이유를 알려주지 않기)과 3번(시간 제한·시도 제한)은 사소해 보이지만 실제 보안 관행입니다 — 공격자에게 명단 탐색과 무차별 대입의 실마리를 주지 않는 장치입니다. 1번의 "API도 동작하면 안 돼"도 중요합니다: 화면만 가리고 API를 열어 두면, 화면을 우회해 직접 API를 부르는 사람에게는 문이 없는 것과 같습니다.</p>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>인증 추가 프롬프트와 필요한 환경변수 3개를 파악했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>인증 추가 프롬프트와 필요한 환경변수 3개를 파악했다</span></label></div>
     </section>
 
-    <!-- ================= SECTION 6 ================= -->
-    <section class="section" id="s6">
-      <div class="sec-head"><span class="sec-num">6</span><h2>지름길 — 나만 쓴다면: 비밀번호 하나로 잠그기</h2></div>
-      <p class="sec-lead">§2~§5의 이메일 인증은 <b>여러 사람을 명단으로 들이는 문</b>입니다. 그런데 배포는 하고 싶고 쓰는 사람은 <b>나 하나</b>라면? 문서 파일에 비밀번호를 걸듯, 사이트 전체에 <b>비밀번호 하나</b>를 거는 훨씬 간단한 방법이 있습니다. SMTP도, 명단도, 메일 발송도 필요 없습니다.</p>
+    <!-- ================= SECTION 5 ================= -->
+    <section class="section" id="s5">
+      <div class="sec-head"><span class="sec-num">5</span><h2>지름길 — 나만 쓴다면: 비밀번호 하나로 잠그기</h2></div>
+      <p class="sec-lead">§2~§4의 이메일 인증은 <b>여러 사람을 명단으로 들이는 문</b>입니다. 그런데 배포는 하고 싶고 쓰는 사람은 <b>나 하나</b>라면? 문서 파일에 비밀번호를 걸듯, 사이트 전체에 <b>비밀번호 하나</b>를 거는 훨씬 간단한 방법이 있습니다. SMTP도, 명단도, 메일 발송도 필요 없습니다.</p>
 
       <h3>원리 — 비밀번호가 아니라 "비밀번호의 지문"을 저장한다</h3>
       <p>가장 쉬운 생각은 비밀번호를 코드에 그대로 적는 것(하드코딩)이지만, 코드는 GitHub에 올라가는 순간 공개됩니다. 그래서 한 단계만 더 갑니다 — <b>단방향 암호화(해시)</b>입니다. 비밀번호를 해시 함수(예: SHA-256)에 넣으면 고정 길이의 문자열이 나오는데, 이 값에서 원래 비밀번호로 <b>되돌리는 것은 불가능</b>합니다. 지문에서 사람을 복원할 수 없는 것과 같습니다.</p>
@@ -422,14 +388,14 @@ Vercel에 배포되어 있는 프로젝트야.
       ⑤에서 "비밀은 서버의 환경변수에"를 배웠습니다. 이 방식은 거기서 한 걸음 더 나갑니다 — <b>환경변수에조차 원문이 아니라 해시만</b> 둡니다. 환경변수가 통째로 노출되는 사고가 나도 비밀번호 원문은 복원되지 않습니다. 같은 원리가 실제 서비스의 회원 비밀번호 저장에도 쓰입니다(그쪽은 솔트 등 장치가 더 붙습니다).</div>
 
       <div class="callout caution"><b class="cap">지름길의 한계 — 이것은 "잠금"이지 "인증"이 아닙니다</b>
-      비밀번호 하나로는 <b>누가 들어왔는지 구분할 수 없습니다.</b> 식별 없이 문만 있는 셈이라, 비밀번호가 한 번 공유되면 통제가 끝나고, 접근 기록도 사람별로 남지 않습니다. 무차별 대입을 견디도록 <b>비밀번호는 길게</b>(문장형 권장) 정하세요. 나 혼자 또는 신뢰하는 소수와 쓰는 사이트라면 이 정도로 충분하고, 여러 사람을 명단으로 관리하고 기록이 필요해지면 그때 §2~§5의 이메일 인증으로 올라가면 됩니다.</div>
+      비밀번호 하나로는 <b>누가 들어왔는지 구분할 수 없습니다.</b> 식별 없이 문만 있는 셈이라, 비밀번호가 한 번 공유되면 통제가 끝나고, 접근 기록도 사람별로 남지 않습니다. 무차별 대입을 견디도록 <b>비밀번호는 길게</b>(문장형 권장) 정하세요. 나 혼자 또는 신뢰하는 소수와 쓰는 사이트라면 이 정도로 충분하고, 여러 사람을 명단으로 관리하고 기록이 필요해지면 그때 §2~§4의 이메일 인증으로 올라가면 됩니다.</div>
 
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>해시를 환경변수에 두는 비밀번호 잠금의 원리와 한계를 이해했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>해시를 환경변수에 두는 비밀번호 잠금의 원리와 한계를 이해했다</span></label></div>
     </section>
 
-    <!-- ================= SECTION 7 ================= -->
-    <section class="section" id="s7">
-      <div class="sec-head"><span class="sec-num">7</span><h2>마무리 — 비밀 총정리와 기성품이라는 선택지</h2></div>
+    <!-- ================= SECTION 6 ================= -->
+    <section class="section" id="s6">
+      <div class="sec-head"><span class="sec-num">6</span><h2>마무리 — 비밀 총정리와 기성품이라는 선택지</h2></div>
       <p class="sec-lead">이번 주에 등장한 비밀을 전부 한 표에 모읍니다. 보관 위치가 전부 같다는 것 — 그것이 이번 주의 결론입니다.</p>
       <table class="step-table">
         <thead><tr><th>비밀</th><th>등장</th><th>유출되면</th><th>보관 위치</th></tr></thead>
@@ -437,7 +403,7 @@ Vercel에 배포되어 있는 프로젝트야.
           <tr><td><b>OpenRouter API 키</b></td><td>③⑤</td><td>내 계정으로 요금 폭탄</td><td rowspan="4" style="vertical-align:middle;text-align:center;background:var(--sky-light);"><b>서버의<br/>환경변수</b><br/><span style="font-size:12px;color:var(--muted);">브라우저·코드·<br/>GitHub 어디에도 없음</span></td></tr>
           <tr><td><b>Gmail 앱 비밀번호</b></td><td>⑦</td><td>내 이름으로 스팸 발송</td></tr>
           <tr><td><b>허용 이메일 명단·인증코드</b></td><td>⑦</td><td>인증 우회, 명단(개인정보) 노출</td></tr>
-          <tr><td><b>비밀번호 해시 (지름길)</b></td><td>⑦ §6</td><td>원문 복원은 불가하나 무차별 대입의 표적 — 그래서 비밀번호는 길게</td></tr>
+          <tr><td><b>비밀번호 해시 (지름길)</b></td><td>⑦ §5</td><td>원문 복원은 불가하나 무차별 대입의 표적 — 그래서 비밀번호는 길게</td></tr>
         </tbody>
       </table>
       <div class="callout caution"><b class="cap">허용 명단도 개인정보다</b>
@@ -455,7 +421,7 @@ Vercel에 배포되어 있는 프로젝트야.
         <div class="next-card"><b>직접 해보기 — 내 서비스 한 사이클</b><span>해 보고 싶다면: 내 데이터로 검색엔진 또는 RAG를 구현하고(②~④의 프롬프트 재사용) → Vercel에 배포하고(⑤) → 문을 달아 보세요. 여럿이 쓰면 §5의 이메일 인증, 나만 쓰면 §6의 비밀번호 잠금이면 충분합니다.</span></div>
         <div class="next-card"><b>다음 주차 — 연동과 자율 에이전트</b><span>4주차에는 AI에게 일을 맡기는 법을 다룹니다 — MCP로 도구를 연결하고, 구글 시트로 문답 이력 기록을 완성하고, 자율 에이전트 에르메스까지. 3주간 만든 모든 것이 재료가 됩니다.</span></div>
       </div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s7" /><span>비밀들의 위험과 공통 보관 위치, 기성품 선택 기준을 이해했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>비밀들의 위험과 공통 보관 위치, 기성품 선택 기준을 이해했다</span></label></div>
     </section>
 
 
@@ -509,46 +475,6 @@ const io=new IntersectionObserver(entries=>{
 secIds.forEach(id=>io.observe(document.getElementById(id)));
 updateProgress();
 
-
-/* ---- 인증 흐름 시뮬레이터 ---- */
-(function(){
-  const emailIn=$("#simEmail"),sendBtn=$("#simSend"),codeArea=$("#simCodeArea"),codeIn=$("#simCode"),
-        verifyBtn=$("#simVerify"),mailbox=$("#simMailbox"),result=$("#simResult"),serverLog=$("#simServerLog");
-  const ALLOW=["kim@itm.kaist.ac.kr","park@itm.kaist.ac.kr","lee@itm.kaist.ac.kr"];
-  let code=null, tries=0;
-  function slog(t){serverLog.insertAdjacentHTML("beforeend",`<div>› ${t}</div>`);serverLog.scrollTop=serverLog.scrollHeight;}
-  sendBtn.addEventListener("click",()=>{
-    const em=emailIn.value.trim().toLowerCase();
-    result.textContent="";mailbox.hidden=true;codeArea.style.display="none";
-    if(!em.includes("@")){result.textContent="이메일 형식을 입력해 보세요.";result.style.color="var(--red)";return;}
-    slog(`/api/send-code 요청 수신: ${em}`);
-    if(!ALLOW.includes(em)){
-      slog(`허용 명단(서버 보관)에 없음 → 발송 거부`);
-      result.textContent="⛔ 허용 명단에 없는 주소입니다. 코드가 발송되지 않았습니다. (명단은 서버에만 있어 방문자는 누가 허용되는지조차 알 수 없습니다)";
-      result.style.color="var(--red)";return;
-    }
-    code=String(Math.floor(100000+Math.random()*900000));tries=0;
-    slog(`명단 확인 → 6자리 코드 생성 → Gmail SMTP로 발송 (코드는 서버 메모리에 5분 보관)`);
-    mailbox.hidden=false;$("#simMailCode").textContent=code;$("#simMailTo").textContent=em;
-    codeArea.style.display="flex";codeIn.value="";
-    result.textContent="📨 코드가 발송되었습니다. (시뮬레이터에서는 아래 '메일함'에 도착합니다)";result.style.color="var(--green)";
-  });
-  verifyBtn.addEventListener("click",()=>{
-    tries++;
-    slog(`/api/verify-code 요청: 입력값 ${codeIn.value||"(빈 값)"} (시도 ${tries}/3)`);
-    if(codeIn.value.trim()===code){
-      slog(`일치 → 세션 발급 → 챗봇 접근 허용`);
-      result.textContent="✅ 인증 성공! 이제 챗봇이 열립니다. 이 브라우저에는 '인증됨' 표식(세션)이 남아 당분간 재인증이 필요 없습니다.";
-      result.style.color="var(--green)";codeArea.style.display="none";mailbox.hidden=true;
-    }else if(tries>=3){
-      slog(`3회 오답 → 코드 폐기. 처음부터 다시`);
-      result.textContent="⛔ 3회 틀려 코드가 폐기되었습니다. 다시 발송부터 진행하세요. (무차별 대입을 막는 기본 장치)";
-      result.style.color="var(--red)";code=null;codeArea.style.display="none";mailbox.hidden=true;
-    }else{
-      result.textContent=`❌ 코드가 다릅니다. (남은 시도 ${3-tries}회)`;result.style.color="var(--red)";
-    }
-  });
-})();
 
 </script>
 </body>
