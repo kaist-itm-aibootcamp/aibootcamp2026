@@ -186,19 +186,21 @@ p{margin:10px 0;}
 .mock-bar .dot{width:11px;height:11px;border-radius:999px;}
 .mock-bar .url{flex:1;background:#fff;border:1px solid #dce0e2;border-radius:999px;padding:4px 14px;font-size:12px;color:#52514e;font-family:ui-monospace,Consolas,monospace;}
 .mock-body{padding:20px 22px;}
-.mock-title{font-size:16px;font-weight:900;margin-bottom:12px;}
-.mock-search{display:flex;gap:8px;margin-bottom:6px;}
-.mock-search .inp{flex:1;border:2px solid var(--brand);border-radius:10px;padding:10px 14px;font-size:14px;color:var(--ink);background:#fff;}
-.mock-search .btn{background:var(--brand-dark);color:#fff;font-weight:800;font-size:13.5px;border-radius:10px;padding:0 20px;display:grid;place-items:center;}
-.mock-meta{font-size:12px;color:var(--muted);margin:8px 0 10px;}
-.mock-card{border:1px solid var(--line);border-radius:10px;padding:11px 14px;margin:8px 0;}
-.mock-card .h{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;margin-bottom:3px;}
-.mock-card .h b{font-size:13.5px;}
-.mock-card .h .score{margin-left:auto;font-size:11.5px;font-weight:800;color:var(--brand-dark);background:var(--sky-light);border-radius:999px;padding:2px 10px;}
-.mock-card .h .res{font-size:11px;font-weight:900;border-radius:999px;padding:2px 9px;}
-.mock-card .h .res.w{color:var(--green);background:#edf4ef;}
-.mock-card .h .res.l{color:var(--red);background:#faeeec;}
-.mock-card .b{font-size:12.5px;color:var(--muted);line-height:1.6;}
+.shot-body{background:#faf9f7;padding:24px 26px 20px;}
+.shot-h1{text-align:center;font-size:21px;font-weight:900;color:#2b2723;margin:2px 0 8px;}
+.shot-sub{text-align:center;font-size:12.5px;color:#8a857e;padding-bottom:16px;border-bottom:1px solid #e8e4de;margin-bottom:18px;}
+.shot-search{display:flex;gap:10px;}
+.shot-search .inp{flex:1;background:#fff;border:1px solid #e3ded7;border-radius:12px;padding:11px 16px;font-size:13.5px;color:#3a352f;}
+.shot-search .btn{background:#b5522a;color:#fff;font-weight:800;font-size:14px;border-radius:10px;padding:0 26px;display:grid;place-items:center;}
+.shot-ex{font-size:12px;color:#b8622f;margin:9px 2px 0;}
+.shot-count{font-size:12.5px;color:#8a857e;margin:20px 2px 10px;}
+.shot-card{background:#fff;border:1px solid #eee9e2;border-radius:14px;padding:15px 18px;margin:10px 0;box-shadow:0 1px 3px rgba(60,50,30,.05);}
+.shot-card .h{display:flex;align-items:baseline;gap:9px;}
+.shot-card .rank{font-size:13px;font-weight:700;color:#8a857e;}
+.shot-card .h b{font-size:14.5px;color:#2b2723;}
+.shot-card .sim{margin-left:auto;font-size:11.5px;font-weight:800;color:#b45f2e;background:#f8ece1;border-radius:999px;padding:3px 11px;white-space:nowrap;}
+.shot-card .meta{font-size:12px;color:#8a857e;margin:5px 0 7px;}
+.shot-card .b{font-size:12.5px;color:#4d473f;line-height:1.75;}
 
 /* ---- 목록으로 돌아가기 (week1과 동일 패턴) ---- */
 .back-week{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:color .15s ease,border-color .15s ease,background .15s ease;}
@@ -526,32 +528,34 @@ p{margin:10px 0;}
 - 로딩 중 표시와 서버 연결 실패 시 안내 문구도 넣어줘
 완성되면 브라우저로 열어서 "직장 내 괴롭힘으로 우울증 진단을 받은 경우"로
 검색해 결과가 나오는지 확인하자.</pre></div>
-      <h3>완성되면 이런 화면이 나옵니다 (예시)</h3>
+      <h3>이 지시대로 만들어 본 첫 결과물입니다</h3>
       <div class="mock-browser">
         <div class="mock-bar">
           <span class="dot" style="background:#ee6a5f"></span><span class="dot" style="background:#f5bd4f"></span><span class="dot" style="background:#61c454"></span>
           <span class="url">http://localhost:8000/search</span>
         </div>
-        <div class="mock-body">
-          <div class="mock-title">⚖️ 판결문 유사 검색 <span style="font-size:11px;font-weight:700;color:#898781">— 347건 · 임베딩 유사도</span></div>
-          <div class="mock-search">
-            <div class="inp">동료 직원에 의한 따돌림(왕따)</div>
-            <div class="btn">판례 검색</div>
+        <div class="shot-body">
+          <div class="shot-h1">직장 내 괴롭힘 판결문 검색</div>
+          <div class="shot-sub">문장으로 물어보면 의미가 비슷한 판결을 찾아드립니다 · 전체 347건</div>
+          <div class="shot-search">
+            <div class="inp">업무상 적정범위를 넘지 않았다고 보아 괴롭힘을 부정한 사례</div>
+            <div class="btn">검색</div>
           </div>
-          <div class="mock-meta">유사도 상위 5건 · 검색 0.9초 (임베딩 호출 포함)</div>
-          <div class="mock-card"><div class="h"><b>대구지방법원 2024가단138550</b><span class="res w">원고일부승</span><span class="score">유사도 0.86</span></div>
-            <div class="b">무용단 단원인 원고 2명이 동료 단원 8명을 상대로 공연 출연자 명단변경, 폭언, 따돌림 등 직장 내 괴롭힘·불법행위를 이유로 손해배상을 청구…</div></div>
-          <div class="mock-card"><div class="h"><b>수원지방법원 2022가단546552</b><span class="res w">원고일부승</span><span class="score">유사도 0.84</span></div>
-            <div class="b">품질검사원인 원고가 폭언, 잔업·특근 배제, 따돌림 등 직장 내 괴롭힘을 이유로 동료 검사원 3명을 상대로 약 3,185만 원의 손해배상을 청구…</div></div>
-          <div class="mock-card"><div class="h"><b>서울중앙지방법원 2022가단5252694</b><span class="res w">원고일부승</span><span class="score">유사도 0.83</span></div>
-            <div class="b">기숙학원 야간사감인 원고가 임금체불 진정 후 파트장 등으로부터 집중 감시, 단체채팅방 배제 등 집단 따돌림을 당했다며 회사와 동료 사감을 상대로…</div></div>
-          <div class="mock-card"><div class="h"><b>인천지방법원 2023가단250172</b><span class="res w">원고일부승</span><span class="score">유사도 0.81</span></div>
-            <div class="b">버스기사인 원고가 자신을 폭행한 동료 기사와 사용자인 회사, '왕따' 행위를 했다는 다른 동료를 상대로 손해배상을 청구…</div></div>
-          <div class="mock-card"><div class="h"><b>울산지방법원 2022가단128995</b><span class="res l">원고패</span><span class="score">유사도 0.80</span></div>
-            <div class="b">자동차 판매사원인 원고와 그 가족들이 지점장·동료들의 집단 따돌림과 노조 지부의 부당징계로 우울증과 휴직에 이르렀다며 손해배상을 청구…</div></div>
+          <div class="shot-ex">예시: 직장 내 괴롭힘 신고 후 보복성 인사발령 · 회식 자리 성희롱으로 징계받은 사건 · 과중한 업무 지시로 극단적 선택에 이른 경우</div>
+          <div class="shot-count">의미가 가까운 순서로 20건</div>
+          <div class="shot-card">
+            <div class="h"><span class="rank">1</span><b>수원지방법원 평택지원 2024가단76216</b><span class="sim">유사도 72.0%</span></div>
+            <div class="meta">2025. 7. 10. · 1심 · 원고패 · 괴롭힘 손해배상</div>
+            <div class="b">회사 총무팀 서무 직원인 원고가 사내이사·총무팀장·시설팀장의 폭언, 부당한 업무지시 등 직장 내 괴롭힘과 회사의 조치의무 위반을 이유로 피고들에게 합계 7,000만 원의 위자료를 청구하였다. 법원은 각 언행이 업무상 적정범위를 넘는 괴롭힘에 해당한다고 보기 어렵고 회사도 신고 후 조사·유급휴가 등 필요한 조치를 하였다며 청구를 전부 기각하였다.</div>
+          </div>
+          <div class="shot-card">
+            <div class="h"><span class="rank">2</span><b>부산지방법원 2023가소568249</b><span class="sim">유사도 71.1%</span></div>
+            <div class="meta">2024. 4. 23. · 1심 · 원고패 · 괴롭힘 손해배상</div>
+            <div class="b">원고가 동료(피고)의 직장 내 괴롭힘을 이유로 불법행위에 기한 위자료 600만 원의 손해배상을 청구한 소액사건이다. 법원은 제출된 증거만으로는 업무상 적정범위를 넘는 괴롭힘 행위를 인정하기에 부족하다며 청구를 기각하였다.</div>
+          </div>
         </div>
       </div>
-      <p class="chart-note" style="margin-top:-6px;">예시 화면입니다 — 다섯 건 모두 코퍼스에 실재하는 동료 따돌림 사건이며, 유사도 점수는 예시 값입니다. "왕따"라는 구어 질의가 "집단 따돌림"·"단체채팅방 배제" 같은 판결문 표현을 찾아낸 점, 그리고 인정·기각 사건이 함께 검색되는 점(검색은 결론을 가리지 않습니다)을 눈여겨보세요.</p>
+      <p class="chart-note" style="margin-top:-6px;">실제 화면입니다 — 이 강의의 지시대로 만든 첫 결과물을 그대로 옮겼습니다. 질의가 키워드가 아니라 <b>"괴롭힘을 부정한 사례"라는 판결의 결론</b>을 묻는 문장인데, 업무상 적정범위를 이유로 청구를 기각한 원고패 판결들이 상위로 나왔습니다. 판결문은 스스로를 "부정한 사례"라고 부르지 않으므로 키워드 검색으로는 성립하지 않는 질의입니다. 몇 건을 보여줄지(이 화면은 20건)나 검색창 아래 예시 문구 같은 세부는 계획서 왕복에서 정한 대로 사람마다 달라집니다.</p>
 
       <div class="tip-card"><b>비교 실험</b> — 앞 페이지의 키워드 검색기와 나란히 놓고 같은 질의("회사가 알 수 있었다" 등)를 던져 보세요. 키워드가 놓치던 사건을 임베딩 검색이 찾아내는 것을 눈으로 확인할 수 있습니다.</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>웹앱에서 실시간 임베딩 검색이 동작한다</span></label></div>
