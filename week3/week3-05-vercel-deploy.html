@@ -226,6 +226,18 @@ p{margin:10px 0;}
 .vf-env .vf-label:first-child{margin-top:0;}
 .vf-btn{display:inline-block;border:1px solid #e4e4e4;border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:600;color:#111;}
 .vf-deploy{background:#000;color:#fff;border-radius:8px;text-align:center;padding:11px;font-weight:700;font-size:14px;margin-top:14px;}
+.vdep{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:14px 20px 6px;margin:12px 0;font-size:13px;color:#111;}
+.vdep .vd-h{font-size:14px;font-weight:800;padding-bottom:10px;}
+.vdep .vd-h small{color:#888;font-weight:600;}
+.vd-row{display:flex;align-items:center;gap:14px;padding:12px 2px;border-top:1px solid #eee;flex-wrap:wrap;}
+.vd-title{flex:1 1 200px;min-width:170px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.vd-ready{font-weight:700;white-space:nowrap;}
+.vd-ready i{display:inline-block;width:9px;height:9px;border-radius:999px;background:#2fbf71;margin-right:6px;}
+.vd-ready small{color:#888;font-weight:600;}
+.vd-badge{border:1px solid #e4e4e4;border-radius:999px;padding:3px 12px;font-size:12px;font-weight:600;white-space:nowrap;}
+.vd-badge.cur{background:#0070f3;color:#fff;border-color:#0070f3;}
+.vd-hash{font-family:ui-monospace,Consolas,monospace;color:#666;font-size:12px;white-space:nowrap;}
+.vd-ago{color:#888;font-size:12px;white-space:nowrap;}
 code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.88em;font-family:ui-monospace,'SF Mono',Consolas,monospace;}
 .copy-block code{background:transparent;border:none;padding:0;color:#9fd0f5;font-size:inherit;}
 .quad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
@@ -430,6 +442,18 @@ openrouter credit 부담할 것이야. 나중에 인증 기능 추가할 예정�
 
       <div class="callout ok"><b class="cap">성공의 순간</b>
       옆 사람에게 내 <code>*.vercel.app</code> 주소를 보내고, 그 사람 폰에서 검색이 되는 것을 확인하세요. <b>내 PC는 꺼도 됩니다.</b> 이것이 "배포했다"의 의미입니다. 이 실습의 실제 배포 결과도 살아 있습니다 — <a href="https://no-bullying-gamma.vercel.app/" target="_blank" rel="noopener"><b>no-bullying-gamma.vercel.app</b></a>을 지금 열어 검색해 볼 수 있습니다. (주소에 <code>-gamma</code>가 붙은 것은 <code>no-bullying.vercel.app</code>을 이미 누군가 쓰고 있어 Vercel이 접미사를 붙였기 때문입니다.)</div>
+
+      <h3>고치면 다시 배포된다 — push가 곧 배포</h3>
+      <p>이제부터는 Claude Code에서 코드를 수정해 GitHub에 push하면, <b>Vercel이 알림을 받아 자동으로 새 버전을 배포</b>합니다. 손으로 할 일이 없습니다. 배포가 어떻게 되고 있는지는 Vercel 대시보드의 <b>Deployments</b> 화면에서 봅니다 — 실제 이 프로젝트의 화면입니다:</p>
+      <div class="vdep">
+        <div class="vd-h">no-bullying <small>· Deployments</small></div>
+        <div class="vd-row"><span class="vd-title">배포본에서 판결문을 못 찾던 원…</span><span class="vd-ready"><i></i>Ready <small>21s</small></span><span class="vd-badge cur">&#8593; Production</span><span class="vd-hash">-o- 2b81927</span><span class="vd-hash">&#8618; master</span><span class="vd-ago">Just now</span></div>
+        <div class="vd-row"><span class="vd-title">Vercel 배포 차단 해결: 커밋 작성…</span><span class="vd-ready"><i></i>Ready <small>19s</small></span><span class="vd-badge">&#8593; Production</span><span class="vd-hash">-o- b0a2e2a</span><span class="vd-hash">&#8618; master</span><span class="vd-ago">5m ago</span></div>
+        <div class="vd-row"><span class="vd-title">Vercel 배포 가능하도록 수정</span><span class="vd-ready"><i></i>Ready <small>21s</small></span><span class="vd-badge">&#8593; Production</span><span class="vd-hash">-o- d706ea0</span><span class="vd-hash">&#8618; master</span><span class="vd-ago">29m ago</span></div>
+      </div>
+      <p>행 하나가 배포 한 번입니다. 이름은 <b>커밋 메시지 그대로</b>라서, 이 세 줄만 읽어도 무슨 일이 있었는지 보입니다 — 배포 준비, 차단 문제 해결, 배포본에서 판결문을 못 찾던 버그 수정. 파란 <b>Production</b> 배지가 지금 서비스 중인 버전이고, 커밋 번호(<code>2b81927</code>)로 어느 코드가 올라가 있는지 GitHub과 맞춰볼 수 있습니다.</p>
+      <div class="callout"><b class="cap">Ready 21s — "빌드"가 하는 일</b>
+      push가 감지되면 Vercel은 배포 전에 <b>빌드(build)</b>부터 합니다: 새 코드를 내려받고 → <code>requirements.txt</code>에 적힌 라이브러리를 설치하고 → 서버리스 함수와 화면 파일을 실행 가능한 꾸러미로 조립한 뒤 → 자기 서버에 올립니다. "Ready 21s"의 21초가 이 조립 시간입니다. 빌드가 실패하면 <b>이전 버전이 그대로 서비스됩니다</b> — 교체는 성공한 빌드만 하므로, 고치다 실수해도 사이트가 죽지는 않습니다.</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>내 검색기가 vercel.app 주소에서 동작한다</span></label></div>
     </section>
 
