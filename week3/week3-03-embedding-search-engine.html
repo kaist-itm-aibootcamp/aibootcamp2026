@@ -270,8 +270,8 @@ p{margin:10px 0;}
     <div class="toc">
       <a href="#s1" data-sec="s1">1. 이미 세상이 쓰는 기술<span class="done-mark">✔</span></a>
       <a href="#s2" data-sec="s2">2. 전체 아키텍처 — 색인과 검색<span class="done-mark">✔</span></a>
-      <a href="#s3" data-sec="s3">3. 실습 ① — 검색 백엔드 서버<span class="done-mark">✔</span></a>
-      <a href="#s4" data-sec="s4">4. 실습 ② — 검색 웹앱 연결<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 실습 — 계획서부터 대화로<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 완성된 화면과 두 번째 왕복<span class="done-mark">✔</span></a>
       <a href="#s5" data-sec="s5">5. 문서화 — 기록을 남긴다<span class="done-mark">✔</span></a>
       <a href="#s6" data-sec="s6">6. 마무리 체크리스트<span class="done-mark">✔</span></a>
     </div>
@@ -478,7 +478,7 @@ p{margin:10px 0;}
 
     <!-- ============ S3 ============ -->
     <section class="section" id="s3">
-      <div class="sec-head"><span class="sec-num">3</span><h2>실습 ① — 검색 백엔드: 계획서부터 대화로</h2></div>
+      <div class="sec-head"><span class="sec-num">3</span><h2>실습 — 계획서부터 대화로</h2></div>
       <p class="sec-lead">비개발자가 개발을 시킬 때 가장 좋은 방법은 <b>사양서를 쓰는 것이 아니라 대화를 하는 것</b>입니다. 순서는 넷입니다 — <b>원하는 것만 서술 → AI가 계획서 작성 → 피드백 주고받기 → 확정된 계획서대로 구현</b>. 코드는 못 읽어도 계획서는 읽고 고칠 수 있기 때문입니다.</p>
       <p>준비물: Claude Code 로그인(2주차 1강에서 설치해 둔 그것 — 이번 주부터 본격적으로 씁니다), 작업 폴더의 <code>embeddings_json/</code> 347개, 그리고 같은 폴더에 <b>OpenRouter 키를 한 줄 저장한 <code>openrouterkey.txt</code></b>. 작업 폴더에서 <code>claude</code>를 실행합니다.</p>
 
@@ -620,27 +620,13 @@ p{margin:10px 0;}
 
       <div class="callout"><b class="cap">왜 이 순서가 좋은가</b>
       ① 비개발자는 코드 대신 <b>계획서를 검토</b>할 수 있다 ② AI의 질문이 <b>내가 미처 정하지 않은 요구</b>를 드러낸다 ③ 잘못된 방향의 구현을 코드가 쌓이기 전에 막는다 ④ "계획서 v2"라는 <b>합의 문서</b>가 남아, 나중에 "왜 이렇게 만들었지?"에 답할 수 있다. — 사람 개발자에게 외주를 줄 때와 정확히 같은 원리입니다.</div>
-      <div class="callout caution"><b class="cap">자주 막히는 지점</b>
-      ① CORS 누락(브라우저에서 조용히 실패 — 계획서 검토 때 "웹페이지에서 서버를 부를 수 있게 해줘"라고 확인) ② 포트 충돌·방화벽 → "다른 포트로 다시 실행해줘" ③ 키 파일 문제 → 폴더에 <code>openrouterkey.txt</code>가 정확한 이름으로 있는지, 안에 키 한 줄만 있는지 확인 ④ 임베딩 모델 문자열 불일치 — 피드백 단계에서 못 박은 이유입니다. 서버가 뜬 터미널 창은 실습이 끝날 때까지 닫지 마세요. 그리고 <b>키가 평문 파일로 남는다는 사실</b>을 기억하세요 — 이 폴더를 공유·백업하기 전에 키 파일부터 빼야 합니다.</div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>계획서 왕복을 거쳐 백엔드가 뜨고 시험 검색이 성공했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>계획서 왕복을 거쳐 구현이 끝나고 시험 검색이 성공했다</span></label></div>
     </section>
 
     <!-- ============ S4 ============ -->
     <section class="section" id="s4">
-      <div class="sec-head"><span class="sec-num">4</span><h2>실습 ② — 검색 웹앱 연결</h2></div>
-      <p class="sec-lead">웹앱은 계획서 v2에 이미 포함되어 있으므로 이어서 요청하면 됩니다. (물론 이 단계도 "화면 구성 계획부터 보여줘"라고 시작해도 좋습니다.)</p>
-      <div class="copy-block"><span class="cb-label">💬 Claude Code 프롬프트 — 검색 웹앱</span><button class="copy-btn" data-copy="c2">복사</button>
-<pre id="c2">검색 웹앱 화면을 만들어줘.
-- 질의 입력창 + "판례 검색" 버튼
-- 버튼을 누르면 서버의 검색 기능을 호출하고, 돌아온 결과를 의미가
-  가까운 순서대로 카드(법원·사건번호·선고일·소송결과·요약·유사도)로 표시
-- 카드를 누르면 판결문 전문을 볼 수 있게 해줘
-- 이 화면은 파일 더블클릭이 아니라 백엔드 서버가 직접 열어주게 해줘
-  (브라우저 주소창에 http://localhost:8000/search 를 치면 나오도록)
-- 로딩 중 표시와 서버 연결 실패 시 안내 문구도 넣어줘
-완성되면 브라우저로 열어서 "직장 내 괴롭힘으로 우울증 진단을 받은 경우"로
-검색해 결과가 나오는지 확인하자.</pre></div>
-      <h3>이 지시대로 만들어 본 첫 결과물입니다</h3>
+      <div class="sec-head"><span class="sec-num">4</span><h2>완성된 화면과 두 번째 왕복</h2></div>
+      <h3>계획서대로 구현된 첫 결과물입니다</h3>
       <div class="mock-browser">
         <div class="mock-bar">
           <span class="dot" style="background:#ee6a5f"></span><span class="dot" style="background:#f5bd4f"></span><span class="dot" style="background:#61c454"></span>
@@ -783,14 +769,14 @@ p{margin:10px 0;}
         <li>임베딩 검색엔진 = 색인 국면(문서 벡터를 미리 DB에) + 검색 국면(①질의 → ②백엔드 → ③질의 임베딩 → ④최근접 탐색 → ⑤목록 반환)</li>
         <li>질의 임베딩 모델은 색인 모델과 반드시 동일</li>
         <li>키와 호출량 통제를 위해 임베딩 호출은 백엔드에서만</li>
-        <li>소규모는 전수 코사인, 대규모는 전용 벡터 DB — 구조는 동일</li>
+        <li>소규모는 모든 문서와 하나하나 비교, 대규모는 전용 벡터 DB — 구조는 동일</li>
         <li>출력은 문서 목록: 읽고 판단하는 것은 사람</li>
         <li>코드만 남기지 말고 기록을 — PLAN(계획)·DECISIONS(왜)·README(사용·배포)·CLAUDE.md(AI 메모) 네 파일을 코드와 함께 커밋</li>
         <li>문서 갱신 규칙을 CLAUDE.md에 박아 두면 이후에는 AI가 코드와 문서를 함께 고친다</li>
       </ul>
       <div class="next-card-grid">
         <div class="next-card"><b>다음 강의 — RAG</b><span>검색엔진이 "문서 목록"을 돌려준다면, RAG는 검색된 문서를 AI가 읽고 "답변"을 씁니다. 목적이 다른 별개 기법을 새로 배웁니다.</span></div>
-        <div class="next-card"><b>직접 해보기</b><span>여러분의 임베딩 JSON으로 같은 두 실습을 반복해 보세요 — 프롬프트에서 폴더명과 시험 질의만 바꾸면 됩니다.</span></div>
+        <div class="next-card"><b>직접 해보기</b><span>여러분의 임베딩 JSON으로 같은 실습을 반복해 보세요 — 프롬프트에서 폴더명과 시험 질의만 바꾸면 됩니다.</span></div>
       </div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>임베딩 검색엔진 강의를 마쳤다!</span></label></div>
     </section>
