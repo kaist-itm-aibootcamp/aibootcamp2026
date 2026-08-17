@@ -72,7 +72,8 @@
 
 | 이전 | 변경 후 |
 |---|---|
-| (신규 — 옛 `인증·접근 통제·데이터 보안`의 이론부 분리) | `week3-01-privacy-security-auth.html` (이론 오프너) |
+| (신규 — 옛 `인증·접근 통제·데이터 보안`의 이론부 분리) | `week3-01-privacy-security-auth.html` (이론 오프너) → **강의에서 제외, `drafts/`로 백업** (인증 부분은 추후 ⑥에 통합 예정) |
+| (신규 — 2026-08-17) | `week3-01-claude-code-onboarding.html` — STEP 1을 Claude Code 온보딩으로 교체 (git·gh 설치, gh 브라우저 로그인, 폴더 연동, 깃헙 레포 생성, 승인 권한 기준) |
 | (2주차에서 이관) `week2-05-keyword-vs-embedding-search.html` | `week3-02-keyword-vs-embedding-search.html` |
 | (2주차에서 이관) `week2-06-embedding-search-engine.html` | `week3-03-embedding-search-engine.html` |
 | (2주차에서 이관) `week2-07-rag-long-context.html` | `week3-04-rag-long-context.html` |

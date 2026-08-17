@@ -258,7 +258,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <div class="hero">
       <span class="hero-kicker">WEEK 3 · STEP 5 — 배포: 검색기에서 챗봇까지</span>
       <h1>내 PC의 검색기를 세상에 —<br/>배포하고, RAG 챗봇으로 승격하기</h1>
-      <p>③에서 만든 유사 판례 검색엔진은 <b>내 PC가 켜져 있을 때, 나만</b> 쓸 수 있었습니다. 이 실습은 두 부로 갑니다. <b>Part A</b> — 그 백엔드를 클라우드(Vercel)로 옮겨 <b>URL 하나로 누구에게나 공유되는 서비스</b>로 만듭니다. <b>Part B</b> — 배포된 검색기를 ④에서 배운 RAG로 승격해, <b>근거 판례를 달아 답변하는 판결문 챗봇</b>까지 완성합니다. ①에서 이론으로 본 원칙 — <b>비밀은 서버에, 환경변수로</b> — 를 오늘 처음 손으로 실행합니다.</p>
+      <p>③에서 만든 유사 판례 검색엔진은 <b>내 PC가 켜져 있을 때, 나만</b> 쓸 수 있었습니다. 이 실습은 두 부로 갑니다. <b>Part A</b> — 그 백엔드를 클라우드(Vercel)로 옮겨 <b>URL 하나로 누구에게나 공유되는 서비스</b>로 만듭니다. <b>Part B</b> — 배포된 검색기를 ④에서 배운 RAG로 승격해, <b>근거 판례를 달아 답변하는 판결문 챗봇</b>까지 완성합니다. <b>비밀은 서버에, 환경변수로</b> — 이 원칙을 오늘 처음 손으로 실행합니다.</p>
     </div>
 
 
@@ -378,7 +378,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <!-- ================= SECTION 4 ================= -->
     <section class="section" id="s4">
       <div class="sec-head"><span class="sec-num">4</span><h2>Part A · 핵심 — API 키는 환경변수에</h2></div>
-      <p class="sec-lead">방금 한 일 중 가장 중요한 것은 4단계의 환경변수입니다. ①에서 이론으로 본 "비밀 관리"가 처음 실물이 된 순간이므로 정확히 짚고 갑니다.</p>
+      <p class="sec-lead">방금 한 일 중 가장 중요한 것은 4단계의 환경변수입니다. "비밀은 코드가 아니라 서버에" — 이 원칙이 처음 실물이 된 순간이므로 정확히 짚고 갑니다.</p>
 
       <div class="term-list">
         <div class="term"><b>환경변수</b><span>코드 바깥, 서버의 설정 공간에 저장하는 이름=값 쌍. 코드는 "OPENROUTER_API_KEY라는 이름의 값을 읽어라"라고만 쓰여 있고, 실제 값은 Vercel 설정 화면에만 존재합니다.</span></div>
@@ -491,7 +491,7 @@ Vercel에 배포되어 있는 프로젝트야.
       <p>그리고 지금 쌓이는 문답 기록은 그 자체로 <b>"사람들이 판례에 대해 무엇을 궁금해하는가"라는 새 데이터</b>입니다:</p>
       <ul class="final-list">
         <li><b>자산</b> — 무엇을 자주 묻나, 근거 판례가 빈약했던(=데이터가 약한) 주제는 무엇인가. 다음 개선의 방향이 기록에서 나옵니다</li>
-        <li><b>책임</b> — 질문에는 이용자의 관심사, 때로는 민감한 사정이 담깁니다(법률 질문이라면 더욱). 그래서 프롬프트에 <b>기록 안내 문구</b>와 <b>"법률 자문이 아님" 고지</b>를 넣었습니다 — ①에서 본 최소 수집·고지 원칙의 실전입니다. 이용자 신원은 수집하지 않고, 목적이 끝난 기록은 지웁니다</li>
+        <li><b>책임</b> — 질문에는 이용자의 관심사, 때로는 민감한 사정이 담깁니다(법률 질문이라면 더욱). 그래서 프롬프트에 <b>기록 안내 문구</b>와 <b>"법률 자문이 아님" 고지</b>를 넣었습니다 — 필요한 것만 수집하고, 수집한다는 사실을 알리는 원칙의 실전입니다. 이용자 신원은 수집하지 않고, 목적이 끝난 기록은 지웁니다</li>
       </ul>
       <div class="tip-card"><b>기록의 완성은 4주차에</b> — 지금은 Vercel Logs에 흘러가는 기록이라 며칠 지나면 사라지고, 표로 모아 보기도 어렵습니다. 4주차에 <b>구글 시트를 데이터베이스로 연동</b>해, 문답 이력이 시트에 행으로 영구히 쌓이고 관리용 현황 페이지로 읽는 것까지 완성합니다.</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s7" /><span>라이브 데모에 참여했고, 기록의 자산·책임 두 측면을 이해했다</span></label></div>
@@ -508,7 +508,7 @@ Vercel에 배포되어 있는 프로젝트야.
         <li>질문하면 근거 판례 3건이 달린 답변이 오고, 문답이 Logs에 기록된다</li>
       </ul>
       <div class="next-card-grid">
-        <div class="next-card"><b>다음 자료 ⑥ — 문 달기</b><span>지금 이 챗봇은 <b>URL만 알면 누구나</b> 들어옵니다. ①에서 본 접근 통제의 스펙트럼을 기억하나요? ⑥에서 이메일 인증코드로 챗봇에 문을 달아, 허용된 사람만 들어오게 만듭니다.</span></div>
+        <div class="next-card"><b>다음 자료 ⑥ — 문 달기</b><span>지금 이 챗봇은 <b>URL만 알면 누구나</b> 들어옵니다. ⑥에서 이메일 인증코드로 챗봇에 문을 달아, 허용된 사람만 들어오게 만듭니다.</span></div>
         <div class="next-card"><b>자율 심화</b><span>배포 URL에 1주차의 Cloudflare 커스텀 도메인을 연결해 보세요(Vercel 프로젝트 Settings → Domains). 또는 판결문 대신 <b>내 데이터</b>(리뷰·논문 초록·업무 문서)로 같은 파이프라인을 반복해 보세요.</span></div>
       </div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s8" /><span>체크리스트를 모두 확인했다</span></label></div>
