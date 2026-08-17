@@ -327,12 +327,12 @@ p{margin:10px 0;}
           <!-- 5 -->
           <rect x="240" y="262" width="200" height="58" rx="8" fill="#e3f1fb" stroke="#2e9bdb"/>
           <text x="340" y="283" text-anchor="middle" font-size="12.5" font-weight="900" fill="#1b6fa6">⑤ 검색 (서버 내부)</text>
-          <text x="340" y="301" text-anchor="middle" font-size="11" fill="#375f8f">347건과 코사인 → 관련 판결 Top-5</text>
+          <text x="340" y="301" text-anchor="middle" font-size="11" fill="#375f8f">347건과 코사인 → 관련 판결 Top-20</text>
           <!-- 6 -->
           <line x1="340" y1="352" x2="571" y2="352" stroke="#b8792e" stroke-width="2.5"/>
           <path d="M571 352 l-10 -6 v12 z" fill="#b8792e"/>
           <text x="456" y="344" text-anchor="middle" font-size="12.5" font-weight="800" fill="#8a5a13">⑥ 챗 모델 요청 (🔑) — 두 번째 방문</text>
-          <text x="456" y="369" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">{지시 + 검색된 판결 5건 + 질문}</text>
+          <text x="456" y="369" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">{지시 + 판결 요약 20건 + 질문}</text>
           <text x="456" y="384" text-anchor="middle" font-size="10.5" fill="#898781">← §3에서 이 꾸러미의 실물을 봅니다</text>
           <!-- 7 -->
           <rect x="492" y="398" width="176" height="42" rx="8" fill="#fff" stroke="#d5ddd3"/>
@@ -347,13 +347,13 @@ p{margin:10px 0;}
           <line x1="331" y1="530" x2="109" y2="530" stroke="#2f765b" stroke-width="2.5"/>
           <path d="M109 530 l10 -6 v12 z" fill="#2f765b"/>
           <text x="216" y="522" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f765b">⑨ 답변 + 근거 목록 반환</text>
-          <text x="216" y="547" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">{answer:"…", sources:[5건 서지]}</text>
+          <text x="216" y="547" text-anchor="middle" font-size="11" fill="#52514e" font-family="monospace">{answer:"…", sources:[근거 서지]}</text>
           <!-- 10 -->
           <rect x="12" y="576" width="176" height="46" rx="8" fill="#edf4ef" stroke="#bfe0c9"/>
           <text x="100" y="596" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f765b">⑩ 답변 + 근거 카드 표시</text>
           <text x="100" y="613" text-anchor="middle" font-size="11" fill="#628a72">아래 "완성 화면 예시" 참고</text>
         </svg>
-        <p class="chart-note">앞 강의와 마찬가지로 — 🔑 키는 서버만 갖고, 판결문 347건 원본은 내 PC를 떠나지 않습니다(⑥에서 검색된 5건의 요약만 전송). 소요 시간은 몇 초로 늘어나는데, 대부분 ⑦의 답변 생성입니다.</p>
+        <p class="chart-note">앞 강의와 마찬가지로 — 🔑 키는 서버만 갖고, 판결문 347건 원본은 내 PC를 떠나지 않습니다(⑥에서 검색된 20건의 요약만 전송). 소요 시간은 몇 초로 늘어나는데, 대부분 ⑦의 답변 생성입니다.</p>
       </div>
 
       <h3>왜 Chat·Cowork가 아니라 외부 유료 API인가</h3>
@@ -380,7 +380,7 @@ p{margin:10px 0;}
     <!-- ============ S3 ============ -->
     <section class="section" id="s3">
       <div class="sec-head"><span class="sec-num">3</span><h2>컨텍스트에 실제로 담기는 것 — 증강의 실물</h2></div>
-      <p class="sec-lead">⑥단계에서 서버가 실제로 보내는 LLM 호출을 열어보면 이렇게 생겼습니다. <b>사용자 질문 앞에 검색된 문서 5건이 끼워 넣어진, 하나의 긴 컨텍스트</b> — 이것이 "증강(Augmented)"의 전부입니다.</p>
+      <p class="sec-lead">⑥단계에서 서버가 실제로 보내는 LLM 호출을 열어보면 이렇게 생겼습니다. <b>사용자 질문 앞에 검색된 판례 요약 20건이 끼워 넣어진, 하나의 긴 컨텍스트</b> — 이것이 "증강(Augmented)"의 전부입니다.</p>
       <div class="api-code">
 <span class="c">// ⑥ 서버가 보내는 실제 LLM 호출 — 컨텍스트 전체가 한 번에 들어갑니다</span><br/>
 <span class="k">POST</span> https://openrouter.ai/api/v1/chat/completions<br/>
@@ -401,12 +401,12 @@ p{margin:10px 0;}
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;검사원 3명을 상대로 약 3,185만 원의 손해배상을 청구…<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[문서 3 | 유사도 0.83] 서울중앙지방법원 2022가단5252694 (원고일부승)<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;단체채팅방 배제 등 집단 따돌림…&nbsp;&nbsp;<span class="c">…[문서 4], [문서 5] 생략…</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;단체채팅방 배제 등 집단 따돌림…&nbsp;&nbsp;<span class="c">…[문서 4] ~ [문서 20] 생략…</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="hl-q">질문: 동료 직원들의 따돌림만으로도 손해배상을 받을 수 있어?</span><span class="hl-doc">"</span> }<br/>
 &nbsp;&nbsp;]<br/>
 }</div>
-      <p class="ctx-note">노란 글씨 = 개발자가 고정한 지시, 파란 글씨 = 방금 검색된 문서 5건, 초록 글씨 = 사용자 질문. 이 전체(약 1천 토큰)가 <b>한 번의 호출에 담긴 하나의 컨텍스트</b>이고, 모델은 "이 자료를 읽고 마지막 질문에 답하라"는 오픈북 문제지를 받은 셈입니다. 검색이 문서를 잘못 고르면 문제지 자체가 엉뚱해집니다 — RAG 품질의 절반은 검색 품질입니다.</p>
+      <p class="ctx-note">노란 글씨 = 개발자가 고정한 지시, 파란 글씨 = 방금 검색된 판례 요약 20건, 초록 글씨 = 사용자 질문. 이 전체(약 3천 토큰)가 <b>한 번의 호출에 담긴 하나의 컨텍스트</b>이고, 모델은 "이 자료를 읽고 마지막 질문에 답하라"는 오픈북 문제지를 받은 셈입니다. 검색이 문서를 잘못 고르면 문제지 자체가 엉뚱해집니다 — RAG 품질의 절반은 검색 품질입니다.</p>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>증강 = "질문 앞에 검색 문서를 끼워 넣는 것"임을 실물로 확인했다</span></label></div>
     </section>
 
@@ -432,30 +432,25 @@ p{margin:10px 0;}
       </div></div>
 
       <div class="workshop-step"><span class="ws-num">2</span><div class="ws-body">
-        <b class="ws-title">AI가 계획서를 만든다 (예시)</b>
+        <b class="ws-title">AI가 계획서 초안과 질문 4가지를 돌려준다 — 실제 돌아온 질문</b>
         <div class="card" style="margin-top:8px;font-size:13.5px;line-height:1.7;">
-          <b>📋 계획서 v1 (요약)</b><br/>
-          <b>만들 것</b> — 기존 서버에 질문 응답 기능(/ask) 추가 + 화면에 "AI에게 물어보기" 탭. 흐름: 질문 → 기존 검색 재사용(Top-5) → 5건을 근거로 챗 모델이 답변 생성<br/>
-          <b>진행 순서</b> — /ask 추가 → 시험 질문(확인 요청) → 화면 탭 연결<br/>
-          <b>질문 3가지</b> — (a) 답변 생성용 챗 모델은 무엇으로 할까요? (추천 가능) (b) 근거 표시는 어떤 형태로? (본문 인용 / 하단 목록 / 둘 다) (c) 검색은 몇 건을 근거로 넣을까요?
+          <b>📋 계획서 v1 (요약)</b> — 기존 서버에 질문 응답 기능 추가 + 챗봇 화면. 흐름: 질문 → 기존 검색 재사용 → 찾은 판례를 근거로 챗 모델이 답변 생성. 이어서 결정이 필요한 질문 네 개가 왔고, 각 질문에는 선택지와 AI의 추천안이 붙어 있었습니다:<br/><br/>
+          <b>(a)</b> 챗봇이 답변할 때 <b>무엇을 근거로 읽게</b> 할까요? 답변의 깊이와 비용을 가장 크게 좌우하는 선택입니다.<br/>
+          <b>(b)</b> 답변을 만드는 <b>AI 모델</b>은 어느 쪽으로 할까요? 네 가지 모두 연결 테스트를 통과했습니다.<br/>
+          <b>(c)</b> <b>대화를 이어가는 방식</b>은 어떻게 할까요?<br/>
+          <b>(d)</b> 챗봇을 <b>화면 어디에</b> 둘까요? 지금은 왼쪽에 검색·결과, 오른쪽에 판결문 전문이 들어가 있습니다.
         </div>
       </div></div>
 
       <div class="workshop-step"><span class="ws-num">3</span><div class="ws-body">
-        <b class="ws-title">피드백을 주고받는다</b>
-        <div class="copy-block" style="margin-top:8px;"><span class="cb-label">💬 3단계 — 피드백 예시</span><button class="copy-btn" data-copy="r2">복사</button>
-<pre id="r2">질문에 답할게.
-(a) 챗 모델은 네가 가성비 좋은 걸로 추천해서 계획서에 이유와 함께 적어줘
-(b) 둘 다 — 답변 문장 안에 [법원 사건번호]로 인용하고,
-    답변 아래에 근거 판례 카드도 보여줘
-(c) 5건이면 충분해
-
-추가 요구:
-- 챗 모델에게 주는 지시에 "제공된 판결로 답할 수 없으면
-  '제공된 판례 범위에서는 답하기 어렵다'고 말하라"를 꼭 넣어줘
-- 키는 지금처럼 openrouterkey.txt에서만 읽어
-
-이 내용 반영해서 계획서 v2로 확정해줘.</pre></div>
+        <b class="ws-title">질문에 답한다 — 실제 답한 그대로</b>
+        <div class="card" style="margin-top:8px;font-size:13.5px;line-height:1.7;">
+          <b>(a)</b> 근거 → <b>요약만 20건</b><br/>
+          <b>(b)</b> 모델 → <b>"네가 가성비 좋은 걸로 추천해서 계획서에 이유와 함께 적어줘. 딥시크 등 OpenRouter에서 널리 활용되는 추론 모델 고려"</b><br/>
+          <b>(c)</b> 대화 방식 → <b>이어지는 대화</b> (AI 추천안 수락)<br/>
+          <b>(d)</b> 화면 위치 → <b>상단 탭으로 전환</b> (AI 추천안 수락)
+        </div>
+        <p style="margin-top:8px;">결정 네 개의 답이 세 갈래입니다 — 둘은 추천안 그대로 수락하고, (a)는 비용을 아끼면서 근거 폭을 넓히는 쪽(전문 몇 건 대신 <b>요약 20건</b>)을 직접 골랐고, (b)는 <b>판단 자체를 AI에게 위임하되 "추천 이유를 계획서에 적어라"</b>고 요구했습니다. 모르는 결정은 이렇게 되넘기면 됩니다 — 근거가 문서로 남아 나중에 검토할 수 있습니다.</p>
       </div></div>
 
       <div class="workshop-step"><span class="ws-num">4</span><div class="ws-body">
@@ -486,7 +481,7 @@ p{margin:10px 0;}
           <div class="chat-input"><div class="inp">추가 질문을 입력하세요…</div><div class="btn">질문</div></div>
         </div>
       </div>
-      <p class="chart-note" style="margin-top:-6px;">예시 화면입니다 — 인용된 세 사건 모두 코퍼스에 실재하며, 답변 문구는 예시입니다. 인정 사례와 기각 사례가 함께 인용된 점(§3의 문서 5건이 그대로 근거가 됨)을 눈여겨보세요.</p>
+      <p class="chart-note" style="margin-top:-6px;">예시 화면입니다 — 인용된 세 사건 모두 코퍼스에 실재하며, 답변 문구는 예시입니다. 인정 사례와 기각 사례가 함께 인용된 점(§3에서 본 요약 20건이 그대로 근거가 됨)을 눈여겨보세요.</p>
 
       <div class="callout caution"><b class="cap">RAG의 실패 모드도 알아두기</b>
       RAG의 품질은 <b>①검색이 좋은 문서를 찾았는가</b>에 달려 있습니다. 답이 이상하면 생성보다 먼저 <b>검색 결과부터 확인</b>하는 것이 디버깅 순서입니다.</div>
@@ -503,10 +498,10 @@ p{margin:10px 0;}
           <h5 style="color:var(--brand-dark)">RAG의 컨텍스트 — 골라서 싣기</h5>
           <div class="ctx-stack">
             <div class="ctx-block ctx-sys" style="padding:8px 14px;"><span class="lb">지시</span>제공 문서만 근거로 답하라…</div>
-            <div class="ctx-block ctx-doc" style="padding:8px 14px;">검색된 판결 5건 (관련도 순)</div>
+            <div class="ctx-block ctx-doc" style="padding:8px 14px;">검색된 판례 요약 20건 (관련도 순)</div>
             <div class="ctx-block ctx-q" style="padding:8px 14px;"><span class="lb">질문</span>동료들의 따돌림도…?</div>
           </div>
-          <span class="ctx-token">총 <b>약 1천 토큰</b> — 질문마다 검색으로 새로 고름</span>
+          <span class="ctx-token">총 <b>약 3천 토큰</b> — 질문마다 검색으로 새로 고름</span>
         </div>
         <div>
           <h5 style="color:var(--green)">Long Context — 통째로 싣기</h5>
@@ -527,7 +522,7 @@ p{margin:10px 0;}
         <tbody>
           <tr><td><b>코퍼스 규모</b></td><td>수만~수백만 건도 가능 (검색이 골라줌)</td><td>컨텍스트 창에 들어가는 만큼</td></tr>
           <tr><td><b>구현 난이도</b></td><td>임베딩 + 벡터 DB + 백엔드 필요</td><td><b>매우 낮음</b> — 파일 첨부 + 프롬프트</td></tr>
-          <tr><td><b>1회 비용</b></td><td>낮음 (관련 5건만 로딩)</td><td>높음 (매 질문마다 전체 토큰 과금)</td></tr>
+          <tr><td><b>1회 비용</b></td><td>낮음 (관련 요약 20건만 로딩)</td><td>높음 (매 질문마다 전체 토큰 과금)</td></tr>
           <tr><td><b>실패 모드</b></td><td>검색이 놓치면 답도 틀림</td><td>자료가 컨텍스트 창을 넘거나(§6), 긴 문맥 중간의 정보를 놓칠 수 있음</td></tr>
           <tr><td><b>강점</b></td><td>반복 질문·서비스화·대규모</td><td>전체 조망이 필요한 질문("전반적 경향은?")</td></tr>
         </tbody>
