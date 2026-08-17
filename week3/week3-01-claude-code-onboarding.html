@@ -281,7 +281,6 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
         <span class="fnode ok">깃헙 레포 생성<small>§5 · 지시 한 번</small></span><span class="farrow">→</span>
         <span class="fnode dark">권한 설정<small>§6</small></span>
       </div>
-      <div class="tip-card"><b>한 번만 하면 됩니다</b> — 오늘 §2~§3의 설치·로그인은 이 PC에서 다시 할 일이 없습니다. 다음 주에도, 여러분의 다른 프로젝트에서도 그대로 쓰입니다.</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>오늘 준비의 다섯 단계를 확인했다</span></label></div>
     </section>
 
@@ -345,7 +344,6 @@ python --version</pre></div>
 <span class="t-ok">✓</span> Configured git protocol
 <span class="t-ok">✓</span> Logged in as <span class="t-b">kaist-itm-aibootcamp</span></pre></div>
 
-      <div class="tip-card"><b>계정을 두 개 이상 쓰신다면</b> — 브라우저에 <b>지금 로그인되어 있는 깃헙 계정</b>으로 연동됩니다. 마지막 줄의 "Logged in as <b>계정명</b>"이 이번 부트캠프에서 쓰려는 계정이 맞는지 확인하세요. 다른 계정이면 브라우저에서 계정을 바꾼 뒤 같은 명령을 다시 실행하면 됩니다.</div>
       <div class="tip-card"><b>어느 폴더에서 실행해도 됩니다</b> — 로그인은 계정 단위라서, 위 화면처럼 프로젝트 폴더 안일 필요는 없습니다. 잘 됐는지는 <code>gh auth status</code>로 언제든 확인할 수 있습니다.</div>
 
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>브라우저 연동으로 gh 로그인을 마쳤다</span></label></div>
@@ -358,7 +356,7 @@ python --version</pre></div>
 
       <div class="workshop-step"><span class="ws-num">1</span>
         <b class="ws-t">프로젝트 폴더 만들기 — <code>C:\claude\no-bullying</code></b>
-        <p>2주차 폴더(<code>C:\claude</code>) 아래에 <b><code>no-bullying</code></b> 폴더를 만들고(macOS는 <code>~/claude/no-bullying</code>), 2주차 산출물 — 판결문 파일들(<code>rulings/</code>), 임베딩 JSON(<code>embeddings_json/</code>), 요약 목록(<code>rulings_summary.csv</code>) — 을 이 안으로 옮깁니다. 직장 내 괴롭힘 판결문 프로젝트라 이름을 no-bullying으로 지었습니다 — 여러분의 프로젝트에 맞는 영문 이름이면 됩니다.</p>
+        <p>2주차 폴더(<code>C:\claude</code>) 아래에 <b><code>no-bullying</code></b> 폴더를 만들고(macOS는 <code>~/claude/no-bullying</code>), 저는 2주차 산출물 — 판결문 파일들(<code>rulings/</code>), 임베딩 JSON(<code>embeddings_json/</code>), 요약 목록(<code>rulings_summary.csv</code>) — 을 이 안으로 옮겨 두었습니다. 이번 주 작업에 필요한 파일을 옮겨 두면 됩니다. 직장 내 괴롭힘 판결문 프로젝트라 이름을 no-bullying으로 지었습니다 — 여러분의 프로젝트에 맞는 영문 이름이면 됩니다.</p>
       </div>
       <div class="workshop-step"><span class="ws-num">2</span>
         <b class="ws-t">Claude Code로 폴더 열기</b>
@@ -406,8 +404,6 @@ openrouterkey.txt 같은 비밀 파일은 레포에 올리지 말고.</pre></div
 
       <div class="callout ok"><b class="cap">지금 단계 — 자동 승인을 줘도 됩니다</b>
       이번 프로젝트는 <b>학습용이고, 데이터는 공개된 판결문</b>입니다. 잘못돼도 잃을 것이 폴더 하나입니다. 자동 승인을 켜고 속도를 내세요 — 승인 대기가 사라지면 실습 흐름이 훨씬 매끄럽습니다.</div>
-      <div class="callout caution"><b class="cap">회사 자료를 다루기 시작하면 — 다시 민감하게</b>
-      기밀 문서, 고객 정보, 사내 시스템이 얽힌 폴더에서는 <b>매번 확인으로 돌아가세요.</b> 자동으로 실행된 명령 하나가 파일을 지우거나 밖으로 보낼 수 있고, 그 책임은 승인 설정을 고른 사람에게 있습니다. 자율 실행의 위험 구조와 안전장치는 <b>4주차 1강</b>에서 자세히 다룹니다.</div>
 
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>내 상황에 맞는 승인 수준을 골랐다</span></label></div>
     </section>
@@ -420,7 +416,7 @@ openrouterkey.txt 같은 비밀 파일은 레포에 올리지 말고.</pre></div
         <li><code>gh auth login</code> 한 줄로 브라우저가 열리며 계정이 연동된다 — "Logged in as"의 계정명 확인</li>
         <li>프로젝트 폴더(<code>C:\claude\no-bullying</code>)에 2주차 산출물을 모아 Claude Code로 열었다</li>
         <li>지시 한 번으로 깃헙 레포가 만들어진다 — 비밀 파일 제외를 명시하고, 올라갔는지 직접 확인</li>
-        <li>승인 수준은 다루는 자료로 정한다 — 학습 프로젝트는 자동 승인, 회사 자료는 매번 확인</li>
+        <li>승인 수준은 다루는 자료로 정한다 — 이번 학습 프로젝트는 자동 승인을 켜도 된다</li>
       </ul>
       <div class="next-card-grid">
         <div class="next-card"><b>다음 강의 — 두 가지 검색 패러다임 (②)</b><span>도구 준비가 끝났으니 만들 것을 정합니다. 판결문 347건으로 <b>키워드 검색과 임베딩 검색</b>을 직접 비교해 보고, "왜 백엔드가 필요한가"에 도달합니다 — 그 백엔드를 ③에서 이 폴더에 만듭니다.</span></div>
