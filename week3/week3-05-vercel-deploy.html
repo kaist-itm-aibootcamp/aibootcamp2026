@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Week 3 — Vercel 배포: 검색기에서 챗봇까지</title>
+<title>Week 3 — Vercel 배포: 내 챗봇을 세상에 내놓기</title>
 <style>
 :root{
   --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
@@ -260,7 +260,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <span class="brand-mark">AI</span>
       <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
     </a>
-    <div class="week-tag"><span class="week-num">WEEK 3</span><span class="week-title">Vercel 배포 — 검색기에서 챗봇까지</span></div>
+    <div class="week-tag"><span class="week-num">WEEK 3</span><span class="week-title">Vercel 배포</span></div>
     <a class="back-week" href="index.html">← 3주차 목록</a>
   </div>
   <div class="progress-wrap" aria-label="진행률">
@@ -273,14 +273,12 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
   <nav class="sidebar" aria-label="목차">
     <div class="sidebar-title">이 페이지의 흐름</div>
     <div class="toc" id="toc">
-      <a href="#s1" data-sec="s1">1. [A] 지금까지의 한계 — 왜 나만 쓸 수 있었나<span class="done-mark">✔</span></a>
-      <a href="#s2" data-sec="s2">2. [A] Vercel과 서버리스 — push하면 서버가 된다<span class="done-mark">✔</span></a>
-      <a href="#s3" data-sec="s3">3. [A] 실습 — 검색기 배포 4단계<span class="done-mark">✔</span></a>
-      <a href="#s4" data-sec="s4">4. [A] 핵심 — API 키는 환경변수에<span class="done-mark">✔</span></a>
-      <a href="#s5" data-sec="s5">5. [B] 승격 — 검색기에서 RAG 챗봇으로<span class="done-mark">✔</span></a>
-      <a href="#s6" data-sec="s6">6. [B] 실습 — 챗봇 기능 추가와 재배포<span class="done-mark">✔</span></a>
-      <a href="#s7" data-sec="s7">7. [B] 라이브 데모 — 기록은 자산이자 책임<span class="done-mark">✔</span></a>
-      <a href="#s8" data-sec="s8">8. 확인 체크리스트<span class="done-mark">✔</span></a>
+      <a href="#s1" data-sec="s1">1. 지금까지의 한계 — 왜 나만 쓸 수 있었나<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. Vercel과 서버리스 — push하면 서버가 된다<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 실습 — 배포 4단계<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 핵심 — API 키는 환경변수에<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 라이브 데모 — 기록은 자산이자 책임<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. 확인 체크리스트<span class="done-mark">✔</span></a>
     </div>
   </nav>
 
@@ -288,16 +286,16 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <div id="celebrateSlot"></div>
 
     <div class="hero">
-      <span class="hero-kicker">WEEK 3 · STEP 5 — 배포: 검색기에서 챗봇까지</span>
-      <h1>내 PC의 검색기를 세상에 —<br/>배포하고, RAG 챗봇으로 승격하기</h1>
-      <p>③에서 만든 유사 판례 검색엔진은 <b>내 PC가 켜져 있을 때, 나만</b> 쓸 수 있었습니다. 이 실습은 두 부로 갑니다. <b>Part A</b> — 그 백엔드를 클라우드(Vercel)로 옮겨 <b>URL 하나로 누구에게나 공유되는 서비스</b>로 만듭니다. <b>Part B</b> — 배포된 검색기를 ④에서 배운 RAG로 승격해, <b>근거 판례를 달아 답변하는 판결문 챗봇</b>까지 완성합니다. <b>비밀은 서버에, 환경변수로</b> — 이 원칙을 오늘 처음 손으로 실행합니다.</p>
+      <span class="hero-kicker">WEEK 3 · STEP 5 — Vercel 배포</span>
+      <h1>내 PC의 챗봇을 세상에 —<br/>URL 하나로 공유되는 서비스로</h1>
+      <p>③~④에서 만든 판례 검색·챗봇 웹앱은 <b>내 PC가 켜져 있을 때, 나만</b> 쓸 수 있었습니다. 오늘 그 웹앱을 클라우드(Vercel)로 옮겨 <b>URL 하나로 누구에게나 공유되는 서비스</b>로 만듭니다. <b>비밀은 서버에, 환경변수로</b> — 이 원칙을 오늘 처음 손으로 실행합니다.</p>
     </div>
 
 
-    <!-- ================= SECTION 1 (Part A) ================= -->
+    <!-- ================= SECTION 1 ================= -->
     <section class="section" id="s1">
-      <div class="sec-head"><span class="sec-num">1</span><h2>Part A · 지금까지의 한계 — 왜 나만 쓸 수 있었나</h2></div>
-      <p class="sec-lead">③에서 만든 검색기의 구조를 다시 봅시다. 브라우저(프런트엔드)는 판결문을 검색할 때마다 <b>내 PC에서 도는 파이썬 로컬 서버</b>에 물어봤습니다.</p>
+      <div class="sec-head"><span class="sec-num">1</span><h2>지금까지의 한계 — 왜 나만 쓸 수 있었나</h2></div>
+      <p class="sec-lead">③~④에서 만든 웹앱의 구조를 다시 봅시다. 브라우저(프런트엔드)는 판결문을 검색할 때마다 <b>내 PC에서 도는 파이썬 로컬 서버</b>에 물어봤습니다.</p>
 
       <div class="flowline">
         <span class="fnode">브라우저<small>검색어 입력</small></span>
@@ -316,14 +314,14 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
         <div class="concept"><div class="ico">🏠</div><b>주소가 localhost</b><span>127.0.0.1은 "내 컴퓨터 자신"이라는 뜻. 남에게 보내줄 수 있는 주소가 아닙니다.</span></div>
         <div class="concept"><div class="ico">👤</div><b>동시 사용자 = 나 혼자</b><span>친구·동료·수강생에게 "이거 써봐"라고 말할 방법이 없습니다.</span></div>
       </div>
-      <div class="callout"><b class="cap">Part A의 목표</b>
+      <div class="callout"><b class="cap">오늘의 목표</b>
       이 중개인을 내 PC에서 <b>클라우드로 이사</b>시킵니다. 그러면 (1) 24시간 켜져 있고 (2) 전 세계에서 접속 가능한 진짜 URL이 생기고 (3) 여러 명이 동시에 써도 됩니다. 코드는 거의 그대로입니다 — 사는 곳만 바뀝니다.</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>로컬 백엔드의 세 가지 한계를 이해했다</span></label></div>
     </section>
 
     <!-- ================= SECTION 2 ================= -->
     <section class="section" id="s2">
-      <div class="sec-head"><span class="sec-num">2</span><h2>Part A · Vercel과 서버리스 — push하면 서버가 된다</h2></div>
+      <div class="sec-head"><span class="sec-num">2</span><h2>Vercel과 서버리스 — push하면 서버가 된다</h2></div>
       <p class="sec-lead">Vercel은 <b>GitHub 저장소를 연결하면 자동으로 배포해 주는 클라우드 서비스</b>입니다. 1주차의 GitHub Pages와 비교하면 위치가 명확해집니다.</p>
 
       <table class="step-table">
@@ -368,7 +366,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
 
     <!-- ================= SECTION 3 ================= -->
     <section class="section" id="s3">
-      <div class="sec-head"><span class="sec-num">3</span><h2>Part A · 실습 — 검색기 배포 4단계</h2></div>
+      <div class="sec-head"><span class="sec-num">3</span><h2>실습 — 배포 4단계</h2></div>
       <p class="sec-lead">여기서부터는 직접 합니다. 15분 안에 배포 URL까지 갑니다. 막히면 손을 드세요.</p>
 
       <div class="ws-steps">
@@ -385,7 +383,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
         </div>
         <div class="workshop-step"><span class="ws-num">2</span>
           <b class="ws-t">코드 변환 — 지시하면, AI가 먼저 문제를 제기한다</b>
-          <p>③의 프로젝트 폴더를 연 뒤 "Vercel에 배포할 수 있게 바꿔 달라"고 지시합니다. 그런데 실제로 시켜 보니 Claude Code는 바로 바꾸지 않고 <b>문제 두 가지를 먼저 제기</b>했습니다:</p>
+          <p>③~④의 프로젝트 폴더를 연 뒤 "Vercel에 배포할 수 있게 바꿔 달라"고 지시합니다. 그런데 실제로 시켜 보니 Claude Code는 바로 바꾸지 않고 <b>문제 두 가지를 먼저 제기</b>했습니다:</p>
           <div class="card" style="font-size:13.5px;line-height:1.75;">
             <p style="margin:0 0 10px;"><b>첫째, 판결문 347건이 인터넷에 공개됩니다.</b> GitHub 저장소를 비공개로 한 이유가 바로 이것인데(DECISIONS.md D-12), Vercel에 올리면 URL을 아는 누구나 볼 수 있습니다. 무료 플랜에는 비밀번호 보호 기능이 없습니다(유료 기능).</p>
             <p style="margin:0;"><b>둘째, API 키가 무방비로 노출된 것과 같아집니다.</b> 공개 URL 뒤에 키가 있으면 누구나 무제한으로 질문을 던질 수 있고, 그 비용은 전부 선생님 OpenRouter 잔액에서 나갑니다. 질문당 1.2원이라 우습게 보이지만 자동화된 요청 몇 만 건이면 금방입니다.</p>
@@ -398,6 +396,7 @@ openrouter credit 부담할 것이야. 나중에 인증 기능 추가할 예정�
 지금은 상관 없음.</pre>
           </div>
           <p class="chart-note">③에서 남긴 기록(DECISIONS.md의 D-12 "저장소 비공개" 결정)을 AI가 스스로 찾아 새 지시와의 충돌을 지적했습니다 — 문서화는 이렇게 되돌아옵니다. 위험을 들은 뒤 감수 여부를 정하는 것은 내 몫이고, 그 결정(공개 무방 · 비용 부담 · 인증은 ⑦에서)도 대화에 기록으로 남았습니다. 이 변환에서 키를 <code>openrouterkey.txt</code> 파일에서 읽던 방식은 <b>환경변수에서 읽는 방식으로 바뀌었습니다</b> — 왜 그래야 하는지는 §4에서 짚습니다.</p>
+          <div class="tip-card"><b>비용 감각</b> — 챗봇 호출 1회는 1원 안팎입니다(④ §5 실측 1.19원). 수업 목적으로 공개하는 정도는 부담이 되지 않습니다. 다만 <b>누구나 쓸 수 있는 상태로 URL이 널리 퍼지면</b> 호출 수만큼 내 크레딧에서 빠져나간다는 점은 유의하세요 — 키에 걸어 둔 한도(2주차 ④)와 ⑦의 인증이 그 안전장치입니다.</div>
         </div>
         <div class="workshop-step"><span class="ws-num">3</span>
           <b class="ws-t">GitHub에 push → Vercel에서 Import</b>
@@ -454,12 +453,12 @@ openrouter credit 부담할 것이야. 나중에 인증 기능 추가할 예정�
       <p>행 하나가 배포 한 번입니다. 이름은 <b>커밋 메시지 그대로</b>라서, 이 세 줄만 읽어도 무슨 일이 있었는지 보입니다 — 배포 준비, 차단 문제 해결, 배포본에서 판결문을 못 찾던 버그 수정. 파란 <b>Production</b> 배지가 지금 서비스 중인 버전이고, 커밋 번호(<code>2b81927</code>)로 어느 코드가 올라가 있는지 GitHub과 맞춰볼 수 있습니다.</p>
       <div class="callout"><b class="cap">Ready 21s — "빌드"가 하는 일</b>
       push가 감지되면 Vercel은 배포 전에 <b>빌드(build)</b>부터 합니다: 새 코드를 내려받고 → <code>requirements.txt</code>에 적힌 라이브러리를 설치하고 → 서버리스 함수와 화면 파일을 실행 가능한 꾸러미로 조립한 뒤 → 자기 서버에 올립니다. "Ready 21s"의 21초가 이 조립 시간입니다. 빌드가 실패하면 <b>이전 버전이 그대로 서비스됩니다</b> — 교체는 성공한 빌드만 하므로, 고치다 실수해도 사이트가 죽지는 않습니다.</div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>내 검색기가 vercel.app 주소에서 동작한다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>내 웹앱이 vercel.app 주소에서 동작한다</span></label></div>
     </section>
 
     <!-- ================= SECTION 4 ================= -->
     <section class="section" id="s4">
-      <div class="sec-head"><span class="sec-num">4</span><h2>Part A · 핵심 — API 키는 환경변수에</h2></div>
+      <div class="sec-head"><span class="sec-num">4</span><h2>핵심 — API 키는 환경변수에</h2></div>
       <p class="sec-lead">방금 한 일 중 가장 중요한 것은 4단계의 환경변수입니다. "비밀은 코드가 아니라 서버에" — 이 원칙이 처음 실물이 된 순간이므로 정확히 짚고 갑니다.</p>
 
       <div class="term-list">
@@ -483,123 +482,42 @@ openrouter credit 부담할 것이야. 나중에 인증 기능 추가할 예정�
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>키를 코드·브라우저에 두면 안 되는 이유를 설명할 수 있다</span></label></div>
     </section>
 
-    <!-- ================= SECTION 5 (Part B) ================= -->
+    <!-- ================= SECTION 5 ================= -->
     <section class="section" id="s5">
-      <div class="sec-head"><span class="sec-num">5</span><h2>Part B · 승격 — 검색기에서 RAG 챗봇으로</h2></div>
-      <p class="sec-lead">배포된 검색기는 <b>비슷한 판례 목록</b>을 돌려줍니다. ④에서 봤듯, 그 위에 LLM을 얹으면 <b>근거가 달린 답변</b>을 쓰는 RAG 챗봇이 됩니다. 원리는 ④의 챗봇과 완전히 같고, 다른 것은 <b>LLM이 어디서 도는가</b>뿐입니다.</p>
-
-      <div class="compare">
-        <div class="col dyn-col"><h4>④ — 내 PC의 RAG</h4>
-          <ul>
-            <li>로컬 백엔드가 검색 + LLM 호출 담당</li>
-            <li>내 PC가 켜져 있어야, 나만 사용</li>
-            <li>키는 내 PC의 키 파일</li>
-          </ul>
-        </div>
-        <div class="col static-col"><h4>오늘 — API 방식 (서버리스)</h4>
-          <ul>
-            <li>서버리스 함수가 임베딩·답변 생성 모두 <b>OpenRouter API 호출</b>로 처리</li>
-            <li>내 PC 꺼도 24시간, URL 아는 누구나 사용</li>
-            <li>키는 Vercel 환경변수 — §4의 공식 그대로</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="flowline">
-        <span class="fnode">이용자<small>질문 입력</small></span>
-        <span class="farrow">→</span>
-        <span class="fnode dark">/api/chat<small>임베딩 → 유사 판례 검색<br/>→ LLM API로 답변 생성</small></span>
-        <span class="farrow">→</span>
-        <span class="fnode ok">답변 + 근거 판례<small>브라우저에 표시</small></span>
-      </div>
-
-      <p>서버리스 환경에는 무거운 모델을 올릴 수 없고 올릴 필요도 없습니다. 임베딩도 답변 생성도 <b>API 호출 한 번</b>이면 되기 때문입니다. 비용 감각도 2주차에 익힌 그대로입니다 — 질문 1건당 임베딩 호출 1회 + LLM 호출 1회, 수업 규모의 문답 수백 건이면 몇십 센트 수준입니다.</p>
-      <div class="tip-card"><b>모델 선택도 프롬프트로:</b> OpenRouter는 모델을 문자열 하나로 바꿉니다. 답변 품질이 아쉬우면 "모델을 ○○로 바꿔줘", 비용이 아쉬우면 "더 저렴한 모델로 바꿔줘"라고 요청하면 됩니다. 2주차에 모델을 고르던 방식 그대로입니다.</div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>API 방식 RAG가 서버리스에서 가능한 이유를 설명할 수 있다</span></label></div>
-    </section>
-
-    <!-- ================= SECTION 6 ================= -->
-    <section class="section" id="s6">
-      <div class="sec-head"><span class="sec-num">6</span><h2>Part B · 실습 — 챗봇 기능 추가와 재배포</h2></div>
-      <p class="sec-lead">Part A에서 배포한 검색기 폴더를 Claude Code로 열고 아래 프롬프트를 실행합니다. 새 계정도 새 키도 필요 없습니다 — 있는 재료의 조립입니다.</p>
-
-      <div class="copy-block"><span class="cb-label">💬 프롬프트 — RAG 챗봇 승격</span>
-        <button class="copy-btn" data-copy="p61">복사</button>
-        <pre id="p61">이 판례 검색기 웹앱을 RAG 챗봇으로 승격해줘.
-Vercel에 배포되어 있는 프로젝트야.
-
-구성:
-1. /api/chat : 질문을 받으면 (a) 기존 검색 로직으로 유사 판례 상위 3건을
-   찾고, (b) 그 판례들을 근거로 OpenRouter의 LLM API를 호출해 답변을
-   생성해서, (c) 답변과 근거 판례 목록을 함께 반환해줘.
-   답변에는 "이 답변은 참고용이며 법률 자문이 아닙니다" 문구를 포함해줘.
-2. 프런트엔드: 채팅 형태 화면. 답변 아래에 근거 판례 3건을 접을 수 있는
-   목록으로 표시. 기존 검색 화면도 남겨두고 서로 오갈 수 있게 해줘.
-3. 문답 기록: 답변이 나갈 때마다 시각·질문·답변 요약(200자 이내)을
-   서버 로그로 남겨줘. Vercel 대시보드의 Logs 화면에서 확인할 거야.
-4. 챗봇 화면에는 "질문과 답변이 서비스 개선을 위해 기록됩니다" 안내
-   문구를 작게 추가해줘.
-5. LLM은 기존 OPENROUTER_API_KEY 환경변수를 사용해. 키를 코드에 넣지 마.
-6. 로컬 확인 방법(vercel dev)과 .env.local 작성법을 알려주고,
-   .gitignore에 .env.local을 반드시 포함해줘.
-7. 파일 변경까지만 하고 git commit/push는 하지 마.</pre>
-      </div>
-
-      <div class="ws-steps">
-        <div class="workshop-step"><span class="ws-num">1</span>
-          <b class="ws-t">로컬에서 확인</b>
-          <p>AI가 알려준 대로 <code>.env.local</code>에 OpenRouter 키를 넣고 <code>vercel dev</code>로 로컬 실행 → 질문을 두어 개 던져 봅니다("직장 내 괴롭힘으로 인정된 사례는?") → 답변에 근거 판례 3건이 달리는지 확인합니다. <code>.env.local</code>은 <b>내 PC 전용</b>이며 <code>.gitignore</code> 덕에 GitHub로 올라가지 않습니다.</p>
-        </div>
-        <div class="workshop-step"><span class="ws-num">2</span>
-          <b class="ws-t">push → 자동 재배포</b>
-          <p>변경 파일을 검토한 뒤 commit·push. <code>.env.local</code>과 키 파일이 목록에 없는지 push 전에 한 번 더 확인하세요. push하면 Vercel이 자동으로 새 버전을 배포합니다 — §3에서 확인한 그 흐름이고, 환경변수는 이미 등록되어 있으므로 추가 설정이 없습니다.</p>
-        </div>
-        <div class="workshop-step"><span class="ws-num">3</span>
-          <b class="ws-t">폰으로 최종 확인</b>
-          <p>내 폰에서 <code>*.vercel.app</code> 챗봇을 열어 질문해 봅니다. 근거 판례가 달린 답변이 오면 — <b>완성입니다.</b> Vercel 대시보드의 <b>Logs</b> 화면에 방금의 문답이 기록된 것도 확인하세요.</p>
-        </div>
-      </div>
-      <div class="callout caution"><b class="cap">막혔을 때 확인 순서</b>
-      ① 환경변수 이름 철자가 코드와 일치하는가 → ② 답변만 안 나오면 OpenRouter 잔액을 확인 → ③ 그래도 안 되면 Vercel 프로젝트의 <b>Logs</b> 화면을 복사해 AI에게 "이 에러 원인 찾아줘".</div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>배포된 챗봇이 근거 판례를 달아 답변한다</span></label></div>
-    </section>
-
-    <!-- ================= SECTION 7 ================= -->
-    <section class="section" id="s7">
-      <div class="sec-head"><span class="sec-num">7</span><h2>Part B · 라이브 데모 — 기록은 자산이자 책임</h2></div>
-      <p class="sec-lead">이제 강사의 챗봇 주소가 화면에 공개됩니다. 전원이 접속해, 궁금한 사건을 자유롭게 질문해 보세요. 옆에는 Vercel의 Logs 화면이 뜹니다 — 여러분이 질문할 때마다 문답 기록이 실시간으로 흘러갑니다.</p>
+      <div class="sec-head"><span class="sec-num">5</span><h2>라이브 데모 — 기록은 자산이자 책임</h2></div>
+      <p class="sec-lead">이제 강사의 챗봇 주소가 화면에 공개됩니다. 전원이 접속해, 궁금한 사건을 자유롭게 질문해 보세요. 옆에는 Vercel의 Logs 화면이 뜹니다 — 요청이 들어올 때마다 서버 기록이 실시간으로 흘러갑니다.</p>
       <div class="callout ok"><b class="cap">이 장면의 의미</b>
       수십 명이 <b>동시에</b> 질문하고 있지만 서비스는 멀쩡합니다 — 모든 요청이 키를 든 서버리스 함수 한 곳을 거치고, Vercel이 함수를 필요한 만큼 깨우기 때문입니다. 이용자 누구도 API 키에는 접근하지 못하고, 서버가 허용한 동작(질문)만 열려 있습니다. 이것이 백엔드가 "문지기" 역할을 한다는 말의 실체입니다.</div>
       <p>그리고 지금 쌓이는 문답 기록은 그 자체로 <b>"사람들이 판례에 대해 무엇을 궁금해하는가"라는 새 데이터</b>입니다:</p>
       <ul class="final-list">
         <li><b>자산</b> — 무엇을 자주 묻나, 근거 판례가 빈약했던(=데이터가 약한) 주제는 무엇인가. 다음 개선의 방향이 기록에서 나옵니다</li>
-        <li><b>책임</b> — 질문에는 이용자의 관심사, 때로는 민감한 사정이 담깁니다(법률 질문이라면 더욱). 그래서 프롬프트에 <b>기록 안내 문구</b>와 <b>"법률 자문이 아님" 고지</b>를 넣었습니다 — 필요한 것만 수집하고, 수집한다는 사실을 알리는 원칙의 실전입니다. 이용자 신원은 수집하지 않고, 목적이 끝난 기록은 지웁니다</li>
+        <li><b>책임</b> — 질문에는 이용자의 관심사, 때로는 민감한 사정이 담깁니다(법률 질문이라면 더욱). ④의 챗봇이 "법률 자문이 아님"을 화면에 고지하듯, 기록을 남긴다면 그 사실도 알리는 것이 원칙입니다 — 필요한 것만 수집하고, 수집한다는 사실을 알리고, 목적이 끝난 기록은 지웁니다</li>
       </ul>
       <div class="tip-card"><b>기록의 완성은 4주차에</b> — 지금은 Vercel Logs에 흘러가는 기록이라 며칠 지나면 사라지고, 표로 모아 보기도 어렵습니다. 4주차에 <b>구글 시트를 데이터베이스로 연동</b>해, 문답 이력이 시트에 행으로 영구히 쌓이고 관리용 현황 페이지로 읽는 것까지 완성합니다.</div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s7" /><span>라이브 데모에 참여했고, 기록의 자산·책임 두 측면을 이해했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>라이브 데모에 참여했고, 기록의 자산·책임 두 측면을 이해했다</span></label></div>
     </section>
 
-    <!-- ================= SECTION 8 ================= -->
-    <section class="section" id="s8">
-      <div class="sec-head"><span class="sec-num">8</span><h2>확인 체크리스트</h2></div>
+    <!-- ================= SECTION 6 ================= -->
+    <section class="section" id="s6">
+      <div class="sec-head"><span class="sec-num">6</span><h2>확인 체크리스트</h2></div>
       <ul class="final-list">
         <li>내 챗봇의 <code>*.vercel.app</code> URL이 있고, 다른 사람 기기에서도 열린다</li>
         <li>OpenRouter 키가 코드 어디에도 없고, Vercel 환경변수에만 있다</li>
         <li>GitHub에 push하면 Vercel이 자동으로 재배포한다는 것을 확인했다</li>
         <li>"서버리스 = 서버를 내가 관리하지 않음"을 한 문장으로 설명할 수 있다</li>
-        <li>질문하면 근거 판례 3건이 달린 답변이 오고, 문답이 Logs에 기록된다</li>
+        <li>배포된 챗봇이 질문에 근거 판례를 달아 답한다</li>
       </ul>
       <div class="next-card-grid">
         <div class="next-card"><b>이어지는 실습 ⑦ — 문 달기</b><span>지금 이 챗봇은 <b>URL만 알면 누구나</b> 들어옵니다. ⑦에서 이메일 인증코드로 챗봇에 문을 달아, 허용된 사람만 들어오게 만듭니다.</span></div>
         <div class="next-card"><b>자율 심화</b><span>배포 URL에 1주차의 Cloudflare 커스텀 도메인을 연결해 보세요(Vercel 프로젝트 Settings → Domains). 또는 판결문 대신 <b>내 데이터</b>(리뷰·논문 초록·업무 문서)로 같은 파이프라인을 반복해 보세요.</span></div>
       </div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s8" /><span>체크리스트를 모두 확인했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>체크리스트를 모두 확인했다</span></label></div>
     </section>
 
 
     <a class="back-home" href="index.html">
       <span class="bh-ic">📚</span>
-      <span><strong>3주차 강의자료 목록으로 돌아가기</strong><small>다음 자료: 인증 실습 — 이메일 인증코드</small></span>
+      <span><strong>3주차 강의자료 목록으로 돌아가기</strong><small>다음 자료로 이어가려면 목록에서 골라보세요</small></span>
     </a>
   </main>
 </div>
