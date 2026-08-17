@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Week 3 — Claude Code 시작하기: 폴더 연동과 깃헙 레포 만들기</title>
+<style>
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#22201d; --muted:#626a64; --line:#d5ddd3;
+  --brand:#2e9bdb; --brand-dark:#1b6fa6; --green:#2f765b; --amber:#b8792e; --red:#b0483f;
+  --blue:#375f8f; --sky-light:#e3f1fb;
+  --shadow:0 16px 45px rgba(54,42,31,.12); --radius:14px; --sidebar-width:250px;
+  /* dataviz roles (validated) */
+  --viz-surface:#ffffff; --viz-ink:#0b0b0b; --viz-ink2:#52514e; --viz-muted:#898781;
+  --viz-grid:#e1e0d9; --viz-axis:#c3c2b7;
+  --series-1:#2a78d6; --series-2:#eb6834;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.75; font-size:15.5px;
+}
+/* ---------- topbar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:12px clamp(16px,4vw,32px);border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(12px);
+}
+.topbar-left{display:flex;align-items:center;gap:18px;}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+.brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-size:15px;font-weight:800;}
+.brand-text{display:block;line-height:1.25;}
+.brand-text strong{display:block;font-size:14.5px;}
+.brand-text small{display:block;margin-top:1px;color:var(--muted);font-size:11.5px;font-weight:600;}
+.week-tag{display:flex;align-items:center;gap:8px;}
+.week-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#fff;background:var(--brand-dark);padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.week-title{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;}
+.progress-wrap{width:min(220px,32vw);flex:0 0 auto;}
+.progress-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-align:right;}
+.progress-track{overflow:hidden;height:7px;border-radius:999px;background:#e1e8df;}
+.progress-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--brand),var(--sky-light));transition:width 220ms ease;}
+/* ---------- layout ---------- */
+.layout{display:flex;align-items:flex-start;}
+.sidebar{
+  position:sticky;top:63px;flex:0 0 var(--sidebar-width);width:var(--sidebar-width);
+  height:calc(100vh - 63px);overflow-y:auto;padding:22px 14px 40px 22px;border-right:1px solid var(--line);
+}
+.sidebar-title{font-size:11px;font-weight:900;letter-spacing:.09em;color:var(--muted);margin-bottom:10px;}
+.toc a{
+  display:block;padding:7px 11px;margin:2px 0;border-radius:8px;border-left:3px solid transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;text-decoration:none;line-height:1.4;
+}
+.toc a:hover{background:#eef3ec;color:var(--ink);}
+.toc a.active{background:var(--sky-light);border-left-color:var(--brand);color:var(--brand-dark);font-weight:800;}
+.toc a .done-mark{color:var(--green);font-weight:900;margin-left:4px;display:none;}
+.toc a.done .done-mark{display:inline;}
+.content{flex:1;min-width:0;max-width:920px;padding:clamp(20px,4vw,44px) clamp(16px,4vw,44px) 100px;}
+/* ---------- hero ---------- */
+.hero{margin-bottom:16px;}
+.hero-kicker{display:inline-block;font-size:12px;font-weight:900;letter-spacing:.07em;color:var(--brand-dark);background:var(--sky-light);padding:5px 13px;border-radius:999px;margin-bottom:12px;}
+.hero h1{font-size:clamp(23px,3.6vw,32px);line-height:1.3;letter-spacing:-.015em;margin-bottom:10px;}
+.hero p{color:var(--muted);max-width:640px;}
+/* ---------- sections ---------- */
+.section{margin-top:44px;padding-top:8px;}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+.sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
+.sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
+.sec-lead{color:var(--muted);margin:4px 0 18px;max-width:700px;}
+h3{font-size:16.5px;margin:26px 0 10px;}
+p{margin:10px 0;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:14px 0;box-shadow:0 3px 14px rgba(54,42,31,.05);}
+/* concept grid */
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+.concept{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.concept .ico{font-size:21px;}
+.concept b{display:block;margin:7px 0 4px;font-size:14.5px;}
+.concept span{display:block;color:var(--muted);font-size:13px;line-height:1.55;}
+.concept .use{display:inline-block;margin-top:9px;font-size:12px;font-weight:800;color:var(--brand-dark);background:var(--sky-light);border-radius:999px;padding:2px 10px;}
+/* callouts */
+.callout{border-left:4px solid var(--brand);background:var(--sky-light);border-radius:0 12px 12px 0;padding:14px 18px;margin:16px 0;font-size:14.5px;}
+.callout.caution{border-left-color:var(--red);background:#faeeec;}
+.callout.ok{border-left-color:var(--green);background:#edf4ef;}
+.callout b.cap{display:block;font-size:13px;letter-spacing:.03em;margin-bottom:4px;}
+.callout.caution b.cap{color:var(--red);}
+.callout.ok b.cap{color:var(--green);}
+.callout b.cap{color:var(--brand-dark);}
+.tip-card{border-left:4px solid var(--brand);background:var(--surface);border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 17px;margin:14px 0;font-size:14px;color:var(--muted);}
+.tip-card b{color:var(--ink);}
+/* prompt copy block */
+.copy-block{position:relative;background:#20242a;color:#e8ecf1;border-radius:12px;padding:18px 20px;margin:14px 0;font-size:14px;line-height:1.8;}
+.copy-block .cb-label{position:absolute;top:-10px;left:14px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#fff;background:var(--brand);padding:3px 10px;border-radius:999px;}
+.copy-block pre{white-space:pre-wrap;word-break:keep-all;font-family:inherit;margin-top:4px;}
+.copy-btn{position:absolute;top:12px;right:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:5px 11px;cursor:pointer;}
+.copy-btn:hover{background:rgba(255,255,255,.18);}
+/* two-col compare */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+.compare .col{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.compare .col h4{font-size:14px;margin-bottom:8px;}
+.compare .col.static-col h4{color:var(--green);}
+.compare .col.dyn-col h4{color:var(--amber);}
+.compare ul{margin:0 0 0 18px;font-size:13.5px;color:var(--muted);}
+.compare li{margin:5px 0;}
+/* stat tiles */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 15px;}
+.stat .v{font-size:26px;font-weight:900;letter-spacing:-.02em;color:var(--brand-dark);line-height:1.15;}
+.stat .k{margin-top:5px;font-size:12.5px;color:var(--muted);line-height:1.5;}
+/* explorer table */
+.explorer{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:16px 0;}
+.radio-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:12px;}
+.radio-row .rlabel{font-size:12.5px;font-weight:800;color:var(--muted);margin-right:2px;}
+.radio-group{display:flex;flex-wrap:wrap;gap:6px;}
+.radio-option{display:flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--line);border-radius:8px;background:#fafcf9;font-size:13px;font-weight:600;cursor:pointer;}
+.radio-option input{accent-color:var(--brand);}
+.radio-option:has(input:checked){border-color:var(--brand);background:var(--sky-light);color:var(--brand-dark);font-weight:800;}
+.book-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+.book-table th{background:#f2f6f0;border:1px solid var(--line);padding:7px 10px;text-align:left;font-size:12.5px;}
+.book-table td{border:1px solid var(--line);padding:6px 10px;}
+.book-table td.num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);}
+.dl-btn{border:1px solid var(--brand);color:var(--brand-dark);background:var(--sky-light);font-weight:800;font-size:13px;border-radius:9px;padding:8px 15px;cursor:pointer;}
+.dl-btn:hover{background:#d3e9f8;}
+/* charts */
+.chart-card{background:var(--viz-surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px 12px;margin:16px 0;}
+.chart-card h4{font-size:15px;color:var(--viz-ink);margin-bottom:2px;}
+.chart-card .sub{font-size:12.5px;color:var(--viz-ink2);margin-bottom:10px;}
+.legend{display:flex;gap:16px;align-items:center;margin:2px 0 8px;font-size:12.5px;color:var(--viz-ink2);}
+.legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;transform:translateY(1px);}
+.chart-svg{width:100%;height:auto;display:block;}
+.viz-tooltip{position:fixed;z-index:60;pointer-events:none;background:#20242a;color:#fff;font-size:12.5px;line-height:1.5;border-radius:8px;padding:7px 11px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .12s;max-width:280px;}
+.chart-note{font-size:12px;color:var(--viz-muted);margin:6px 0 4px;}
+/* insight list */
+.insight{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0;}
+.insight .n{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;border-radius:999px;background:var(--sky-light);color:var(--brand-dark);font-weight:900;font-size:13px;transform:translateY(2px);}
+.insight p{margin:0;font-size:14.5px;}
+/* example embed (lightbox) */
+.example-card{display:flex;gap:0;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;cursor:pointer;margin:16px 0;box-shadow:var(--shadow);max-width:560px;}
+.example-card:focus-visible{outline:3px solid var(--brand);}
+.example-thumb{position:relative;height:210px;overflow:hidden;background:#eef1ec;}
+.example-thumb iframe{position:absolute;top:0;left:0;width:400%;height:400%;transform:scale(.25);transform-origin:top left;border:none;pointer-events:none;}
+.example-thumb .zoom{position:absolute;right:12px;bottom:12px;background:rgba(32,36,42,.85);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:5px 12px;}
+.example-body{padding:14px 18px;}
+.example-body b{font-size:14.5px;}
+.example-body p{margin:4px 0 0;font-size:13px;color:var(--muted);}
+.example-lightbox{position:fixed;inset:0;z-index:80;background:rgba(20,24,20,.62);display:flex;align-items:center;justify-content:center;padding:3vh 3vw;}
+.example-lightbox[hidden]{display:none;}
+.lightbox-inner{position:relative;width:min(980px,96vw);height:92vh;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);}
+.lightbox-inner iframe{width:100%;height:100%;border:none;}
+.lightbox-close{position:absolute;top:10px;right:10px;z-index:2;border:none;background:#20242a;color:#fff;width:34px;height:34px;border-radius:999px;font-size:16px;font-weight:900;cursor:pointer;}
+/* completion */
+.completion-row{margin:22px 0 6px;}
+.check{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 18px;cursor:pointer;font-size:14px;font-weight:700;color:var(--muted);}
+.check input{width:17px;height:17px;accent-color:var(--green);}
+.check:has(input:checked){border-color:var(--green);color:var(--green);background:#edf4ef;}
+/* celebrate banner */
+.celebrate-banner{border:1px solid #bfe0c9;background:linear-gradient(120deg,#edf7ef,#e3f1fb);border-radius:var(--radius);padding:18px 22px;margin:0 0 22px;font-size:15px;box-shadow:var(--shadow);}
+.celebrate-banner b{color:var(--green);}
+/* checklist */
+.final-list{list-style:none;margin:14px 0;}
+.final-list li{display:flex;gap:10px;margin:9px 0;font-size:14.5px;}
+.final-list li::before{content:"✔";color:var(--green);font-weight:900;}
+.next-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.next-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.next-card b{display:block;font-size:14.5px;margin-bottom:5px;color:var(--brand-dark);}
+.next-card span{font-size:13.5px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#20242a;color:#fff;font-size:13.5px;font-weight:700;border-radius:999px;padding:10px 20px;opacity:0;transition:all .25s;z-index:90;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media (max-width:900px){ .layout{display:block;} .sidebar{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  .concept-grid{grid-template-columns:1fr 1fr;} .stat-row{grid-template-columns:1fr 1fr;} .compare{grid-template-columns:1fr;} .next-card-grid{grid-template-columns:1fr;} }
+@media (max-width:640px){ .topbar{flex-wrap:wrap;row-gap:10px;} .topbar-left{flex-wrap:wrap;row-gap:8px;} .progress-wrap{width:100%;} .concept-grid{grid-template-columns:1fr;} }
+
+/* ---- 목록으로 돌아가기 (week1과 동일 패턴) ---- */
+.back-week{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;transition:color .15s ease,border-color .15s ease,background .15s ease;}
+.back-week:hover{color:var(--brand-dark);border-color:var(--brand);background:var(--sky-light);}
+.back-home{display:flex;align-items:center;gap:15px;max-width:840px;margin:34px 0 10px;padding:20px 24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);text-decoration:none;color:var(--ink);transition:transform .18s ease,border-color .18s ease;}
+.back-home:hover{transform:translateY(-2px);border-color:var(--brand);}
+.back-home .bh-ic{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;border-radius:11px;background:var(--sky-light);color:var(--brand-dark);font-size:19px;font-weight:900;}
+.back-home strong{display:block;font-size:15.5px;font-weight:800;}
+.back-home small{display:block;margin-top:3px;color:var(--muted);font-size:12.5px;font-weight:600;}
+@media (max-width:640px){.back-home{padding:18px;gap:12px;}}
+
+/* ---- week3 공통 추가 ---- */
+.flowline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0;padding:15px 17px;background:var(--surface);border:1px solid var(--line);border-radius:12px;}
+.flowline .fnode{display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:9px 14px;border-radius:10px;background:var(--sky-light);border:1px solid #c9e2f5;font-size:13px;font-weight:800;color:var(--brand-dark);text-align:center;line-height:1.35;}
+.flowline .fnode small{font-size:11px;font-weight:600;color:var(--muted);}
+.flowline .fnode.dark{background:#20242a;border-color:#20242a;color:#fff;}
+.flowline .fnode.dark small{color:#aab4c0;}
+.flowline .fnode.ok{background:#edf4ef;border-color:#bfe0c9;color:var(--green);}
+.flowline .farrow{color:var(--muted);font-weight:900;}
+.step-table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0;}
+.step-table th{background:#f2f6f0;border:1px solid var(--line);padding:8px 12px;text-align:left;font-size:13px;}
+.step-table td{border:1px solid var(--line);padding:8px 12px;vertical-align:top;}
+.step-table td b{color:var(--brand-dark);}
+.badge{display:inline-block;font-size:11.5px;font-weight:800;border-radius:999px;padding:2px 10px;vertical-align:1px;}
+.badge.b-green{background:#edf4ef;color:var(--green);}
+.badge.b-red{background:#faeeec;color:var(--red);}
+.badge.b-blue{background:var(--sky-light);color:var(--brand-dark);}
+.badge.b-amber{background:#fbf1de;color:var(--amber);}
+.kv{display:grid;grid-template-columns:170px 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0;font-size:13.5px;}
+.kv > div{padding:9px 14px;border-bottom:1px solid var(--line);background:var(--surface);}
+.kv > div:nth-child(odd){background:#f2f6f0;font-weight:800;font-size:12.5px;}
+.kv > div:nth-last-child(-n+2){border-bottom:none;}
+.ws-steps{counter-reset:ws;margin:16px 0;}
+.workshop-step{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px 14px 58px;margin:12px 0;}
+.workshop-step .ws-num{position:absolute;left:16px;top:16px;display:grid;place-items:center;width:28px;height:28px;border-radius:999px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:13.5px;}
+.workshop-step b.ws-t{display:block;font-size:14.5px;margin-bottom:4px;}
+.workshop-step p{font-size:14px;color:var(--muted);margin:4px 0;}
+.workshop-step code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.5px;}
+code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.88em;font-family:ui-monospace,'SF Mono',Consolas,monospace;}
+.copy-block code{background:transparent;border:none;padding:0;color:#9fd0f5;font-size:inherit;}
+.quad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+.quad .q{border:1px solid var(--line);border-radius:12px;padding:15px 17px;background:var(--surface);}
+.quad .q h4{font-size:14px;margin-bottom:6px;}
+.quad .q p{font-size:13.5px;color:var(--muted);margin:4px 0;}
+.term-list{margin:14px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+.term-list .term{display:grid;grid-template-columns:150px 1fr;border-bottom:1px solid var(--line);background:var(--surface);}
+.term-list .term:last-child{border-bottom:none;}
+.term-list .term > b{padding:11px 14px;background:#f2f6f0;font-size:13.5px;}
+.term-list .term > span{padding:11px 14px;font-size:13.5px;color:var(--muted);}
+@media (max-width:700px){.quad{grid-template-columns:1fr;}.kv{grid-template-columns:1fr;}.kv > div:nth-child(odd){border-bottom:none;padding-bottom:2px;}.term-list .term{grid-template-columns:1fr;}}
+
+/* terminal transcript */
+.termwin{background:#0c0c0c;border-radius:12px;margin:14px 0;overflow:hidden;box-shadow:0 3px 14px rgba(54,42,31,.15);}
+.termwin .tw-bar{display:flex;align-items:center;gap:6px;padding:9px 14px;background:#1d1f23;}
+.termwin .tw-bar i{width:11px;height:11px;border-radius:999px;display:inline-block;}
+.termwin .tw-bar i:nth-child(1){background:#ff5f57;}.termwin .tw-bar i:nth-child(2){background:#febc2e;}.termwin .tw-bar i:nth-child(3){background:#28c840;}
+.termwin .tw-bar span{margin-left:8px;color:#9aa3ad;font-size:11.5px;font-weight:700;}
+.termwin pre{margin:0;padding:16px 18px;color:#cccccc;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;line-height:1.95;white-space:pre-wrap;word-break:break-all;}
+.t-cmd{color:#e5c07b;}.t-flag{color:#7f848e;}.t-q{color:#61afef;}.t-ans{color:#c678dd;font-weight:700;}
+.t-ok{color:#98c379;font-weight:700;}.t-warn{color:#e5c07b;}.t-b{color:#ffffff;font-weight:800;}.t-dim{color:#7f848e;}
+</style>
+</head>
+<body id="top">
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-text"><strong>KAIST I&amp;TM</strong><small>AI 부트캠프</small></span>
+    </a>
+    <div class="week-tag"><span class="week-num">WEEK 3</span><span class="week-title">개인정보 보안과 인증</span></div>
+    <a class="back-week" href="index.html">← 3주차 목록</a>
+  </div>
+  <div class="progress-wrap" aria-label="진행률">
+    <span class="progress-label"><b id="progressCount">0</b>/<span id="progressTotal">0</span> 완료</span>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="목차">
+    <div class="sidebar-title">이 페이지의 흐름</div>
+    <div class="toc">
+      <a href="#s1" data-sec="s1">1. 이번 주는 Claude Code<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. 준비 ① — git·gh 설치<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. 준비 ② — gh 로그인<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 작업 폴더 열기<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 첫 지시 — 깃헙 레포 만들기<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">6. 권한 — 자동 승인을 얼마나<span class="done-mark">✔</span></a>
+      <a href="#s7" data-sec="s7">7. 마무리 체크리스트<span class="done-mark">✔</span></a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div id="celebrateSlot"></div>
+
+    <div class="hero">
+      <span class="hero-kicker">WEEK 3 · STEP 1 — Claude Code 온보딩</span>
+      <h1>Claude Code 시작하기 —<br/>폴더를 열고, 깃헙 레포를 만든다</h1>
+      <p>2주차의 수집·임베딩·지도는 모두 <b>Cowork</b>에서 했습니다. 이번 주는 검색 서버를 <b>내 PC에서 켜고</b>, 코드를 파일로 쌓고, 그것을 깃헙에 올려 배포까지 갑니다 — 2주차 1강에서 설치해 둔 <b>데스크톱 앱의 Code</b>가 이번 주의 주력입니다. 오늘은 그 준비를 끝냅니다: 도구 두 개를 설치하고, 작업 폴더를 열고, 깃헙 레포를 만들어 둡니다.</p>
+    </div>
+
+    <!-- ============ S1 ============ -->
+    <section class="section" id="s1">
+      <div class="sec-head"><span class="sec-num">1</span><h2>이번 주는 Claude Code — 오늘 준비할 것</h2></div>
+      <p class="sec-lead">Cowork는 클라우드에서 일하고 결과를 폴더로 내려줬습니다. Claude Code는 <b>내 PC에서 직접</b> 파일을 만들고 프로그램을 실행합니다 — 서버를 켜 두는 일(③), 깃헙에 올려 배포하는 일(⑤)이 전부 여기서 이루어집니다.</p>
+      <div class="flowline">
+        <span class="fnode">git·gh 설치<small>§2 · 터미널에서</small></span><span class="farrow">→</span>
+        <span class="fnode">gh 로그인<small>§3 · 브라우저 연동</small></span><span class="farrow">→</span>
+        <span class="fnode">폴더 열기<small>§4 · Claude Code</small></span><span class="farrow">→</span>
+        <span class="fnode ok">깃헙 레포 생성<small>§5 · 지시 한 번</small></span><span class="farrow">→</span>
+        <span class="fnode dark">권한 설정<small>§6</small></span>
+      </div>
+      <div class="tip-card"><b>한 번만 하면 됩니다</b> — 오늘 §2~§3의 설치·로그인은 이 PC에서 다시 할 일이 없습니다. 다음 주에도, 여러분의 다른 프로젝트에서도 그대로 쓰입니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>오늘 준비의 다섯 단계를 확인했다</span></label></div>
+    </section>
+
+    <!-- ============ S2 ============ -->
+    <section class="section" id="s2">
+      <div class="sec-head"><span class="sec-num">2</span><h2>준비 ① — 터미널에서 git·gh 설치하기</h2></div>
+      <p class="sec-lead">도구 두 개를 설치합니다. 명령 입력이 처음이어도 괜찮습니다 — 아래 명령을 <b>복사해 붙여넣고 Enter</b>, 그게 전부입니다.</p>
+
+      <div class="callout"><b class="cap">git — 파일의 변경 이력을 기록하는 도구</b>
+      코드가 바뀔 때마다 "언제 무엇이 어떻게 바뀌었는지"를 기록하고, 그 기록을 깃헙 저장소와 주고받습니다. 1주차에 GitHub Pages에 올렸던 <b>저장소(repository)</b>를 내 PC에서 다루는 도구가 git입니다. Claude Code가 코드를 저장·업로드할 때 내부에서 이것을 씁니다.</div>
+      <div class="callout"><b class="cap">gh — 터미널에서 깃헙을 조작하는 GitHub 공식 도구</b>
+      레포 만들기, 올리기 같은 깃헙 작업을 웹사이트에 들어가지 않고 명령으로 처리합니다. §5에서 Claude Code가 "레포를 만들어줘"라는 지시를 수행할 때 쓰는 손이 바로 gh입니다.</div>
+
+      <div class="workshop-step"><span class="ws-num">1</span>
+        <b class="ws-t">터미널 열기</b>
+        <p><b>Windows</b>: 시작 메뉴에서 <b>PowerShell</b>을 검색해 실행합니다. <b>macOS</b>: Spotlight(⌘+Space)에서 <b>터미널</b>을 검색해 실행합니다. 명령을 한 줄씩 입력하는 검은 창이 뜨면 준비된 것입니다.</p>
+      </div>
+      <div class="workshop-step"><span class="ws-num">2</span>
+        <b class="ws-t">설치 명령 실행</b>
+        <div class="copy-block"><span class="cb-label">Windows (PowerShell)</span><button class="copy-btn" data-copy="c1">복사</button>
+<pre class="mono" id="c1">winget install --id Git.Git -e
+winget install --id GitHub.cli -e</pre></div>
+        <div class="copy-block"><span class="cb-label">macOS (터미널)</span><button class="copy-btn" data-copy="c2">복사</button>
+<pre class="mono" id="c2">git --version
+brew install gh</pre></div>
+        <p>macOS에서 <code>git --version</code>을 쳤을 때 설치 안내 창이 뜨면 그대로 설치하면 됩니다. <code>brew</code> 명령이 없다고 나오면 — Claude Code를 먼저 열고 <b>"gh를 설치해줘"</b>라고 맡기세요. 환경에 맞는 방법으로 안내해 줍니다.</p>
+      </div>
+      <div class="workshop-step"><span class="ws-num">3</span>
+        <b class="ws-t">설치 확인</b>
+        <div class="copy-block"><span class="cb-label">확인</span><button class="copy-btn" data-copy="c3">복사</button>
+<pre class="mono" id="c3">git --version
+gh --version</pre></div>
+        <p>둘 다 버전 번호가 나오면 성공입니다. Windows에서 명령을 못 찾는다고 나오면 <b>터미널 창을 닫고 새로 연 뒤</b> 다시 시도하세요 — 설치 직후에는 새 창이어야 인식됩니다.</p>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>git과 gh의 버전 번호를 확인했다</span></label></div>
+    </section>
+
+    <!-- ============ S3 ============ -->
+    <section class="section" id="s3">
+      <div class="sec-head"><span class="sec-num">3</span><h2>준비 ② — gh 로그인: 명령 한 줄이면 브라우저가 뜹니다</h2></div>
+      <p class="sec-lead">gh가 내 깃헙 계정으로 일하려면 로그인이 필요합니다. 터미널에서 아래 한 줄을 실행하면 <b>브라우저가 알아서 열리면서</b> 연동이 됩니다.</p>
+
+      <div class="copy-block"><span class="cb-label">로그인 명령</span><button class="copy-btn" data-copy="c4">복사</button>
+<pre class="mono" id="c4">gh auth login --hostname github.com --git-protocol https --web</pre></div>
+
+      <p>실행하면 이런 화면이 지나갑니다 — 질문에 <b>Yes</b>로 답하고, 화면에 뜬 <b>일회용 코드를 복사</b>한 뒤 Enter를 누르면 브라우저가 열립니다. 브라우저에 코드를 붙여넣고 승인하면 끝입니다.</p>
+
+      <div class="termwin"><div class="tw-bar"><i></i><i></i><i></i><span>PowerShell</span></div>
+<pre>PS C:\claude\no-bullying&gt; <span class="t-cmd">gh auth login</span> <span class="t-flag">--hostname github.com --git-protocol https --web</span>
+<span class="t-q">?</span> Authenticate Git with your GitHub credentials? <span class="t-ans">Yes</span>
+
+<span class="t-warn">!</span> First copy your one-time code: <span class="t-b">1BC6-A269</span>
+<span class="t-b">Press Enter</span> to open https://github.com/login/device in your browser...
+<span class="t-ok">✓</span> Authentication complete.
+<span class="t-dim">- gh config set -h github.com git_protocol https</span>
+<span class="t-ok">✓</span> Configured git protocol
+<span class="t-ok">✓</span> Logged in as <span class="t-b">kaist-itm-aibootcamp</span></pre></div>
+
+      <div class="tip-card"><b>계정을 두 개 이상 쓰신다면</b> — 브라우저에 <b>지금 로그인되어 있는 깃헙 계정</b>으로 연동됩니다. 마지막 줄의 "Logged in as <b>계정명</b>"이 이번 부트캠프에서 쓰려는 계정이 맞는지 확인하세요. 다른 계정이면 브라우저에서 계정을 바꾼 뒤 같은 명령을 다시 실행하면 됩니다.</div>
+      <div class="tip-card"><b>어느 폴더에서 실행해도 됩니다</b> — 로그인은 계정 단위라서, 위 화면처럼 프로젝트 폴더 안일 필요는 없습니다. 잘 됐는지는 <code>gh auth status</code>로 언제든 확인할 수 있습니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>브라우저 연동으로 gh 로그인을 마쳤다</span></label></div>
+    </section>
+
+    <!-- ============ S4 ============ -->
+    <section class="section" id="s4">
+      <div class="sec-head"><span class="sec-num">4</span><h2>Claude Code에 작업 폴더 열기</h2></div>
+      <p class="sec-lead">이번 주 내내 쓸 프로젝트 폴더를 하나 만들고, Claude Code로 엽니다.</p>
+
+      <div class="workshop-step"><span class="ws-num">1</span>
+        <b class="ws-t">프로젝트 폴더 만들기 — <code>C:\claude\no-bullying</code></b>
+        <p>2주차 폴더(<code>C:\claude</code>) 아래에 <b><code>no-bullying</code></b> 폴더를 만들고(macOS는 <code>~/claude/no-bullying</code>), 2주차 산출물 — 판결문 파일들(<code>rulings/</code>), 임베딩 JSON(<code>embeddings_json/</code>), 요약 목록(<code>rulings_summary.csv</code>) — 을 이 안으로 옮깁니다. 직장 내 괴롭힘 판결문 프로젝트라 이름을 no-bullying으로 지었습니다 — 여러분의 프로젝트에 맞는 영문 이름이면 됩니다.</p>
+      </div>
+      <div class="workshop-step"><span class="ws-num">2</span>
+        <b class="ws-t">Claude Code로 폴더 열기</b>
+        <p>Claude 데스크톱 앱에서 <b>Code</b>를 고르고, 방금 만든 폴더를 작업 폴더로 엽니다. 2주차에 Cowork로 폴더를 연동했던 것과 같은 감각입니다 — 다른 점은 이제 AI가 이 폴더 안에서 <b>직접 실행</b>까지 한다는 것입니다.</p>
+      </div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>프로젝트 폴더를 만들어 Claude Code로 열었다</span></label></div>
+    </section>
+
+    <!-- ============ S5 ============ -->
+    <section class="section" id="s5">
+      <div class="sec-head"><span class="sec-num">5</span><h2>첫 지시 — 깃헙 레포 만들기</h2></div>
+      <p class="sec-lead">폴더가 열렸으면 첫 지시를 내립니다. 깃헙 레포는 ⑤(배포)에서 필요해지지만, <b>지금 만들어 두면 이번 주 작업이 전부 이력으로 남습니다.</b></p>
+
+      <div class="copy-block"><span class="cb-label">💬 첫 프롬프트</span><button class="copy-btn" data-copy="c5">복사</button>
+<pre id="c5">현재 폴더 내용으로 깃헙 레포를 만들어서 작업하려고 해.
+깃헙에 no-bullying이라는 레포를 만들어줘.
+openrouterkey.txt 같은 비밀 파일은 레포에 올리지 말고.</pre></div>
+
+      <p>이 한 번의 지시로 Claude가 알아서 진행합니다 — 폴더를 git 저장소로 초기화하고, 올리지 않을 파일을 정리하고(<code>.gitignore</code>), §3에서 로그인해 둔 gh로 <b>깃헙에 레포를 만들어 업로드</b>까지 합니다. 공개/비공개를 물어보면 <b>비공개(private)</b>로 시작하세요 — 나중에 언제든 공개로 바꿀 수 있습니다.</p>
+
+      <div class="callout caution"><b class="cap">올리기 전에 — 비밀 파일 확인</b>
+      깃헙에 올라간 파일은 그 레포를 볼 수 있는 모두가 봅니다. 프롬프트에 <b>비밀 파일 제외</b>를 명시한 이유입니다. 작업이 끝나면 github.com에서 레포를 열어 <b><code>openrouterkey.txt</code>가 목록에 없는지</b> 직접 확인하세요. 만약 올라갔다면 — 파일만 지우는 것으로는 부족합니다(이력에 남습니다). 그 키를 폐기하고 새로 발급하는 것이 정답입니다(2주차 ④의 "키를 다루는 세 가지 습관").</div>
+
+      <div class="tip-card"><b>확인</b> — 브라우저에서 github.com에 로그인해 내 계정의 <b>no-bullying</b> 레포가 생겼는지, 판결문·임베딩 파일이 들어 있는지 열어 보세요. 여기까지 되면 이번 주 준비는 끝났습니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>깃헙에 레포가 만들어졌고, 비밀 파일이 없는 것을 확인했다</span></label></div>
+    </section>
+
+    <!-- ============ S6 ============ -->
+    <section class="section" id="s6">
+      <div class="sec-head"><span class="sec-num">6</span><h2>권한 설정 — 자동 승인을 얼마나 줄 것인가</h2></div>
+      <p class="sec-lead">방금 §5에서 경험했듯 Claude Code는 명령 실행·파일 변경 전에 <b>승인을 요청</b>합니다. 이 확인을 얼마나 자동화할지는 사용자가 정합니다.</p>
+
+      <table class="step-table">
+        <thead><tr><th style="width:130px">방식</th><th>동작</th><th>어울리는 경우</th></tr></thead>
+        <tbody>
+          <tr><td><b>매번 확인</b></td><td>실행마다 내용을 읽고 승인</td><td>처음 쓰는 도구·낯선 폴더·민감한 자료</td></tr>
+          <tr><td><b>선택적 허용</b></td><td>같은 종류의 작업은 계속 허용</td><td>반복 작업이 많은 실습 중반부터</td></tr>
+          <tr><td><b>자동 승인</b></td><td>대부분의 작업을 확인 없이 진행</td><td>신뢰하는 폴더의 학습·취미 프로젝트</td></tr>
+        </tbody>
+      </table>
+
+      <p>기준은 작업의 목록이 아니라 <b>다루는 자료</b>입니다. 최근의 Claude 데스크톱 앱은 자동 모드가 많이 다듬어져서, 위험한 작업(대량 삭제, 밖으로 보내기 등)은 자동 모드에서도 따로 확인을 요청합니다. 그래서 판단은 이렇게 하면 됩니다:</p>
+
+      <div class="callout ok"><b class="cap">지금 단계 — 자동 승인을 줘도 됩니다</b>
+      이번 프로젝트는 <b>학습용이고, 데이터는 공개된 판결문</b>입니다. 잘못돼도 잃을 것이 폴더 하나입니다. 자동 승인을 켜고 속도를 내세요 — 승인 대기가 사라지면 실습 흐름이 훨씬 매끄럽습니다.</div>
+      <div class="callout caution"><b class="cap">회사 자료를 다루기 시작하면 — 다시 민감하게</b>
+      기밀 문서, 고객 정보, 사내 시스템이 얽힌 폴더에서는 <b>매번 확인으로 돌아가세요.</b> 자동으로 실행된 명령 하나가 파일을 지우거나 밖으로 보낼 수 있고, 그 책임은 승인 설정을 고른 사람에게 있습니다. 자율 실행의 위험 구조와 안전장치는 <b>4주차 1강</b>에서 자세히 다룹니다.</div>
+
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>내 상황에 맞는 승인 수준을 골랐다</span></label></div>
+    </section>
+
+    <!-- ============ S7 ============ -->
+    <section class="section" id="s7">
+      <div class="sec-head"><span class="sec-num">7</span><h2>마무리 체크리스트</h2></div>
+      <ul class="final-list">
+        <li>git(변경 이력 기록)과 gh(터미널에서 깃헙 조작)를 설치하고 버전을 확인했다</li>
+        <li><code>gh auth login</code> 한 줄로 브라우저가 열리며 계정이 연동된다 — "Logged in as"의 계정명 확인</li>
+        <li>프로젝트 폴더(<code>C:\claude\no-bullying</code>)에 2주차 산출물을 모아 Claude Code로 열었다</li>
+        <li>지시 한 번으로 깃헙 레포가 만들어진다 — 비밀 파일 제외를 명시하고, 올라갔는지 직접 확인</li>
+        <li>승인 수준은 다루는 자료로 정한다 — 학습 프로젝트는 자동 승인, 회사 자료는 매번 확인</li>
+      </ul>
+      <div class="next-card-grid">
+        <div class="next-card"><b>다음 강의 — 두 가지 검색 패러다임 (②)</b><span>도구 준비가 끝났으니 만들 것을 정합니다. 판결문 347건으로 <b>키워드 검색과 임베딩 검색</b>을 직접 비교해 보고, "왜 백엔드가 필요한가"에 도달합니다 — 그 백엔드를 ③에서 이 폴더에 만듭니다.</span></div>
+        <div class="next-card"><b>이번 주의 흐름</b><span>오늘 만든 레포에 ③의 검색엔진과 ④~⑤의 챗봇 코드가 쌓이고, ⑤에서 이 레포를 Vercel에 연결하는 순간 <b>URL 하나로 세상에 공개</b>됩니다.</span></div>
+      </div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s7" /><span>Claude Code 온보딩을 마쳤다!</span></label></div>
+    </section>
+
+      <a class="back-home" href="index.html">
+        <span class="bh-ic">←</span>
+        <span><strong>3주차 강의자료 목록으로 돌아가기</strong><small>다음 자료로 이어가려면 목록에서 골라보세요</small></span>
+      </a>
+
+  </main>
+</div>
+
+<div class="toast" id="toast">복사되었습니다</div>
+
+<script>
+
+const CELEBRATE_HTML = "🎉 <b>온보딩 완료!</b> git·gh가 설치되고, 폴더가 열리고, 깃헙에 레포까지 생겼습니다. 이번 주에 만드는 모든 것이 이 레포에 쌓입니다 — ②(두 가지 검색 패러다임)로 이어가세요.";
+
+const $ = s => document.querySelector(s);
+/* 진행률 + 축하 배너 (상태는 메모리에만) */
+
+/* 프롬프트 복사 */
+function showToast(msg){
+  const t = $("#toast"); if(!t) return;
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+function fallbackCopy(text, done){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){}
+  ta.remove();
+}
+document.querySelectorAll(".copy-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const text = document.getElementById(btn.dataset.copy).textContent;
+    const done = () => showToast("복사되었습니다");
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+    } else fallbackCopy(text, done);
+  });
+});
+
+const checks=[...document.querySelectorAll("input[data-progress]")];
+$("#progressTotal").textContent=checks.length;
+let celebrated=false;
+function updateProgress(){
+  const done=checks.filter(c=>c.checked).length;
+  $("#progressCount").textContent=done;
+  $("#progressBar").style.width=(done/checks.length*100)+"%";
+  checks.forEach(c=>{const a=document.querySelector(`.toc a[data-sec="${c.dataset.progress}"]`);if(a)a.classList.toggle("done",c.checked);});
+  if(done===checks.length&&!celebrated){
+    celebrated=true;
+    const b=document.createElement("div");b.className="celebrate-banner";
+    b.innerHTML=CELEBRATE_HTML;
+    $("#celebrateSlot").appendChild(b);
+    b.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+}
+checks.forEach(c=>c.addEventListener("change",updateProgress));
+/* 사이드바 scroll-spy */
+const secIds=[...document.querySelectorAll("main .section")].map(s=>s.id);
+const tocLinks={};
+document.querySelectorAll(".toc a").forEach(a=>tocLinks[a.dataset.sec]=a);
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(en=>{en.target._visible=en.isIntersecting;});
+  let current=null;
+  for(const id of secIds){const el=document.getElementById(id);if(el&&el._visible){current=id;break;}}
+  if(current){Object.values(tocLinks).forEach(a=>a.classList.remove("active"));tocLinks[current].classList.add("active");}
+},{rootMargin:"-15% 0px -55% 0px"});
+secIds.forEach(id=>io.observe(document.getElementById(id)));
+updateProgress();
+
+</script>
+</body>
+</html>
