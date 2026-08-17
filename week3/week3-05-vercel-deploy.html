@@ -342,23 +342,29 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <div class="ws-steps">
         <div class="workshop-step"><span class="ws-num">1</span>
           <b class="ws-t">Vercel 가입 — GitHub 계정으로</b>
-          <p><a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a> → <b>Sign Up</b> → <b>Continue with GitHub</b>. 새 비밀번호 없이 1주차에 만든 GitHub 계정으로 바로 들어갑니다. Hobby(무료) 플랜을 선택합니다.</p>
+          <p><a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a> → <b>Sign Up</b>. 가입 과정에서 몇 가지를 묻는데, 이렇게 답하면 됩니다:</p>
+          <ul>
+            <li><b>플랜 선택</b> → <b>Hobby</b>. 개인 프로젝트용 무료 플랜으로, 이번 실습 전부에 충분합니다.</li>
+            <li><b>이름</b> → 자유롭게. 화면 표시용입니다.</li>
+            <li><b>가입 방법</b> → <b>Continue with GitHub</b>. 새 비밀번호를 만들 것 없이 ①에서 로그인해 둔 GitHub 계정으로 들어갑니다. GitHub이 Vercel을 승인하겠느냐고 물으면 <b>Authorize</b>를 누르세요 — 이 승인 덕분에 3단계에서 내 저장소 목록이 Vercel에 보입니다.</li>
+            <li><b>휴대폰 인증</b>을 요구하면 → 번호를 넣고 문자로 온 코드를 입력합니다 (무료 계정 부정 사용을 막기 위한 절차입니다).</li>
+          </ul>
         </div>
         <div class="workshop-step"><span class="ws-num">2</span>
-          <b class="ws-t">코드 변환 — Claude Code에 요청</b>
-          <p>③의 검색기 폴더를 연 뒤 아래 프롬프트를 입력합니다. 로컬 FastAPI → Vercel 서버리스 구조로 바꾸는 작업입니다.</p>
-          <div class="copy-block"><span class="cb-label">💬 프롬프트</span>
-            <button class="copy-btn" data-copy="p31">복사</button>
-            <pre id="p31">이 폴더는 로컬 FastAPI 백엔드와 프런트엔드로 이루어진 유사 판례 검색 웹앱이야. 이걸 Vercel에 배포할 수 있게 바꿔줘.
-
-요구사항:
-1. FastAPI 엔드포인트를 Vercel 서버리스 함수(api/ 폴더)로 옮겨줘.
-2. OpenRouter API 키는 코드에 절대 넣지 말고, 환경변수 OPENROUTER_API_KEY에서 읽게 해줘. openrouterkey.txt 파일은 .gitignore에 추가해서 GitHub에 올라가지 않게 해줘.
-3. 프런트엔드가 localhost:8000 대신 상대 경로(/api/...)로 호출하게 수정해줘.
-4. 필요한 설정 파일(vercel.json, requirements.txt 등)을 만들어줘.
-5. 파일 변경까지만 하고, git commit과 push는 하지 마. 내가 검토 후 직접 할게.
-6. 끝나면 바뀐 파일 목록과 Vercel 배포 단계를 정리해줘.</pre>
+          <b class="ws-t">코드 변환 — 지시하면, AI가 먼저 문제를 제기한다</b>
+          <p>③의 프로젝트 폴더를 연 뒤 "Vercel에 배포할 수 있게 바꿔 달라"고 지시합니다. 그런데 실제로 시켜 보니 Claude Code는 바로 바꾸지 않고 <b>문제 두 가지를 먼저 제기</b>했습니다:</p>
+          <div class="card" style="font-size:13.5px;line-height:1.75;">
+            <p style="margin:0 0 10px;"><b>첫째, 판결문 347건이 인터넷에 공개됩니다.</b> GitHub 저장소를 비공개로 한 이유가 바로 이것인데(DECISIONS.md D-12), Vercel에 올리면 URL을 아는 누구나 볼 수 있습니다. 무료 플랜에는 비밀번호 보호 기능이 없습니다(유료 기능).</p>
+            <p style="margin:0;"><b>둘째, API 키가 무방비로 노출된 것과 같아집니다.</b> 공개 URL 뒤에 키가 있으면 누구나 무제한으로 질문을 던질 수 있고, 그 비용은 전부 선생님 OpenRouter 잔액에서 나갑니다. 질문당 1.2원이라 우습게 보이지만 자동화된 요청 몇 만 건이면 금방입니다.</p>
           </div>
+          <p>둘 다 맞는 지적이고, 둘 다 <b>기술 문제가 아니라 내가 내릴 결정</b>입니다. 실제로 이렇게 답해서 진행시켰습니다:</p>
+          <div class="copy-block"><span class="cb-label">💬 실제 지시 — 위험을 알고 내린 결정</span>
+            <button class="copy-btn" data-copy="p31">복사</button>
+            <pre id="p31">현재 웹앱을 vercel에 배포할 수 있도록 바꿔줘. 판결문 공개되어도 무방함.
+openrouter credit 부담할 것이야. 나중에 인증 기능 추가할 예정이라서
+지금은 상관 없음.</pre>
+          </div>
+          <p class="chart-note">③에서 남긴 기록(DECISIONS.md의 D-12 "저장소 비공개" 결정)을 AI가 스스로 찾아 새 지시와의 충돌을 지적했습니다 — 문서화는 이렇게 되돌아옵니다. 위험을 들은 뒤 감수 여부를 정하는 것은 내 몫이고, 그 결정(공개 무방 · 비용 부담 · 인증은 ⑦에서)도 대화에 기록으로 남았습니다. 이 변환에서 키를 <code>openrouterkey.txt</code> 파일에서 읽던 방식은 <b>환경변수에서 읽는 방식으로 바뀌었습니다</b> — 왜 그래야 하는지는 §4에서 짚습니다.</p>
         </div>
         <div class="workshop-step"><span class="ws-num">3</span>
           <b class="ws-t">GitHub에 push → Vercel에서 Import</b>
