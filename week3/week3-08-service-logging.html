@@ -441,8 +441,6 @@ alter table public.chat_logs enable row level security;</pre>
 <span class="k">alter table</span> public.chat_logs <span class="k">enable row level security</span>;</div>
           </div>
           <p>칸 구성은 §2에서 정한 그대로입니다 — 시각·질문·답변·비용·소요 시간(번호와 시각은 자동으로 채워집니다). 실행 결과가 <b>"Success. No rows returned"</b>이면 성공입니다 — 방금 만든 표가 비어 있어 "가져온 행이 없다"는 뜻이지 오류가 아닙니다. 왼쪽 <b>Table Editor</b>에 <code>chat_logs</code>가 보이면 확실합니다.</p>
-          <div class="callout ok"><b class="cap">마지막 줄이 자물쇠입니다</b>
-          <code>enable row level security</code>가 표에 행 단위 보안(RLS)을 켭니다 — 규칙을 하나도 안 만들었으므로 <b>바깥(Publishable key) 경로는 기본 거부</b>가 되고, Secret key를 쓰는 우리 서버만 통과합니다. 1단계에서 Secret key를 고른 이유가 여기서 완성됩니다.</div>
         </div>
         <div class="workshop-step"><span class="ws-num">3</span>
           <b class="ws-t">Vercel에 환경변수 추가</b>
