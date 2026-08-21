@@ -264,14 +264,14 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <section class="section" id="s1">
       <div class="sec-head"><span class="sec-num">1</span><h2>문제 — AI는 내 데이터를 모른다</h2></div>
       <p class="sec-lead">Claude에게 "내 포트폴리오 지금 어떻게 돼 있지?"라고 물으면 답하지 못합니다. 그 데이터는 여러분의 구글 시트에 있고, AI는 거기 접근할 수 없기 때문입니다.</p>
-      <p>지금까지의 해결책은 <b>복사–붙여넣기</b>였습니다. 시트를 열어 내용을 복사해 대화창에 붙이고, 파일이면 업로드하고, 바뀌면 다시 반복합니다. 되긴 하지만 두 가지가 아쉽습니다:</p>
+      <p>지금까지의 해결책은 <b>파일을 대화에 업로드</b>하는 것이었습니다. 2주차 내내 그렇게 일했고, 그것만 해도 대단한 일입니다 — 파일 몇 개를 올려 분석하는 데는 부족함이 없습니다. 그런데 일일이 올릴 수 없는 상황이 오면 한계가 드러납니다:</p>
       <div class="concept-grid">
-        <div class="concept"><div class="ico">🔁</div><b>매번 수동</b><span>데이터가 바뀔 때마다 사람이 다시 날라야 합니다. "연결"이 아니라 "배달"입니다.</span></div>
-        <div class="concept"><div class="ico">📏</div><b>양의 한계</b><span>시트 수십 장, 메일 수백 통을 붙여넣을 수는 없습니다. AI가 필요한 부분을 스스로 찾아 읽어야 합니다.</span></div>
-        <div class="concept"><div class="ico">✍️</div><b>읽기만 가능</b><span>붙여넣기로는 AI가 시트에 값을 쓰거나 메일을 보내는 일은 아예 불가능합니다.</span></div>
+        <div class="concept"><div class="ico">🔁</div><b>매번 업로드</b><span>데이터가 바뀔 때마다 사람이 다시 올려야 합니다. "연결"이 아니라 "배달"입니다.</span></div>
+        <div class="concept"><div class="ico">📏</div><b>양의 한계</b><span>시트 수십 장, 메일 수백 통을 일일이 올릴 수는 없습니다. AI가 필요한 부분을 스스로 찾아 읽어야 합니다.</span></div>
+        <div class="concept"><div class="ico">✍️</div><b>읽기만 가능</b><span>업로드로는 AI가 시트에 값을 쓰거나 메일을 보내는 일은 아예 불가능합니다.</span></div>
       </div>
       <p>필요한 것은 AI가 내 데이터 창고에 <b>스스로 드나들 수 있는 문</b>입니다. 그 문을 만드는 표준이 MCP입니다.</p>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>복사–붙여넣기 방식의 한계를 이해했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>업로드 방식의 한계를 이해했다</span></label></div>
     </section>
 
     <!-- ================= SECTION 2 ================= -->
@@ -351,7 +351,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
         </div>
       </div>
       <div class="callout ok"><b class="cap">방금 일어난 일</b>
-      Claude(MCP 클라이언트)가 구글의 MCP 서버에 "이 이름의 시트를 찾아 내용을 달라"고 요청했고, 여러분이 허용한 토큰의 범위 안에서 데이터가 대화로 들어왔습니다. 복사–붙여넣기가 사라진 첫 경험입니다.</div>
+      Claude(MCP 클라이언트)가 구글의 MCP 서버에 "이 이름의 시트를 찾아 내용을 달라"고 요청했고, 여러분이 허용한 토큰의 범위 안에서 데이터가 대화로 들어왔습니다. 업로드 없이 데이터가 대화로 들어온 첫 경험입니다.</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>커넥터로 내 시트를 대화에서 읽어 분석했다</span></label></div>
     </section>
 
