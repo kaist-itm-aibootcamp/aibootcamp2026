@@ -262,7 +262,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <div class="sidebar-title">이 페이지의 흐름</div>
     <div class="toc" id="toc">
       <a href="#s1" data-sec="s1">1. 헤르메스란 — Claude와 뭐가 다른가<span class="done-mark">✔</span></a>
-      <a href="#s2" data-sec="s2">2. 설치 — Hostinger 원클릭 앱<span class="done-mark">✔</span></a>
+      <a href="#s2" data-sec="s2">2. 설치 — 내 컴퓨터에<span class="done-mark">✔</span></a>
       <a href="#s3" data-sec="s3">3. OpenRouter 연동 — 두뇌 꽂기<span class="done-mark">✔</span></a>
       <a href="#s4" data-sec="s4">4. 텔레그램 게이트웨이 — 페어링으로 연결<span class="done-mark">✔</span></a>
       <a href="#s5" data-sec="s5">5. 첫 대화와 안전 점검<span class="done-mark">✔</span></a>
@@ -275,8 +275,8 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
 
     <div class="hero">
       <span class="hero-kicker">WEEK 4 · STEP 6 — 헤르메스 설치</span>
-      <h1>내 에이전트 서버 —<br/>헤르메스를 세운다</h1>
-      <p>⑤에서 위험과 안전장치를 손에 쥐었으니, 이제 <b>자율 에이전트를 직접 설치</b>합니다. 헤르메스(Hermes Agent)는 서버에 상주하며 텔레그램으로 말을 걸 수 있는 오픈소스 에이전트입니다. 설치는 <b>Hostinger의 원클릭 앱</b>을 씁니다 — 24시간 켜져 있는 내 서버가 생깁니다. 서버 만들기 → 두뇌(OpenRouter) 연결 → 텔레그램 연결 → 포트폴리오 연동까지 갑니다. ⑤에서 배운 안전 원칙이 <b>실물</b>로 등장하는 지점들을 놓치지 마세요 — 이 에이전트가 ⑦의 투자 위원회를 굴리게 됩니다.</p>
+      <h1>내 에이전트 —<br/>헤르메스를 세운다</h1>
+      <p>⑤에서 위험과 안전장치를 손에 쥐었으니, 이제 <b>자율 에이전트를 직접 설치</b>합니다. 헤르메스(Hermes Agent)는 상주하며 텔레그램으로 말을 걸 수 있는 오픈소스 에이전트입니다. 이번 실습은 <b>내 컴퓨터에 로컬로 설치</b>합니다. 설치 → 두뇌(OpenRouter) 연결 → 텔레그램 연결 → 포트폴리오 연동까지 갑니다. ⑤에서 배운 안전 원칙이 <b>실물</b>로 등장하는 지점들을 놓치지 마세요. 이 에이전트가 ⑦의 투자 위원회를 굴리게 됩니다.</p>
     </div>
 
 
@@ -295,58 +295,34 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
           <tr><td><b>확장</b></td><td>스킬·MCP·커넥터</td><td>스킬 <b>자가 생성</b> + MCP + cron 루틴(⑦)</td></tr>
         </tbody>
       </table>
-      <p>요약하면: <b>몸(실행 환경)은 내 것, 두뇌(모델)는 골라 꽂고, 입(대화 통로)은 메신저.</b> 이 조합이 "내가 자는 동안 일하는 AI"를 가능하게 합니다 — 그리고 ⑤에서 배웠듯, 바로 이 조합(사적 데이터 + 외부 콘텐츠 + 외부 통신)이 치명적 3요소이기도 합니다. 설치 과정 내내 안전장치를 함께 챙기는 이유입니다.</p>
+      <p>요약하면: <b>몸(실행 환경)은 내 것, 두뇌(모델)는 골라 꽂고, 입(대화 통로)은 메신저.</b> 이 조합이 "내가 자는 동안 일하는 AI"를 가능하게 합니다. ⑤에서 배웠듯 바로 이 조합(사적 데이터 + 외부 콘텐츠 + 외부 통신)이 치명적 3요소이기도 합니다. 설치 과정 내내 안전장치를 함께 챙기는 이유입니다.</p>
+
+      <h3>왜 헤르메스인가 — 실행 환경의 자유도</h3>
+      <p>굳이 직접 설치까지 해서 쓰는 이유는 하나입니다. <b>에이전트의 실행 환경을 내가 원하는 대로 설정할 수 있는 자유도</b>입니다. 지금까지의 Claude는 Anthropic이 정해 둔 환경 안에서 쓰는 완성품입니다. 편하지만 정해진 틀 밖으로는 나갈 수 없습니다. 헤르메스에서는 그 틀을 내가 정합니다:</p>
+      <ul class="final-list">
+        <li><b>두뇌</b> : 작업마다 모델을 골라 꽂습니다. 비싼 추론 모델과 값싼 모델을 용도별로 나눠 쓸 수 있습니다</li>
+        <li><b>도구와 기억</b> : 어떤 스킬과 MCP를 쥐여줄지, 무엇을 기억하게 할지를 내가 구성합니다</li>
+        <li><b>시간</b> : 내가 부를 때만 도는 것이 아니라, 루틴(cron)으로 정해진 시각에 스스로 돌게 합니다</li>
+        <li><b>통로</b> : 내가 매일 쓰는 메신저(텔레그램 등)를 대화 창구로 삼습니다</li>
+        <li><b>역할</b> : 에이전트를 여럿 두고 역할과 성격을 다르게 설정합니다. ⑦의 투자 위원회가 바로 이 자유도로 만들어집니다</li>
+      </ul>
+      <p>자유도의 값은 책임입니다. 환경을 내가 정하는 만큼 안전장치도 내가 챙깁니다. ⑤의 원칙이 이 강의 곳곳에서 실물로 나오는 이유입니다.</p>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>헤르메스와 Claude의 존재 방식 차이를 설명할 수 있다</span></label></div>
     </section>
 
     <!-- ================= SECTION 2 ================= -->
     <section class="section" id="s2">
-      <div class="sec-head"><span class="sec-num">2</span><h2>설치 — Hostinger 원클릭 앱</h2></div>
-      <p class="sec-lead">에이전트는 <b>24시간 상주</b>해야 의미가 있는데, 내 PC는 덮개를 닫으면 꺼집니다. 그래서 <b>호스팅 서비스(Hostinger)</b>에 올립니다. 예전에는 서버를 직접 세팅해야 했지만, 지금은 앱을 고르고 결제하면 <b>알아서 설치</b>됩니다. 실제 시작 화면입니다:</p>
-      <div class="hos">
-        <div class="h-h">One plan for any application. Change anytime</div>
-        <div class="h-sub">Pick the application you want to install first.</div>
-        <div class="h-apps">
-          <span class="h-app">🦀 OpenClaw</span>
-          <span class="h-app on">🅰️ Hermes Agent</span>
-          <span class="h-app">🔗 n8n</span>
-        </div>
-        <div class="h-plans">
-          <div class="h-plan"><div class="p-t">24 months</div><div class="p-p"><s>$21.99</s> $5.99<span style="font-size:11px;font-weight:600;">/mo</span></div></div>
-          <div class="h-plan"><div class="p-t">12 months</div><div class="p-p"><s>$21.99</s> $7.99<span style="font-size:11px;font-weight:600;">/mo</span></div></div>
-          <div class="h-plan on"><div class="p-t">1 month</div><div class="p-p"><s>$21.99</s> $10.99<span style="font-size:11px;font-weight:600;">/mo</span></div></div>
-        </div>
-        <div style="font-weight:800;margin:12px 0 4px;text-align:center;">Power your agent your way</div>
-        <div class="h-pow">
-          <div class="pw"><b>Hostinger AI Router</b><span>AI 크레딧을 충전해 여러 모델을 골라 쓰기</span></div>
-          <div class="pw"><b>Use your ChatGPT subscription</b><span>이미 있는 ChatGPT Plus/Pro 구독 사용</span></div>
-          <div class="pw"><b>Bring your own API key</b><span>OpenAI·Anthropic·xAI·Gemini 등 내 키 연결</span></div>
-        </div>
-        <div class="h-caps">
-          <div>Ready out of the box</div><div>Visual interface included</div>
-          <div>No maintenance needed</div><div>CLI access included</div>
-          <div>Security managed for you</div><div>Web search included</div>
-          <div>Switch applications anytime</div><div>Works with Hostinger Connector</div>
-        </div>
-        <div class="h-go">Get started</div>
+      <div class="sec-head"><span class="sec-num">2</span><h2>설치 — 내 컴퓨터에</h2></div>
+      <p class="sec-lead">헤르메스는 <b>내 컴퓨터에 설치해</b> 돌립니다. 공식 설치 안내를 따라 해도 되고, 이런 일은 Claude Code에 맡기는 것이 이제 익숙한 방법입니다:</p>
+      <div class="copy-block"><span class="cb-label">💬 프롬프트</span>
+        <button class="copy-btn" data-copy="p61">복사</button>
+        <pre id="p61">Hermes Agent(Nous Research의 오픈소스 에이전트)를 이 컴퓨터에
+설치하려고 해. 공식 문서대로 진행하고, 결정할 게 있으면 물어봐.</pre>
       </div>
-      <div class="ws-steps">
-        <div class="workshop-step"><span class="ws-num">1</span>
-          <b class="ws-t">앱은 Hermes Agent, 플랜은 짧게 시작</b>
-          <p>설치할 앱으로 <b>Hermes Agent</b>를 고릅니다(OpenClaw·n8n도 같은 자리에 있습니다). 플랜은 나중에 바꿀 수 있으니 <b>1개월</b>로 가볍게 시작해도 됩니다.</p>
-        </div>
-        <div class="workshop-step"><span class="ws-num">2</span>
-          <b class="ws-t">두뇌 연결 방식은 "Bring your own API key"</b>
-          <p>세 가지 중 <b>Bring your own API key</b>를 고르면, 2·3주차에 쓰던 내 <b>OpenRouter 키를 그대로 재사용</b>할 수 있습니다(자세한 입력은 §3). Hostinger 크레딧이나 ChatGPT 구독을 쓰는 길도 있지만, 이 부트캠프는 OpenRouter로 통일해 왔습니다.</p>
-        </div>
-        <div class="workshop-step"><span class="ws-num">3</span>
-          <b class="ws-t">Get started — 설치는 시스템이</b>
-          <p><b>Get started</b>를 누르면 결제 후 시스템이 헤르메스를 설치합니다. 끝나면 관리 화면에 <b>Visual interface</b>(브라우저에서 쓰는 화면)와 <b>CLI access</b>(터미널)가 함께 제공됩니다 — 이 자료의 <code>hermes …</code> 명령은 이 터미널에서 실행합니다.</p>
-        </div>
-      </div>
-      <div class="callout ok"><b class="cap">왜 이 방식인가 — 난이도는 내려가고, 안전장치는 기본으로</b>
-      ① 내 PC를 켜 둘 필요 없이 <b>24시간 상주</b> ② API 키·대화 기록·데이터가 <b>내 서버에만</b> 남음 ③ "Security managed for you"처럼 격리·관리가 기본 제공되어, ⑤에서 배운 <b>컨테이너 고립</b>이 처음부터 적용된 상태로 시작합니다. 로컬 설치의 의존성 세팅이 통째로 사라지는 것은 덤입니다.</div>
-      <h3>설치 후 서버에 생기는 것 — <code>~/.hermes/</code> 홈 폴더</h3>
+      <p>설치가 끝나면 터미널에서 <code>hermes</code> 명령으로 실행합니다.</p>
+      <div class="callout"><b class="cap">로컬 설치의 특성</b>
+      ① 서버 비용 없이 바로 시작하고, 키·대화 기록·데이터가 내 컴퓨터 밖으로 나가지 않습니다 ② 대신 <b>컴퓨터가 켜져 있는 동안만</b> 동작합니다. ⑦에서 루틴을 걸 때는 그 시각에 컴퓨터가 켜져 있어야 합니다 ③ 24시간 상주가 필요해지면 나중에 호스팅 서버로 옮기면 됩니다. <code>~/.hermes/</code> 폴더 구조가 같아서 이사가 어렵지 않습니다.</div>
+      <h3>설치 후 내 컴퓨터에 생기는 것 — <code>~/.hermes/</code> 홈 폴더</h3>
       <div class="kv">
         <div><code>config.yaml</code></div><div>에이전트 설정 — 모델, 게이트웨이, terminal backend 등</div>
         <div><code>.env</code></div><div><b>API 키 보관소.</b> 3주차 공식("비밀은 환경변수로")의 헤르메스 버전 — §3에서 채웁니다</div>
@@ -383,7 +359,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
         </div>
       </div>
       <div class="callout"><b class="cap">.env는 내 서버에만</b>
-      3주차에는 키를 Vercel의 환경변수에 두었습니다. 헤르메스는 자가 호스팅이므로 <b>키가 내 서버(VPS)의 <code>.env</code>에 놓입니다</b> — 편리하지만, OpenClaw 사고 원인 중 하나가 "평문으로 놓인 비밀"이었음을 기억하세요. 이 파일을 절대 git에 커밋하거나 메신저로 보내지 말고, 에이전트의 작업 폴더 안에 복사해 두지도 마세요(울타리 안의 비밀은 보호 대상이 아니라 작업 대상이 됩니다).</div>
+      3주차에는 키를 Vercel의 환경변수에 두었습니다. 헤르메스에서는 <b>키가 내 컴퓨터의 <code>~/.hermes/.env</code>에 놓입니다</b> — 편리하지만, OpenClaw 사고 원인 중 하나가 "평문으로 놓인 비밀"이었음을 기억하세요. 이 파일을 절대 git에 커밋하거나 메신저로 보내지 말고, 에이전트의 작업 폴더 안에 복사해 두지도 마세요(울타리 안의 비밀은 보호 대상이 아니라 작업 대상이 됩니다).</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>OpenRouter 키를 .env에 넣고 기본 모델을 지정했다</span></label></div>
     </section>
 
@@ -438,7 +414,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       </div>
 
       <h3>운영 전 안전 점검 — ①의 체크리스트를 이 자리에</h3>
-      <div class="insight"><span class="n">1</span><p><b>terminal backend는 docker로.</b> <code>config.yaml</code>에서 에이전트의 셸 실행을 Docker 컨테이너로 두면, 명령이 서버 본체가 아니라 일회용 컨테이너 안에서 돕니다 — ①에서 배운 "모델이 속아도 OS가 막는" 구조입니다. Hostinger 템플릿은 처음부터 Docker 기반이라 이 원칙이 기본 적용되어 있습니다 — 설정을 바꿀 때 이 구조를 깨지 않는 것이 핵심입니다.</p></div>
+      <div class="insight"><span class="n">1</span><p><b>terminal backend는 docker로.</b> <code>config.yaml</code>에서 에이전트의 셸 실행을 Docker 컨테이너로 두면, 명령이 내 컴퓨터 본체가 아니라 일회용 컨테이너 안에서 돕니다. ⑤에서 배운 "모델이 속아도 OS가 막는" 구조입니다. 로컬 설치에서는 이 설정을 직접 챙겨야 합니다. Docker가 없거나 설정이 낯설면 Claude Code에 맡기면 됩니다.</p></div>
       <div class="insight"><span class="n">2</span><p><b>페어링은 내 계정 하나만.</b> 가족·친구 계정을 무심코 승인하지 않기. 승인 목록이 곧 화이트리스트입니다.</p></div>
       <div class="insight"><span class="n">3</span><p><b>비밀은 <code>.env</code>에만, 작업 폴더 밖에.</b> 에이전트가 읽고 다니는 폴더에 키·토큰 사본을 두지 않기.</p></div>
       <div class="insight"><span class="n">4</span><p><b>logs/를 가끔 열어 본다.</b> 자율은 무감독이 아닙니다 — 에이전트가 무슨 일을 했는지 확인하는 습관이 마지막 안전장치입니다.</p></div>
@@ -450,7 +426,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <div class="sec-head"><span class="sec-num">6</span><h2>마무리</h2></div>
       <ul class="final-list">
         <li>헤르메스 = 자가 호스팅 · 상시 상주 · 메신저로 부르는 오픈소스(MIT) 에이전트</li>
-        <li>설치는 Hostinger VPS 원클릭 템플릿 — 24시간 상주 + Docker 고립 기본, 도메인을 붙이면 개인 서버</li>
+        <li>설치는 내 컴퓨터에 로컬로. 컴퓨터가 켜져 있는 동안 동작하고, 필요해지면 호스팅으로 옮길 수 있다</li>
         <li>두뇌는 OpenRouter로 — 2·3주차의 키 재사용, 키는 .env에만</li>
         <li>텔레그램 연결의 관문은 페어링 코드 — HITL·화이트리스트의 실물</li>
         <li>terminal backend는 docker — 템플릿에 기본 적용된 "속아도 막히는" 구조를 깨지 않기</li>
