@@ -104,6 +104,9 @@
 | (신규 — 2026-08-21) | `week4-04-notion-report.html` — STEP 4 노션 연동(루틴이 매일 발행하는 자산 일지, 공유·대화) |
 | (재편 — 2026-08-21) `week4-01-autonomous-execution-risks.html` 기반 | `week4-05-autonomous-risks.html` — STEP 5 맡기기 전에(위험·안전장치)로 이동 재구성, 멜버른 예약 해킹 사례 추가 |
 | (재편 — 2026-08-21) `week4-05-hermes-agent-setup.html` 기반 | `week4-06-hermes-agent.html` — STEP 6 헤르메스 설치로 재구성, 설치를 Hostinger 원클릭 앱 실제 화면으로 교체, ⑦ 위원회로 연결 |
+| (신규 — 2026-08-21) | `week4-07-investment-advisors.html` — STEP 7 나의 투자 자문단(강세론·약세론·리스크검증 스킬 3종, 노션 데이터 창구, 매일 소집 루틴, 실행 실물 재현). 명칭 변천: 투자 위원회 → 투자 자문단 |
+| (재작성 — 2026-08-21) | `week4-assignment.html` — 자율 실습(포트폴리오 수익률 앱)을 종합 과제(내 데이터로 시트 원장→관리기→노션 일지→자문단 한 바퀴)로 교체 |
+| (정리 — 2026-08-21) | 구 번호 체계 파일 삭제: `week4-01-autonomous-execution-risks` · `week4-02-mcp-connectors` · `week4-04-google-sheets-integration` · `week4-05-hermes-agent-setup` · `week4-06-hermes-agent-routines`. 고유 내용이 남은 `week4-03-cli-tools` · `week4-07-integration-decision-guide`는 `drafts/`로 백업 |
 | `tmp-cli-tools.html` · `tmp-sheets-readonly.html` · `tmp-team-dashboard.html` | 흡수 후 삭제 |
 
 > 2026-08 주차 재편성: 새 Week 4 = "연동과 자율 에이전트 — AI에게 일을 맡기는 법" (마지막 주차, 자료 7개, STEP 1~7). 스킬 만들기가 2주차로 옮겨갔고, CLI가 ③ 별도 강의로 분리되면서 시트 연동·에르메스·총정리가 ④~⑦로 밀렸다.
