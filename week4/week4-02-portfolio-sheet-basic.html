@@ -206,6 +206,38 @@ p{margin:10px 0;}
 .workshop-step b.ws-t{display:block;font-size:14.5px;margin-bottom:4px;}
 .workshop-step p{font-size:14px;color:var(--muted);margin:4px 0;}
 .workshop-step code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.5px;}
+.pfapp{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin:12px 0;padding:18px 22px;font-size:13px;color:#1f2320;}
+.pfapp .pf-kicker{font-size:10.5px;font-weight:800;letter-spacing:.1em;color:#8a857e;}
+.pfapp .pf-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.pfapp .pf-head b{font-size:17px;}
+.pfapp .pf-sub{font-size:12px;color:#8a857e;margin-top:2px;}
+.pfapp .pf-btn{border:1px solid #e0ddd7;border-radius:8px;padding:6px 13px;font-size:12px;font-weight:700;white-space:nowrap;}
+.pfapp .pf-tabs{display:flex;gap:20px;border-bottom:1px solid #eceae5;margin:12px 0 16px;font-size:13px;color:#8a857e;font-weight:700;}
+.pfapp .pf-tabs span{padding:0 2px 8px;}
+.pfapp .pf-tabs .on{color:#1f2320;border-bottom:2px solid #1f2320;font-weight:800;}
+.pfapp .pf-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid #eceae5;border-radius:10px;overflow:hidden;margin-bottom:14px;}
+.pfapp .pf-tile{padding:12px 16px;border-right:1px solid #f1efe9;}
+.pfapp .pf-tile:last-child{border-right:none;}
+.pfapp .pf-tile .k{font-size:11px;color:#8a857e;}
+.pfapp .pf-tile .v{font-size:17px;font-weight:900;margin-top:2px;letter-spacing:-.01em;}
+.pfapp .pf-tile .d{font-size:11px;margin-top:1px;color:#8a857e;}
+.pfapp .up{color:#c04a3a;}
+.pfapp .dn{color:#2e6fd6;}
+.pfapp .pf-cap{font-size:12.5px;font-weight:800;margin:14px 0 8px;}
+.pfapp .pf-bar{display:flex;height:22px;border-radius:5px;overflow:hidden;margin:4px 0;}
+.pfapp .pf-bar div{display:grid;place-items:center;color:#fff;font-size:10.5px;font-weight:800;white-space:nowrap;overflow:hidden;}
+.pfapp .pf-lab{font-size:11px;color:#8a857e;width:34px;flex:0 0 auto;padding-top:4px;}
+.pfapp .pf-row{display:flex;gap:8px;align-items:flex-start;}
+.pfapp table.pf-tbl{width:100%;border-collapse:collapse;font-size:12.3px;margin-top:4px;}
+.pfapp table.pf-tbl th{text-align:right;color:#8a857e;font-weight:600;border-bottom:1px solid #eceae5;padding:6px 8px;font-size:11.5px;}
+.pfapp table.pf-tbl th:first-child,.pfapp table.pf-tbl td:first-child{text-align:left;}
+.pfapp table.pf-tbl td{text-align:right;border-bottom:1px solid #f4f2ec;padding:7px 8px;}
+.pfapp .pf-note{font-size:11.5px;color:#8a857e;margin-top:10px;line-height:1.65;}
+.pfapp .pf-slider{display:inline-flex;align-items:center;gap:6px;}
+.pfapp .pf-slider i{display:block;width:130px;height:4px;border-radius:999px;background:#e4e1da;position:relative;font-style:normal;}
+.pfapp .pf-slider i::after{content:"";position:absolute;left:44%;top:-5px;width:14px;height:14px;border-radius:999px;background:#2e6fd6;}
+.pfapp .pf-cond{display:flex;flex-wrap:wrap;gap:18px;align-items:center;font-size:12px;color:#3a3f3b;margin-bottom:12px;}
+.pfapp .pf-chart{border:1px dashed #e0ddd7;border-radius:8px;padding:10px 12px;font-size:11.5px;color:#8a857e;margin:6px 0 2px;}
 code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.88em;font-family:ui-monospace,'SF Mono',Consolas,monospace;}
 .copy-block code{background:transparent;border:none;padding:0;color:#9fd0f5;font-size:inherit;}
 .quad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
@@ -262,20 +294,18 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <!-- ================= SECTION 1 ================= -->
     <section class="section" id="s1">
       <div class="sec-head"><span class="sec-num">1</span><h2>만들 것 — 시트가 장부가 된다</h2></div>
-      <p class="sec-lead">이번 주 내내 쓸 장부를 먼저 만듭니다. 이 장부는 개별 거래를 하나하나 적는 것이 아니라, 지금 내 자산이 <b>어떻게 배분되어 있는지의 스냅샷</b>입니다. 구글 시트에 아래 표를 만들어 두세요.</p>
+      <p class="sec-lead">이번 주 내내 쓸 장부를 먼저 만들었습니다. 이 장부는 개별 거래를 하나하나 적는 것이 아니라, 지금 내 자산이 <b>어떻게 배분되어 있는지의 스냅샷</b>입니다. 구글 시트에 아래 표를 만들어 두었어요.</p>
       <table class="step-table">
-        <thead><tr><th>자산</th><th class="r">목표비중</th><th>대표 ETF</th><th>백필(과거 재구성)</th></tr></thead>
+        <thead><tr><th>종목명</th><th>종목코드</th><th class="r">보유량</th><th class="r">평균매입가</th></tr></thead>
         <tbody>
-          <tr><td>S&amp;P500 UH</td><td class="r">60%</td><td>환노출 현물형 S&amp;P500 ETF</td><td>S&amp;P500 TR × 원/달러</td></tr>
-          <tr><td>금 현물 UH</td><td class="r">20%</td><td>KRX 금현물 ETF</td><td>금 현물 × 원/달러</td></tr>
-          <tr><td>원화 현금</td><td class="r">10%</td><td>TIGER CD금리투자KIS(합성) 357870</td><td>CD 91일 금리</td></tr>
-          <tr><td>달러 현금</td><td class="r">10%</td><td>TIGER 미국달러SOFR금리액티브(합성) 456610</td><td>SOFR × 원/달러</td></tr>
+          <tr><td>KODEX 미국S&amp;P500</td><td>379800</td><td>1,327</td><td>22,600</td></tr>
+          <tr><td>ACE KRX금현물</td><td>411060</td><td>341</td><td>29,300</td></tr>
+          <tr><td>TIGER CD금리투자KIS(합성)</td><td>357870</td><td>88</td><td>56,900</td></tr>
+          <tr><td>TIGER 미국달러SOFR금리액티브(합성)</td><td>456610</td><td>82</td><td>61,100</td></tr>
         </tbody>
       </table>
-      <p>예시로 만든 자산배분입니다. 개별 종목이 아니라 <b>ETF로 자산을 배분하는 포트폴리오</b>이고, "UH"는 환헤지를 하지 않은(환노출) 자산이라는 뜻입니다.</p>
+      <p>시연용으로 만든 자산배분입니다. 개별 종목이 아니라 <b>ETF로 자산을 배분하는 포트폴리오</b>입니다. 미국 주식(S&amp;P500), 금 현물, 원화 현금(CD금리), 달러 현금(SOFR)의 네 자산입니다.</p>
       <p><b>거래를 일일이 기록하지 않는 것</b>이 이 방식의 핵심입니다. 매수·매도가 있을 때마다 적는 대신, 한 달에 한 번 정도 그 시점의 배분 상태를 <b>새 스냅샷</b>으로 남깁니다. 한 파일 안에서 날짜별 시트(탭)로 구분하면, 시트 하나가 그 날짜의 포트폴리오 한 장이 됩니다. 자주 매매하지 않는다면 이 방식으로 충분합니다.</p>
-      <div class="callout"><b class="cap">백필 — 과거를 채워 넣기</b>
-      표의 마지막 열은 각 자산의 과거 값을 어떻게 되살리는지입니다. 예를 들어 환노출 S&amp;P500은 "S&amp;P500 총수익 지수 × 원/달러 환율"로 20년치를 재구성할 수 있습니다. 이렇게 백필해 둔 과거 데이터가 있어야 나중에 ⑦의 검증 담당이 "이 배분을 20년 전부터 굴렸다면 어땠을까"를 백테스트할 수 있습니다. 과거 데이터는 지금은 로컬에 저장해 둡니다.</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>이번 주에 쓸 포트폴리오 스냅샷 시트를 만들었다</span></label></div>
     </section>
 
@@ -329,7 +359,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
         </div>
         <div class="workshop-step"><span class="ws-num">4</span>
           <b class="ws-t">이후는 이런 지시들 — 실제 기록에서 셋</b>
-          <p>이 데모는 코드를 한 줄도 쓰지 않고 <b>지시 아홉 번</b>으로 완성됐습니다(로컬에서 돌아가는 React 앱). 성격이 다른 셋만 보면:</p>
+          <p>이 데모는 코드를 한 줄도 쓰지 않고 <b>지시 아홉 번</b>으로 완성됐습니다(로컬에서 돌아가는 React 앱). 성격이 다른 둘만 보면:</p>
           <div class="copy-block"><span class="cb-label">💬 규칙은 숫자로</span>
             <button class="copy-btn" data-copy="p2">복사</button>
             <pre id="p2">자산배분 목표는 60:20:10:10이고, 연 1회 리밸런싱.
@@ -343,17 +373,82 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
 적절하게 백필하는 방법을 고안할 것.</pre>
           </div>
           <p style="margin-top:6px;">이 데모에서 가장 중요한 지시였습니다. 보유 ETF들이 상장 2~5년차라 20년 백테스트가 애초에 불가능하다는 사실(지시한 사람도 몰랐던 벽)을 AI가 먼저 확인해 보고했고, 각 ETF가 무엇의 수익률을 따라가는지를 근거로 상장 이전 구간을 이어 붙여 최대 22년까지 소급했습니다. 해법을 지시하지 않고 <b>풀어야 할 문제만</b> 던졌기 때문에 가능했던 결과입니다.</p>
-          <div class="copy-block"><span class="cb-label">💬 보고 나서, 되돌리기</span>
-            <button class="copy-btn" data-copy="p4">복사</button>
-            <pre id="p4">색상 팔레트는 기본으로 돌아갈 것. 이전이 더 보기 좋다</pre>
-          </div>
-          <p style="margin-top:6px;">색·배치·단위처럼 <b>보기 전에는 판단할 수 없는 것</b>은 미리 고민하지 않습니다. 만들어 보고 마음에 안 들면 한 줄로 되돌립니다.</p>
         </div>
         <div class="workshop-step"><span class="ws-num">5</span>
           <b class="ws-t">확인 — 시트를 고치면 대시보드가 바뀐다</b>
           <p>계획을 승인해 대시보드가 뜨면, <b>시트의 스냅샷을 직접 고치고</b> 대시보드를 새로고침해 봅니다. 바뀐 배분이 화면에 반영되면 프로그램이 내 시트를 실제로 읽고 있는 것입니다. (관리기가 시트에 <b>써 넣는</b> 방향은 이번엔 열어 두지 않았습니다 — 스냅샷은 손으로 입력하고, 화면은 읽기 전용으로 시작합니다.)</p>
         </div>
       </div>
+
+      <h3>완성된 화면 — 탭 셋</h3>
+      <p>화면 구성이 자리를 잡은 뒤, 탭을 나누라는 지시 한 줄을 줬습니다:</p>
+      <div class="copy-block"><span class="cb-label">💬 실제 지시</span>
+        <button class="copy-btn" data-copy="p4">복사</button>
+        <pre id="p4">현황 탭, 백테스트 탭, 리밸런싱 탭을 따로 구분할 것.</pre>
+      </div>
+      <p>아래는 실제로 돌아가는 화면입니다(2026.08.21 기준, 로컬 실행).</p>
+
+      <h4 style="margin:18px 0 6px;font-size:15px;">① 현황 탭 — 지금 내 자산이 어떤 상태인가</h4>
+      <div class="pfapp">
+        <div class="pf-head"><div><div class="pf-kicker">PORTFOLIO</div><b>자산 관리</b><div class="pf-sub">구글 시트 스냅샷 장부 · 시세 Yahoo Finance · 2026.08.21 종가 기준</div></div><span class="pf-btn">새로고침</span></div>
+        <div class="pf-tabs"><span class="on">현황</span><span>리밸런싱</span><span>백테스트</span></div>
+        <div class="pf-tiles">
+          <div class="pf-tile"><div class="k">총 평가액</div><div class="v">58,354,525원</div></div>
+          <div class="pf-tile"><div class="k">평가손익</div><div class="v up">+1,361,774원</div><div class="d up">+2.39%</div></div>
+          <div class="pf-tile"><div class="k">전일 대비</div><div class="v dn">−418,890원</div><div class="d dn">−0.71%</div></div>
+          <div class="pf-tile"><div class="k">누적 투입액</div><div class="v">56,992,751원</div><div class="d">스냅샷 8건</div></div>
+        </div>
+        <div class="pf-chart">📈 자산 추이 (2026.01.02 ~ 2026.08.21) : 금융 자산 실선과 누적 투입액 계단 점선이 함께 그려집니다. 기간은 3개월·6개월·1년·전체로 전환.</div>
+        <div class="pf-cap">자산배분 <span style="float:right;color:#8a857e;font-weight:600;">목표 60 : 20 : 10 : 10</span></div>
+        <div class="pf-row"><span class="pf-lab">현재</span><div class="pf-bar" style="flex:1;">
+          <div style="width:62%;background:#2e6fd6;">S&amp;P500 62%</div><div style="width:19%;background:#e2703a;">금현물 19%</div><div style="width:10%;background:#2f9e6e;">CD금리 10%</div><div style="width:9%;background:#e0a52e;">달러SOFR 9%</div></div></div>
+        <div class="pf-row"><span class="pf-lab">목표</span><div class="pf-bar" style="flex:1;">
+          <div style="width:60%;background:#2e6fd6;">S&amp;P500 60%</div><div style="width:20%;background:#e2703a;">금현물 20%</div><div style="width:10%;background:#2f9e6e;">CD금리 10%</div><div style="width:10%;background:#e0a52e;"></div></div></div>
+        <div class="pf-note">아래로 보유 종목 표가 이어집니다. 종목마다 보유량 · 평균매입가 · 현재가 · 평가액 · 평가손익 · 비중이 한 줄씩입니다.</div>
+      </div>
+      <p>시트의 스냅샷(수량·매입가)에 야후 파이낸스의 종가를 붙여 계산합니다. 요약 타일, 투입액 대비 추이, 현재와 목표 배분의 비교, 보유 종목 표까지가 한 화면입니다.</p>
+
+      <h4 style="margin:18px 0 6px;font-size:15px;">② 리밸런싱 탭 — 지금 조정해야 하는가</h4>
+      <div class="pfapp">
+        <div class="pf-tabs" style="margin-top:0;"><span>현황</span><span class="on">리밸런싱</span><span>백테스트</span></div>
+        <div class="pf-tiles" style="grid-template-columns:repeat(3,1fr);">
+          <div class="pf-tile"><div class="k">판정</div><div class="v">전 종목 밴드 이내</div></div>
+          <div class="pf-tile"><div class="k">다음 정기 리밸런싱</div><div class="v">2027.08.03 <span style="color:#8a857e;font-size:12px;">D-347</span></div></div>
+          <div class="pf-tile"><div class="k">직전 조정</div><div class="v">2026.08.03</div></div>
+        </div>
+        <div class="pf-cap">주문 제안 <span style="float:right;color:#8a857e;font-weight:600;">연 1회 정기 + 밴드(5/25 규칙) 이탈 시 수시</span></div>
+        <table class="pf-tbl">
+          <tr><th>종목</th><th>현재 → 목표</th><th>이탈</th><th>조정 금액</th><th>주문</th></tr>
+          <tr><td>S&amp;P500</td><td>61.9% → 60%</td><td>+1.9%p</td><td>−1,091,385원</td><td class="dn">매도 46주</td></tr>
+          <tr><td>금현물</td><td>19.0% → 20%</td><td>−1.0%p</td><td>+575,405원</td><td class="up">매수 20주</td></tr>
+          <tr><td>CD금리</td><td>9.6% → 10%</td><td>−0.4%p</td><td>+214,788원</td><td class="up">매수 4주</td></tr>
+          <tr><td>달러SOFR</td><td>9.5% → 10%</td><td>−0.5%p</td><td>+301,193원</td><td class="up">매수 5주</td></tr>
+        </table>
+        <div class="pf-note">밴드는 5/25 규칙 — 절대 5%p와 목표의 상대 25% 중 작은 쪽. 비중 60·20%는 ±5%p, 10%는 ±2.5%p가 허용 범위입니다.</div>
+      </div>
+      <p>종목별로 목표에서 얼마나 벗어났는지를 게이지로 보여주고, 밴드를 넘으면 몇 주를 사고팔면 되는지까지 계산해 줍니다. 밴드 폭을 지정하지 않았는데 AI가 자산배분에서 널리 쓰이는 5/25 규칙을 골라 근거를 화면에 적어 둔 것이 보입니다. 지금은 전 종목이 밴드 이내라 할 일이 없다는 판정입니다.</p>
+
+      <h4 style="margin:18px 0 6px;font-size:15px;">③ 백테스트 탭 — 이 배분을 과거에 굴렸다면</h4>
+      <div class="pfapp">
+        <div class="pf-tabs" style="margin-top:0;"><span>현황</span><span>리밸런싱</span><span class="on">백테스트</span></div>
+        <div class="pf-cond">
+          <span>기간 <b>10년</b> <span class="pf-slider"><i></i></span></span>
+          <span>리밸런싱 밴드 <b>±5%P</b> <span class="pf-slider"><i></i></span></span>
+          <span>초기 투자금 <b>1000</b>만원</span>
+          <span>매월 적립 <b>0</b>만원</span>
+          <span class="pf-btn">실행</span>
+        </div>
+        <div class="pf-tiles">
+          <div class="pf-tile"><div class="k">최종 평가액</div><div class="v">39,934,747원</div><div class="d">투입 1,000만원</div></div>
+          <div class="pf-tile"><div class="k">연평균 수익률</div><div class="v up">+14.85%</div></div>
+          <div class="pf-tile"><div class="k">최대 낙폭</div><div class="v dn">−18.66%</div></div>
+          <div class="pf-tile"><div class="k">리밸런싱</div><div class="v">17회</div><div class="d">정기 10 · 밴드 7</div></div>
+        </div>
+        <div class="pf-chart">📈 시뮬레이션 자산 추이 (2016.08 ~ 2026.08) : 10년 전 1,000만원을 이 배분으로 굴렸을 때의 곡선과 리밸런싱 시점들이 표시됩니다.</div>
+        <div class="pf-note"><b>백필 근거</b> — ETF 상장 이전 구간은 프록시의 일간 수익률을 상장일 가격에 접합해 채웠습니다: CD금리(2023.06 이전)는 CD 91일 금리 누적(근사), S&amp;P500(2021.04 이전)은 S&amp;P500 총수익 × 원/달러, 금현물(2021.12 이전)은 국제 금가격 × 원/달러, 달러SOFR(2023.05 이전)은 미국 단기금리 × 원/달러.</div>
+      </div>
+      <p>기간과 밴드를 슬라이더로 바꿔 가며 실험할 수 있습니다. 보유 ETF들이 상장 2~5년차라 20년 백테스트가 불가능했던 문제를, 각 ETF가 무엇을 따라가는지(프록시)로 과거를 재구성해 해결했습니다. 그 근거를 화면 아래에 스스로 밝혀 둔 것, 그리고 근사치를 쓴 구간은 파일을 고쳐 덮어쓸 수 있게 한 것까지가 AI의 작업입니다. 과거 데이터는 로컬에 저장됩니다.</p>
+
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>계획 문답을 거쳐 대시보드가 뜨고, 시트 수정이 화면에 반영됐다</span></label></div>
     </section>
 
