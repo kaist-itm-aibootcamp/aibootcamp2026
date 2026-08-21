@@ -103,6 +103,7 @@
 | (신규 — 2026-08-21) | `week4-03-service-account.html` — STEP 3 서비스 계정 업그레이드(GCP·폴더 공유·JSON 키 로컬) |
 | (신규 — 2026-08-21) | `week4-04-notion-report.html` — STEP 4 노션 연동(루틴이 매일 발행하는 자산 일지, 공유·대화) |
 | (재편 — 2026-08-21) `week4-01-autonomous-execution-risks.html` 기반 | `week4-05-autonomous-risks.html` — STEP 5 맡기기 전에(위험·안전장치)로 이동 재구성, 멜버른 예약 해킹 사례 추가 |
+| (재편 — 2026-08-21) `week4-05-hermes-agent-setup.html` 기반 | `week4-06-hermes-agent.html` — STEP 6 헤르메스 설치로 재구성, 설치를 Hostinger 원클릭 앱 실제 화면으로 교체, ⑦ 위원회로 연결 |
 | `tmp-cli-tools.html` · `tmp-sheets-readonly.html` · `tmp-team-dashboard.html` | 흡수 후 삭제 |
 
 > 2026-08 주차 재편성: 새 Week 4 = "연동과 자율 에이전트 — AI에게 일을 맡기는 법" (마지막 주차, 자료 7개, STEP 1~7). 스킬 만들기가 2주차로 옮겨갔고, CLI가 ③ 별도 강의로 분리되면서 시트 연동·에르메스·총정리가 ④~⑦로 밀렸다.
