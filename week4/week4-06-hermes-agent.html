@@ -90,6 +90,11 @@ body{
 .hd-box .y{color:#f2b53a;font-weight:700;}
 .hd-box .o{color:#e08a3c;}
 @media (max-width:700px){.hd{display:block;}.hd-side{display:none;}}
+.hx{background:#141210;border-radius:12px;padding:16px 18px;margin:12px 0;font-family:ui-monospace,Consolas,monospace;font-size:12px;line-height:1.85;color:#e8c477;overflow-x:auto;box-shadow:var(--shadow);}
+.hx .t{color:#f2b53a;font-weight:700;}
+.hx .w{color:#cfc4a6;white-space:normal;}
+.hx table{border-collapse:collapse;margin:4px 0;}
+.hx td{padding:1px 16px 1px 0;vertical-align:top;white-space:nowrap;}
 .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
 .sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
 .sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
@@ -291,8 +296,8 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <a href="#s1" data-sec="s1">1. 헤르메스란 — Claude와 뭐가 다른가<span class="done-mark">✔</span></a>
       <a href="#s2" data-sec="s2">2. 설치 — 내 컴퓨터에<span class="done-mark">✔</span></a>
       <a href="#s3" data-sec="s3">3. OpenRouter 연동 — 두뇌 꽂기<span class="done-mark">✔</span></a>
-      <a href="#s4" data-sec="s4">4. 텔레그램 게이트웨이 — 페어링으로 연결<span class="done-mark">✔</span></a>
-      <a href="#s5" data-sec="s5">5. 첫 대화와 안전 점검<span class="done-mark">✔</span></a>
+      <a href="#s4" data-sec="s4">4. 텔레그램 — 설치 때 함께 연결<span class="done-mark">✔</span></a>
+      <a href="#s5" data-sec="s5">5. 시연 — 폰에서 시키면 PC에서 실행<span class="done-mark">✔</span></a>
       <a href="#s6" data-sec="s6">6. 마무리<span class="done-mark">✔</span></a>
     </div>
   </nav>
@@ -303,7 +308,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <div class="hero">
       <span class="hero-kicker">WEEK 4 · STEP 6 — 헤르메스 설치</span>
       <h1>내 에이전트 —<br/>헤르메스를 세운다</h1>
-      <p>⑤에서 위험과 안전장치를 손에 쥐었으니, 이제 <b>자율 에이전트를 직접 설치</b>합니다. 헤르메스(Hermes Agent)는 상주하며 텔레그램으로 말을 걸 수 있는 오픈소스 에이전트입니다. 이 강의는 <b>시연</b>입니다. 설치를 권하는 것이 아니라, 자율 에이전트를 실행하면 무슨 일이 벌어지는지 실제 화면으로 봅니다. 강사는 헤르메스를 <b>윈도우 PC에 로컬로 설치</b>하고 텔레그램을 연결해 두었습니다. 구조(설치 → 두뇌 → 텔레그램)를 이해한 뒤, 연동된 실제 대화와 "폰에서 시키면 PC에서 실행되는" 장면을 봅니다. 이 에이전트가 ⑦의 투자 위원회를 굴리게 됩니다.</p>
+      <p>⑤에서 위험과 안전장치를 손에 쥐었으니, 이제 <b>자율 에이전트를 직접 설치</b>합니다. 헤르메스(Hermes Agent)는 상주하며 텔레그램으로 말을 걸 수 있는 오픈소스 에이전트입니다. 이 강의는 <b>시연</b>입니다. 설치를 권하는 것이 아니라, 자율 에이전트를 실행하면 무슨 일이 벌어지는지 실제 화면으로 봅니다. 강사는 헤르메스를 <b>윈도우 PC에 로컬로 설치</b>하고 텔레그램을 연결해 두었습니다. 구조(설치 → 두뇌 → 텔레그램)를 이해한 뒤, "폰에서 시키면 PC에서 실행되는" 장면을 봅니다. 이 에이전트가 ⑦의 투자 위원회를 굴리게 됩니다.</p>
     </div>
 
 
@@ -358,88 +363,33 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <!-- ================= SECTION 3 ================= -->
     <section class="section" id="s3">
       <div class="sec-head"><span class="sec-num">3</span><h2>OpenRouter 연동 — 두뇌 꽂기</h2></div>
-      <p class="sec-lead">헤르메스는 몸일 뿐, 두뇌(모델)는 밖에서 꽂아야 합니다. 2·3주차에 만들어 둔 <b>OpenRouter API 키를 그대로 재사용</b>합니다 — 새로 발급할 필요 없습니다.</p>
-
-      <div class="ws-steps">
-        <div class="workshop-step"><span class="ws-num">1</span>
-          <b class="ws-t">.env에 키 넣기</b>
-          <div class="copy-block"><span class="cb-label">📄 ~/.hermes/.env</span>
-            <button class="copy-btn" data-copy="h3">복사</button>
-            <pre id="h3">OPENROUTER_API_KEY=sk-or-v1-여기에-내-키</pre>
-          </div>
-        </div>
-        <div class="workshop-step"><span class="ws-num">2</span>
-          <b class="ws-t">config.yaml에서 기본 모델 지정</b>
-          <div class="copy-block"><span class="cb-label">📄 ~/.hermes/config.yaml</span>
-            <button class="copy-btn" data-copy="h4">복사</button>
-            <pre id="h4">model:
+      <p class="sec-lead">헤르메스는 몸일 뿐, 두뇌(모델)는 밖에서 꽂아야 합니다. 2·3주차에 만들어 둔 <b>OpenRouter API 키를 그대로 재사용</b>합니다. 새로 발급할 필요 없습니다.</p>
+      <p>키는 따로 파일을 만들 필요가 없습니다. <b>설치 과정에서 OpenRouter 키를 물으면 입력</b>하면 되고, 입력한 키는 <code>~/.hermes/.env</code>에 저장됩니다.</p>
+      <p>기본 모델은 <code>config.yaml</code>에서 지정합니다. 시연 환경은 3주차 챗봇과 같은 <b>deepseek-v4-flash</b>입니다:</p>
+      <div class="copy-block"><span class="cb-label">📄 ~/.hermes/config.yaml</span>
+        <button class="copy-btn" data-copy="h4">복사</button>
+        <pre id="h4">model:
   provider: "openrouter"
-  default: "anthropic/claude-sonnet-4.6"</pre>
-          </div>
-          <p>OpenRouter를 통해 200개 이상의 모델을 같은 키로 바꿔 낄 수 있습니다. 한 번만 써 보려면 설정 없이 <code>hermes chat --provider openrouter --model anthropic/claude-sonnet-4.6</code>처럼 실행 시 지정할 수도 있습니다.</p>
-        </div>
+  default: "deepseek/deepseek-v4-flash"</pre>
       </div>
-      <div class="callout"><b class="cap">.env는 내 서버에만</b>
-      3주차에는 키를 Vercel의 환경변수에 두었습니다. 헤르메스에서는 <b>키가 내 컴퓨터의 <code>~/.hermes/.env</code>에 놓입니다</b> — 편리하지만, OpenClaw 사고 원인 중 하나가 "평문으로 놓인 비밀"이었음을 기억하세요. 이 파일을 절대 git에 커밋하거나 메신저로 보내지 말고, 에이전트의 작업 폴더 안에 복사해 두지도 마세요(울타리 안의 비밀은 보호 대상이 아니라 작업 대상이 됩니다).</div>
+      <p>OpenRouter를 통해 200개 이상의 모델을 같은 키로 바꿔 낄 수 있습니다.</p>
+      <div class="callout"><b class="cap">.env는 내 컴퓨터에만</b>
+      설치 때 입력한 키는 내 컴퓨터의 <code>~/.hermes/.env</code>에 평문으로 놓입니다. 이 파일을 git에 커밋하거나 메신저로 보내지 말고, 에이전트의 작업 폴더 안에 복사해 두지도 마세요. 울타리 안의 비밀은 보호 대상이 아니라 작업 대상이 됩니다.</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>두뇌는 .env의 키와 config.yaml의 모델 지정으로 꽂힌다는 것을 이해했다</span></label></div>
     </section>
 
     <!-- ================= SECTION 4 ================= -->
     <section class="section" id="s4">
-      <div class="sec-head"><span class="sec-num">4</span><h2>텔레그램 게이트웨이 — 페어링으로 연결</h2></div>
-      <p class="sec-lead">이제 입을 답니다. 텔레그램 봇을 만들어 헤르메스에 연결하면, 폰에서 말 거는 것만으로 에이전트가 움직입니다. 연결 과정은 이렇습니다:</p>
-
-      <div class="ws-steps">
-        <div class="workshop-step"><span class="ws-num">1</span>
-          <b class="ws-t">BotFather로 봇 만들기</b>
-          <p>텔레그램에서 <b>@BotFather</b>를 검색해 대화 시작 → <code>/newbot</code> → 봇 이름과 아이디(…bot으로 끝나야 함) 지정 → 발급된 <b>봇 토큰</b>을 복사해 둡니다. 이 토큰도 비밀입니다 — 키와 같은 등급으로 다루세요.</p>
-        </div>
-        <div class="workshop-step"><span class="ws-num">2</span>
-          <b class="ws-t">게이트웨이 설정</b>
-          <div class="copy-block"><span class="cb-label">⌨️ 터미널</span>
-            <button class="copy-btn" data-copy="h5">복사</button>
-            <pre id="h5">hermes gateway setup</pre>
-          </div>
-          <p>목록에서 <b>Telegram</b>을 선택하고, 1단계의 봇 토큰을 붙여넣습니다.</p>
-        </div>
-        <div class="workshop-step"><span class="ws-num">3</span>
-          <b class="ws-t">페어링 — 사용자 승인</b>
-          <p>텔레그램에서 내 봇에게 첫 메시지를 보내면 <b>페어링 코드</b>가 표시됩니다. 터미널에서 그 코드를 승인해야 대화가 시작됩니다:</p>
-          <div class="copy-block"><span class="cb-label">⌨️ 터미널</span>
-            <button class="copy-btn" data-copy="h6">복사</button>
-            <pre id="h6">hermes pairing approve telegram 페어링코드</pre>
-          </div>
-        </div>
-        <div class="workshop-step"><span class="ws-num">4</span>
-          <b class="ws-t">게이트웨이 시작</b>
-          <div class="copy-block"><span class="cb-label">⌨️ 터미널</span>
-            <button class="copy-btn" data-copy="h7">복사</button>
-            <pre id="h7">hermes gateway start</pre>
-          </div>
-        </div>
-      </div>
-
-      <div class="callout ok"><b class="cap">①의 원칙, 두 번째 실물 — 페어링 코드가 곧 human-in-the-loop</b>
-      왜 봇에게 바로 말을 걸 수 없게 해 놓았을까요? 봇 아이디는 사실상 공개 정보라, 승인 절차가 없다면 <b>아무나</b> 내 컴퓨터의 에이전트에게 명령을 보낼 수 있기 때문입니다. 페어링 코드는 "이 사람의 명령만 받는다"를 <b>사람이 직접 승인</b>하는 장치 — ⑤에서 배운 화이트리스트 + HITL이 실물로 구현된 모습입니다.</div>
-
-      <h3>연동된 모습 — 실제 첫 대화</h3>
-      <p>연결을 마친 강사의 텔레그램입니다. 매끄러운 데모가 아니라 실제 화면이라 배울 것이 더 많습니다:</p>
-      <div class="tgc">
-        <div class="tg-date"><span>August 21</span></div>
-        <div class="tg-row me"><div class="tg-bub"><span class="tg-link">/start</span><span class="tg-time">오후 8:48 ✓✓</span></div></div>
-        <div class="tg-row"><div class="tg-bub">⚠️ Gateway shutting down — Your current task will be interrupted.<span class="tg-time">오후 8:53</span></div></div>
-        <div class="tg-row me"><div class="tg-bub">안녕?<span class="tg-time">오후 8:54 ✓✓</span></div></div>
-        <div class="tg-row me"><div class="tg-bub">넌 왜 답이 없지?<span class="tg-time">오후 8:54 ✓✓</span></div></div>
-        <div class="tg-row"><div class="tg-bub"><div class="tg-quote"><b>BP Kim</b>넌 왜 답이 없지?</div>↪ Redirected current run (iteration 1/150). I&#39;ll adjust using your correction.<br/><br/>💡 First-time tip — I redirected the current run using your message. Completed work stays in context, and <span class="tg-link">/stop</span> still cancels the task. Send <span class="tg-link">/busy queue</span> to wait for a separate turn, or <span class="tg-link">/busy status</span> to check. This notice won&#39;t appear again.<span class="tg-time">오후 8:54</span></div></div>
-        <div class="tg-row"><div class="tg-bub"><div class="tg-quote"><b>BP Kim</b>안녕?</div>아이고, 미안합니다. 답변이 중간에 끊겨서 전달이 안 됐었네요 🤦<br/><br/>안녕하세요! 저는 Hermes Agent예요. 궁금하신 거나 도와드릴 일 있으면 편하게 말씀해 주세요. 사용 가능한 명령어를 보시려면 <span class="tg-link">/help</span>를 입력하시면 됩니다.<br/><br/>혹시 저를 더 유용하게 쓸 수 있도록 간단한 프로필(예: 어떻게 불러드리면 되는지, 주로 하시는 일, 저를 어떻게 활용하고 싶으신지)을 만들어도 될까요? 꼭 필요한 건 아니고, 부담되시면 안 하셔도 됩니다!<span class="tg-time">오후 8:54</span></div></div>
-      </div>
-      <p class="chart-note">눈여겨볼 것 두 가지. 처음에 답이 없던 이유가 화면에 그대로 남아 있고(게이트웨이 재시작 알림), 작업 중에 새 메시지를 보내면 하던 일에 끼워 넣는다는 안내(Redirected)가 옵니다. 항상 떠 있는 소프트웨어를 데리고 산다는 것의 실제 감촉입니다.</p>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>페어링이 왜 필요한지 알고, 연동된 대화가 어떤 모습인지 보았다</span></label></div>
+      <div class="sec-head"><span class="sec-num">4</span><h2>텔레그램 — 설치 때 함께 연결됩니다</h2></div>
+      <p class="sec-lead">입(대화 통로)도 따로 만들 것이 없습니다. <b>설치 과정의 안내를 따라가면 텔레그램 봇 연결까지 끝납니다.</b> 이후에는 폰에서 말 거는 것만으로 에이전트가 움직입니다.</p>
+      <div class="callout ok"><b class="cap">⑤의 원칙, 실물 하나 — 페어링</b>
+      낯선 계정이 봇에게 말을 걸면 바로 대화가 되지 않고 <b>페어링 승인</b>을 거칩니다. 봇 아이디는 사실상 공개 정보라, 승인 절차가 없다면 아무나 내 컴퓨터의 에이전트에게 명령을 보낼 수 있기 때문입니다. ⑤에서 배운 화이트리스트 + HITL이 실물로 구현된 모습입니다.</div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>텔레그램 연결의 관문이 페어링 승인이라는 것을 이해했다</span></label></div>
     </section>
 
     <!-- ================= SECTION 5 ================= -->
     <section class="section" id="s5">
-      <div class="sec-head"><span class="sec-num">5</span><h2>첫 대화와 안전 점검</h2></div>
+      <div class="sec-head"><span class="sec-num">5</span><h2>시연 — 폰에서 시키면 PC에서 실행됩니다</h2></div>
       <p class="sec-lead">이제 핵심 장면입니다. 폰에서 "설치가 잘 되었는지 점검"이라고 보내면, 에이전트가 <b>PC에서 명령을 직접 실행</b>하고 결과를 보고합니다. 실제 화면입니다:</p>
       <div class="tgc">
         <div class="tg-row me"><div class="tg-bub">hermes agent 설치가 잘 되었는지 점검<span class="tg-time">오후 8:59 ✓✓</span></div></div>
@@ -451,7 +401,31 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
         <span class="tg-time">오후 9:00</span></div></div>
         <div class="tg-row"><div class="tg-bub"><div class="tg-quote"><b>BP Kim</b>hermes agent 설치가 잘 되었는지 점검</div>전반적으로 <b>설치가 아주 잘 되어 있습니다!</b> ✅ 아래에 주요 내용 정리했어요:<span class="tg-time">오후 9:00</span></div></div>
       </div>
-      <p class="chart-note">문장 한 줄이 폰을 떠나 PC의 셸 명령 실행으로 이어지고, 어떤 명령을 돌렸는지가 채팅에 투명하게 남습니다. 에이전트가 "도구를 쥔다"는 말의 실물입니다. 아무나 페어링되면 안 되는 이유이자, terminal backend를 docker로 두라는 이유이기도 합니다.</p>
+      <p class="chart-note">문장 한 줄이 폰을 떠나 PC의 셸 명령 실행으로 이어지고, 어떤 명령을 돌렸는지가 채팅에 투명하게 남습니다. 에이전트가 "도구를 쥔다"는 말의 실물이고, 아무나 페어링되면 안 되는 이유이기도 합니다.</p>
+
+      <h3>한 단계 더 — 프로젝트를 통째로 맡겨 보기</h3>
+      <p>이번에는 일다운 일입니다. "github에 asset-manager 프로젝트가 있어. 그걸 hermes 폴더 안에 clone 해서 살펴봐"라고 보냈더니, 에이전트가 <b>스스로 gh를 실행해 내 깃헙에서 레포를 찾고, 내려받고, 분석 보고</b>까지 돌아왔습니다:</p>
+      <div class="hx">
+        <div class="t">📁 C:\hermes\asset-manager</div>
+        <br/><span class="t">포트폴리오 관리기</span> — 구글 시트를 장부로 쓰는 자산 포트폴리오 대시보드 (React + Vite + TypeScript)<br/><br/>
+        <span class="t">구조</span>
+        <table>
+          <tr><td>server/portfolio.ts (363줄)</td><td class="w">핵심 로직 — 포트폴리오 현황, 리밸런싱, 백테스트</td></tr>
+          <tr><td>server/sheet.ts</td><td class="w">Google Sheets API (탭 = 날짜별 스냅샷)</td></tr>
+          <tr><td>server/google-auth.ts</td><td class="w">GCP 서비스 계정 JWT 인증</td></tr>
+          <tr><td>server/yahoo.ts</td><td class="w">Yahoo Finance 시세 + 12시간 디스크 캐시</td></tr>
+          <tr><td>src/App.tsx (620줄)</td><td class="w">대시보드 UI — 현황/리밸런싱/백테스트 3탭</td></tr>
+          <tr><td>scripts/daily-report.mts</td><td class="w">노션 일일 리포트 생성기</td></tr>
+        </table><br/>
+        <span class="t">주요 특징</span><br/>
+        · 목표 배분 60:20:10:10 (S&amp;P500/금현물/CD금리/달러SOFR), 5/25 밴드 리밸런싱 + 연 1회 정기<br/>
+        · 수익률은 IRR (CAGR 아님, 적립식 고려)<br/>
+        · 시트 권한은 읽기 전용, 키 없으면 공개 CSV로 자동 전환<br/><br/>
+        <span class="t">커밋 히스토리 (3개)</span><br/>
+        1. bf57138 구글 시트 장부 기반 포트폴리오 관리기 &nbsp;2. 922ce24 GCP 서비스 계정으로 시트 읽기 &nbsp;3. e0d2381 노션 일일 리포트 생성기<br/><br/>
+        <span class="w">참고로 README에 C:\claude\asset-manager 경로가 적혀 있는데 실제 clone은 C:\hermes\asset-manager에 했습니다. 앞으로 이 프로젝트에서 뭘 할까요? (코드 분석, 기능 추가, 버그 수정 등)</span>
+      </div>
+      <p class="chart-note">②~④에서 만든 관리기 프로젝트를 에이전트가 알아서 찾아 읽었습니다. README와 실제 경로가 다르다는 것까지 짚습니다. 이대로 개발 작업을 시킬 수도 있습니다. 다만 개발이라면 굳이 헤르메스일 이유가 없습니다. 아래 평가 그대로입니다.</p>
 
       <h3>대시보드 — 설정은 여기서</h3>
       <p>터미널에서 <code>hermes dashboard</code>를 실행하면 브라우저(<code>localhost:9119</code>)에서 대시보드가 열립니다. 모델, 루틴(CRON), 스킬, MCP, 페어링, 키까지 꽤 세밀하게 설정할 수 있습니다:</p>
@@ -475,7 +449,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
           </div>
         </div>
       </div>
-      <div class="tip-card"><b>써 본 평가</b> — 설정 자유도는 확실히 높습니다. 다만 범용 작업 도구로 쓰기에는 Claude Code(또는 Codex) 쪽이 낫다는 것이 강사의 솔직한 평입니다. 헤르메스의 자리는 "상시 상주 + 메신저 + 루틴"이라는 에이전트 운영 그 자체이고, ⑦에서 그 용도로 씁니다.</div>
+      <div class="tip-card"><b>써 본 평가</b> — 설정 자유도는 확실히 높습니다. 다만 개발 같은 일반 작업이라면, Claude Code를 두고 이 <b>더 위험한 환경</b>(상시 상주, 넓은 자율 실행)을 쓸 이유는 아직 찾지 못했다는 것이 강사의 솔직한 평입니다. 헤르메스의 자리는 "상시 상주 + 메신저 + 루틴"이라는 에이전트 운영 그 자체이고, ⑦에서 그 용도로만 씁니다.</div>
       <div class="kv">
         <div><code>hermes dashboard</code></div><div>브라우저 대시보드 열기 (localhost:9119)</div>
         <div><code>hermes status</code></div><div>에이전트·게이트웨이 동작 상태 확인</div>
@@ -483,12 +457,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
         <div><code>hermes version</code></div><div>설치된 버전 확인</div>
       </div>
 
-      <h3>운영 전 안전 점검 — ①의 체크리스트를 이 자리에</h3>
-      <div class="insight"><span class="n">1</span><p><b>terminal backend는 docker로.</b> <code>config.yaml</code>에서 에이전트의 셸 실행을 Docker 컨테이너로 두면, 명령이 내 컴퓨터 본체가 아니라 일회용 컨테이너 안에서 돕니다. ⑤에서 배운 "모델이 속아도 OS가 막는" 구조입니다. 로컬 설치에서는 이 설정을 직접 챙겨야 합니다. Docker가 없거나 설정이 낯설면 Claude Code에 맡기면 됩니다.</p></div>
-      <div class="insight"><span class="n">2</span><p><b>페어링은 내 계정 하나만.</b> 가족·친구 계정을 무심코 승인하지 않기. 승인 목록이 곧 화이트리스트입니다.</p></div>
-      <div class="insight"><span class="n">3</span><p><b>비밀은 <code>.env</code>에만, 작업 폴더 밖에.</b> 에이전트가 읽고 다니는 폴더에 키·토큰 사본을 두지 않기.</p></div>
-      <div class="insight"><span class="n">4</span><p><b>logs/를 가끔 열어 본다.</b> 자율은 무감독이 아닙니다 — 에이전트가 무슨 일을 했는지 확인하는 습관이 마지막 안전장치입니다.</p></div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>지시 한 줄이 PC 명령 실행으로 이어지는 것과 안전 점검 4가지를 확인했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>지시 한 줄이 PC 명령 실행으로 이어지는 것을 확인했다</span></label></div>
     </section>
 
     <!-- ================= SECTION 6 ================= -->
@@ -497,10 +466,9 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <ul class="final-list">
         <li>헤르메스 = 자가 호스팅 · 상시 상주 · 메신저로 부르는 오픈소스(MIT) 에이전트</li>
         <li>시연 환경은 내 컴퓨터 로컬 설치. 컴퓨터가 켜져 있는 동안 동작하고, 필요해지면 호스팅으로 옮길 수 있다</li>
-        <li>두뇌는 OpenRouter로 — 2·3주차의 키 재사용, 키는 .env에만</li>
+        <li>두뇌는 OpenRouter로. 키는 설치 때 입력하며(2·3주차 키 재사용) 기본 모델은 deepseek-v4-flash</li>
         <li>텔레그램 연결의 관문은 페어링 코드 — HITL·화이트리스트의 실물</li>
-        <li>terminal backend는 docker로. "속아도 막히는" 구조를 직접 챙긴다</li>
-      </ul>
+              </ul>
       <div class="next-card-grid">
         <div class="next-card"><b>다음 강의 ⑦ — 나의 투자 위원회</b><span>이 에이전트 위에 관점이 다른 봇 셋을 올립니다. 추세·리밸런싱·검증 담당이 포트폴리오를 놓고 토론하고, 주 1회 루틴으로 돌립니다. 결정은 나.</span></div>
         <div class="next-card"><b>포트폴리오를 물려주기</b><span>②~③에서 만든 시트와 서비스 계정 키를 이 에이전트가 읽게 해 두면, ⑦의 위원회가 내 실제 배분을 검토할 수 있습니다.</span></div>
