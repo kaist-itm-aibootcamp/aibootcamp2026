@@ -221,7 +221,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <div class="hero">
       <span class="hero-kicker">WEEK 4 · STEP 7 — 나의 투자 자문단</span>
       <h1>관점이 다른 봇 셋,<br/>결정은 나</h1>
-      <p>부트캠프의 마지막 실습입니다. ⑥에서 세운 헤르메스 위에 <b>투자 자문단</b>을 올립니다. ②~③에서 만든 포트폴리오 관리기(asset-manager)의 데이터를 읽어, <b>관점이 서로 다른 봇 셋</b>이 각자 의견을 내고, 반론과 검증을 거친 종합 보고가 <b>매일 아침 텔레그램으로</b> 도착하는 구조입니다. 자문단은 제안까지만 합니다. 매매 실행 기능은 없고, 결정은 언제나 사람이 합니다.</p>
+      <p>부트캠프의 마지막 실습입니다. ⑥에서 세운 헤르메스 위에 <b>투자 자문단</b>을 올립니다. ④에서 노션에 매일 쌓이는 포트폴리오 일지를 읽어, <b>관점이 서로 다른 봇 셋</b>이 각자 의견을 내고, 반론과 검증을 거친 종합 보고가 <b>매일 아침 텔레그램으로</b> 도착하는 구조입니다. 자문단은 제안까지만 합니다. 매매 실행 기능은 없고, 결정은 언제나 사람이 합니다.</p>
     </div>
 
     <div class="callout caution"><b class="cap">시작 전에 분명히 해 둡니다</b>
@@ -233,7 +233,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <p class="sec-lead">지금까지 만든 조각이 전부 재료가 됩니다. 새로 만드는 것은 <b>스킬 파일 3개와 루틴 1개</b>뿐입니다.</p>
 
       <div class="flowline">
-        <span class="fnode">📊 asset-manager<small>시트 스냅샷 + 시세</small></span>
+        <span class="fnode">📒 노션 일지<small>④가 매일 쌓는 현황</small></span>
         <span class="farrow">→</span>
         <span class="fnode">🐂 강세론 담당<small>기회의 논거</small></span>
         <span class="fnode">🐻 약세론 담당<small>위험의 논거</small></span>
@@ -254,11 +254,12 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
 
       <h3>재료 점검 — 이미 다 만들어 두었습니다</h3>
       <div class="kv">
-        <div>데이터</div><div><code>C:\hermes\asset-manager</code> 프로젝트 (⑥에서 헤르메스가 직접 clone). 보유 현황은 구글 시트의 날짜별 탭에서, 시세는 Yahoo Finance 코드로 읽습니다</div>
+        <div>데이터</div><div>④의 노션 일지. 매일 리포트로 쌓이는 포트폴리오 현황(자산별 비중·평가액)을 자문단이 읽습니다</div>
+        <div>백테스트 재료</div><div><code>C:\hermes\asset-manager</code> 프로젝트 (⑥에서 헤르메스가 직접 clone). 과거 시세와 백테스트 로직은 여기서 가져옵니다</div>
         <div>실행 환경</div><div>헤르메스 (⑥에서 설치한 로컬 PC의 상주 에이전트)</div>
         <div>웹 검색</div><div>강세론·약세론 담당이 최근 뉴스와 가치 지표를 찾는 데 씁니다. ⑤의 외부 콘텐츠라서 안전 수칙을 스킬에 함께 적습니다</div>
         <div>대화 통로</div><div>텔레그램 (⑥에서 페어링까지 완료)</div>
-        <div>기록 (선택)</div><div>노션 일지 (④에서 만든 일일 리포트 자리에 자문단 보고도 쌓을 수 있습니다)</div>
+        <div>기록 (선택)</div><div>자문단의 종합 보고도 같은 노션 일지에 쌓아, 데이터 창구가 기록장을 겸하게 할 수 있습니다</div>
       </div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s1" /><span>자문단의 전체 구조(데이터 → 자문역 셋 → 보고 → 나)를 파악했다</span></label></div>
     </section>
@@ -380,6 +381,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <section class="section" id="s4">
       <div class="sec-head"><span class="sec-num">4</span><h2>스킬 파일 3개 — 자문역을 만든다</h2></div>
       <p class="sec-lead">⑥에서 본 <code>~/.hermes/skills/</code> 폴더에 자문역 한 명당 스킬 파일 하나를 만듭니다. 스킬 파일은 자문역의 <b>역할 정의서</b>입니다. 신조, 읽을 데이터, 판단 규칙, 출력 형식, 금지 사항의 다섯 부분으로 적습니다.</p>
+      <p>자문역들의 데이터 창구는 <b>④의 노션 일지</b>입니다. 원장인 구글 시트를 직접 열게 하는 대신, 매일 노션에 쌓이는 리포트를 읽게 합니다. 이미 사람이 읽기 좋게 정리된 데이터라 에이전트도 읽기 쉽고, ②~④에서 만든 파이프라인(시트 → 관리기 → 노션)을 그대로 재사용하는 구성입니다. 백테스트에 필요한 과거 시세만 asset-manager 프로젝트 코드로 가져옵니다.</p>
       <p>의견을 내는 두 자문역(강세론·약세론)에게는 <b>웹 검색</b>도 쥐여줍니다. 최근 시장 뉴스와 가치 지표(P/E 등)의 최신 값은 시트와 시세 데이터만으로는 알 수 없기 때문입니다. 리스크·검증 담당에게는 주지 않습니다. 두 보고와 계산만으로 일하는 역할입니다. 웹 검색은 ⑤에서 배운 외부 콘텐츠라서, 검색 결과 속 지시문을 따르지 말라는 수칙도 스킬에 함께 적습니다.</p>
       <p>파일을 직접 만들 필요는 없습니다. 헤르메스에게 지시 한 번, 그리고 파일 내용 세 개를 보내면 됩니다. 지시는 짧게:</p>
 
@@ -404,9 +406,11 @@ description: 투자 자문단의 강세론 담당. 추세·가치·뉴스를 종
 신조: 기회를 놓치는 것도 손실이다. 지금 시장에서 살 이유를 가장 강하게 만든다.
 
 ## 데이터
-- C:\hermes\asset-manager 프로젝트를 데이터 창구로 쓴다. 보유 현황은 구글 시트의
-  최신 날짜 탭, 시세는 프로젝트의 Yahoo Finance 코드(server/yahoo.ts)로 읽는다.
-- 자산별 최근 3개월, 6개월, 12개월 수익률을 계산한다.
+- ④에서 만든 노션 일지가 데이터 창구다. 매일 쌓인 리포트에서 최신 포트폴리오
+  현황(자산별 비중·평가액)과 최근 흐름을 읽는다.
+- 노션 읽기는 C:\hermes\asset-manager 프로젝트의 노션 연동을 활용한다.
+- 일지에 쌓인 기간보다 긴 수익률(3·6·12개월)이 필요하면 프로젝트의
+  Yahoo Finance 코드(server/yahoo.ts)로 보충한다.
 - 웹 검색으로 각 자산의 최근 뉴스, 실적 전망, 시장 심리를 확인하고 출처를 밝힌다.
 
 ## 분석 방법 (네 갈래를 모두 본다)
@@ -440,9 +444,11 @@ description: 투자 자문단의 약세론 담당. 같은 데이터에서 위험
 신조: 잃지 않는 것이 먼저다. 지금 시장에서 조심할 이유를 가장 강하게 만든다.
 
 ## 데이터
-- C:\hermes\asset-manager 프로젝트를 데이터 창구로 쓴다. 보유 현황은 구글 시트의
-  최신 날짜 탭, 시세는 프로젝트의 Yahoo Finance 코드(server/yahoo.ts)로 읽는다.
-- 자산별 최근 3개월, 6개월, 12개월 수익률을 계산한다.
+- ④에서 만든 노션 일지가 데이터 창구다. 매일 쌓인 리포트에서 최신 포트폴리오
+  현황(자산별 비중·평가액)과 최근 흐름을 읽는다.
+- 노션 읽기는 C:\hermes\asset-manager 프로젝트의 노션 연동을 활용한다.
+- 일지에 쌓인 기간보다 긴 수익률(3·6·12개월)이 필요하면 프로젝트의
+  Yahoo Finance 코드(server/yahoo.ts)로 보충한다.
 - 웹 검색으로 각 자산의 최근 뉴스와 가치 지표의 최신 값을 확인하고 출처를 밝힌다.
 
 ## 분석 방법 (네 갈래를 모두 본다)
@@ -480,9 +486,10 @@ description: 투자 자문단의 리스크·검증 담당. 강세·약세 보고
 - 받은 보고가 없으면 현재 배분 유지를 기본안으로 놓고 검증한다.
 
 ## 데이터
-- C:\hermes\asset-manager 프로젝트를 데이터 창구로 쓴다.
-- server/portfolio.ts에 백테스트 로직이 이미 있다. 가능하면 그것을 활용한다.
-- 과거 시세는 프로젝트의 Yahoo Finance 코드로 읽는다.
+- 현재 포트폴리오 현황은 ④의 노션 일지에서 확인한다. 두 보고가 인용한 숫자가
+  일지와 맞는지도 본다.
+- 백테스트·몬테카를로에 필요한 과거 시세는 C:\hermes\asset-manager 프로젝트의
+  Yahoo Finance 코드로 읽고, server/portfolio.ts의 백테스트 로직을 활용한다.
 
 ## 검증 방법 (세 단계)
 1. 반론: 두 보고에서 각각 가장 약한 근거 하나를 골라 반박한다. 오래된 뉴스에 기댔는지,
@@ -539,7 +546,7 @@ advisor-bull과 advisor-bear를 각각 실행하고, 두 보고를 advisor-risk�
     <section class="section" id="s6">
       <div class="sec-head"><span class="sec-num">6</span><h2>안전장치 점검 — ⑤의 원칙을 이 자문단에 대본다</h2></div>
       <p class="sec-lead">자율 루틴을 걸기 전, ⑤에서 배운 원칙으로 이 설계를 점검합니다.</p>
-      <div class="insight"><span class="n">1</span><p><b>읽기 전용.</b> 자문단이 만지는 데이터 창구는 ③에서 만든 서비스 계정이고, 권한은 뷰어입니다. 봇이 폭주해도 시트의 원장은 바꿀 수 없습니다.</p></div>
+      <div class="insight"><span class="n">1</span><p><b>원장과의 거리.</b> 자문단이 읽는 것은 ④의 노션 일지이고, 원장인 구글 시트는 직접 만지지 않습니다. 시트 쪽 접근도 ③의 서비스 계정 뷰어 권한이라, 봇이 폭주해도 원장은 바꿀 수 없습니다.</p></div>
       <div class="insight"><span class="n">2</span><p><b>실행 권한 없음.</b> 증권사 연결 자체가 없습니다. 자문단의 출력은 글이 전부라서, 최악의 사고도 "이상한 보고서"에서 멈춥니다.</p></div>
       <div class="insight"><span class="n">3</span><p><b>Human-in-the-loop.</b> 종합 보고의 끝은 항상 사람의 결정입니다. 실제로 매수·매도를 한다면 그것은 내가 증권사 앱을 열어 직접 하는 별개의 행동입니다.</p></div>
       <div class="insight"><span class="n">4</span><p><b>외부 콘텐츠 경계.</b> 자문역이 웹 검색으로 읽는 기사는 ⑤에서 배운 불신 콘텐츠입니다. 검색 결과는 참고 근거로만 쓰고 그 안의 지시문은 따르지 않는다는 수칙을 스킬 파일의 금지 항목에 못 박았습니다.</p></div>
