@@ -187,6 +187,13 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
 .tg-row.me .tg-bub{background:#effdde;}
 .tg-quote{border-left:3px solid #4f9d47;background:#f1f8ec;border-radius:5px;padding:4px 9px;margin-bottom:6px;font-size:12px;color:#444;}
 .tg-quote b{display:block;color:#3e8e3a;font-size:12px;}
+.tg-time{float:right;font-size:10.5px;color:#9db08d;margin:8px 0 0 10px;}
+.tg-cmd{background:#f5f6f7;border-radius:9px;overflow:hidden;margin:6px 0 2px;font-family:ui-monospace,Consolas,monospace;font-size:12px;min-width:230px;}
+.tg-cmd .h{background:#e7eaec;padding:4px 10px;color:#555;font-size:11.5px;}
+.tg-cmd .c{padding:6px 10px;color:#333;}
+.tg-cmd .cb{color:#1d4ed8;}
+.tg-cmd .co{color:#d97706;}
+.tg-cmd .cr{color:#dc2626;}
 .chart-note{font-size:12px;color:var(--muted);margin:6px 0 4px;}
 /* notion recreation */
 .nt{display:flex;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);margin:12px 0;font-size:12.5px;color:#37352f;line-height:1.5;}
@@ -612,6 +619,21 @@ advisor-bull과 advisor-bear를 각각 실행하고, 두 보고를 advisor-risk�
 매매 실행은 절대 하지 말고, 결정은 내가 한다.</pre>
       </div>
 
+      <h3>먼저 손으로 한 번 — 소집 실행 장면</h3>
+      <p>루틴에 걸기 전에, 소집 지시만 떼어 텔레그램으로 직접 보내 봤습니다. 자문단이 깨어나 일을 나누는 실제 장면입니다:</p>
+      <div class="tgc">
+        <div class="tg-row me"><div class="tg-bub">advisor-bull과 advisor-bear를 각각 실행하고, 두 보고를 advisor-risk로 검증한 다음,<br/>세 보고를 종합해 의견이 갈린 지점과 함께 텔레그램으로 보내 줘.<br/>매매 실행은 절대 하지 말고, 결정은 내가 한다.<span class="tg-time">오후 10:38 ✓✓</span></div></div>
+        <div class="tg-row"><div class="tg-bub">투자 자문단을 소집하겠습니다. 먼저 세 스킬을 로드하고, 리스크 담당이 쓸 백테스트 로직을 확인합니다.<span class="tg-time">오후 10:38</span></div></div>
+        <div class="tg-row"><div class="tg-bub">📚 Reading skill advisor-bull<span class="tg-time">오후 10:38</span></div></div>
+        <div class="tg-row"><div class="tg-bub">🖥 <b>terminal</b>
+          <div class="tg-cmd"><div class="h">shell</div><div class="c"><span class="cb">ls</span> /c/hermes/asset-manager/server/ <span class="cr">&amp;&amp;</span>...</div></div>
+          <div class="tg-cmd"><div class="h">shell</div><div class="c"><span class="co">cd</span> /c/hermes/asset-manager <span class="cr">&amp;&amp;</span> <span class="cb">npm run</span>...</div></div>
+        <span class="tg-time">오후 10:38</span></div></div>
+        <div class="tg-row"><div class="tg-bub">스킬 로드 완료. 이제 최신 포트폴리오 데이터 생성, 백테스트 로직 확인, 뉴스 검색을 병렬로 진행합니다.<span class="tg-time">오후 10:39</span></div></div>
+        <div class="tg-row"><div class="tg-bub">🔎 Searching files for export (async )?function|export inter…<br/>🔍 Searching the web for S&amp;P 500 outlook August 2026 market fo…<br/>🔍 Searching the web for 금값 전망 2026 하반기 국제 금 가격<br/>📖 Reading portfolio.ts L200-339<br/>🔍 Searching the web for gold price outlook 2026 Fed rate cut<br/>🔍 Searching the web for 한국 기준금리 2026 CD 91일물 전망<span class="tg-time">오후 10:39</span></div></div>
+      </div>
+      <p class="chart-note">지시 네 줄에 자문단이 깨어나 일을 나눕니다. 스킬 셋을 읽고, 터미널에서 백테스트 로직을 확인하고, 뉴스 검색을 병렬로 돌립니다. 검색어를 보면 설계대로 움직이는 것이 보입니다. S&amp;P500 전망과 금값 전망은 강세·약세 담당의 재료이고, portfolio.ts를 읽는 것은 리스크·검증 담당의 준비이며, CD 91일물 전망까지 찾는 것은 현금성 자산도 빼놓지 않는다는 뜻입니다.</p>
+
       <p>매일 아침 도착하는 종합 보고에는 이런 것이 담기게 됩니다:</p>
       <ul class="final-list">
         <li>오늘의 포트폴리오 현황 (자산별 비중, 목표와의 거리)</li>
@@ -623,7 +645,7 @@ advisor-bull과 advisor-bear를 각각 실행하고, 두 보고를 advisor-risk�
       <div class="callout"><b class="cap">로컬 설치의 조건 하나</b>
       ⑥에서 본 대로, 로컬 설치 에이전트는 <b>컴퓨터가 켜져 있는 동안만</b> 동작합니다. 매일 아침 7시 30분 루틴이라면 그 시각에 PC가 켜져 있어야 합니다. 부담스러우면 시각을 바꾸거나, 24시간 상주가 필요해질 때 호스팅 서버로 옮기면 됩니다.</div>
 
-      <div class="tip-card"><b>실행 결과는 실물로 추가됩니다.</b> 이 구성을 강사의 헤르메스에서 실제로 돌린 결과 화면(자문역별 보고와 종합 보고)이 확인되는 대로 이 자리에 실립니다.</div>
+      <div class="tip-card"><b>종합 보고는 이어서 실립니다.</b> 위 소집이 끝나고 도착한 자문역별 보고와 종합 보고의 실물도 확인되는 대로 이 자리에 추가됩니다.</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>루틴 등록 지시와 종합 보고의 구성을 이해했다</span></label></div>
     </section>
 
