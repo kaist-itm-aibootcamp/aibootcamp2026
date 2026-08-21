@@ -295,7 +295,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <div class="toc" id="toc">
       <a href="#s1" data-sec="s1">1. 헤르메스란 — Claude와 뭐가 다른가<span class="done-mark">✔</span></a>
       <a href="#s2" data-sec="s2">2. 설치 — 내 컴퓨터에<span class="done-mark">✔</span></a>
-      <a href="#s3" data-sec="s3">3. OpenRouter 연동 — 두뇌 꽂기<span class="done-mark">✔</span></a>
+      <a href="#s3" data-sec="s3">3. OpenRouter 연동 — 모델 연결<span class="done-mark">✔</span></a>
       <a href="#s4" data-sec="s4">4. 텔레그램 — 설치 때 함께 연결<span class="done-mark">✔</span></a>
       <a href="#s5" data-sec="s5">5. 시연 — 폰에서 시키면 PC에서 실행<span class="done-mark">✔</span></a>
       <a href="#s6" data-sec="s6">6. 마무리<span class="done-mark">✔</span></a>
@@ -308,7 +308,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <div class="hero">
       <span class="hero-kicker">WEEK 4 · STEP 6 — 헤르메스 설치</span>
       <h1>내 에이전트 —<br/>헤르메스를 세운다</h1>
-      <p>⑤에서 위험과 안전장치를 손에 쥐었으니, 이제 <b>자율 에이전트를 직접 설치</b>합니다. 헤르메스(Hermes Agent)는 상주하며 텔레그램으로 말을 걸 수 있는 오픈소스 에이전트입니다. 이 강의는 <b>시연</b>입니다. 설치를 권하는 것이 아니라, 자율 에이전트를 실행하면 무슨 일이 벌어지는지 실제 화면으로 봅니다. 강사는 헤르메스를 <b>윈도우 PC에 로컬로 설치</b>하고 텔레그램을 연결해 두었습니다. 구조(설치 → 두뇌 → 텔레그램)를 이해한 뒤, "폰에서 시키면 PC에서 실행되는" 장면을 봅니다. 이 에이전트가 ⑦의 투자 자문단을 굴리게 됩니다.</p>
+      <p>⑤에서 위험과 안전장치를 배웠습니다. 이 강의는 <b>시연</b>입니다. 설치를 권하는 것이 아니라, 자율 에이전트를 실행하면 무슨 일이 벌어지는지 실제 화면으로 봅니다. 구조(설치 → 모델 연결 → 텔레그램)를 이해한 뒤, "폰에서 시키면 PC에서 실행되는" 장면까지 따라갑니다. 이 에이전트가 ⑦의 투자 자문단을 굴리게 됩니다.</p>
     </div>
 
 
@@ -323,16 +323,16 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
           <tr><td><b>어디서 사나</b></td><td>Anthropic의 서버 (나는 접속)</td><td><b>내 컴퓨터/서버</b> (자가 호스팅)</td></tr>
           <tr><td><b>언제 사나</b></td><td>내가 대화창을 열 때</td><td><b>상시 상주(persistent)</b> — 세션이 끝나도 기억 유지</td></tr>
           <tr><td><b>어떻게 부르나</b></td><td>앱·웹·터미널</td><td>메신저 게이트웨이 <b>21개+</b> — 텔레그램·디스코드·슬랙 등</td></tr>
-          <tr><td><b>두뇌(모델)</b></td><td>Claude 고정</td><td>자유 — <b>OpenRouter(200+ 모델)</b>·OpenAI·자체 엔드포인트</td></tr>
+          <tr><td><b>모델</b></td><td>Claude 고정</td><td>자유 — <b>OpenRouter(200+ 모델)</b>·OpenAI·자체 엔드포인트</td></tr>
           <tr><td><b>확장</b></td><td>스킬·MCP·커넥터</td><td>스킬 <b>자가 생성</b> + MCP + cron 루틴(⑦)</td></tr>
         </tbody>
       </table>
-      <p>요약하면: <b>몸(실행 환경)은 내 것, 두뇌(모델)는 골라 꽂고, 입(대화 통로)은 메신저.</b> 이 조합이 "내가 자는 동안 일하는 AI"를 가능하게 합니다. ⑤에서 배웠듯 바로 이 조합(사적 데이터 + 외부 콘텐츠 + 외부 통신)이 치명적 3요소이기도 합니다. 설치 과정 내내 안전장치를 함께 챙기는 이유입니다.</p>
+      <p>요약하면: <b>실행 환경은 내 것, 모델은 골라서 연결하고, 대화 통로는 늘 쓰는 메신저.</b> 이 조합이 "내가 자는 동안 일하는 AI"를 가능하게 합니다. ⑤에서 배웠듯 바로 이 조합(사적 데이터 + 외부 콘텐츠 + 외부 통신)이 치명적 3요소이기도 합니다. 설치 과정 내내 안전장치를 함께 챙기는 이유입니다.</p>
 
       <h3>왜 헤르메스인가 — 실행 환경의 자유도</h3>
       <p>굳이 직접 설치까지 해서 쓰는 이유는 하나입니다. <b>에이전트의 실행 환경을 내가 원하는 대로 설정할 수 있는 자유도</b>입니다. 지금까지의 Claude는 Anthropic이 정해 둔 환경 안에서 쓰는 완성품입니다. 편하지만 정해진 틀 밖으로는 나갈 수 없습니다. 헤르메스에서는 그 틀을 내가 정합니다:</p>
       <ul class="final-list">
-        <li><b>두뇌</b> : 작업마다 모델을 골라 꽂습니다. 비싼 추론 모델과 값싼 모델을 용도별로 나눠 쓸 수 있습니다</li>
+        <li><b>모델</b> : 작업마다 골라서 연결합니다. 비싼 추론 모델과 값싼 모델을 용도별로 나눠 쓸 수 있습니다</li>
         <li><b>도구와 기억</b> : 어떤 스킬과 MCP를 쥐여줄지, 무엇을 기억하게 할지를 내가 구성합니다</li>
         <li><b>시간</b> : 내가 부를 때만 도는 것이 아니라, 루틴(cron)으로 정해진 시각에 스스로 돌게 합니다</li>
         <li><b>통로</b> : 내가 매일 쓰는 메신저(텔레그램 등)를 대화 창구로 삼습니다</li>
@@ -362,8 +362,8 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
 
     <!-- ================= SECTION 3 ================= -->
     <section class="section" id="s3">
-      <div class="sec-head"><span class="sec-num">3</span><h2>OpenRouter 연동 — 두뇌 꽂기</h2></div>
-      <p class="sec-lead">헤르메스는 몸일 뿐, 두뇌(모델)는 밖에서 꽂아야 합니다. 2·3주차에 만들어 둔 <b>OpenRouter API 키를 그대로 재사용</b>합니다. 새로 발급할 필요 없습니다.</p>
+      <div class="sec-head"><span class="sec-num">3</span><h2>OpenRouter 연동 — 모델 연결</h2></div>
+      <p class="sec-lead">헤르메스 자체에 모델은 들어 있지 않아 외부 API로 연결합니다. 2·3주차에 만들어 둔 <b>OpenRouter API 키를 그대로 재사용</b>합니다. 새로 발급할 필요 없습니다.</p>
       <p>키는 따로 파일을 만들 필요가 없습니다. <b>설치 과정에서 OpenRouter 키를 물으면 입력</b>하면 되고, 입력한 키는 <code>~/.hermes/.env</code>에 저장됩니다.</p>
       <p>기본 모델은 <code>config.yaml</code>에서 지정합니다. 시연 환경은 3주차 챗봇과 같은 <b>deepseek-v4-flash</b>입니다:</p>
       <div class="copy-block"><span class="cb-label">📄 ~/.hermes/config.yaml</span>
@@ -372,16 +372,16 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
   provider: "openrouter"
   default: "deepseek/deepseek-v4-flash"</pre>
       </div>
-      <p>OpenRouter를 통해 200개 이상의 모델을 같은 키로 바꿔 낄 수 있습니다.</p>
+      <p>OpenRouter를 통해 200개 이상의 모델을 같은 키로 바꿔 쓸 수 있습니다.</p>
       <div class="callout"><b class="cap">.env는 내 컴퓨터에만</b>
       설치 때 입력한 키는 내 컴퓨터의 <code>~/.hermes/.env</code>에 평문으로 놓입니다. 이 파일을 git에 커밋하거나 메신저로 보내지 말고, 에이전트의 작업 폴더 안에 복사해 두지도 마세요. 울타리 안의 비밀은 보호 대상이 아니라 작업 대상이 됩니다.</div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>두뇌는 .env의 키와 config.yaml의 모델 지정으로 꽂힌다는 것을 이해했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>모델은 .env의 키와 config.yaml의 지정으로 연결된다는 것을 이해했다</span></label></div>
     </section>
 
     <!-- ================= SECTION 4 ================= -->
     <section class="section" id="s4">
       <div class="sec-head"><span class="sec-num">4</span><h2>텔레그램 — 설치 때 함께 연결됩니다</h2></div>
-      <p class="sec-lead">입(대화 통로)도 따로 만들 것이 없습니다. <b>설치 과정의 안내를 따라가면 텔레그램 봇 연결까지 끝납니다.</b> 이후에는 폰에서 말 거는 것만으로 에이전트가 움직입니다.</p>
+      <p class="sec-lead">대화 통로도 따로 만들 것이 없습니다. <b>설치 과정의 안내를 따라가면 텔레그램 봇 연결까지 끝납니다.</b> 이후에는 폰에서 말 거는 것만으로 에이전트가 움직입니다.</p>
       <div class="callout ok"><b class="cap">⑤의 원칙, 실물 하나 — 페어링</b>
       낯선 계정이 봇에게 말을 걸면 바로 대화가 되지 않고 <b>페어링 승인</b>을 거칩니다. 봇 아이디는 사실상 공개 정보라, 승인 절차가 없다면 아무나 내 컴퓨터의 에이전트에게 명령을 보낼 수 있기 때문입니다. ⑤에서 배운 화이트리스트 + HITL이 실물로 구현된 모습입니다.</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>텔레그램 연결의 관문이 페어링 승인이라는 것을 이해했다</span></label></div>
@@ -404,7 +404,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <p class="chart-note">문장 한 줄이 폰을 떠나 PC의 셸 명령 실행으로 이어지고, 어떤 명령을 돌렸는지가 채팅에 투명하게 남습니다. 에이전트가 "도구를 쥔다"는 말의 실물이고, 아무나 페어링되면 안 되는 이유이기도 합니다.</p>
 
       <h3>한 단계 더 — 프로젝트를 통째로 맡겨 보기</h3>
-      <p>이번에는 일다운 일입니다. "github에 asset-manager 프로젝트가 있어. 그걸 hermes 폴더 안에 clone 해서 살펴봐"라고 보냈더니, 에이전트가 <b>스스로 gh를 실행해 내 깃헙에서 레포를 찾고, 내려받고, 분석 보고</b>까지 돌아왔습니다:</p>
+      <p>이번에는 일다운 일입니다. "github에 asset-manager 프로젝트가 있어. 그걸 hermes 폴더 안에 clone 해서 살펴봐"라고 보냈더니, 에이전트가 <b>스스로 gh를 실행해 내 깃헙에서 레포를 찾아 내려받고, 분석 보고</b>까지 보내왔습니다:</p>
       <div class="hx">
         <div class="t">📁 C:\hermes\asset-manager</div>
         <br/><span class="t">포트폴리오 관리기</span> — 구글 시트를 장부로 쓰는 자산 포트폴리오 대시보드 (React + Vite + TypeScript)<br/><br/>
@@ -425,7 +425,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
         1. bf57138 구글 시트 장부 기반 포트폴리오 관리기 &nbsp;2. 922ce24 GCP 서비스 계정으로 시트 읽기 &nbsp;3. e0d2381 노션 일일 리포트 생성기<br/><br/>
         <span class="w">참고로 README에 C:\claude\asset-manager 경로가 적혀 있는데 실제 clone은 C:\hermes\asset-manager에 했습니다. 앞으로 이 프로젝트에서 뭘 할까요? (코드 분석, 기능 추가, 버그 수정 등)</span>
       </div>
-      <p class="chart-note">②~④에서 만든 관리기 프로젝트를 에이전트가 알아서 찾아 읽었습니다. README와 실제 경로가 다르다는 것까지 짚습니다. 이대로 개발 작업을 시킬 수도 있습니다. 다만 개발이라면 굳이 헤르메스일 이유가 없습니다. 아래 평가 그대로입니다.</p>
+      <p class="chart-note">②~④에서 만든 관리기 프로젝트를 에이전트가 알아서 찾아 읽었습니다. README와 실제 경로가 다르다는 것까지 짚습니다. 이대로 개발 작업을 시킬 수도 있습니다.</p>
 
       <h3>대시보드 — 설정은 여기서</h3>
       <p>터미널에서 <code>hermes dashboard</code>를 실행하면 브라우저(<code>localhost:9119</code>)에서 대시보드가 열립니다. 모델, 루틴(CRON), 스킬, MCP, 페어링, 키까지 꽤 세밀하게 설정할 수 있습니다:</p>
@@ -466,7 +466,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <ul class="final-list">
         <li>헤르메스 = 자가 호스팅 · 상시 상주 · 메신저로 부르는 오픈소스(MIT) 에이전트</li>
         <li>시연 환경은 내 컴퓨터 로컬 설치. 컴퓨터가 켜져 있는 동안 동작하고, 필요해지면 호스팅으로 옮길 수 있다</li>
-        <li>두뇌는 OpenRouter로. 키는 설치 때 입력하며(2·3주차 키 재사용) 기본 모델은 deepseek-v4-flash</li>
+        <li>모델은 OpenRouter로. 키는 설치 때 입력하며(2·3주차 키 재사용) 기본 모델은 deepseek-v4-flash</li>
         <li>텔레그램 연결의 관문은 페어링 코드 — HITL·화이트리스트의 실물</li>
               </ul>
       <div class="next-card-grid">
