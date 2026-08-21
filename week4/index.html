@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>4주차 강의자료 · 연동과 자율 에이전트 | 2026 에이전틱 AI 부트캠프</title>
-<meta name="description" content="KAIST 기술경영전문대학원 2026 에이전틱 AI 부트캠프 4주차(마지막 주차) 강의자료 모음입니다. 자율 실행의 위험과 안전장치에서 시작해 MCP 커넥터·CLI·구글 시트 연동을 거쳐, 자가 호스팅 에이전트 에르메스를 설치하고 텔레그램·cron 루틴으로 'AI에게 일을 맡기는 법'을 완성합니다." />
+<meta name="description" content="KAIST 기술경영전문대학원 2026 에이전틱 AI 부트캠프 4주차(마지막 주차) 강의자료 모음입니다. MCP 커넥터로 시작해 구글 시트 포트폴리오 관리기와 노션 협업을 만들고, 자가 호스팅 에이전트 헤르메스 위에 관점이 다른 봇 셋의 투자 위원회를 세웁니다. 결정은 사람의 몫입니다." />
 <style>
   :root{
     --bg:#f4f6f3;
@@ -178,6 +178,8 @@
   .kind-practice{color:var(--green);background:var(--green-light);border-color:#cfe3d7;}
   .kind-reading{color:var(--amber);background:var(--amber-light);border-color:#eeddbb;}
   .kind-optional{color:var(--muted);background:var(--line-soft);border-color:var(--line);}
+  .material.soon{opacity:.55;cursor:default;}
+  .material.soon .go{display:none;}
   .material .go{
     font-size:20px;color:var(--brand);flex:0 0 auto;transition:transform .18s ease;
   }
@@ -252,18 +254,18 @@
         <span class="hero-badge final">마지막 주차</span>
         <span class="hero-date">2026년 8월 25일 (화) · 저녁 8:00–9:30</span>
       </div>
-      <h1>연동과 자율 에이전트 —<br/>AI에게 일을 맡기는 법</h1>
+      <h1>연동과 에이전트 —<br/>내 데이터와 잇고, 일을 맡긴다</h1>
       <p class="hero-lead">
-        부트캠프의 마지막 주차입니다. 자율 실행의 <b>위험과 안전장치</b>(프롬프트 인젝션·샌드박스·human-in-the-loop)에서
-        출발해, MCP 커넥터·CLI·구글 시트 연동으로 <b>AI의 도구함</b>을 채우고, 자가 호스팅 에이전트
-        <b>에르메스(Hermes)</b>를 설치해 텔레그램으로 부르고 cron 루틴으로 <b>"내가 자는 동안 일하는 AI"</b>를
-        완성합니다. 강의는 킥오프 시연으로 시작합니다 — 에르메스 설치 → 텔레그램 연결 → 루틴 등록을
-        한 흐름으로 보여드린 뒤, 자료를 <b>순서대로</b> 따라갑니다.
+        부트캠프의 마지막 주차입니다. 이번 주는 <b>내 포트폴리오</b> 하나를 관통 예제로 씁니다.
+        연동의 표준 <b>MCP와 커넥터</b>로 시작해, <b>구글 시트</b>를 장부 삼은 포트폴리오 관리기를 만들고
+        연결을 서비스 계정으로 격상하며, <b>노션</b>으로 리포트를 발행해 사람과 공유합니다.
+        마지막에는 자가 호스팅 에이전트 <b>헤르메스(Hermes)</b>를 세우고, 관점이 다른 봇 셋의
+        <b>투자 위원회</b>에 포트폴리오 검토를 맡깁니다. 결정은 나의 몫입니다.
       </p>
       <div class="hero-meta">
         <span class="meta-chip">📘 강의자료 <b>7개</b></span>
-        <span class="meta-chip">🧪 실습 <b>에르메스 설치 + 텔레그램 페어링 + 루틴 등록</b></span>
-        <span class="meta-chip">🎯 산출물 <b>매일 아침 브리핑을 보내는 나의 자율 에이전트</b></span>
+        <span class="meta-chip">🧪 실습 <b>포트폴리오 관리기 + 노션 리포트 + 투자 위원회</b></span>
+        <span class="meta-chip">🎯 산출물 <b>시트·노션과 연결되고 봇 셋이 검토하는 나의 포트폴리오 운영 체계</b></span>
       </div>
     </div>
   </section>
@@ -273,39 +275,39 @@
     <div class="wrap">
       <div class="section-head">
         <span class="eyebrow">4주차 강의자료</span>
-        <h2>원칙을 세우고, 연결하고, 맡기는 7개의 자료</h2>
-        <p>①은 자율 에이전트를 들이기 전에 반드시 알아야 할 위험과 안전장치, ②~④는 AI의 도구함을 채우는 과정(MCP, CLI, 시트 연동), ⑤~⑦은 자율 에이전트를 직접 설치·운영하고 4주 전체를 판단 기준으로 접는 과정입니다. 앞 자료의 원칙이 뒤 자료의 실물로 등장하므로 <b>순서대로</b> 보시는 것을 권합니다.</p>
+        <h2>연결에서 위임까지, 7개의 자료</h2>
+        <p>①은 연동의 개념(MCP)과 커넥터 첫 연결, ②~④는 구글 시트와 노션으로 포트폴리오의 <b>데이터 면과 협업 면</b>을 만드는 과정, ⑤~⑦은 안전 원칙을 세우고 에이전트를 설치해 <b>투자 위원회</b>를 맡기는 과정입니다. 앞 자료의 산출물이 뒤 자료의 재료가 되므로 <b>순서대로</b> 보시는 것을 권합니다.</p>
       </div>
 
       <div class="flow-strip">
-        <span class="fs-item"><span>1</span>위험·안전장치</span>
+        <span class="fs-item"><span>1</span>연동·커넥터</span>
         <span class="fs-arrow">→</span>
-        <span class="fs-item"><span>2</span>MCP</span>
+        <span class="fs-item"><span>2</span>시트 기초</span>
         <span class="fs-arrow">→</span>
-        <span class="fs-item"><span>3</span>CLI</span>
+        <span class="fs-item"><span>3</span>서비스 계정</span>
         <span class="fs-arrow">→</span>
-        <span class="fs-item"><span>4</span>시트 연동</span>
+        <span class="fs-item"><span>4</span>노션</span>
         <span class="fs-arrow">→</span>
-        <span class="fs-item"><span>5</span>에르메스 설치</span>
+        <span class="fs-item"><span>5</span>안전장치</span>
         <span class="fs-arrow">→</span>
-        <span class="fs-item"><span>6</span>루틴·대시보드</span>
+        <span class="fs-item"><span>6</span>헤르메스</span>
         <span class="fs-arrow">→</span>
-        <span class="fs-item"><span>7</span>총정리</span>
+        <span class="fs-item"><span>7</span>투자 위원회</span>
       </div>
 
       <div class="part-head">
         <span class="part-num">PART 1</span>
-        <h3>위험을 알고 시작한다</h3>
-        <small>① · 이론</small>
+        <h3>연결부터 배운다</h3>
+        <small>① · 개념 + 실습</small>
       </div>
 
       <div class="material-list">
 
-        <a class="material" href="week4-01-autonomous-execution-risks.html">
+        <a class="material" href="week4-01-mcp-connectors.html">
           <span class="num">01</span>
           <div class="material-body">
-            <h3>자율 실행의 위험과 안전장치 <span class="kind kind-concept">개념</span></h3>
-            <p>자율 에이전트에게 열쇠를 주기 전에 잠금장치부터 — 치명적 3요소(사적 데이터·불신 콘텐츠·외부 통신)와 간접 프롬프트 인젝션의 구조, OpenClaw(2026) 실제 사례, 그리고 두 겹의 방어: 샌드박스·컨테이너 고립과 human-in-the-loop.</p>
+            <h3>연동이란 — MCP와 커넥터, 연결해서 써보기 <span class="kind kind-concept">개념</span> <span class="kind kind-practice">실습</span></h3>
+            <p>AI를 내 데이터에 연결하는 표준 규약 MCP를 이해하고, Claude의 커넥터가 곧 MCP 서버임을 확인한 뒤, Google Drive 커넥터를 켜서 내 시트를 대화에서 직접 분석해 봅니다. 이번 주 전체의 지도가 함께 그려집니다.</p>
           </div>
           <span class="go">→</span>
         </a>
@@ -314,84 +316,78 @@
 
       <div class="part-head">
         <span class="part-num">PART 2</span>
-        <h3>AI의 도구함을 채운다</h3>
-        <small>②–④ · 개념 + 실습</small>
+        <h3>구글 시트와 노션 — 데이터 면과 협업 면</h3>
+        <small>②–④ · 실습</small>
       </div>
 
       <div class="material-list">
 
-        <a class="material" href="week4-02-mcp-connectors.html">
+        <a class="material" href="week4-02-portfolio-sheet-basic.html">
           <span class="num">02</span>
           <div class="material-body">
-            <h3>MCP(커넥터) — 연결의 표준 <span class="kind kind-concept">개념</span> <span class="kind kind-practice">실습</span></h3>
-            <p>AI를 내 데이터에 연결하는 표준 규약 MCP를 이해하고, Claude의 커넥터가 곧 MCP 서버임을 확인한 뒤, Google Drive 커넥터로 내 시트를 대화에서 직접 분석해 봅니다.</p>
+            <h3>시트 읽고 쓰기 — 포트폴리오 관리기 (기초) <span class="kind kind-practice">실습</span></h3>
+            <p>구글 시트를 장부 삼아 포트폴리오 스냅샷을 기록하고, 링크 공유(주소가 곧 열쇠)로 프로그램이 읽는 대시보드를 만듭니다. 실제 계획 문답과 지시 기록 발췌로 "짧게 지시하고 대화로 키우는" 리듬을 익힙니다.</p>
           </div>
           <span class="go">→</span>
         </a>
 
-        <a class="material" href="week4-03-cli-tools.html">
+        <div class="material soon">
           <span class="num">03</span>
           <div class="material-body">
-            <h3>CLI — MCP가 없는 시스템을 잇는 만능 어댑터 <span class="kind kind-concept">개념</span> <span class="kind kind-practice">실습</span></h3>
-            <p>통로를 만드는 대신 AI에게 도구를 쥐여주는 발상의 전환. Google Cloud CLI 제품군·ffmpeg·pandoc·ImageMagick 같은 기성 CLI를 한국어로 부리는 예시 네 가지, 그리고 레거시 시스템용 어댑터를 직접 만들어 CLAUDE.md에 꽂는 3단계까지.</p>
+            <h3>서비스 계정으로 업그레이드 <span class="kind kind-practice">실습</span> <span class="kind kind-optional">준비 중</span></h3>
+            <p>시트를 다시 비공개로 잠그고, 프로그램에게만 열쇠(GCP 서비스 계정)를 줍니다. 관리기 동작은 그대로이고 문단속만 달라집니다.</p>
           </div>
-          <span class="go">→</span>
-        </a>
+        </div>
 
-        <a class="material" href="week4-04-google-sheets-integration.html">
+        <div class="material soon">
           <span class="num">04</span>
           <div class="material-body">
-            <h3>구글 시트 연동 — 읽기 전용에서 서비스 계정까지 <span class="kind kind-concept">개념</span> <span class="kind kind-reading">시연</span></h3>
-            <p>"웹에 게시"로 백엔드 없이 도는 대시보드부터, 정식 출입구(Sheets API + 서비스 계정)와 열쇠 보관 원칙, 그리고 "시트는 그대로, 화면만 서비스로" 팀 현황판 활용사례까지 — 시트 연동의 전체 지도를 한 편에 담았습니다.</p>
+            <h3>노션 연동 — 리포트 발행·공유, 그리고 대화 <span class="kind kind-practice">실습</span> <span class="kind kind-optional">준비 중</span></h3>
+            <p>시트 데이터로 월간 리포트를 노션 페이지로 발행하고, 사람을 초대해 코멘트로 소통합니다. 말미에는 프로그램이 채워 둔 노션 데이터를 근거로 Claude와 대화하는 연결까지.</p>
           </div>
-          <span class="go">→</span>
-        </a>
+        </div>
 
       </div>
 
       <div class="part-head">
         <span class="part-num">PART 3</span>
-        <h3>자율 에이전트를 설치하고, 맡기고, 판단한다</h3>
-        <small>⑤–⑦ · 실습 + 총정리</small>
+        <h3>에이전트에게 맡긴다</h3>
+        <small>⑤–⑦ · 개념 + 실습</small>
       </div>
 
       <div class="material-list">
 
-        <a class="material" href="week4-05-hermes-agent-setup.html">
+        <div class="material soon">
           <span class="num">05</span>
           <div class="material-body">
-            <h3>에르메스 에이전트 ① — 설치·텔레그램·OpenRouter <span class="kind kind-practice">실습</span></h3>
-            <p>Nous Research의 오픈소스 자율 에이전트 에르메스를 <b>Hostinger VPS의 원클릭 템플릿</b>으로 설치합니다 — 24시간 도는 내 서버가 생기고, 도메인까지 붙이면 개인 서버 완성. OpenRouter 키로 두뇌를 꽂고, BotFather 봇과 페어링 코드로 텔레그램을 연결합니다. ①의 안전 원칙이 실물로 등장합니다.</p>
+            <h3>맡기기 전에 — 자율 실행의 위험과 안전장치 <span class="kind kind-concept">개념</span> <span class="kind kind-optional">준비 중</span></h3>
+            <p>자율 에이전트에게 열쇠를 주기 전에 잠금장치부터. 치명적 3요소와 프롬프트 인젝션의 구조, 그리고 사람이 승인하는 지점(human-in-the-loop)을 어디에 둘 것인가.</p>
           </div>
-          <span class="go">→</span>
-        </a>
+        </div>
 
-        <a class="material" href="week4-06-hermes-agent-routines.html">
+        <div class="material soon">
           <span class="num">06</span>
           <div class="material-body">
-            <h3>에르메스 에이전트 ② — cron 루틴·대시보드 <span class="kind kind-practice">실습</span></h3>
-            <p>매일 아침 9시, 스스로 조사해 텔레그램으로 브리핑을 보내는 cron 루틴을 등록하고, 관리 대시보드를 한 바퀴 돕니다. 그리고 솔직한 비교 — "사실 Claude로도 됩니다": 자가 호스팅이 진짜 의미 있는 네 가지 경우.</p>
+            <h3>헤르메스 설치 — 내 에이전트 서버 <span class="kind kind-practice">실습</span> <span class="kind kind-optional">준비 중</span></h3>
+            <p>오픈소스 자율 에이전트 헤르메스를 VPS 원클릭 템플릿으로 설치하고, OpenRouter로 두뇌를 꽂고 텔레그램으로 연결합니다. 포트폴리오 시트와의 연동까지.</p>
           </div>
-          <span class="go">→</span>
-        </a>
+        </div>
 
-        <a class="material" href="week4-07-integration-decision-guide.html">
+        <div class="material soon">
           <span class="num">07</span>
           <div class="material-body">
-            <h3>총정리 — 판단 기준과 4주의 마무리 <span class="kind kind-reading">정리</span></h3>
-            <p>커넥터·정적·백엔드·인증·CLI에 "루틴/자율 에이전트" 갈래를 더한 판단표 한 장, 일곱 사례 자가 점검, 난이도별 도전 과제 — 그리고 1~4주차 전체 여정의 마무리와 수료 축하까지.</p>
+            <h3>나의 투자 위원회 — 관점이 다른 봇 셋, 결정은 나 <span class="kind kind-practice">실습</span> <span class="kind kind-optional">준비 중</span></h3>
+            <p>추세 담당·리밸런싱 담당·검증 담당(백테스트·몬테카를로) 세 봇이 같은 포트폴리오를 놓고 각자 조사하고 토론해 종합 의견을 냅니다. 주 1회 루틴으로 돌리고, 결정은 사람이 합니다.</p>
           </div>
-          <span class="go">→</span>
-        </a>
+        </div>
 
-        <a class="material" href="week4-assignment.html">
+        <div class="material soon">
           <span class="num">＋</span>
           <div class="material-body">
-            <h3>자율 실습 — 포트폴리오 수익률 앱 <span class="kind kind-optional">선택</span></h3>
-            <p>해 보고 싶은 분들을 위한 상세 안내입니다. 시트에 포트폴리오 원장을 만들고, 앱이 매일 시세를 수집해 기록으로 쌓아 수익률과 자산 추이 그래프를 보여주게 하고, 비밀번호 잠금까지 — 4주 동안 배운 것을 한 화면에 모으는 실습입니다.</p>
+            <h3>자율 실습 — 내 데이터로 같은 흐름 <span class="kind kind-optional">선택 · 준비 중</span></h3>
+            <p>내 업무 데이터로 같은 흐름을 반복합니다. 시트 관리기 → 노션 공유 → 에이전트 검토.</p>
           </div>
-          <span class="go">→</span>
-        </a>
+        </div>
 
       </div>
     </div>
@@ -402,10 +398,15 @@
     <div class="wrap">
       <div class="section-head">
         <span class="eyebrow">강의 전 준비물</span>
-        <h2>세 가지만 확인하면 됩니다</h2>
-        <p>새로 만들 것은 텔레그램 봇 하나뿐이고, 나머지는 지난 3주 동안 만든 것들의 재사용입니다.</p>
+        <h2>네 가지만 확인하면 됩니다</h2>
+        <p>새로 만들 것은 노션 계정과 텔레그램 봇 정도이고, 나머지는 지난 3주 동안 만든 것들의 재사용입니다.</p>
       </div>
       <div class="prep-grid">
+        <div class="prep">
+          <span class="ic">📝</span>
+          <b>노션 계정</b>
+          <span>④에서 리포트를 발행하고 공유할 협업 도구입니다. <a href="https://www.notion.com" target="_blank" rel="noopener">notion.com</a>에서 무료 계정을 만들어 두세요.</span>
+        </div>
         <div class="prep">
           <span class="ic">✈️</span>
           <b>텔레그램 계정</b>
@@ -435,7 +436,7 @@
       </div>
       <div class="note">
         <span>🎓</span>
-        <span><b>자율 실습(선택)</b> — 4주 동안 배운 것을 한 화면에 모으는 <b>포트폴리오 수익률 앱</b>을 만들어 보고 싶다면, 목록 맨 아래의 <a href="week4-assignment.html" style="font-weight:800;color:var(--green);">자율 실습 안내</a>를 따라가 보세요. 전체 커리큘럼은 <a href="../index.html#curriculum" style="font-weight:800;color:var(--green);">부트캠프 홈</a>에서 언제든 다시 볼 수 있습니다.</span>
+        <span><b>자율 실습(선택)</b> — 내 업무 데이터로 시트 관리기 → 노션 공유 → 에이전트 검토 흐름을 반복하는 안내를 준비하고 있습니다. 전체 커리큘럼은 <a href="../index.html#curriculum" style="font-weight:800;color:var(--green);">부트캠프 홈</a>에서 언제든 다시 볼 수 있습니다.</span>
       </div>
     </div>
   </section>
