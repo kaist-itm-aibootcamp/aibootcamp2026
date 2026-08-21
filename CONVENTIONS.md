@@ -98,9 +98,13 @@
 | (신규) | `week4-05-hermes-agent-setup.html` (에르메스 ① — Hostinger VPS 원클릭 설치·도메인·텔레그램·OpenRouter) |
 | (신규) | `week4-06-hermes-agent-routines.html` (에르메스 ② cron 루틴·대시보드) |
 | (신규) | `week4/index.html` · `week4-assignment.html` |
+| (재편 — 2026-08-21) `week4-02-mcp-connectors.html` 기반 | `week4-01-mcp-connectors.html` — 새 목차 STEP 1(연동이란: MCP와 커넥터, 연결해서 써보기)로 재구성 신설 |
+| (신규 — 2026-08-21) | `week4-02-portfolio-sheet-basic.html` — STEP 2 시트 읽고 쓰기: 포트폴리오 관리기(기초), 링크 공유 방식 |
+| (신규 — 2026-08-21) | `week4-03-service-account.html` — STEP 3 서비스 계정 업그레이드(GCP·폴더 공유·JSON 키 로컬) |
 | `tmp-cli-tools.html` · `tmp-sheets-readonly.html` · `tmp-team-dashboard.html` | 흡수 후 삭제 |
 
 > 2026-08 주차 재편성: 새 Week 4 = "연동과 자율 에이전트 — AI에게 일을 맡기는 법" (마지막 주차, 자료 7개, STEP 1~7). 스킬 만들기가 2주차로 옮겨갔고, CLI가 ③ 별도 강의로 분리되면서 시트 연동·에르메스·총정리가 ④~⑦로 밀렸다.
+> 2026-08-21 재편성: Week 4 목차를 "① 연동(MCP·커넥터) ② 시트 기초 관리기 ③ 서비스 계정 ④ 노션 ⑤ 안전장치 ⑥ 헤르메스 ⑦ 투자 위원회"로 확정(관통 예제: 내 포트폴리오). 구 강의 파일들(위험·CLI·구 시트·에르메스 2편·총정리)은 새 강의가 완성되는 대로 재구성·정리 예정이며 index 링크에서는 제외됨.
 
 ## 콘텐츠 규칙
 
