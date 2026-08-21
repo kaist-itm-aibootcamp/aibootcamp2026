@@ -194,6 +194,13 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
 .tg-cmd .cb{color:#1d4ed8;}
 .tg-cmd .co{color:#d97706;}
 .tg-cmd .cr{color:#dc2626;}
+.tg-bub.wide{max-width:100%;}
+.tg-dim{color:#7c8a74;font-size:12px;}
+.tg-sec{font-weight:800;margin:10px 0 4px;}
+.tg-scroll{overflow-x:auto;}
+.tg-tbl{border-collapse:collapse;font-size:12px;margin:4px 0;min-width:420px;width:100%;}
+.tg-tbl th{background:#f1f8ec;border:1px solid #dfe8d8;padding:4px 8px;text-align:left;font-size:11.5px;}
+.tg-tbl td{border:1px solid #e6ede0;padding:4px 8px;vertical-align:top;}
 .chart-note{font-size:12px;color:var(--muted);margin:6px 0 4px;}
 /* notion recreation */
 .nt{display:flex;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);margin:12px 0;font-size:12.5px;color:#37352f;line-height:1.5;}
@@ -634,18 +641,64 @@ advisor-bull과 advisor-bear를 각각 실행하고, 두 보고를 advisor-risk�
       </div>
       <p class="chart-note">지시 네 줄에 자문단이 깨어나 일을 나눕니다. 스킬 셋을 읽고, 터미널에서 백테스트 로직을 확인하고, 뉴스 검색을 병렬로 돌립니다. 검색어를 보면 설계대로 움직이는 것이 보입니다. S&amp;P500 전망과 금값 전망은 강세·약세 담당의 재료이고, portfolio.ts를 읽는 것은 리스크·검증 담당의 준비이며, CD 91일물 전망까지 찾는 것은 현금성 자산도 빼놓지 않는다는 뜻입니다.</p>
 
-      <p>매일 아침 도착하는 종합 보고에는 이런 것이 담기게 됩니다:</p>
-      <ul class="final-list">
-        <li>오늘의 포트폴리오 현황 (자산별 비중, 목표와의 거리)</li>
-        <li>강세론 담당의 제안과 약세론 담당의 제안</li>
-        <li>두 제안이 갈린 지점, 그리고 리스크·검증 담당이 붙인 반론과 숫자</li>
-        <li>마지막 줄은 항상 같습니다: 결정은 사람의 몫</li>
-      </ul>
+      <h3>종합 보고 — 실제 도착한 최종 보고서</h3>
+      <p>몇 분 뒤 도착한 보고서 전문입니다. 지면에 맞게 표로 정리했을 뿐 내용은 그대로입니다:</p>
+      <div class="tgc">
+        <div class="tg-row"><div class="tg-bub">검증 계산이 완료됐습니다. 세 보고를 종합해 최종 보고서를 보냅니다.</div></div>
+        <div class="tg-row"><div class="tg-bub wide">
+          🏛️ <b>투자 자문단 보고 — 2026-08-21</b><br/>
+          <span class="tg-dim">기준: 자산 5,835만원 · S&amp;P500 61.9% / 금 19.0% / CD 9.6% / SOFR 9.5% · 시세·뉴스 8/21 기준</span>
+          <div class="tg-sec">🐂 1. 강세론 (advisor-bull)</div>
+          <div class="tg-scroll"><table class="tg-tbl">
+            <tr><th>자산</th><th>강세 근거</th><th>매력도</th></tr>
+            <tr><td>S&amp;P500</td><td>Q2 실적 +48~51% YoY·리비전 상향, AI 투자 수익화, JPM 목표 8,000 상향, 신고가 근처 추세</td><td>상</td></tr>
+            <tr><td>금</td><td>연초 대비 +50% 후 조정, Fed 인하 기대·중앙은행 매수·호르무즈 프리미엄</td><td>중</td></tr>
+            <tr><td>CD금리</td><td>한은 인하 사이클 진입, 확정 수익</td><td>하</td></tr>
+            <tr><td>달러SOFR</td><td>단기금리 3.6% 고금리 유지 시 우량 수익, 달러 강세</td><td>중</td></tr>
+          </table></div>
+          제안: <b>S&amp;P500 65%로 확대 (~+181만원)</b>, 금·CD·SOFR 소폭 축소<br/>
+          가장 강한 근거: ① S&amp;P 실적 서프라이즈 + AI 모멘텀 ② Fed 인하·달러 약세 전환 시 주식·금 동반 강세 — 확신: 중~상
+          <div class="tg-sec">🐻 2. 약세론 (advisor-bear)</div>
+          <div class="tg-scroll"><table class="tg-tbl">
+            <tr><th>자산</th><th>위험 요인</th><th>경계</th></tr>
+            <tr><td>S&amp;P500</td><td>밸류 20배(5·10년 평균, 확장 여지 제한), GDP 1.5%(컨센 하회), VIX 낮은 상태에서 악재 시 급락, 61.9% 쏠림</td><td>상</td></tr>
+            <tr><td>금</td><td>$5,600→$4,400 (−27%), ETF 유입 둔화, Fed 인상 리스크</td><td>중</td></tr>
+            <tr><td>CD금리</td><td>인하 기대 소멸, 고금리 장기화</td><td>중</td></tr>
+            <tr><td>달러SOFR</td><td>2027년 인상 가격 반영, 스태그플레이션 리스크</td><td>중</td></tr>
+          </table></div>
+          제안: <b>S&amp;P 55%로 축소 (~−403만원)</b>, CD+SOFR 25%로 확대, 금 유지<br/>
+          가장 강한 근거: ① 밸류 20배 + 성장 둔화 + 에너지 가격(스태그플레이션) ② VIX 최저 수준 + 호르무즈 악재 시 되돌림 — 확신: 중
+          <div class="tg-sec">⚖️ 3. 리스크·검증 (advisor-risk)</div>
+          반론:<br/>
+          • 강세의 약점: "실적 51% 성장"은 AI 투자 사이클이 이어져야 하는 전제 — JPM도 FCF 하락을 리스크로 인정. 20배 밸류에서 멀티플 확장 여지는 제한적.<br/>
+          • 약세의 약점: "쏠림"은 현재 61.9%가 밴드(55~65%) 안이라 규칙상 문제 없음. VIX는 타이밍 지표가 아님. 축소 후 재진입 비용도 존재.<br/><br/>
+          <span class="tg-dim">숫자 검증 — 백테스트 2023-08-21~2026-08-21 · CD금리는 한은 기준금리+0.20%p 근사 곡선 사용(실제와 다를 수 있음) · 몬테카를로는 과거 월수익률 1,000회, 과거 반복 가정</span>
+          <div class="tg-scroll"><table class="tg-tbl">
+            <tr><th>안</th><th>백테 IRR</th><th>최대낙폭</th><th>MC 중앙값</th><th>MC 하위5%</th><th>예상 비용</th></tr>
+            <tr><td>현재 유지 (60/20/10/10)</td><td>25.2%</td><td>−18.9%</td><td>+1.2%</td><td>−4.8%</td><td>없음</td></tr>
+            <tr><td>강세안 (S&amp;P 65%)</td><td>26.6%</td><td>−20.6%</td><td>+1.3%</td><td>−4.9%</td><td>~340만원 매매</td></tr>
+            <tr><td>약세안 (S&amp;P 55%)</td><td>24.4%</td><td>−17.0%</td><td>+0.9%</td><td>−4.7%</td><td>~810만원 매매</td></tr>
+          </table></div>
+          • 비용: 3년간 리밸런싱 8~9회(연 2.7~3회) — 과도한 회전 아님. 국내 ETF 수수료 0.015~0.05%라 비용 부담 미미<br/>
+          • 해석: 강세안이 수익률 1.4%p 높지만 낙폭도 1.7%p 깊어짐. 약세안은 낙폭을 줄이는 대신 수익을 희생. 하위 5% 시나리오는 세 안 모두 −4.7~−4.9%로 차이가 거의 없음
+          <div class="tg-sec">🔀 4. 종합 — 의견이 갈린 지점</div>
+          1. S&amp;P500 비중 (최대 쟁점): 강세 65% vs 약세 55% vs 현재 60% (모두 밴드 내)<br/>
+          2. 안전자산(CD+SOFR): 강세 축소 vs 약세 25% 확대 — 금리 방향 전망 차이 (인하 vs 고금리 지속)<br/>
+          3. 금: 강세 소폭 확대 vs 약세 유지 — 견해차 작음<br/>
+          4. 공통 합의: <b>지금 당장 리밸런싱 필요 없음</b> (전 종목 밴드 이내), 검증 결과 셋 다 수용 가능 수준<br/><br/>
+          판단에 남기는 질문:<br/>
+          • S&amp;P 비중을 55~65% 중 어디에 둘 것인가? (위험 허용도)<br/>
+          • 금리 방향: 인하 사이클 vs 고금리 지속 — 어느 쪽에 더 무게?<br/>
+          • 매매를 직접 실행하실지, 실행 계획(주수·금액)만 별도로 도출할지?<br/><br/>
+          <span class="tg-dim">매매 실행 없음 · 최종 결정은 사용자. 출처: Reuters, JPMorgan, Goldman Sachs, Stifel, Oppenheimer, World Gold Council, IG/TD Securities 등 (8/17~8/21)</span>
+        </div></div>
+      </div>
+      <p class="chart-note">설계한 출력 형식이 그대로 돌아왔습니다. 정반대 제안(65% 확대 vs 55% 축소)이 실제로 동시에 도착했고, 리스크·검증 담당은 양쪽의 가장 약한 근거를 하나씩 반박한 뒤("VIX는 타이밍 지표가 아님") 세 안에 백테스트·몬테카를로·비용 숫자를 붙였습니다. 수익률과 낙폭이 맞바꿈 관계라는 것을 숫자로 보여주고는, 결론 대신 질문 세 개를 사람에게 남겼습니다. "결정은 나"가 보고서 형식 안에 구현된 셈입니다. 이 숫자와 전망은 교육용 시뮬레이션의 산출물이지 투자 자문이 아닙니다.</p>
+      <p>이제 앞의 루틴 프롬프트를 등록하면, 이 형식의 보고가 매일 아침 도착합니다.</p>
 
       <div class="callout"><b class="cap">로컬 설치의 조건 하나</b>
       ⑥에서 본 대로, 로컬 설치 에이전트는 <b>컴퓨터가 켜져 있는 동안만</b> 동작합니다. 매일 아침 7시 30분 루틴이라면 그 시각에 PC가 켜져 있어야 합니다. 부담스러우면 시각을 바꾸거나, 24시간 상주가 필요해질 때 호스팅 서버로 옮기면 됩니다.</div>
 
-      <div class="tip-card"><b>종합 보고는 이어서 실립니다.</b> 위 소집이 끝나고 도착한 자문역별 보고와 종합 보고의 실물도 확인되는 대로 이 자리에 추가됩니다.</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>루틴 등록 지시와 종합 보고의 구성을 이해했다</span></label></div>
     </section>
 
