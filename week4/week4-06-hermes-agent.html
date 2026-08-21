@@ -63,6 +63,33 @@ body{
 .hero p{color:var(--muted);max-width:640px;}
 /* ---------- sections ---------- */
 .section{margin-top:44px;padding-top:8px;}
+.tgc{background:linear-gradient(160deg,#dcedc8,#cde5bd);border-radius:14px;padding:14px 14px 10px;margin:14px 0;}
+.tg-date{text-align:center;margin:2px 0 10px;}
+.tg-date span{background:rgba(80,110,70,.35);color:#fff;font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 12px;}
+.tg-row{display:flex;margin:7px 0;}
+.tg-row.me{justify-content:flex-end;}
+.tg-bub{max-width:82%;background:#fff;border-radius:12px;padding:8px 12px;font-size:13px;line-height:1.65;box-shadow:0 1px 2px rgba(40,60,30,.15);color:#1c1c1c;}
+.tg-row.me .tg-bub{background:#effdde;}
+.tg-time{float:right;font-size:10.5px;color:#9db08d;margin:8px 0 0 10px;}
+.tg-quote{border-left:3px solid #4f9d47;background:#f1f8ec;border-radius:5px;padding:4px 9px;margin-bottom:6px;font-size:12px;color:#444;}
+.tg-quote b{display:block;color:#3e8e3a;font-size:12px;}
+.tg-link{color:#3f92d2;font-weight:600;}
+.tg-cmd{background:#f5f6f7;border-radius:9px;overflow:hidden;margin:6px 0 2px;font-family:ui-monospace,Consolas,monospace;font-size:12px;min-width:220px;}
+.tg-cmd .h{background:#e7eaec;padding:4px 10px;color:#555;font-size:11.5px;}
+.tg-cmd .c{padding:6px 10px;color:#1d4ed8;}
+.hd{display:flex;background:#0d1f1c;border-radius:12px;overflow:hidden;margin:12px 0;font-family:ui-monospace,Consolas,monospace;box-shadow:var(--shadow);}
+.hd-side{flex:0 0 148px;background:#12312c;color:#cfe3da;padding:12px 0;font-size:10.5px;letter-spacing:.05em;}
+.hd-side b{display:block;color:#fff;font-size:12.5px;padding:0 14px 8px;line-height:1.3;}
+.hd-side div{padding:4.5px 14px;}
+.hd-side div.on{background:#0d1f1c;color:#fff;border-left:3px solid #f2b53a;padding-left:11px;}
+.hd-main{flex:1;padding:14px 18px;color:#e8e2d2;min-width:0;overflow-x:auto;}
+.hd-url{color:#8fa39b;font-size:11px;margin-bottom:10px;}
+.hd-logo{color:#f2b53a;font-weight:900;font-size:clamp(19px,3.5vw,30px);letter-spacing:.05em;text-shadow:2px 2px 0 #7a5a10;}
+.hd-sub{color:#c9a86a;font-size:11px;margin:3px 0 12px;}
+.hd-box{border:1px solid #7a5a10;border-radius:8px;padding:11px 14px;font-size:11.5px;line-height:1.75;color:#d8cfb6;}
+.hd-box .y{color:#f2b53a;font-weight:700;}
+.hd-box .o{color:#e08a3c;}
+@media (max-width:700px){.hd{display:block;}.hd-side{display:none;}}
 .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
 .sec-num{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--brand-dark);color:#fff;font-weight:900;font-size:15px;transform:translateY(4px);}
 .sec-head h2{font-size:clamp(19px,2.6vw,23px);letter-spacing:-.01em;}
@@ -276,7 +303,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <div class="hero">
       <span class="hero-kicker">WEEK 4 · STEP 6 — 헤르메스 설치</span>
       <h1>내 에이전트 —<br/>헤르메스를 세운다</h1>
-      <p>⑤에서 위험과 안전장치를 손에 쥐었으니, 이제 <b>자율 에이전트를 직접 설치</b>합니다. 헤르메스(Hermes Agent)는 상주하며 텔레그램으로 말을 걸 수 있는 오픈소스 에이전트입니다. 이번 실습은 <b>내 컴퓨터에 로컬로 설치</b>합니다. 설치 → 두뇌(OpenRouter) 연결 → 텔레그램 연결 → 포트폴리오 연동까지 갑니다. ⑤에서 배운 안전 원칙이 <b>실물</b>로 등장하는 지점들을 놓치지 마세요. 이 에이전트가 ⑦의 투자 위원회를 굴리게 됩니다.</p>
+      <p>⑤에서 위험과 안전장치를 손에 쥐었으니, 이제 <b>자율 에이전트를 직접 설치</b>합니다. 헤르메스(Hermes Agent)는 상주하며 텔레그램으로 말을 걸 수 있는 오픈소스 에이전트입니다. 이 강의는 <b>시연</b>입니다. 설치를 권하는 것이 아니라, 자율 에이전트를 실행하면 무슨 일이 벌어지는지 실제 화면으로 봅니다. 강사는 헤르메스를 <b>윈도우 PC에 로컬로 설치</b>하고 텔레그램을 연결해 두었습니다. 구조(설치 → 두뇌 → 텔레그램)를 이해한 뒤, 연동된 실제 대화와 "폰에서 시키면 PC에서 실행되는" 장면을 봅니다. 이 에이전트가 ⑦의 투자 위원회를 굴리게 됩니다.</p>
     </div>
 
 
@@ -313,13 +340,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     <!-- ================= SECTION 2 ================= -->
     <section class="section" id="s2">
       <div class="sec-head"><span class="sec-num">2</span><h2>설치 — 내 컴퓨터에</h2></div>
-      <p class="sec-lead">헤르메스는 <b>내 컴퓨터에 설치해</b> 돌립니다. 공식 설치 안내를 따라 해도 되고, 이런 일은 Claude Code에 맡기는 것이 이제 익숙한 방법입니다:</p>
-      <div class="copy-block"><span class="cb-label">💬 프롬프트</span>
-        <button class="copy-btn" data-copy="p61">복사</button>
-        <pre id="p61">Hermes Agent(Nous Research의 오픈소스 에이전트)를 이 컴퓨터에
-설치하려고 해. 공식 문서대로 진행하고, 결정할 게 있으면 물어봐.</pre>
-      </div>
-      <p>설치가 끝나면 터미널에서 <code>hermes</code> 명령으로 실행합니다.</p>
+      <p class="sec-lead">강사의 시연 환경은 <b>윈도우 PC에 로컬 설치</b>한 헤르메스입니다. 설치 과정 자체는 이 수업에서 다루지 않습니다. 해 보고 싶은 사람은 공식 문서를 따라 하거나 Claude Code에 맡기면 되고, 설치하면 터미널의 <code>hermes</code> 명령으로 실행됩니다.</p>
       <div class="callout"><b class="cap">로컬 설치의 특성</b>
       ① 서버 비용 없이 바로 시작하고, 키·대화 기록·데이터가 내 컴퓨터 밖으로 나가지 않습니다 ② 대신 <b>컴퓨터가 켜져 있는 동안만</b> 동작합니다. ⑦에서 루틴을 걸 때는 그 시각에 컴퓨터가 켜져 있어야 합니다 ③ 24시간 상주가 필요해지면 나중에 호스팅 서버로 옮기면 됩니다. <code>~/.hermes/</code> 폴더 구조가 같아서 이사가 어렵지 않습니다.</div>
       <h3>설치 후 내 컴퓨터에 생기는 것 — <code>~/.hermes/</code> 홈 폴더</h3>
@@ -331,7 +352,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
         <div><code>skills/</code></div><div>스킬 폴더 — 3주차에 만든 SKILL.md 구조와 같은 계열이며, 헤르메스는 스스로 스킬을 만들어 여기 저장하기도 합니다</div>
         <div><code>sessions/</code> · <code>logs/</code></div><div>대화 기록과 동작 로그 — 에이전트가 무슨 일을 했는지 확인하는 감사 창구</div>
       </div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>헤르메스를 설치하고 ~/.hermes/ 구조를 파악했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s2" /><span>설치하면 무엇이 생기는지(~/.hermes/ 구조) 파악했다</span></label></div>
     </section>
 
     <!-- ================= SECTION 3 ================= -->
@@ -360,13 +381,13 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       </div>
       <div class="callout"><b class="cap">.env는 내 서버에만</b>
       3주차에는 키를 Vercel의 환경변수에 두었습니다. 헤르메스에서는 <b>키가 내 컴퓨터의 <code>~/.hermes/.env</code>에 놓입니다</b> — 편리하지만, OpenClaw 사고 원인 중 하나가 "평문으로 놓인 비밀"이었음을 기억하세요. 이 파일을 절대 git에 커밋하거나 메신저로 보내지 말고, 에이전트의 작업 폴더 안에 복사해 두지도 마세요(울타리 안의 비밀은 보호 대상이 아니라 작업 대상이 됩니다).</div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>OpenRouter 키를 .env에 넣고 기본 모델을 지정했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>두뇌는 .env의 키와 config.yaml의 모델 지정으로 꽂힌다는 것을 이해했다</span></label></div>
     </section>
 
     <!-- ================= SECTION 4 ================= -->
     <section class="section" id="s4">
       <div class="sec-head"><span class="sec-num">4</span><h2>텔레그램 게이트웨이 — 페어링으로 연결</h2></div>
-      <p class="sec-lead">이제 입을 답니다. 텔레그램 봇을 만들어 헤르메스에 연결하면, 폰에서 말 거는 것만으로 내 서버의 에이전트가 움직입니다.</p>
+      <p class="sec-lead">이제 입을 답니다. 텔레그램 봇을 만들어 헤르메스에 연결하면, 폰에서 말 거는 것만으로 에이전트가 움직입니다. 연결 과정은 이렇습니다:</p>
 
       <div class="ws-steps">
         <div class="workshop-step"><span class="ws-num">1</span>
@@ -399,15 +420,64 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       </div>
 
       <div class="callout ok"><b class="cap">①의 원칙, 두 번째 실물 — 페어링 코드가 곧 human-in-the-loop</b>
-      왜 봇에게 바로 말을 걸 수 없게 해 놓았을까요? 봇 아이디는 사실상 공개 정보라, 승인 절차가 없다면 <b>아무나</b> 내 컴퓨터의 에이전트에게 명령을 보낼 수 있기 때문입니다. 페어링 코드는 "이 사람의 명령만 받는다"를 <b>사람이 직접 승인</b>하는 장치 — ①에서 배운 화이트리스트 + HITL이 실물로 구현된 모습입니다.</div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>텔레그램 봇을 페어링 승인으로 연결하고 게이트웨이를 시작했다</span></label></div>
+      왜 봇에게 바로 말을 걸 수 없게 해 놓았을까요? 봇 아이디는 사실상 공개 정보라, 승인 절차가 없다면 <b>아무나</b> 내 컴퓨터의 에이전트에게 명령을 보낼 수 있기 때문입니다. 페어링 코드는 "이 사람의 명령만 받는다"를 <b>사람이 직접 승인</b>하는 장치 — ⑤에서 배운 화이트리스트 + HITL이 실물로 구현된 모습입니다.</div>
+
+      <h3>연동된 모습 — 실제 첫 대화</h3>
+      <p>연결을 마친 강사의 텔레그램입니다. 매끄러운 데모가 아니라 실제 화면이라 배울 것이 더 많습니다:</p>
+      <div class="tgc">
+        <div class="tg-date"><span>August 21</span></div>
+        <div class="tg-row me"><div class="tg-bub"><span class="tg-link">/start</span><span class="tg-time">오후 8:48 ✓✓</span></div></div>
+        <div class="tg-row"><div class="tg-bub">⚠️ Gateway shutting down — Your current task will be interrupted.<span class="tg-time">오후 8:53</span></div></div>
+        <div class="tg-row me"><div class="tg-bub">안녕?<span class="tg-time">오후 8:54 ✓✓</span></div></div>
+        <div class="tg-row me"><div class="tg-bub">넌 왜 답이 없지?<span class="tg-time">오후 8:54 ✓✓</span></div></div>
+        <div class="tg-row"><div class="tg-bub"><div class="tg-quote"><b>BP Kim</b>넌 왜 답이 없지?</div>↪ Redirected current run (iteration 1/150). I&#39;ll adjust using your correction.<br/><br/>💡 First-time tip — I redirected the current run using your message. Completed work stays in context, and <span class="tg-link">/stop</span> still cancels the task. Send <span class="tg-link">/busy queue</span> to wait for a separate turn, or <span class="tg-link">/busy status</span> to check. This notice won&#39;t appear again.<span class="tg-time">오후 8:54</span></div></div>
+        <div class="tg-row"><div class="tg-bub"><div class="tg-quote"><b>BP Kim</b>안녕?</div>아이고, 미안합니다. 답변이 중간에 끊겨서 전달이 안 됐었네요 🤦<br/><br/>안녕하세요! 저는 Hermes Agent예요. 궁금하신 거나 도와드릴 일 있으면 편하게 말씀해 주세요. 사용 가능한 명령어를 보시려면 <span class="tg-link">/help</span>를 입력하시면 됩니다.<br/><br/>혹시 저를 더 유용하게 쓸 수 있도록 간단한 프로필(예: 어떻게 불러드리면 되는지, 주로 하시는 일, 저를 어떻게 활용하고 싶으신지)을 만들어도 될까요? 꼭 필요한 건 아니고, 부담되시면 안 하셔도 됩니다!<span class="tg-time">오후 8:54</span></div></div>
+      </div>
+      <p class="chart-note">눈여겨볼 것 두 가지. 처음에 답이 없던 이유가 화면에 그대로 남아 있고(게이트웨이 재시작 알림), 작업 중에 새 메시지를 보내면 하던 일에 끼워 넣는다는 안내(Redirected)가 옵니다. 항상 떠 있는 소프트웨어를 데리고 산다는 것의 실제 감촉입니다.</p>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>페어링이 왜 필요한지 알고, 연동된 대화가 어떤 모습인지 보았다</span></label></div>
     </section>
 
     <!-- ================= SECTION 5 ================= -->
     <section class="section" id="s5">
       <div class="sec-head"><span class="sec-num">5</span><h2>첫 대화와 안전 점검</h2></div>
-      <p class="sec-lead">폰을 들고 봇에게 말을 걸어 보세요 — "안녕, 너는 지금 어디서 실행되고 있어?" 응답이 오면, 여러분의 첫 자가 호스팅 에이전트가 깨어난 것입니다.</p>
+      <p class="sec-lead">이제 핵심 장면입니다. 폰에서 "설치가 잘 되었는지 점검"이라고 보내면, 에이전트가 <b>PC에서 명령을 직접 실행</b>하고 결과를 보고합니다. 실제 화면입니다:</p>
+      <div class="tgc">
+        <div class="tg-row me"><div class="tg-bub">hermes agent 설치가 잘 되었는지 점검<span class="tg-time">오후 8:59 ✓✓</span></div></div>
+        <div class="tg-row"><div class="tg-bub">한번 확인해볼게요! 점검 몇 가지 돌려볼게<span class="tg-time">오후 9:00</span></div></div>
+        <div class="tg-row"><div class="tg-bub">🖥 <b>terminal</b>
+          <div class="tg-cmd"><div class="h">shell</div><div class="c">hermes --version 2&gt;&amp;1</div></div>
+          <div class="tg-cmd"><div class="h">shell</div><div class="c">hermes doctor 2&gt;&amp;1</div></div>
+          <div class="tg-cmd"><div class="h">shell</div><div class="c">which hermes &amp;&amp; type hermes</div></div>
+        <span class="tg-time">오후 9:00</span></div></div>
+        <div class="tg-row"><div class="tg-bub"><div class="tg-quote"><b>BP Kim</b>hermes agent 설치가 잘 되었는지 점검</div>전반적으로 <b>설치가 아주 잘 되어 있습니다!</b> ✅ 아래에 주요 내용 정리했어요:<span class="tg-time">오후 9:00</span></div></div>
+      </div>
+      <p class="chart-note">문장 한 줄이 폰을 떠나 PC의 셸 명령 실행으로 이어지고, 어떤 명령을 돌렸는지가 채팅에 투명하게 남습니다. 에이전트가 "도구를 쥔다"는 말의 실물입니다. 아무나 페어링되면 안 되는 이유이자, terminal backend를 docker로 두라는 이유이기도 합니다.</p>
+
+      <h3>대시보드 — 설정은 여기서</h3>
+      <p>터미널에서 <code>hermes dashboard</code>를 실행하면 브라우저(<code>localhost:9119</code>)에서 대시보드가 열립니다. 모델, 루틴(CRON), 스킬, MCP, 페어링, 키까지 꽤 세밀하게 설정할 수 있습니다:</p>
+      <div class="hd">
+        <div class="hd-side"><b>HERMES AGENT</b>
+          <div class="on">&gt;_ CHAT</div><div>💬 SESSIONS</div><div>📁 FILES</div><div>⚙ MODELS</div><div>📄 LOGS</div><div>🕘 CRON</div><div>◆ SKILLS</div><div>🔌 PLUGINS</div><div>⚗ MCP</div><div>📡 CHANNELS</div><div>🪝 WEBHOOKS</div><div>🛡 PAIRING</div><div>👤 PROFILES</div><div>⚙ CONFIG</div><div>🔑 KEYS</div><div>🛠 SYSTEM</div>
+        </div>
+        <div class="hd-main">
+          <div class="hd-url">127.0.0.1:9119/chat</div>
+          <div class="hd-logo">HERMES-AGENT</div>
+          <div class="hd-sub">⚕ Nous Research · Messenger of the Digital Gods</div>
+          <div class="hd-box">
+            <span class="y">Hermes Agent v0.20.4 (2026.8.18)</span><br/>
+            <span class="y">▾ Available Tools</span><br/>
+            browser-use: browser_exec · code_execution: execute_code · cronjob: cronjob<br/>
+            file: patch, read_file, search_files, write_file · memory: memory (and 7 more toolsets…)<br/>
+            <span class="y">▸ Available Skills</span> (72) in 11 categories<br/>
+            24 tools · 72 skills · /help for commands<br/>
+            <span class="o">! 2 commits behind - run hermes update to update</span><br/>
+            deepseek-v4-flash · Nous Research · C:\Users\bpkim · Session: 1652951f
+          </div>
+        </div>
+      </div>
+      <div class="tip-card"><b>써 본 평가</b> — 설정 자유도는 확실히 높습니다. 다만 범용 작업 도구로 쓰기에는 Claude Code(또는 Codex) 쪽이 낫다는 것이 강사의 솔직한 평입니다. 헤르메스의 자리는 "상시 상주 + 메신저 + 루틴"이라는 에이전트 운영 그 자체이고, ⑦에서 그 용도로 씁니다.</div>
       <div class="kv">
+        <div><code>hermes dashboard</code></div><div>브라우저 대시보드 열기 (localhost:9119)</div>
         <div><code>hermes status</code></div><div>에이전트·게이트웨이 동작 상태 확인</div>
         <div><code>hermes doctor</code></div><div>환경 문제 진단 — 뭔가 안 될 때 첫 번째로 실행</div>
         <div><code>hermes version</code></div><div>설치된 버전 확인</div>
@@ -418,7 +488,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <div class="insight"><span class="n">2</span><p><b>페어링은 내 계정 하나만.</b> 가족·친구 계정을 무심코 승인하지 않기. 승인 목록이 곧 화이트리스트입니다.</p></div>
       <div class="insight"><span class="n">3</span><p><b>비밀은 <code>.env</code>에만, 작업 폴더 밖에.</b> 에이전트가 읽고 다니는 폴더에 키·토큰 사본을 두지 않기.</p></div>
       <div class="insight"><span class="n">4</span><p><b>logs/를 가끔 열어 본다.</b> 자율은 무감독이 아닙니다 — 에이전트가 무슨 일을 했는지 확인하는 습관이 마지막 안전장치입니다.</p></div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>텔레그램으로 첫 대화를 나누고 안전 점검 4가지를 확인했다</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>지시 한 줄이 PC 명령 실행으로 이어지는 것과 안전 점검 4가지를 확인했다</span></label></div>
     </section>
 
     <!-- ================= SECTION 6 ================= -->
@@ -426,22 +496,22 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <div class="sec-head"><span class="sec-num">6</span><h2>마무리</h2></div>
       <ul class="final-list">
         <li>헤르메스 = 자가 호스팅 · 상시 상주 · 메신저로 부르는 오픈소스(MIT) 에이전트</li>
-        <li>설치는 내 컴퓨터에 로컬로. 컴퓨터가 켜져 있는 동안 동작하고, 필요해지면 호스팅으로 옮길 수 있다</li>
+        <li>시연 환경은 내 컴퓨터 로컬 설치. 컴퓨터가 켜져 있는 동안 동작하고, 필요해지면 호스팅으로 옮길 수 있다</li>
         <li>두뇌는 OpenRouter로 — 2·3주차의 키 재사용, 키는 .env에만</li>
         <li>텔레그램 연결의 관문은 페어링 코드 — HITL·화이트리스트의 실물</li>
-        <li>terminal backend는 docker — 템플릿에 기본 적용된 "속아도 막히는" 구조를 깨지 않기</li>
+        <li>terminal backend는 docker로. "속아도 막히는" 구조를 직접 챙긴다</li>
       </ul>
       <div class="next-card-grid">
         <div class="next-card"><b>다음 강의 ⑦ — 나의 투자 위원회</b><span>이 에이전트 위에 관점이 다른 봇 셋을 올립니다. 추세·리밸런싱·검증 담당이 포트폴리오를 놓고 토론하고, 주 1회 루틴으로 돌립니다. 결정은 나.</span></div>
-        <div class="next-card"><b>포트폴리오를 물려주기</b><span>②~③에서 만든 시트와 서비스 계정 키를 이 서버가 읽게 해 두면, ⑦의 위원회가 내 실제 배분을 검토할 수 있습니다. 폴더째 공유해 둔 이유가 여기서 쓰입니다.</span></div>
+        <div class="next-card"><b>포트폴리오를 물려주기</b><span>②~③에서 만든 시트와 서비스 계정 키를 이 에이전트가 읽게 해 두면, ⑦의 위원회가 내 실제 배분을 검토할 수 있습니다.</span></div>
       </div>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>헤르메스 설치를 마쳤다!</span></label></div>
+      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s6" /><span>헤르메스 강의를 마쳤다!</span></label></div>
     </section>
 
 
     <a class="back-home" href="index.html">
       <span class="bh-ic">📚</span>
-      <span><strong>4주차 강의자료 목록으로 돌아가기</strong><small>다음 자료: cron 루틴과 대시보드</small></span>
+      <span><strong>4주차 강의자료 목록으로 돌아가기</strong><small>다음 자료: 나의 투자 위원회</small></span>
     </a>
   </main>
 </div>
