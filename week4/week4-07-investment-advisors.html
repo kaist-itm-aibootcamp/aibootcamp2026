@@ -224,6 +224,13 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
 .nt-conn{display:flex;gap:10px;align-items:center;}
 .nt-k{display:grid;place-items:center;width:34px;height:34px;border-radius:8px;background:#2f80de;color:#fff;font-weight:800;font-size:16px;flex:0 0 auto;}
 .nt-conn small{display:block;color:#9b9a97;font-size:11px;line-height:1.4;}
+.nt-sec{font-weight:800;font-size:14px;margin:16px 0 6px;color:#37352f;}
+.nt-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:5px 0;}
+.nt-row b{font-size:13px;}
+.nt-desc{font-size:12px;color:#9b9a97;line-height:1.5;}
+.nt-tog{flex:0 0 auto;width:34px;height:19px;border-radius:999px;background:#2f80de;position:relative;margin-top:2px;}
+.nt-tog::after{content:"";position:absolute;top:2px;right:2px;width:15px;height:15px;border-radius:50%;background:#fff;}
+.nt-btn{flex:0 0 auto;border:1px solid #ececea;border-radius:8px;padding:4px 12px;font-weight:700;font-size:12.5px;box-shadow:0 1px 2px rgba(0,0,0,.05);}
 @media (max-width:700px){.nt-side{display:none;}}
 @media (max-width:700px){.quad{grid-template-columns:1fr;}.dxo-top{flex-direction:column;}.dxo-mid{flex-direction:row;justify-content:center;}}
 @media (max-width:700px){.kv{grid-template-columns:1fr;}.kv > div:nth-child(odd){border-bottom:none;padding-bottom:2px;}.term-list .term{grid-template-columns:1fr;}}
@@ -323,23 +330,14 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <h3>참고 구조 1 — TradingAgents: 트레이딩 회사를 통째로 본뜨다</h3>
       <div class="card">
         <p style="margin-top:0;font-size:14px;"><b>TradingAgents</b>는 실제 트레이딩 회사의 분업을 에이전트로 옮긴 연구 프로젝트입니다(논문 arXiv 2412.20138, 코드는 깃허브 TauricResearch/TradingAgents로 공개). 애널리스트들이 각자 다른 데이터를 분석하고, 강세론자와 약세론자가 토론을 벌인 뒤, 트레이더가 계획을 세우고, 리스크 팀이 다시 논쟁하고, 펀드매니저가 승인합니다:</p>
-        <div class="flowline">
-          <span class="fnode">📊 애널리스트 팀<small>기본적 · 기술적 · 뉴스 · 심리</small></span>
-          <span class="farrow">→</span>
-          <span class="fnode">🗣 리서처 팀<small>강세론자 vs 약세론자 토론</small></span>
-          <span class="farrow">→</span>
-          <span class="fnode">💼 트레이더<small>매매 계획</small></span>
-          <span class="farrow">→</span>
-          <span class="fnode">🛡 리스크 팀<small>공격 · 중립 · 보수 재토론</small></span>
-          <span class="farrow">→</span>
-          <span class="fnode dark">✅ 펀드매니저<small>최종 승인</small></span>
-        </div>
+        <img src="img/tradingagents-schema.png" alt="TradingAgents 구조도: 시장·소셜·뉴스·재무 데이터를 애널리스트가 모으고, 리서처 팀의 강세론자와 약세론자가 토론한 뒤, 트레이더가 제안하고 리스크 관리 팀과 매니저를 거쳐 실행되는 흐름" style="width:100%;height:auto;border:1px solid var(--line);border-radius:10px;margin:10px 0 4px;" />
+        <p class="fig-note">TradingAgents 공식 구조도. 출처: <a href="https://github.com/TauricResearch/TradingAgents" target="_blank" rel="noopener">github.com/TauricResearch/TradingAgents</a></p>
         <p style="font-size:13.5px;color:var(--muted);margin-bottom:0;">핵심은 중간의 두 토론 단계입니다. 낙관과 비관을 각각 맡은 에이전트가 상대의 논거를 반박하게 해서, 한쪽으로 쏠린 결론이 그대로 통과되지 못하게 막습니다.</p>
       </div>
 
       <h3>참고 구조 2 — ai-hedge-fund: 투자 대가들을 자문단으로</h3>
       <div class="card">
-        <p style="margin-top:0;font-size:14px;"><b>ai-hedge-fund</b>(깃허브 virattt/ai-hedge-fund)는 관점을 가르는 다른 방법을 보여주는 오픈소스 교육 프로젝트입니다. 워런 버핏, 벤저민 그레이엄, 캐시 우드, 마이클 버리처럼 알려진 투자자들의 원칙을 각각 에이전트로 만들었습니다. 성향이 정반대인 투자자들이라 같은 종목에도 매수와 매도 신호가 동시에 나오고, 각 에이전트가 신호와 확신도를 내면 리스크 매니저가 한도를 점검하고 포트폴리오 매니저가 종합합니다.</p>
+        <p style="margin-top:0;font-size:14px;"><b>ai-hedge-fund</b>(깃허브 virattt/ai-hedge-fund)는 관점을 가르는 다른 방법을 보여주는 오픈소스 교육 프로젝트로, 지금도 개발이 활발히 이어지고 있습니다. 워런 버핏, 벤저민 그레이엄, 캐시 우드, 마이클 버리처럼 알려진 투자자들의 원칙을 각각 에이전트로 만들었습니다. 성향이 정반대인 투자자들이라 같은 종목에도 매수와 매도 신호가 동시에 나오고, 각 에이전트가 신호와 확신도를 내면 리스크 매니저가 한도를 점검하고 포트폴리오 매니저가 종합합니다.</p>
         <p style="font-size:13.5px;color:var(--muted);margin-bottom:0;">이 프로젝트는 문서 첫머리에 "교육·연구 목적이며 실제 매매는 하지 않는다"를 명시합니다. 우리 자문단과 같은 태도입니다.</p>
       </div>
 
@@ -413,7 +411,6 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
         </tbody>
       </table>
       <p>정반대 제안이 동시에 도착하는 것이 <b>정상 작동</b>입니다. 둘 다 논리가 있고, 어느 논리를 택할지는 내 투자 기간과 성향의 문제입니다.</p>
-      <div class="tip-card"><b>추세와 가치는 사라지지 않았습니다.</b> 역할의 이름이 아니라 분석 도구가 됐습니다. 강세론 담당도 약세론 담당도 추세·가치·뉴스를 모두 보고, 같은 재료에서 반대 논거를 만들어 냅니다. 참조 사례들이 지표가 아니라 관점으로 역할을 가른 것과 같은 설계입니다.</div>
 
       <div class="term-list">
         <div class="term"><b>백테스트</b><span>제안대로 배분했다면 과거 결과가 어땠을지 계산하는 것. asset-manager의 <code>server/portfolio.ts</code>에 이 로직이 이미 들어 있습니다</span></div>
@@ -431,9 +428,36 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
 
       <h3>먼저 — 헤르메스에게 노션 읽기 권한을 준다</h3>
       <p>헤르메스가 노션을 읽으려면 열쇠가 필요합니다. 노션은 이것을 <b>연결(connection)</b>이라고 부릅니다. 강사가 실제로 한 순서입니다:</p>
-      <div class="insight"><span class="n">1</span><p><b>연결 만들기.</b> 노션 사이드바 아래 개발자 영역의 <b>연결</b> 메뉴에서 <b>+ 신규 연결</b>을 눌러 연결을 만듭니다. 만들면 <b>액세스 토큰</b>이 발급됩니다.</p></div>
-      <div class="insight"><span class="n">2</span><p><b>토큰 전달.</b> 발급된 액세스 토큰을 헤르메스 폴더에 저장해 두고, 헤르메스에게 노션은 이 토큰으로 읽으라고 알려줍니다.</p></div>
-      <div class="insight"><span class="n">3</span><p><b>페이지에 권한 주기.</b> <b>자산 현황 일지</b> 페이지의 ⋯ 메뉴 → 연결에서 방금 만든 연결을 추가합니다. 연결은 권한을 받은 페이지(하위 페이지 포함)만 읽을 수 있습니다.</p></div>
+      <div class="insight"><span class="n">1</span><p><b>개발자 기능 켜기.</b> 노션 <b>설정 → 개발자</b>에서 <b>개발자 기능 활성화</b>를 켭니다. 이걸 켜야 사이드바에 개발자 메뉴(연결·개인 액세스 토큰)가 나타납니다.</p></div>
+      <div class="nt">
+        <div class="nt-side">
+          <div class="nt-cap">계정</div>
+          <div class="nt-item">Ⓚ KAIST-ITM</div>
+          <div class="nt-item">⚙ 기본 설정</div>
+          <div class="nt-item">🔔 알림</div>
+          <div class="nt-item">✉ 메일 및 캘린더</div>
+          <div class="nt-cap">워크스페이스</div>
+          <div class="nt-item">⚙ 일반</div>
+          <div class="nt-item">👥 사람</div>
+          <div class="nt-cap">기능</div>
+          <div class="nt-item">✦ Notion AI</div>
+          <div class="nt-item">▦ 연결</div>
+          <div class="nt-item">◈ Notion MCP</div>
+          <div class="nt-item">🌐 공개 페이지</div>
+          <div class="nt-item on">{ } 개발자</div>
+        </div>
+        <div class="nt-main">
+          <div class="nt-h">개발자</div>
+          <div class="nt-row"><span style="font-size:13px;color:#37352f;">Worker, 연결 개발을 위한 기능 활성화</span><span style="color:#2f80de;font-weight:600;font-size:13px;white-space:nowrap;">Open developer tools ↗</span></div>
+          <div class="nt-sec">개발자 UI</div>
+          <div class="nt-row"><span><b>개발자 기능 활성화</b><br/><span class="nt-desc">개발자 툴바, 개발자 메뉴, 개발자 도구에 대한 빠른 사용 권한 등 개발자 UI를 활성화하세요.</span></span><span class="nt-tog"></span></div>
+          <div class="nt-sec">개인 사용 권한 토큰(PAT)</div>
+          <div class="nt-row"><span><b>개인 액세스 토큰 만들기</b> ⓘ<br/><span class="nt-desc">Notion API에 요청을 보내려면 개인 액세스 토큰을 생성하세요. 토큰은 여기에서 관리하세요.</span></span><span class="nt-btn">새 토큰</span></div>
+        </div>
+      </div>
+      <div class="insight"><span class="n">2</span><p><b>연결 만들기.</b> 노션 사이드바 아래 개발자 영역의 <b>연결</b> 메뉴에서 <b>+ 신규 연결</b>을 눌러 연결을 만듭니다. 만들면 <b>액세스 토큰</b>이 발급됩니다.</p></div>
+      <div class="insight"><span class="n">3</span><p><b>토큰 전달.</b> 발급된 액세스 토큰을 헤르메스 폴더에 저장해 두고, 헤르메스에게 노션은 이 토큰으로 읽으라고 알려줍니다.</p></div>
+      <div class="insight"><span class="n">4</span><p><b>페이지에 권한 주기.</b> <b>자산 현황 일지</b> 페이지의 ⋯ 메뉴 → 연결에서 방금 만든 연결을 추가합니다. 연결은 권한을 받은 페이지(하위 페이지 포함)만 읽을 수 있습니다.</p></div>
       <p>연결을 만들고 나면 노션의 개발자 도구 화면에 이렇게 나타납니다:</p>
       <div class="nt">
         <div class="nt-side">
