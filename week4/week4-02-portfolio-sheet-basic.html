@@ -206,6 +206,24 @@ p{margin:10px 0;}
 .workshop-step b.ws-t{display:block;font-size:14.5px;margin-bottom:4px;}
 .workshop-step p{font-size:14px;color:var(--muted);margin:4px 0;}
 .workshop-step code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.5px;}
+/* browser window skin */
+.bwin{border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);margin:12px 0;}
+.bwin-bar{display:flex;align-items:center;gap:10px;background:#e9ecef;padding:8px 12px;border-bottom:1px solid #dcdfe3;}
+.bwin-dots{display:flex;gap:5px;flex:0 0 auto;}
+.bwin-dots span{display:block;width:11px;height:11px;border-radius:50%;}
+.bwin-url{flex:1;max-width:340px;background:#fff;border:1px solid #dcdfe3;border-radius:999px;padding:3px 14px;font-size:12px;color:#444;font-family:ui-monospace,Consolas,monospace;}
+.bwin .pfapp{border:none;border-radius:0;box-shadow:none;margin:0;}
+/* architecture diagram */
+.arch{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;}
+.arch .ab{flex:1;min-width:150px;border:1px solid #c9e2f5;background:var(--sky-light);border-radius:10px;padding:11px 13px;text-align:center;font-size:13px;font-weight:800;color:var(--brand-dark);line-height:1.4;}
+.arch .ab small{display:block;font-size:11.5px;font-weight:600;color:var(--muted);}
+.arch .ab.dark{background:#20242a;border-color:#20242a;color:#fff;}
+.arch .ab.dark small{color:#aab4c0;}
+.arch .aarr{flex:0 0 auto;color:var(--muted);font-weight:900;font-size:13px;text-align:center;line-height:1.3;}
+.arch .aarr small{display:block;font-size:10.5px;font-weight:700;}
+.arch .acol{display:flex;flex-direction:column;gap:8px;flex:1;min-width:170px;}
+.arch .acol .ab{min-width:0;}
+@media (max-width:700px){.arch{flex-direction:column;align-items:stretch;}.arch .aarr{transform:rotate(90deg);}}
 .pfapp{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin:12px 0;padding:18px 22px;font-size:13px;color:#1f2320;}
 .pfapp .pf-kicker{font-size:10.5px;font-weight:800;letter-spacing:.1em;color:#8a857e;}
 .pfapp .pf-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
@@ -389,6 +407,8 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <p>아래는 실제로 돌아가는 화면입니다(2026.08.21 기준, 로컬 실행).</p>
 
       <h4 style="margin:18px 0 6px;font-size:15px;">① 현황 탭 — 지금 내 자산이 어떤 상태인가</h4>
+      <div class="bwin">
+        <div class="bwin-bar"><div class="bwin-dots"><span style="background:#ff5f57"></span><span style="background:#febc2e"></span><span style="background:#28c840"></span></div><div class="bwin-url">localhost:5173</div></div>
       <div class="pfapp">
         <div class="pf-head"><div><div class="pf-kicker">PORTFOLIO</div><b>자산 관리</b><div class="pf-sub">구글 시트 스냅샷 장부 · 시세 Yahoo Finance · 2026.08.21 종가 기준</div></div><span class="pf-btn">새로고침</span></div>
         <div class="pf-tabs"><span class="on">현황</span><span>리밸런싱</span><span>백테스트</span></div>
@@ -406,7 +426,8 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
           <div style="width:60%;background:#2e6fd6;">S&amp;P500 60%</div><div style="width:20%;background:#e2703a;">금현물 20%</div><div style="width:10%;background:#2f9e6e;">CD금리 10%</div><div style="width:10%;background:#e0a52e;"></div></div></div>
         <div class="pf-note">아래로 보유 종목 표가 이어집니다. 종목마다 보유량 · 평균매입가 · 현재가 · 평가액 · 평가손익 · 비중이 한 줄씩입니다.</div>
       </div>
-      <p>시트의 스냅샷(수량·매입가)에 야후 파이낸스의 종가를 붙여 계산합니다. 요약 타일, 투입액 대비 추이, 현재와 목표 배분의 비교, 보유 종목 표까지가 한 화면입니다.</p>
+      </div>
+      <p>주소창의 <code>localhost:5173</code>이 보여주듯 이 앱은 인터넷이 아니라 <b>내 컴퓨터 안에서만</b> 돌고 있습니다. 어떤 구조로 도는지는 §4에서 그림으로 봅니다. 시트의 스냅샷(수량·매입가)에 야후 파이낸스의 종가를 붙여 계산합니다. 요약 타일, 투입액 대비 추이, 현재와 목표 배분의 비교, 보유 종목 표까지가 한 화면입니다.</p>
 
       <h4 style="margin:18px 0 6px;font-size:15px;">② 리밸런싱 탭 — 지금 조정해야 하는가</h4>
       <div class="pfapp">
@@ -464,6 +485,29 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
         <span class="fnode">대시보드<small>주소(.env)로 읽어 표시</small></span>
       </div>
       <p>①의 커넥터가 "Claude 대화가 내 데이터에 닿는 길"이었다면, 오늘 것은 <b>"내 프로그램이 내 데이터에 닿는 길"</b>입니다. 같은 시트에 사람·대화·프로그램이 각자의 길로 닿습니다. 이것이 시트를 장부로 쓰는 힘입니다.</p>
+
+      <h3>실행되는 구조 — 화면 뒤에서 무엇이 도는가</h3>
+      <p>관리기는 한 덩어리가 아니라 <b>화면과 서버 둘</b>로 나뉘어 내 컴퓨터에서 함께 돕니다:</p>
+      <div class="arch">
+        <span class="ab">🖥 내 브라우저<small>localhost:5173 · 화면 표시</small></span>
+        <span class="aarr">⇄<small>요청 / 결과</small></span>
+        <span class="ab dark">⚙ 로컬 서버<small>내 컴퓨터에서 실행 · 읽기와 계산</small></span>
+        <span class="aarr">→<small>읽기 전용</small></span>
+        <span class="acol">
+          <span class="ab">📊 구글 시트<small>장부 · .env의 주소로 읽기</small></span>
+          <span class="ab">📈 야후 파이낸스<small>현재가와 과거 시세</small></span>
+        </span>
+      </div>
+      <p>새로고침 한 번에 일어나는 데이터의 흐름은 이렇습니다:</p>
+      <div class="insight"><span class="n">1</span><p>브라우저의 화면이 로컬 서버에 "현황을 달라"고 요청합니다.</p></div>
+      <div class="insight"><span class="n">2</span><p>서버가 <code>.env</code>의 주소로 구글 시트에서 스냅샷(수량·매입가)을, 야후 파이낸스에서 시세를 읽어 옵니다.</p></div>
+      <div class="insight"><span class="n">3</span><p>서버가 평가액·비중·리밸런싱·백테스트를 계산해 결과만 브라우저로 돌려줍니다.</p></div>
+      <div class="insight"><span class="n">4</span><p>브라우저가 결과를 표와 차트로 그립니다. 장부의 원본은 복사되지 않고 시트에 그대로 있습니다.</p></div>
+      <div class="term-list">
+        <div class="term"><b>localhost</b><span>"내 컴퓨터"를 가리키는 주소입니다. 이 주소인 동안 앱은 나만 볼 수 있고, 인터넷에 공개되지 않습니다.</span></div>
+        <div class="term"><b>5173</b><span>이 앱에 배정된 포트 번호입니다. 한 컴퓨터에서 여러 프로그램이 통신할 수 있도록 프로그램마다 다른 번호를 씁니다.</span></div>
+      </div>
+      <div class="tip-card"><b>서버를 어떤 기술로 만들었는지는 세부사항입니다.</b> 어떤 언어와 프레임워크로 짜였는지는 이용자 입장에서 알 필요가 없고, 궁금해지면 그때 공부하면 됩니다. 지금 필요한 것은 이 그림의 구조입니다. 화면과 계산이 분리되어 있고, 장부는 시트에 있습니다.</div>
       <div class="callout"><b class="cap">찜찜한 점 — 어느 쪽 권한이든 아쉽다</b>
       지금 이 시트는 주소만 알면 누구나 볼 수 있는 상태입니다. 예시 숫자라 괜찮았지, 실제 자산 내역이라면 곤란합니다. 권한을 어느 쪽으로 두어도 아쉬움이 남습니다. <b>읽기(뷰어) 권한만 줬다면</b> 앱이 시트를 수정할 수 없고, <b>편집 권한도 준다면</b> 주소를 아는 누구나 고칠 수 있는 문제가 그대로입니다. 다음 강의 ③에서 시트를 <b>다시 비공개로 잠그고</b>, 프로그램에게만 열쇠를 주는 방식(서비스 계정)으로 격상합니다. 관리기는 그대로 두고 문단속만 바꿉니다.</div>
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s4" /><span>사람·대화·프로그램이 같은 장부에 닿는 구조와 링크 공유의 한계를 이해했다</span></label></div>
