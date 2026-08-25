@@ -241,12 +241,11 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
   <nav class="sidebar" aria-label="목차">
     <div class="sidebar-title">이 페이지의 흐름</div>
     <div class="toc" id="toc">
-      <a href="#s1" data-sec="s1">1. 문제 — AI는 내 데이터를 모른다<span class="done-mark">✔</span></a>
+      <a href="#s1" data-sec="s1">1. 문제<span class="done-mark">✔</span></a>
       <a href="#s2" data-sec="s2">2. MCP — 연결 방법의 표준 규격<span class="done-mark">✔</span></a>
       <a href="#s3" data-sec="s3">3. Claude의 커넥터 = MCP 서버<span class="done-mark">✔</span></a>
       <a href="#s4" data-sec="s4">4. 실습 — Drive 커넥터로 내 시트 분석하기<span class="done-mark">✔</span></a>
-      <a href="#s5" data-sec="s5">5. 커넥터의 한계, 그리고 오늘의 질문<span class="done-mark">✔</span></a>
-      <a href="#s6" data-sec="s6">6. 마무리 — 이번 주의 지도<span class="done-mark">✔</span></a>
+      <a href="#s6" data-sec="s6">5. 마무리 — 이번 주의 지도<span class="done-mark">✔</span></a>
     </div>
   </nav>
 
@@ -262,9 +261,9 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
 
     <!-- ================= SECTION 1 ================= -->
     <section class="section" id="s1">
-      <div class="sec-head"><span class="sec-num">1</span><h2>문제 — AI는 내 데이터를 모른다</h2></div>
-      <p class="sec-lead">Claude에게 "내 포트폴리오 지금 어떻게 돼 있지?"라고 물으면 답하지 못합니다. 그 데이터는 여러분의 구글 시트에 있고, AI는 거기 접근할 수 없기 때문입니다.</p>
-      <p>지금까지의 해결책은 <b>파일을 대화에 업로드</b>하는 것이었습니다. 그런데 일일이 올릴 수 없는 상황이 오면 한계가 드러납니다:</p>
+      <div class="sec-head"><span class="sec-num">1</span><h2>문제</h2></div>
+      <p class="sec-lead">Claude에게 "내 포트폴리오 지금 어떻게 돼 있지?"라고 묻는다고 해 봅시다. 이런 질문에 답하게 하려면 어떻게 해야 할까요.</p>
+      <p>일반적인 해결책은 <b>파일을 대화에 업로드</b>하는 것입니다. 그런데 일일이 올릴 수 없는 상황이 오면 한계가 드러납니다:</p>
       <div class="concept-grid">
         <div class="concept"><div class="ico">🔁</div><b>매번 업로드</b><span>데이터가 바뀔 때마다 사람이 다시 올려야 합니다. "연결"이 아니라 "배달"입니다.</span></div>
         <div class="concept"><div class="ico">📏</div><b>양의 한계</b><span>시트 수십 장, 메일 수백 통을 일일이 올릴 수는 없습니다. AI가 필요한 부분을 스스로 찾아 읽어야 합니다.</span></div>
@@ -334,7 +333,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
       <div class="ws-steps">
         <div class="workshop-step"><span class="ws-num">1</span>
           <b class="ws-t">연습용 시트 만들기</b>
-          <p>구글 시트를 새로 만들어 간단한 표를 입력합니다. 예: 이번 달 지출 내역(날짜·항목·금액 10행). ②에서 쓸 <b>포트폴리오 표</b>(자산·수량·매입가)를 미리 만들어 봐도 좋습니다. 실제 민감 정보는 넣지 마세요.</p>
+          <p>구글 시트를 새로 만들어 간단한 표를 입력합니다. 예: 이번 달 지출 내역(날짜·항목·금액 10행). ②에서 쓸 <b>포트폴리오 표</b>(자산·수량·매입가)를 미리 만들어 봐도 좋습니다.</p>
         </div>
         <div class="workshop-step"><span class="ws-num">2</span>
           <b class="ws-t">Google Drive 커넥터 켜기</b>
@@ -344,7 +343,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
           <b class="ws-t">대화로 분석 요청</b>
           <div class="copy-block"><span class="cb-label">💬 프롬프트</span>
             <button class="copy-btn" data-copy="p42">복사</button>
-            <pre id="p42">내 구글 드라이브에서 "[시트 제목]" 시트를 찾아 읽고,
+            <pre id="p42">내 구글 드라이브에서 [시트 제목] 시트를 찾아 읽고,
 어떤 내용인지 요약한 다음 눈에 띄는 점을 알려줘.</pre>
           </div>
           <p>파일을 업로드한 적이 없는데 Claude가 시트 내용을 정확히 읽어 옵니다. 시트를 수정하고 같은 질문을 다시 하면 <b>바뀐 내용이 반영</b>됩니다. 배달이 아니라 연결이기 때문입니다.</p>
@@ -356,28 +355,8 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
     </section>
 
     <!-- ================= SECTION 5 ================= -->
-    <section class="section" id="s5">
-      <div class="sec-head"><span class="sec-num">5</span><h2>커넥터의 한계, 그리고 오늘의 질문</h2></div>
-      <p class="sec-lead">커넥터는 강력하지만, 지금 우리가 만들려는 것, 즉 남에게 서비스하는 웹앱에는 그대로 쓸 수 없습니다.</p>
-
-      <table class="step-table">
-        <thead><tr><th></th><th>커넥터 (지금 한 것)</th><th>프로그램의 데이터 연동 (②~③에서 다룰 것)</th></tr></thead>
-        <tbody>
-          <tr><td><b>어디서 동작</b></td><td>Claude 대화 안</td><td>내가 배포한 웹앱 안</td></tr>
-          <tr><td><b>누가 쓰나</b></td><td>연결한 나 자신</td><td>URL을 아는 누구나</td></tr>
-          <tr><td><b>형태</b></td><td>질문–답변 (대화형)</td><td>화면·차트·버튼 (서비스형)</td></tr>
-          <tr><td><b>갱신</b></td><td>물어볼 때마다</td><td>자동 (폴링·실시간)</td></tr>
-          <tr><td><b>알맞은 용도</b></td><td>내 데이터의 분석·정리·탐색</td><td>여러 사람이 함께 쓰는 도구</td></tr>
-        </tbody>
-      </table>
-
-      <p>즉 커넥터는 "<b>나의</b> 데이터 작업"의 도구입니다. 내가 만든 프로그램이 시트를 직접 읽고 쓰게 하려면 다른 길이 필요합니다. 그 길로 ②~③에서 <b>포트폴리오 관리기</b>를 만듭니다.</p>
-      <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s5" /><span>커넥터(대화형)와 웹앱 연동(서비스형)의 차이를 설명할 수 있다</span></label></div>
-    </section>
-
-    <!-- ================= SECTION 6 ================= -->
     <section class="section" id="s6">
-      <div class="sec-head"><span class="sec-num">6</span><h2>마무리 — 이번 주의 지도</h2></div>
+      <div class="sec-head"><span class="sec-num">5</span><h2>마무리 — 이번 주의 지도</h2></div>
       <p class="sec-lead">이번 주 내내 이 연결 위에 하나의 예제인 <b>내 포트폴리오</b>를 쌓아 갑니다.</p>
       <ul class="final-list">
         <li><b>②~③ 구글 시트</b> — 시트를 데이터베이스 삼아 포트폴리오 관리기를 만들고, 연결 방식을 서비스 계정으로 격상합니다</li>
