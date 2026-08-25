@@ -468,7 +468,7 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
         <div class="pf-chart">📈 시뮬레이션 자산 추이 (2016.08 ~ 2026.08) : 10년 전 1,000만원을 이 배분으로 굴렸을 때의 곡선과 리밸런싱 시점들이 표시됩니다.</div>
         <div class="pf-note"><b>백필 근거</b> — ETF 상장 이전 구간은 프록시의 일간 수익률을 상장일 가격에 접합해 채웠습니다: CD금리(2023.06 이전)는 CD 91일 금리 누적(근사), S&amp;P500(2021.04 이전)은 S&amp;P500 총수익 × 원/달러, 금현물(2021.12 이전)은 국제 금가격 × 원/달러, 달러SOFR(2023.05 이전)은 미국 단기금리 × 원/달러.</div>
       </div>
-      <p>기간과 밴드를 슬라이더로 바꿔 가며 실험할 수 있습니다. 그 근거를 화면 아래에 스스로 밝혀 둔 것, 그리고 근사치를 쓴 구간은 파일을 고쳐 덮어쓸 수 있게 한 것까지가 AI의 작업입니다. 과거 데이터는 로컬에 저장됩니다.</p>
+      <p>기간과 밴드를 슬라이더로 바꿔 가며 실험할 수 있습니다. 그 근거를 화면 아래에 스스로 밝혀 둔 것, 그리고 근사치를 쓴 구간은 파일을 고쳐 덮어쓸 수 있게 한 것까지가 AI의 작업입니다. 과거 데이터는 내 컴퓨터 하드디스크에 저장됩니다.</p>
 
       <div class="completion-row"><label class="check"><input type="checkbox" data-progress="s3" /><span>계획 문답을 거쳐 대시보드가 뜨고, 시트 수정이 화면에 반영됐다</span></label></div>
     </section>
@@ -495,13 +495,13 @@ code{background:#f0f3ee;border:1px solid var(--line);border-radius:5px;padding:1
         <span class="aarr">→<small>읽기 전용</small></span>
         <span class="acol">
           <span class="ab">📊 구글 시트<small>장부 · .env의 주소로 읽기</small></span>
-          <span class="ab">📈 야후 파이낸스<small>현재가와 과거 시세 · 받아온 값은 로컬에 저장</small></span>
+          <span class="ab">📈 야후 파이낸스<small>현재가와 과거 시세 · 받아온 값은 내 컴퓨터 하드디스크에 저장</small></span>
         </span>
       </div>
       <p>새로고침 한 번에 일어나는 데이터의 흐름은 이렇습니다:</p>
       <div class="insight"><span class="n">1</span><p>브라우저의 화면이 로컬 서버에 "현황을 달라"고 요청합니다.</p></div>
       <div class="insight"><span class="n">2</span><p>서버가 <code>.env</code>의 주소로 구글 시트에서 스냅샷(수량·매입가)을, 야후 파이낸스에서 시세를 읽어 옵니다.</p></div>
-      <div class="insight"><span class="n">3</span><p>읽어 온 시세는 <b>내 컴퓨터에 파일로 저장</b>됩니다(캐시). 다음 새로고침 때는 저장된 값을 먼저 쓰고, 오래된 경우에만 다시 받아 옵니다.</p></div>
+      <div class="insight"><span class="n">3</span><p>읽어 온 시세는 <b>내 컴퓨터 하드디스크에 파일로 저장</b>됩니다(캐시). 다음 새로고침 때는 저장된 값을 먼저 쓰고, 오래된 경우에만 다시 받아 옵니다.</p></div>
       <div class="insight"><span class="n">4</span><p>서버가 평가액·비중·리밸런싱·백테스트를 계산해 결과만 브라우저로 돌려줍니다.</p></div>
       <div class="insight"><span class="n">5</span><p>브라우저가 결과를 표와 차트로 그립니다. 장부의 원본은 복사되지 않고 시트에 그대로 있습니다.</p></div>
       <div class="term-list">
